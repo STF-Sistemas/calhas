@@ -1,0 +1,31 @@
+<section class="page-section" aria-labelledby="desenhos-title">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="page-header">
+    <div class="page-header__info">
+      <div class="page-header__title-row">
+        <div class="page-header__icon">
+          <i class="pi pi-pen-to-square"></i>
+        </div>
+        <div>
+          <h1 id="desenhos-title" class="page-header__title">Desenhos</h1>
+          <p class="page-header__subtitle">Cadastre os perfis de corte utilizados na fabricação.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-data-table
+    title="Desenhos Cadastrados"
+    [data]="desenhos"
+    [columns]="cols"
+    [loading]="loading"
+    [globalFilterFields]="['descricao']"
+    (add)="onAdd()"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)">
+  </app-data-table>
+
+  <app-desenho-form #form (saved)="carregarDesenhos()"></app-desenho-form>
+</section>

@@ -1,0 +1,93 @@
+<div class="layout-wrapper" [ngClass]="{
+    'layout-static-inactive': !sidebarVisible() && !isMobile(),
+    'layout-mobile-active': sidebarVisible() && isMobile(),
+    'app-dark': themeService.isDarkMode()
+}">
+  <!-- Topbar -->
+  <header class="layout-topbar">
+    <a class="layout-topbar-logo" routerLink="/" aria-label="Página Inicial">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" style="width: 36px; height: 36px; flex-shrink: 0; border-radius: 8px;">
+        <rect width="32" height="32" rx="7" style="fill: var(--p-primary)"/>
+        <path d="M5 12 L5 18 Q5 27 16 27 Q27 27 27 18 L27 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <line x1="5" y1="12" x2="5" y2="10" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        <line x1="27" y1="12" x2="27" y2="10" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="12" cy="5.5" r="1.3" fill="white" opacity="0.75"/>
+        <circle cx="16" cy="4" r="1.4" fill="white"/>
+        <circle cx="20" cy="5.5" r="1.3" fill="white" opacity="0.75"/>
+      </svg>
+      <span class="text-xl font-bold text-900">Calhas Pro</span>
+    </a>
+
+    <button class="p-link layout-topbar-button layout-menu-button ml-3" (click)="toggleSidebar()" aria-label="Abrir/Fechar Menu">
+      <i class="pi pi-bars text-xl"></i>
+    </button>
+
+    <div class="layout-topbar-menu">
+      <button class="p-link layout-topbar-button" (click)="themeService.toggleTheme()"
+        [pTooltip]="themeService.isDarkMode() ? 'Modo Claro' : 'Modo Escuro'"
+        [attr.aria-label]="themeService.isDarkMode() ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'">
+        <i [class]="themeService.isDarkMode() ? 'pi pi-sun' : 'pi pi-moon'"></i>
+      </button>
+
+      <button class="p-link layout-topbar-button" (click)="colorMenu.toggle($event)"
+        pTooltip="Cor do Sistema" aria-label="Selecionar Cor do Sistema">
+        <i class="pi pi-palette"></i>
+      </button>
+      <p-menu #colorMenu [model]="colorMenuItems" [popup]="true"></p-menu>
+
+      <button class="p-link layout-topbar-button" pTooltip="Notificações" aria-label="Notificações">
+        <i class="pi pi-bell"></i>
+      </button>
+      <button class="p-link layout-topbar-button" (click)="profileMenu.toggle($event)"
+        pTooltip="Meu Perfil" aria-label="Meu Perfil">
+        <i class="pi pi-user"></i>
+      </button>
+      <p-menu #profileMenu [model]="profileMenuItems" [popup]="true"></p-menu>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="layout-sidebar">
+    <nav class="layout-menu mt-2" aria-label="Menu Principal">
+      <ul class="list-none p-0 m-0">
+        @for (group of getFilteredGroups(); track group.label) {
+          <li class="layout-menuitem-root-text">{{ group.label }}</li>
+          @for (item of group.items; track item.label) {
+            <li>
+              <a pRipple [routerLink]="item.routerLink" routerLinkActive="active-route"
+                (click)="isMobile() && sidebarVisible.set(false)"
+                [attr.aria-label]="item.label">
+                <i [class]="item.icon"></i>
+                <span>{{ item.label }}</span>
+              </a>
+            </li>
+          }
+        }
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Container -->
+  <div class="layout-main-container">
+    <main class="layout-main fade-in">
+      <router-outlet></router-outlet>
+    </main>
+
+    <footer class="layout-footer py-4 border-top-1 border-surface-200 mt-6">
+      <div class="flex flex-column md:flex-row align-items-center justify-content-between gap-3">
+        <span class="text-600 text-sm">
+          © {{ currentYear }} <a href="https://www.sistemastecnologiafuturo.com.br" target="_blank"
+            rel="noopener noreferrer" class="font-bold text-primary no-underline hover:underline">Sistemas de Tecnologia do Futuro</a>
+        </span>
+        <div class="flex align-items-center gap-3">
+          <i class="pi pi-facebook text-600 cursor-pointer hover:text-primary transition-colors" aria-hidden="true"></i>
+          <i class="pi pi-instagram text-600 cursor-pointer hover:text-primary transition-colors" aria-hidden="true"></i>
+          <i class="pi pi-github text-600 cursor-pointer hover:text-primary transition-colors" aria-hidden="true"></i>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Mask mobile -->
+  <div class="layout-mask" (click)="sidebarVisible.set(false)" aria-hidden="true"></div>
+</div>

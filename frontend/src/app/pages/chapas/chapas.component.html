@@ -1,0 +1,33 @@
+<section class="page-section" aria-labelledby="chapas-title">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="page-header">
+    <div class="page-header__info">
+      <div class="page-header__title-row">
+        <div class="page-header__icon">
+          <i class="pi pi-th-large"></i>
+        </div>
+        <div>
+          <h1 id="chapas-title" class="page-header__title">Gestão de Chapas</h1>
+          <p class="page-header__subtitle">Cadastre as chapas disponíveis e seus respectivos cortes de fabricação.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-data-table
+    title="Chapas Cadastradas"
+    [data]="chapas"
+    [columns]="cols"
+    [loading]="loading"
+    [globalFilterFields]="['descricao', 'material']"
+    [showToggleStatus]="true"
+    (add)="onAdd()"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)"
+    (toggleStatus)="onToggleStatus($event)">
+  </app-data-table>
+
+  <app-chapa-form #form (saved)="carregarChapas()"></app-chapa-form>
+</section>

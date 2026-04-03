@@ -1,0 +1,266 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["util", "conf", "calhas"]
+}
+
+// =============================================
+// SCHEMA: util
+// =============================================
+
+model Tipo {
+  id        Int    @id @default(autoincrement())
+  descricao String @db.VarChar(50)
+
+  @@map("tipos")
+  @@schema("util")
+}
+
+// =============================================
+// SCHEMA: conf
+// =============================================
+
+model Usuario {
+  id           Int      @id @default(autoincrement())
+  nome         String   @db.VarChar(150)
+  email        String   @unique @db.VarChar(200)
+  senha        String   @db.VarChar(255)
+  status       Int      @default(1)
+  data_criacao DateTime @default(now())
+  admin        Boolean  @default(false)
+  super_admin  Boolean  @default(false)
+  cod_empresa  Int?
+  excluido     Boolean  @default(false)
+
+  empresa Empresa? @relation(fields: [cod_empresa], references: [id])
+
+  @@map("usuarios")
+  @@schema("conf")
+}
+
+// =============================================
+// SCHEMA: calhas
+// =============================================
+
+model Cidade {
+  id          Int    @id @default(autoincrement())
+  descricao   String @db.VarChar(150)
+  uf          String @db.VarChar(2)
+  codigo_ibge String @db.VarChar(10)
+
+  empresas Empresa[]
+  clientes Cliente[]
+
+  @@map("cidades")
+  @@schema("calhas")
+}
+
+model Empresa {
+  id             Int       @id @default(autoincrement())
+  razao_social   String    @db.VarChar(200)
+  nome_fantasia  String?   @db.VarChar(200)
+  cnpj           String    @unique @db.VarChar(20)
+  email          String?   @db.VarChar(200)
+  telefone       String?   @db.VarChar(20)
+  data_expiracao DateTime?
+  ativo          Int       @default(1)
+  excluido       Boolean   @default(false)
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+  cep            String?   @db.VarChar(10)
+  endereco       String?   @db.VarChar(200)
+  numero         String?   @db.VarChar(10)
+  bairro         String?   @db.VarChar(100)
+  complemento    String?   @db.VarChar(100)
+  marca_dagua    String?   @db.VarChar(250)
+  cod_cidade     Int?
+
+  cidade          Cidade?          @relation(fields: [cod_cidade], references: [id])
+  usuarios        Usuario[]
+  clientes        Cliente[]
+  produtos        Produto[]
+  chapas          Chapa[]
+  servicos        Servico[]
+  pedidos         Pedido[]
+  desenhos        Desenho[]
+  meios_pagamento MeioPagamento[]
+
+  @@map("empresas")
+  @@schema("calhas")
+}
+
+model Cliente {
+  id            Int      @id @default(autoincrement())
+  cod_empresa   Int
+  razao_social  String   @db.VarChar(200)
+  nome_fantasia String?  @db.VarChar(200)
+  cpf_cnpj      String?  @db.VarChar(20)
+  email         String?  @db.VarChar(200)
+  telefone      String?  @db.VarChar(20)
+  ativo         Int      @default(1)
+  excluido      Boolean  @default(false)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  cep           String?  @db.VarChar(10)
+  endereco      String?  @db.VarChar(200)
+  numero        String?  @db.VarChar(10)
+  bairro        String?  @db.VarChar(100)
+  complemento   String?  @db.VarChar(100)
+  cod_cidade    Int?
+  observacoes   String?  @db.Text
+
+  empresa Empresa  @relation(fields: [cod_empresa], references: [id])
+  cidade  Cidade?  @relation(fields: [cod_cidade], references: [id])
+  pedidos Pedido[]
+
+  @@map("clientes")
+  @@schema("calhas")
+}
+
+model Produto {
+  id             Int     @id @default(autoincrement())
+  cod_empresa    Int
+  descricao      String  @db.VarChar(200)
+  unidade_medida String  @db.VarChar(10)
+  valor_unitario Decimal @db.Decimal(10, 4)
+  status         Int     @default(1)
+  excluido       Boolean @default(false)
+
+  empresa       Empresa      @relation(fields: [cod_empresa], references: [id])
+  pedidos_itens PedidoItem[]
+
+  @@map("produtos")
+  @@schema("calhas")
+}
+
+model Chapa {
+  id          Int     @id @default(autoincrement())
+  cod_empresa Int
+  descricao   String  @db.VarChar(200)
+  status      Int     @default(1)
+  excluido    Boolean @default(false)
+
+  empresa Empresa @relation(fields: [cod_empresa], references: [id])
+  cortes  Corte[]
+
+  @@map("chapas")
+  @@schema("calhas")
+}
+
+model Corte {
+  id        Int     @id @default(autoincrement())
+  cod_chapa Int
+  descricao String  @db.VarChar(200)
+  corte     Decimal @db.Decimal(10, 4)
+  valor     Decimal @db.Decimal(10, 4)
+  status    Int     @default(1)
+  excluido  Boolean @default(false)
+
+  chapa         Chapa        @relation(fields: [cod_chapa], references: [id])
+  pedidos_itens PedidoItem[]
+
+  @@map("cortes")
+  @@schema("calhas")
+}
+
+model Servico {
+  id          Int     @id @default(autoincrement())
+  cod_empresa Int
+  descricao   String  @db.VarChar(200)
+  valor       Decimal @db.Decimal(10, 4)
+  status      Int     @default(1)
+  excluido    Boolean @default(false)
+
+  empresa       Empresa      @relation(fields: [cod_empresa], references: [id])
+  pedidos_itens PedidoItem[]
+
+  @@map("servicos")
+  @@schema("calhas")
+}
+
+model Pedido {
+  id                 Int      @id @default(autoincrement())
+  cod_empresa        Int
+  cod_cliente        Int
+  cod_meio_pagamento Int?
+  data_pedido        DateTime @default(now())
+  status             Int      @default(6)
+  valor_material     Decimal  @default(0) @db.Decimal(10, 4)
+  valor_servico      Decimal  @default(0) @db.Decimal(10, 4)
+  valor_total        Decimal  @default(0) @db.Decimal(10, 4)
+  observacoes        String?  @db.Text
+  excluido           Boolean  @default(false)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  empresa         Empresa        @relation(fields: [cod_empresa], references: [id])
+  cliente         Cliente        @relation(fields: [cod_cliente], references: [id])
+  meio_pagamento  MeioPagamento? @relation(fields: [cod_meio_pagamento], references: [id])
+  itens           PedidoItem[]
+
+  @@map("pedidos")
+  @@schema("calhas")
+}
+
+model MeioPagamento {
+  id          Int     @id @default(autoincrement())
+  cod_empresa Int
+  descricao   String  @db.VarChar(200)
+  ativo       Int     @default(1)
+  excluido    Boolean @default(false)
+
+  empresa Empresa  @relation(fields: [cod_empresa], references: [id])
+  pedidos Pedido[]
+
+  @@map("meios_pagamento")
+  @@schema("calhas")
+}
+
+model Desenho {
+  id          Int      @id @default(autoincrement())
+  cod_empresa Int
+  descricao   String   @db.VarChar(200)
+  pontos      Json     @default("[]")
+  status      Int      @default(1)
+  excluido    Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  empresa       Empresa      @relation(fields: [cod_empresa], references: [id])
+  pedidos_itens PedidoItem[]
+
+  @@map("desenhos")
+  @@schema("calhas")
+}
+
+model PedidoItem {
+  id             Int     @id @default(autoincrement())
+  cod_pedido     Int
+  cod_produto    Int?
+  cod_servico    Int?
+  cod_corte      Int?
+  cod_desenho    Int?
+  tipo           Int     @default(1)
+  quantidade     Decimal @db.Decimal(10, 4)
+  valor_unitario Decimal @db.Decimal(10, 4)
+  valor_total    Decimal @db.Decimal(10, 4)
+  observacoes    String? @db.Text
+  medidas        Json?
+
+  pedido  Pedido   @relation(fields: [cod_pedido], references: [id], onDelete: Cascade)
+  produto Produto? @relation(fields: [cod_produto], references: [id])
+  servico Servico? @relation(fields: [cod_servico], references: [id])
+  corte   Corte?   @relation(fields: [cod_corte], references: [id])
+  desenho Desenho? @relation(fields: [cod_desenho], references: [id])
+
+  @@map("pedidos_itens")
+  @@schema("calhas")
+}

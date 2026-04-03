@@ -1,0 +1,46 @@
+<app-dialog-wrapper
+  [(visible)]="visible"
+  [title]="produtoId ? 'Editar Produto' : 'Novo Produto'"
+  [isLoadingData]="isLoadingData"
+  [isSaving]="isSaving"
+  [saveDisabled]="false"
+  width="500px"
+  (save)="onSave()">
+
+  <form [formGroup]="form" class="p-fluid">
+
+    <h3 class="section-title">
+      <i class="pi pi-box"></i>
+      Dados do Produto
+    </h3>
+
+    <div class="row">
+      <div class="field col-12">
+        <label for="descricao">Descrição *</label>
+        <input pInputText id="descricao" formControlName="descricao" placeholder="Ex: Vedacalha 280g" />
+        @if (form.get('descricao')?.invalid && form.get('descricao')?.touched) {
+          <small class="p-error">Descrição é obrigatória.</small>
+        }
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field col-12 col-md-6">
+        <label for="unidade_medida">Unidade (UN, PC, KG) *</label>
+        <input pInputText id="unidade_medida" formControlName="unidade_medida" maxlength="10" />
+        @if (form.get('unidade_medida')?.invalid && form.get('unidade_medida')?.touched) {
+          <small class="p-error">Unidade de medida é obrigatória.</small>
+        }
+      </div>
+
+      <div class="field col-12 col-md-6">
+        <label for="valor_unitario">Valor Unitário *</label>
+        <input pInputText appCurrencyMask id="valor_unitario" formControlName="valor_unitario" class="w-full" />
+        @if (form.get('valor_unitario')?.invalid && form.get('valor_unitario')?.touched) {
+          <small class="p-error">Valor unitário deve ser maior que zero.</small>
+        }
+      </div>
+    </div>
+
+  </form>
+</app-dialog-wrapper>

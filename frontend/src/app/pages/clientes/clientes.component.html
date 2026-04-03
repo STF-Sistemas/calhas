@@ -1,0 +1,31 @@
+<section class="page-section" aria-labelledby="clientes-title">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="page-header">
+    <div class="page-header__info">
+      <div class="page-header__title-row">
+        <div class="page-header__icon">
+          <i class="pi pi-users"></i>
+        </div>
+        <div>
+          <h1 id="clientes-title" class="page-header__title">Gestão de Clientes</h1>
+          <p class="page-header__subtitle">Administre o cadastro de clientes da sua empresa.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-data-table
+    title="Clientes Cadastrados"
+    [data]="clientes"
+    [columns]="cols"
+    [loading]="loading"
+    [globalFilterFields]="['razao_social', 'cpf_cnpj', 'email']"
+    (add)="onAdd()"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)">
+  </app-data-table>
+
+  <app-cliente-form #form (saved)="carregarClientes()"></app-cliente-form>
+</section>

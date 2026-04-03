@@ -1,0 +1,143 @@
+<app-dialog-wrapper
+  [(visible)]="visible"
+  [title]="clienteId ? 'Editar Cliente' : 'Novo Cliente'"
+  [isLoadingData]="isLoadingData"
+  [isSaving]="isSaving"
+  [saveDisabled]="false"
+  width="900px"
+  height="calc(100vh - 5rem)"
+  position="top"
+  (save)="onSave()">
+
+  <form [formGroup]="form" class="p-fluid">
+
+    <!-- ===================== DADOS DO CLIENTE ======================== -->
+    <h3 class="section-title">
+      <i class="pi pi-user"></i>
+      Dados do Cliente
+    </h3>
+
+    <!-- Razão Social + Nome Fantasia -->
+    <div class="row">
+      <div class="field col-12 col-md-6">
+        <label for="razao_social">Razão Social / Nome Completo *</label>
+        <input pInputText id="razao_social" formControlName="razao_social" placeholder="Nome completo ou razão social" />
+        @if (form.get('razao_social')?.invalid && form.get('razao_social')?.touched) {
+          <small class="p-error">Razão social é obrigatória.</small>
+        }
+      </div>
+
+      <div class="field col-12 col-md-6">
+        <label for="nome_fantasia">Nome Fantasia</label>
+        <input pInputText id="nome_fantasia" formControlName="nome_fantasia" placeholder="Nome popular / fantasia" />
+      </div>
+    </div>
+
+    <!-- CPF/CNPJ + E-mail + Telefone -->
+    <div class="row">
+      <div class="field col-12 col-md-4">
+        <label for="cpf_cnpj">CPF / CNPJ *</label>
+        <input pInputText id="cpf_cnpj" formControlName="cpf_cnpj"
+          placeholder="000.000.000-00 ou 00.000.000/0000-00"
+          mask="000.000.000-00||00.000.000/0000-00" />
+        @if (form.get('cpf_cnpj')?.invalid && form.get('cpf_cnpj')?.touched) {
+          <small class="p-error">CPF / CNPJ é obrigatório.</small>
+        }
+      </div>
+
+      <div class="field col-12 col-md-4">
+        <label for="email">E-mail</label>
+        <input pInputText id="email" type="email" formControlName="email" placeholder="contato@cliente.com.br" />
+        @if (form.get('email')?.invalid && form.get('email')?.touched) {
+          <small class="p-error">E-mail inválido.</small>
+        }
+      </div>
+
+      <div class="field col-12 col-md-4">
+        <label for="telefone">Telefone</label>
+        <input pInputText id="telefone" formControlName="telefone" type="tel"
+          placeholder="(00) 0000-0000 ou (00) 00000-0000"
+          mask="(00) 0000-0000||(00) 00000-0000" />
+      </div>
+    </div>
+
+    <!-- ===================== ENDEREÇO ======================== -->
+    <h3 class="section-title mt-2">
+      <i class="pi pi-map-marker"></i>
+      Endereço
+    </h3>
+
+    <!-- CEP + Logradouro -->
+    <div class="row">
+      <div class="field col-12 col-sm-4 col-md-3">
+        <label for="cep">CEP *</label>
+        <p-inputMask id="cep" mask="99999-999" formControlName="cep" placeholder="00000-000"
+          (onComplete)="onCepChange()">
+        </p-inputMask>
+        @if (form.get('cep')?.invalid && form.get('cep')?.touched) {
+          <small class="p-error">CEP é obrigatório.</small>
+        }
+      </div>
+
+      <div class="field col-12 col-sm-8 col-md-9">
+        <label for="endereco">Logradouro *</label>
+        <input pInputText id="endereco" formControlName="endereco" placeholder="Rua, Avenida, etc." />
+        @if (form.get('endereco')?.invalid && form.get('endereco')?.touched) {
+          <small class="p-error">Logradouro é obrigatório.</small>
+        }
+      </div>
+    </div>
+
+    <!-- Número + Bairro -->
+    <div class="row">
+      <div class="field col-12 col-sm-4 col-md-3">
+        <label for="numero">Número *</label>
+        <input pInputText id="numero" formControlName="numero" placeholder="Ex: 123" />
+        @if (form.get('numero')?.invalid && form.get('numero')?.touched) {
+          <small class="p-error">Número é obrigatório.</small>
+        }
+      </div>
+
+      <div class="field col-12 col-sm-8 col-md-9">
+        <label for="bairro">Bairro *</label>
+        <input pInputText id="bairro" formControlName="bairro" placeholder="Nome do bairro" />
+        @if (form.get('bairro')?.invalid && form.get('bairro')?.touched) {
+          <small class="p-error">Bairro é obrigatório.</small>
+        }
+      </div>
+    </div>
+
+    <!-- Complemento + Cidade -->
+    <div class="row">
+      <div class="field col-12 col-md-5">
+        <label for="complemento">Complemento / Ref.</label>
+        <input pInputText id="complemento" formControlName="complemento" placeholder="Apto, Sala, Ref..." />
+      </div>
+
+      <div class="field col-12 col-md-7">
+        <label for="cidade">
+          Cidade *
+          <span class="label-hint">(preenchida automaticamente via CEP)</span>
+        </label>
+        <input pInputText id="cidade" formControlName="cidade_nome" placeholder="Preenchida via CEP" />
+        @if (form.get('cod_cidade')?.invalid && form.get('cod_cidade')?.touched) {
+          <small class="p-error">Cidade é obrigatória. Informe um CEP válido.</small>
+        }
+      </div>
+    </div>
+
+    <!-- ===================== OBSERVAÇÕES ======================== -->
+    <h3 class="section-title mt-2">
+      <i class="pi pi-comment"></i>
+      Observações
+    </h3>
+
+    <div class="row">
+      <div class="field col-12">
+        <textarea pInputTextarea id="observacoes" formControlName="observacoes" rows="3"
+          class="w-full" placeholder="Informações adicionais sobre o cliente..."></textarea>
+      </div>
+    </div>
+
+  </form>
+</app-dialog-wrapper>

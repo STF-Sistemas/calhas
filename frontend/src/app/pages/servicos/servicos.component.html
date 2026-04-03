@@ -1,0 +1,33 @@
+<section class="page-section" aria-labelledby="servicos-title">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="page-header">
+    <div class="page-header__info">
+      <div class="page-header__title-row">
+        <div class="page-header__icon">
+          <i class="pi pi-wrench"></i>
+        </div>
+        <div>
+          <h1 id="servicos-title" class="page-header__title">Gestão de Serviços</h1>
+          <p class="page-header__subtitle">Cadastre serviços de mão de obra, instalação e frete.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-data-table
+    title="Serviços Cadastrados"
+    [data]="servicos"
+    [columns]="cols"
+    [loading]="loading"
+    [globalFilterFields]="['descricao']"
+    [showToggleStatus]="true"
+    (add)="onAdd()"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)"
+    (toggleStatus)="onToggleStatus($event)">
+  </app-data-table>
+
+  <app-servico-form #form (saved)="carregarServicos()"></app-servico-form>
+</section>

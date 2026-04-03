@@ -1,0 +1,33 @@
+<section class="page-section" aria-labelledby="meios-pagamento-title">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="page-header">
+    <div class="page-header__info">
+      <div class="page-header__title-row">
+        <div class="page-header__icon">
+          <i class="pi pi-credit-card"></i>
+        </div>
+        <div>
+          <h1 id="meios-pagamento-title" class="page-header__title">Meios de Pagamento</h1>
+          <p class="page-header__subtitle">Cadastre as formas de pagamento aceitas pela empresa.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-data-table
+    title="Meios de Pagamento Cadastrados"
+    [data]="meios"
+    [columns]="cols"
+    [loading]="loading"
+    [globalFilterFields]="['descricao']"
+    [showToggleStatus]="true"
+    (add)="onAdd()"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)"
+    (toggleStatus)="onToggleStatus($event)">
+  </app-data-table>
+
+  <app-meio-pagamento-form #form (saved)="carregar()"></app-meio-pagamento-form>
+</section>

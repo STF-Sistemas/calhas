@@ -1,0 +1,39 @@
+<app-dialog-wrapper
+  [(visible)]="visible"
+  [title]="servicoId ? 'Editar Serviço' : 'Novo Serviço'"
+  [isLoadingData]="isLoadingData"
+  [isSaving]="isSaving"
+  [saveDisabled]="false"
+  width="500px"
+  (save)="onSave()">
+
+  <form [formGroup]="form" class="p-fluid">
+
+    <h3 class="section-title">
+      <i class="pi pi-wrench"></i>
+      Dados do Serviço
+    </h3>
+
+    <div class="row">
+      <div class="field col-12">
+        <label for="descricao">Descrição do Serviço *</label>
+        <input pInputText id="descricao" formControlName="descricao" placeholder="Ex: Instalação de Calhas (m)" />
+        @if (form.get('descricao')?.invalid && form.get('descricao')?.touched) {
+          <small class="p-error">Descrição é obrigatória.</small>
+        }
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field col-12">
+        <label for="valor">Valor Sugerido *</label>
+        <input pInputText appCurrencyMask id="valor" formControlName="valor" class="w-full" />
+        @if (form.get('valor')?.invalid && form.get('valor')?.touched) {
+          <small class="p-error">Valor deve ser maior que zero.</small>
+        }
+        <small class="text-600" style="margin-top: 0.25rem;">Este valor pode ser alterado no momento do pedido.</small>
+      </div>
+    </div>
+
+  </form>
+</app-dialog-wrapper>

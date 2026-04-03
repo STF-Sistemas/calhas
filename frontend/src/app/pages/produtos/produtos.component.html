@@ -1,0 +1,33 @@
+<section class="page-section" aria-labelledby="produtos-title">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="page-header">
+    <div class="page-header__info">
+      <div class="page-header__title-row">
+        <div class="page-header__icon">
+          <i class="pi pi-box"></i>
+        </div>
+        <div>
+          <h1 id="produtos-title" class="page-header__title">Gestão de Produtos</h1>
+          <p class="page-header__subtitle">Gerencie os produtos e materiais disponíveis para venda.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-data-table
+    title="Produtos Cadastrados"
+    [data]="produtos"
+    [columns]="cols"
+    [loading]="loading"
+    [globalFilterFields]="['descricao']"
+    [showToggleStatus]="true"
+    (add)="onAdd()"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)"
+    (toggleStatus)="onToggleStatus($event)">
+  </app-data-table>
+
+  <app-produto-form #form (saved)="carregarProdutos()"></app-produto-form>
+</section>

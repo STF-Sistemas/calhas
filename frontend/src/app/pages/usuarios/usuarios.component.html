@@ -1,0 +1,31 @@
+<section class="page-section" aria-labelledby="usuarios-title">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="page-header">
+    <div class="page-header__info">
+      <div class="page-header__title-row">
+        <div class="page-header__icon">
+          <i class="pi pi-user"></i>
+        </div>
+        <div>
+          <h1 id="usuarios-title" class="page-header__title">Gestão de Usuários</h1>
+          <p class="page-header__subtitle">Controle os acessos e permissões dos colaboradores.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-data-table
+    title="Usuários Cadastrados"
+    [data]="usuarios"
+    [columns]="cols"
+    [loading]="loading"
+    [globalFilterFields]="['nome', 'email']"
+    (add)="onAdd()"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)">
+  </app-data-table>
+
+  <app-usuario-form #form (saved)="carregarUsuarios()"></app-usuario-form>
+</section>

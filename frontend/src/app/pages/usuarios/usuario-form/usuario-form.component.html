@@ -1,0 +1,91 @@
+<app-dialog-wrapper
+  [(visible)]="visible"
+  [title]="usuarioId ? 'Editar Usuário' : 'Novo Usuário'"
+  [isLoadingData]="isLoadingData"
+  [isSaving]="isSaving"
+  [saveDisabled]="form.invalid"
+  width="500px"
+  position="top"
+  height="calc(100vh - 5rem)"
+  (save)="onSave()">
+
+  <form [formGroup]="form" class="p-fluid">
+
+    <!-- ===================== EMPRESA ======================== -->
+    <h3 class="section-title">
+      <i class="pi pi-building"></i>
+      Empresa
+    </h3>
+
+    <div class="row">
+      <div class="field col-12">
+        <label for="cod_empresa">Empresa *</label>
+        <p-select
+          id="cod_empresa"
+          formControlName="cod_empresa"
+          [options]="empresas"
+          optionLabel="razao_social"
+          optionValue="id"
+          placeholder="Selecione a Empresa"
+          [filter]="true"
+          filterBy="razao_social">
+        </p-select>
+      </div>
+    </div>
+
+    <!-- ===================== DADOS DE ACESSO ======================== -->
+    <h3 class="section-title mt-2">
+      <i class="pi pi-user"></i>
+      Dados de Acesso
+    </h3>
+
+    <div class="row">
+      <div class="field col-12">
+        <label for="nome">Nome Completo *</label>
+        <input pInputText id="nome" formControlName="nome" placeholder="Nome do colaborador" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field col-12">
+        <label for="email">E-mail de Acesso *</label>
+        <input pInputText id="email" type="email" formControlName="email" placeholder="email@empresa.com.br" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field col-12">
+        <label for="senha">Senha {{ usuarioId ? '(Deixe em branco para não alterar)' : '*' }}</label>
+        <p-password
+          id="senha"
+          formControlName="senha"
+          [toggleMask]="true"
+          [feedback]="!usuarioId"
+          placeholder="Mínimo 6 caracteres"
+          inputStyleClass="w-full">
+        </p-password>
+      </div>
+    </div>
+
+    <!-- ===================== PERMISSÕES ======================== -->
+    <h3 class="section-title mt-2">
+      <i class="pi pi-shield"></i>
+      Permissões
+    </h3>
+
+    <div class="row">
+      <div class="field col-12 md:col-6">
+        <label for="status">Status *</label>
+        <p-select id="status" formControlName="status" [options]="statusOpcoes"></p-select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12" style="display:flex; align-items:center; gap:0.6rem; padding: 0.25rem 0.75rem;">
+        <p-checkbox id="admin" formControlName="admin" [binary]="true"></p-checkbox>
+        <label for="admin" style="margin:0; font-weight:500; font-size:0.875rem; cursor:pointer;">Administrador da Empresa</label>
+      </div>
+    </div>
+
+  </form>
+</app-dialog-wrapper>

@@ -1,0 +1,36 @@
+<section class="page-section" aria-labelledby="pedidos-title">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="page-header">
+    <div class="page-header__info">
+      <div class="page-header__title-row">
+        <div class="page-header__icon">
+          <i class="pi pi-file-edit"></i>
+        </div>
+        <div>
+          <h1 id="pedidos-title" class="page-header__title">Gestão de Pedidos</h1>
+          <p class="page-header__subtitle">Acompanhe e gerencie os pedidos de venda e fabricação.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-data-table
+    title="Histórico de Pedidos"
+    [data]="pedidos"
+    [columns]="cols"
+    [loading]="loading"
+    [globalFilterFields]="['id', 'cliente_nome']"
+    [addButtonLabel]="'Novo Pedido'"
+    [showPrintButton]="true"
+    [showPrintDesenhoButton]="true"
+    (add)="onAdd()"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)"
+    (print)="onPrint($event)"
+    (printDesenho)="onPrintDesenho($event)">
+  </app-data-table>
+
+  <app-pedido-form #form (saved)="carregarPedidos()"></app-pedido-form>
+</section>

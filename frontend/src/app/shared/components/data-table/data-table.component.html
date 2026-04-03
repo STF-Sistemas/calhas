@@ -1,0 +1,157 @@
+<div class="card shadow-1 p-0 overflow-hidden">
+    <p-table 
+        #dt 
+        [value]="data" 
+        [columns]="columns" 
+        [loading]="loading"
+        [rows]="rows" 
+        [paginator]="true" 
+        [globalFilterFields]="globalFilterFields"
+        [rowHover]="true" 
+        dataKey="id"
+        currentPageReportTemplate="Exibindo {first} a {last} de {totalRecords} registros" 
+        [showCurrentPageReport]="true"
+        styleClass="p-datatable-sm"
+        [responsiveLayout]="'stack'"
+        [breakpoint]="'960px'"
+    >
+        <ng-template pTemplate="caption">
+            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3 p-3">
+                @if (title) {
+                    <h2 class="m-0 text-xl font-bold">{{ title }}</h2>
+                }
+                
+                <div class="flex flex-wrap gap-2 align-items-center">
+                    <p-iconField iconPosition="left" class="w-full md:w-auto">
+                        <p-inputIcon styleClass="pi pi-search"></p-inputIcon>
+                        <input 
+                            pInputText 
+                            type="text" 
+                            (input)="dt.filterGlobal($any($event.target).value, 'contains')" 
+                            placeholder="Pesquisar..." 
+                            class="w-full"
+                        />
+                    </p-iconField>
+                    
+                    @if (showAddButton) {
+                        <p-button 
+                            [label]="addButtonLabel" 
+                            icon="pi pi-plus" 
+                            severity="primary" 
+                            (onClick)="add.emit()"
+                            aria-label="Adicionar novo registro"
+                        ></p-button>
+                    }
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header" let-columns>
+            <tr>
+                @for (col of columns; track col.field) {
+                    <th [pSortableColumn]="col.field" class="white-space-nowrap">
+                        {{ col.header }} <p-sortIcon [field]="col.field"></p-sortIcon>
+                    </th>
+                }
+                <th class="text-center" style="width: 10rem; white-space: nowrap;">Ações</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-rowData let-columns="columns">
+            <tr>
+                @for (col of columns; track col.field) {
+                    <td>
+                        @if (col.type === 'status') {
+                            <p-tag [value]="isAtivo(rowData[col.field]) ? 'Ativo' : 'Inativo'"
+                                   [severity]="isAtivo(rowData[col.field]) ? 'success' : 'danger'">
+                            </p-tag>
+                        } @else if (col.type === 'currency') {
+                            {{ rowData[col.field] | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+                        } @else if (col.type === 'date') {
+                            {{ rowData[col.field] | date:'dd/MM/yyyy' }}
+                        } @else if (col.type === 'phone') {
+                            {{ rowData[col.field] | mask: rowData[col.field]?.length > 10 ? '(00) 00000-0000' : '(00) 0000-0000' }}
+                        } @else if (col.type === 'cpf_cnpj') {
+                            {{ rowData[col.field] | mask: rowData[col.field]?.replace(/\D/g,'')?.length > 11 ? '00.000.000/0000-00' : '000.000.000-00' }}
+                        } @else if (col.type === 'drawing') {
+                            @if (rowData[col.field]?.length >= 2) {
+                              <svg width="96" height="44" style="display:block;border-radius:4px;">
+                                <rect width="96" height="44" fill="#141414" rx="4"/>
+                                <polyline [attr.points]="getDrawingPoints(rowData[col.field])"
+                                          fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+                              </svg>
+                            } @else {
+                              <span class="text-400 text-sm">Sem desenho</span>
+                            }
+                        } @else {
+                            {{ rowData[col.field] }}
+                        }
+                    </td>
+                }
+                <td class="text-center" style="white-space: nowrap;">
+                    <div style="display:flex; flex-wrap:nowrap; justify-content:center; align-items:center; gap:0.25rem;">
+                        <p-button
+                            [style.display]="showToggleStatus ? 'inline-flex' : 'none'"
+                            icon="pi pi-power-off"
+                            [rounded]="true"
+                            [text]="true"
+                            [severity]="toggleSeverity(rowData[statusField])"
+                            (onClick)="toggleStatus.emit(rowData)"
+                            [pTooltip]="toggleTooltip(rowData[statusField])"
+                        ></p-button>
+                        @if (showPrintButton) {
+                            <p-button
+                                icon="pi pi-print"
+                                [rounded]="true"
+                                [text]="true"
+                                severity="info"
+                                (onClick)="print.emit(rowData)"
+                                pTooltip="Imprimir pedido"
+                                aria-label="Imprimir pedido"
+                            ></p-button>
+                        }
+                        @if (showPrintDesenhoButton) {
+                            <p-button
+                                icon="pi pi-print"
+                                [rounded]="true"
+                                [text]="true"
+                                severity="warn"
+                                (onClick)="printDesenho.emit(rowData)"
+                                pTooltip="Imprimir ordem de corte"
+                                aria-label="Imprimir ordem de corte"
+                            ></p-button>
+                        }
+                        @if (showEditButton) {
+                            <p-button
+                                icon="pi pi-pencil"
+                                [rounded]="true"
+                                [text]="true"
+                                severity="secondary"
+                                (onClick)="edit.emit(rowData)"
+                                pTooltip="Editar"
+                            ></p-button>
+                        }
+                        @if (showDeleteButton) {
+                            <p-button
+                                icon="pi pi-trash"
+                                [rounded]="true"
+                                [text]="true"
+                                severity="danger"
+                                (onClick)="delete.emit(rowData)"
+                                pTooltip="Excluir"
+                            ></p-button>
+                        }
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td [attr.colspan]="columns.length + 1" class="text-center p-5 text-600">
+                    Nenhum registro encontrado.
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

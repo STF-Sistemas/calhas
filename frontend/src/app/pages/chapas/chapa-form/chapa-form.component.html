@@ -1,0 +1,88 @@
+<app-dialog-wrapper
+  [(visible)]="visible"
+  [title]="chapaId ? 'Editar Chapa' : 'Nova Chapa'"
+  [isLoadingData]="isLoadingData"
+  [isSaving]="isSaving"
+  [saveDisabled]="false"
+  width="900px"
+  height="calc(100vh - 5rem)"
+  position="top"
+  (save)="onSave()">
+
+  <form [formGroup]="form" class="p-fluid">
+
+    <!-- ===================== DADOS DA CHAPA ======================== -->
+    <h3 class="section-title">
+      <i class="pi pi-th-large"></i>
+      Dados da Chapa
+    </h3>
+
+    <div class="row">
+      <div class="field col-12">
+        <label for="descricao">Descrição da Chapa *</label>
+        <input pInputText id="descricao" formControlName="descricao" placeholder="Ex: Chapa Galvalume 0,43mm" />
+        @if (form.get('descricao')?.invalid && form.get('descricao')?.touched) {
+          <small class="p-error">Descrição é obrigatória.</small>
+        }
+      </div>
+    </div>
+
+  </form>
+
+  <!-- ===================== CORTES ======================== -->
+  <h3 class="section-title mt-2">
+    <i class="pi pi-list"></i>
+    Cortes desta Chapa
+    <p-button
+      label="Adicionar Corte"
+      icon="pi pi-plus"
+      [text]="true"
+      severity="primary"
+      size="small"
+      (onClick)="adicionarCorte()"
+      [style]="{'margin-left': 'auto'}">
+    </p-button>
+  </h3>
+
+  <p-table [value]="cortesVisiveis" styleClass="p-datatable-sm" [responsiveLayout]="'scroll'">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Descrição *</th>
+        <th style="width: 8rem">Corte (cm)</th>
+        <th style="width: 10rem">Valor (R$) *</th>
+        <th style="width: 4rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-corte>
+      <tr>
+        <td>
+          <input pInputText [(ngModel)]="corte.descricao" class="p-inputtext-sm w-full" placeholder="Descrição do corte" />
+        </td>
+        <td>
+          <p-inputNumber [(ngModel)]="corte.corte" mode="decimal" [minFractionDigits]="2" inputStyleClass="w-full"></p-inputNumber>
+        </td>
+        <td>
+          <input pInputText appCurrencyMask [(ngModel)]="corte.valor" class="w-full" />
+        </td>
+        <td class="text-center">
+          <p-button
+            icon="pi pi-trash"
+            severity="danger"
+            [text]="true"
+            [rounded]="true"
+            (onClick)="removerCorte(corte)"
+            aria-label="Remover corte">
+          </p-button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4" class="text-center p-3 text-600">
+          Nenhum corte cadastrado.
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+</app-dialog-wrapper>

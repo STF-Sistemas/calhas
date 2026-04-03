@@ -1,0 +1,41 @@
+<section class="page-section" aria-labelledby="empresas-title">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-header__info">
+      <div class="page-header__title-row">
+        <div class="page-header__icon">
+          <i class="pi pi-building"></i>
+        </div>
+        <div>
+          <h1 id="empresas-title" class="page-header__title">Gestão de Empresas</h1>
+          <p class="page-header__subtitle">Administre as empresas parceiras do ecossistema Calhas Pro.</p>
+        </div>
+      </div>
+
+      <p-tag
+        value="Super Admin"
+        severity="danger"
+        [rounded]="true"
+        aria-label="Acesso restrito a Super Administradores">
+      </p-tag>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <app-data-table
+    title="Empresas Cadastradas"
+    [data]="empresas"
+    [columns]="cols"
+    [loading]="loading"
+    [globalFilterFields]="['razao_social', 'cnpj', 'email']"
+    (add)="onAdd()"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)">
+  </app-data-table>
+
+  <!-- Form Modal -->
+  <app-empresa-form #form (saved)="carregarEmpresas()"></app-empresa-form>
+</section>

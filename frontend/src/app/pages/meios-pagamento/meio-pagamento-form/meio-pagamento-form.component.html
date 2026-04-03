@@ -1,0 +1,29 @@
+<app-dialog-wrapper
+  [(visible)]="visible"
+  [title]="meioId ? 'Editar Meio de Pagamento' : 'Novo Meio de Pagamento'"
+  [isLoadingData]="isLoadingData"
+  [isSaving]="isSaving"
+  [saveDisabled]="form.invalid"
+  width="480px"
+  (save)="onSave()">
+
+  <form [formGroup]="form" class="p-fluid">
+
+    <h3 class="section-title">
+      <i class="pi pi-credit-card"></i>
+      Dados do Meio de Pagamento
+    </h3>
+
+    <div class="row">
+      <div class="field col-12">
+        <label for="descricao">Descrição *</label>
+        <input pInputText id="descricao" formControlName="descricao"
+          placeholder="Ex: Dinheiro, Pix, Cartão de Crédito..." />
+        @if (form.get('descricao')?.invalid && form.get('descricao')?.touched) {
+          <small class="p-error">Descrição é obrigatória.</small>
+        }
+      </div>
+    </div>
+
+  </form>
+</app-dialog-wrapper>

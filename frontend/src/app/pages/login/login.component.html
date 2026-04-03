@@ -1,0 +1,60 @@
+<div class="login-container flex align-items-center justify-content-center min-h-screen p-3 fade-in">
+  <!-- Seletor de Temas Sakai (Top Right) -->
+  <div class="theme-switcher-fixed">
+    <button class="p-link theme-button" (click)="themeService.toggleTheme()"
+      [pTooltip]="themeService.isDarkMode() ? 'Modo Claro' : 'Modo Escuro'">
+      <i [class]="themeService.isDarkMode() ? 'pi pi-sun' : 'pi pi-moon'"></i>
+    </button>
+    <button class="p-link theme-button" (click)="colorMenu.toggle($event)" pTooltip="Cor do Sistema">
+      <i class="pi pi-palette"></i>
+    </button>
+    <p-menu #colorMenu [model]="colorMenuItems" [popup]="true"></p-menu>
+  </div>
+
+  <div class="login-card-wrapper">
+    <div class="login-card flex flex-column align-items-center">
+      <!-- Logo e Título -->
+      <div class="flex flex-column align-items-center mb-5 w-full">
+        <div class="logo-box mb-4">
+          <svg width="45" height="42" viewBox="0 0 45 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M19.3407 10.3644C19.3407 8.01633 21.2443 6.1127 23.5924 6.1127C25.9404 6.1127 27.8441 8.01633 27.8441 10.3644"
+              stroke="var(--p-primary)" stroke-width="3" stroke-linecap="round" />
+            <path
+              d="M15.4093 15.421C15.4093 10.8988 19.0747 7.2334 23.5969 7.2334C28.1191 7.2334 31.7845 10.8988 31.7845 15.421"
+              stroke="var(--p-primary)" stroke-width="3" stroke-linecap="round" />
+            <circle cx="23.5924" cy="24.4371" r="14.375" stroke="var(--p-primary)" stroke-width="3" />
+            <circle cx="23.5925" cy="24.4371" r="8.625" stroke="var(--p-primary)" stroke-width="3" />
+          </svg>
+        </div>
+        <h1 class="text-900 text-3xl font-bold mb-2 text-center">Bem-vindo ao Calhas Pro</h1>
+        <span class="text-600 font-medium text-center">Acesse o portal para continuar</span>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-column w-full">
+        <div class="field w-full">
+          <label for="email">E-mail</label>
+          <input pInputText id="email" type="email" formControlName="email" placeholder="Endereço de e-mail"
+            class="w-full p-3 text-lg" />
+        </div>
+
+        <div class="field w-full">
+          <label for="senha">Senha</label>
+          <p-password id="senha" formControlName="senha" [toggleMask]="true" [feedback]="false" placeholder="Sua senha"
+            styleClass="w-full" inputStyleClass="w-full p-3 text-lg"></p-password>
+        </div>
+
+        <div class="login-footer-row mb-4">
+          <div class="flex align-items-center gap-2">
+            <p-checkbox [binary]="true" formControlName="remember" inputId="remember"></p-checkbox>
+            <label for="remember" class="text-600 cursor-pointer">Lembrar de mim</label>
+          </div>
+          <a href="#" class="text-primary font-medium no-underline hover:underline">Esqueceu a senha?</a>
+        </div>
+
+        <button pButton pRipple label="Acessar Conta" type="submit" [loading]="isLoading" [disabled]="loginForm.invalid"
+          class="mt-4 w-full p-4 text-xl font-bold"></button>
+      </form>
+    </div>
+  </div>
+</div>

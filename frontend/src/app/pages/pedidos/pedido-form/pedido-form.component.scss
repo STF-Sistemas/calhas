@@ -1,0 +1,29 @@
+.field {
+    margin-bottom: 1rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+:host ::ng-deep {
+    .p-datatable.no-border .p-datatable-tbody > tr > td {
+        border-bottom: 1px solid var(--surface-border);
+    }
+}
+
+textarea {
+    resize: none;
+}
+
+.sticky {
+    position: sticky;
+    top: 1rem;
+}
+
+@media screen and (max-width: 1200px) {
+    .sticky {
+        position: static;
+    }
+}

@@ -1,0 +1,61 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  header="Medidas do Desenho"
+  [style]="{ width: '920px' }"
+  [draggable]="false"
+  [resizable]="false"
+  appendTo="body">
+
+  @if (desenho) {
+    <!-- Canvas -->
+    <div style="border-radius:6px; overflow:hidden; border:1px solid #2a2a2a; margin-bottom:1rem;">
+      <canvas #canvas style="display:block; width:100%;"></canvas>
+    </div>
+
+    <!-- Legenda -->
+    <div style="display:flex; gap:1rem; margin-bottom:1rem; font-size:0.8rem;">
+      <span style="display:flex; align-items:center; gap:0.3rem;">
+        <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:#ef4444;"></span>
+        Sem medida
+      </span>
+      <span style="display:flex; align-items:center; gap:0.3rem;">
+        <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:#22c55e;"></span>
+        Medida definida
+      </span>
+    </div>
+
+    <!-- Inputs de medidas -->
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:0.75rem; margin-bottom:1.5rem;">
+      @for (seg of segmentos; track seg) {
+        <div style="display:flex; flex-direction:column; gap:0.25rem;">
+          <label style="font-size:0.85rem; font-weight:600; display:flex; align-items:center; gap:0.4rem;">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; font-size:0.7rem; font-weight:700;"
+                  [style.background]="medidas[seg] > 0 ? '#22c55e' : '#ef4444'"
+                  style="color:#fff;">
+              {{ seg + 1 }}
+            </span>
+            Segmento {{ seg + 1 }}
+          </label>
+          <p-inputNumber
+            [ngModel]="medidas[seg]"
+            (ngModelChange)="onMedidaChange(seg, $event)"
+            [min]="0"
+            suffix=" cm"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="2"
+            inputStyleClass="w-full"
+            placeholder="0 cm">
+          </p-inputNumber>
+        </div>
+      }
+    </div>
+
+    <!-- Rodapé -->
+    <div style="display:flex; justify-content:flex-end; gap:0.5rem; border-top:1px solid var(--surface-200); padding-top:1rem;">
+      <p-button label="Cancelar" icon="pi pi-times" severity="secondary" [text]="true" (onClick)="visible = false"></p-button>
+      <p-button label="Confirmar Medidas" icon="pi pi-check" severity="primary" (onClick)="confirmar()"></p-button>
+    </div>
+  }
+
+</p-dialog>

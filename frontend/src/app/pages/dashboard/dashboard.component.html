@@ -1,0 +1,175 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+<app-pedido-form #form (saved)="ngOnInit()"></app-pedido-form>
+
+<section class="dashboard-container" aria-labelledby="dashboard-title">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div>
+      <h1 id="dashboard-title" class="dashboard-title">
+        Bem-vindo, {{ authService.currentUser()?.nome || 'Administrador' }}!
+      </h1>
+      <p class="dashboard-subtitle">Aqui está o resumo da sua operação hoje.</p>
+    </div>
+    <div class="dashboard-header-actions">
+      <p-button
+        label="Novo Pedido"
+        icon="pi pi-plus"
+        routerLink="/pedidos"
+        aria-label="Criar novo pedido"
+        styleClass="p-button-primary dashboard-new-btn">
+      </p-button>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div style="display:flex; justify-content:center; padding: 4rem;">
+      <i class="pi pi-spin pi-spinner" style="font-size:2rem;"></i>
+    </div>
+  } @else {
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card stat-card--blue">
+        <div class="stat-card__header">
+          <span class="stat-card__label">Pedidos do Mês</span>
+          <div class="stat-card__icon-wrap"><i class="pi pi-shopping-bag"></i></div>
+        </div>
+        <div class="stat-card__value">{{ stats?.pedidosMes ?? 0 }}</div>
+        <div class="stat-card__detail">
+          <i class="pi pi-calendar"></i>
+          Mês atual
+        </div>
+      </div>
+
+      <div class="stat-card stat-card--green">
+        <div class="stat-card__header">
+          <span class="stat-card__label">Receita do Mês</span>
+          <div class="stat-card__icon-wrap"><i class="pi pi-dollar"></i></div>
+        </div>
+        <div class="stat-card__value">{{ formatCurrency(stats?.receitaMes ?? 0) }}</div>
+        <div class="stat-card__detail">
+          <i class="pi pi-arrow-up"></i>
+          Faturamento mês atual
+        </div>
+      </div>
+
+      <div class="stat-card stat-card--purple">
+        <div class="stat-card__header">
+          <span class="stat-card__label">Clientes Ativos</span>
+          <div class="stat-card__icon-wrap"><i class="pi pi-users"></i></div>
+        </div>
+        <div class="stat-card__value">{{ stats?.clientesAtivos ?? 0 }}</div>
+        <div class="stat-card__detail">
+          <i class="pi pi-user"></i>
+          Total de clientes
+        </div>
+      </div>
+
+      <div class="stat-card stat-card--orange">
+        <div class="stat-card__header">
+          <span class="stat-card__label">Pedidos em Aberto</span>
+          <div class="stat-card__icon-wrap"><i class="pi pi-clock"></i></div>
+        </div>
+        <div class="stat-card__value">{{ stats?.pedidosAbertos ?? 0 }}</div>
+        <div class="stat-card__detail">
+          <i class="pi pi-info-circle"></i>
+          Aguardando produção
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+      <!-- Recent Orders Table -->
+      <div class="content-grid__main">
+        <app-data-table
+          title="Pedidos Recentes"
+          [data]="pedidosRecentes"
+          [columns]="cols"
+          [showAddButton]="false"
+          [showPrintButton]="true"
+          [showPrintDesenhoButton]="true"
+          (print)="onPrint($event)"
+          (printDesenho)="onPrintDesenho($event)"
+          (edit)="onEdit($event)"
+          (delete)="onDelete($event)">
+        </app-data-table>
+      </div>
+
+      <!-- Sidebar Panel -->
+      <div class="content-grid__aside">
+        <!-- Quick Actions -->
+        <div class="panel">
+          <h2 class="panel__title">
+            <i class="pi pi-bolt"></i>
+            Atalhos Rápidos
+          </h2>
+          <div class="quick-actions">
+            <a class="quick-action" routerLink="/pedidos" aria-label="Criar novo pedido">
+              <div class="quick-action__icon quick-action__icon--primary">
+                <i class="pi pi-shopping-cart"></i>
+              </div>
+              <div class="quick-action__content">
+                <span class="quick-action__label">Novo Pedido</span>
+                <span class="quick-action__desc">Registrar venda</span>
+              </div>
+              <i class="pi pi-chevron-right quick-action__arrow"></i>
+            </a>
+            <a class="quick-action" routerLink="/clientes" aria-label="Cadastrar novo cliente">
+              <div class="quick-action__icon quick-action__icon--success">
+                <i class="pi pi-user-plus"></i>
+              </div>
+              <div class="quick-action__content">
+                <span class="quick-action__label">Novo Cliente</span>
+                <span class="quick-action__desc">Cadastrar cliente</span>
+              </div>
+              <i class="pi pi-chevron-right quick-action__arrow"></i>
+            </a>
+            <a class="quick-action" routerLink="/produtos" aria-label="Cadastrar produto">
+              <div class="quick-action__icon quick-action__icon--warning">
+                <i class="pi pi-box"></i>
+              </div>
+              <div class="quick-action__content">
+                <span class="quick-action__label">Novo Produto</span>
+                <span class="quick-action__desc">Adicionar ao catálogo</span>
+              </div>
+              <i class="pi pi-chevron-right quick-action__arrow"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Status Summary -->
+        <div class="panel">
+          <h2 class="panel__title">
+            <i class="pi pi-chart-bar"></i>
+            Status dos Pedidos
+          </h2>
+          <div class="status-list">
+            <div class="status-item">
+              <span class="status-item__dot status-item__dot--success"></span>
+              <span class="status-item__label">Concluídos</span>
+              <span class="status-item__value">{{ stats?.pedidosConcluidos ?? 0 }}</span>
+            </div>
+            <div class="status-item">
+              <span class="status-item__dot status-item__dot--warning"></span>
+              <span class="status-item__label">Em Produção</span>
+              <span class="status-item__value">{{ stats?.pedidosEmProducao ?? 0 }}</span>
+            </div>
+            <div class="status-item">
+              <span class="status-item__dot status-item__dot--info"></span>
+              <span class="status-item__label">Em Aberto</span>
+              <span class="status-item__value">{{ stats?.pedidosAbertos ?? 0 }}</span>
+            </div>
+            <div class="status-item">
+              <span class="status-item__dot status-item__dot--danger"></span>
+              <span class="status-item__label">Cancelados</span>
+              <span class="status-item__value">{{ stats?.pedidosCancelados ?? 0 }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  }
+</section>

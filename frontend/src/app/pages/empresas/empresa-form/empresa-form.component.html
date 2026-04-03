@@ -1,0 +1,142 @@
+<app-dialog-wrapper [(visible)]="visible" [title]="empresaId ? 'Editar Empresa' : 'Nova Empresa'"
+  [isLoadingData]="isLoadingData" [isSaving]="isSaving" [saveDisabled]="form.invalid" width="900px"
+  height="calc(100vh - 5rem)" position="top" (save)="onSave()">
+
+  <form [formGroup]="form">
+    <p-tabs value="0">
+      <p-tablist>
+        <p-tab value="0">
+          <i class="pi pi-building mr-2"></i>
+          Dados da Empresa
+        </p-tab>
+        <p-tab value="1">
+          <i class="pi pi-cog mr-2"></i>
+          Configurações
+        </p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+
+        <!-- ==================== ABA: DADOS DA EMPRESA ==================== -->
+        <p-tabpanel value="0">
+
+          <h3 class="section-title">
+            <i class="pi pi-building"></i>
+            Dados da Empresa
+          </h3>
+
+          <!-- Razão Social + Nome Fantasia -->
+          <div class="row">
+            <div class="field col-12 col-md-6">
+              <label for="razao_social">Razão Social *</label>
+              <input pInputText id="razao_social" formControlName="razao_social" placeholder="Nome completo da empresa" />
+            </div>
+
+            <div class="field col-12 col-md-6">
+              <label for="nome_fantasia">Nome Fantasia</label>
+              <input pInputText id="nome_fantasia" formControlName="nome_fantasia" placeholder="Nome popular / fantasia" />
+            </div>
+          </div>
+
+          <!-- CNPJ + E-mail -->
+          <div class="row">
+            <div class="field col-12 col-md-6">
+              <label for="cnpj">CNPJ *</label>
+              <p-inputMask id="cnpj" mask="99.999.999/9999-99" formControlName="cnpj" placeholder="00.000.000/0000-00">
+              </p-inputMask>
+            </div>
+
+            <div class="field col-12 col-md-6">
+              <label for="email">E-mail Comercial</label>
+              <input pInputText id="email" type="email" formControlName="email" placeholder="contato@empresa.com.br" />
+            </div>
+          </div>
+
+          <!-- Telefone -->
+          <div class="row">
+            <div class="field col-12 col-md-6">
+              <label for="telefone">Telefone</label>
+              <input pInputText id="telefone" formControlName="telefone" type="tel"
+                placeholder="(00) 0000-0000 ou (00) 00000-0000" mask="(00) 0000-0000 || (00) 00000-0000" />
+            </div>
+          </div>
+
+          <!-- ===================== ENDEREÇO ======================== -->
+          <h3 class="section-title mt-2">
+            <i class="pi pi-map-marker"></i>
+            Endereço / Sede
+          </h3>
+
+          <!-- CEP + Logradouro -->
+          <div class="row">
+            <div class="field col-12 col-sm-4 col-md-3">
+              <label for="cep">CEP *</label>
+              <p-inputMask id="cep" mask="99999-999" formControlName="cep" placeholder="00000-000"
+                (onComplete)="onCepChange()">
+              </p-inputMask>
+            </div>
+
+            <div class="field col-12 col-sm-8 col-md-9">
+              <label for="endereco">Logradouro *</label>
+              <input pInputText id="endereco" formControlName="endereco" placeholder="Rua, Avenida, etc." />
+            </div>
+          </div>
+
+          <!-- Número + Bairro -->
+          <div class="row">
+            <div class="field col-12 col-sm-4 col-md-3">
+              <label for="numero">Número *</label>
+              <input pInputText id="numero" formControlName="numero" placeholder="Ex: 123" />
+            </div>
+
+            <div class="field col-12 col-sm-8 col-md-9">
+              <label for="bairro">Bairro *</label>
+              <input pInputText id="bairro" formControlName="bairro" placeholder="Nome do bairro" />
+            </div>
+          </div>
+
+          <!-- Cidade - linha completa -->
+          <div class="row">
+            <div class="field col-12">
+              <label for="cidade">
+                Cidade *
+                <span class="label-hint">(preenchida automaticamente via CEP)</span>
+              </label>
+              <input pInputText id="cidade" formControlName="cidade_nome" placeholder="Preenchida via CEP" />
+            </div>
+          </div>
+
+        </p-tabpanel>
+
+        <!-- ==================== ABA: CONFIGURAÇÕES ==================== -->
+        <p-tabpanel value="1">
+
+          <h3 class="section-title">
+            <i class="pi pi-print"></i>
+            Impressão
+          </h3>
+
+          <div class="row">
+            <div class="field col-12">
+              <label for="marca_dagua">Marca d'água do Pedido</label>
+              <span class="label-hint">
+                Texto exibido como marca d'água na impressão dos pedidos (máx. 250 caracteres).
+              </span>
+              <textarea
+                pTextarea
+                id="marca_dagua"
+                formControlName="marca_dagua"
+                rows="3"
+                placeholder="Ex.: CÓPIA NÃO VÁLIDA, RASCUNHO, nome da empresa..."
+                aria-label="Marca d'água para impressão de pedidos"
+                [autoResize]="true">
+              </textarea>
+            </div>
+          </div>
+
+        </p-tabpanel>
+
+      </p-tabpanels>
+    </p-tabs>
+  </form>
+</app-dialog-wrapper>

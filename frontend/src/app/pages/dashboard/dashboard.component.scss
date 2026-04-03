@@ -1,0 +1,310 @@
+.dashboard-container {
+  animation: dashboardFadeIn 0.5s ease-out;
+}
+
+@keyframes dashboardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===========================
+   Header
+=========================== */
+.dashboard-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.dashboard-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0 0 0.25rem;
+  line-height: 1.2;
+}
+
+.dashboard-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.dashboard-header-actions {
+  flex-shrink: 0;
+
+  ::ng-deep .dashboard-new-btn {
+    background: var(--p-primary) !important;
+    border-color: var(--p-primary) !important;
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 0.65rem 1.5rem;
+    transition: all 0.2s;
+
+    &:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+/* ===========================
+   Stats Cards
+=========================== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 1200px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.stat-card {
+  background: var(--surface-0);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 16px 16px 0 0;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  &--blue::before { background: #3b82f6; }
+  &--green::before { background: #10b981; }
+  &--purple::before { background: #8b5cf6; }
+  &--orange::before { background: #f97316; }
+}
+
+.stat-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.stat-card__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.stat-card__icon-wrap {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+
+  .stat-card--blue & { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+  .stat-card--green & { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+  .stat-card--purple & { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
+  .stat-card--orange & { background: rgba(249, 115, 22, 0.12); color: #f97316; }
+}
+
+.stat-card__value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-color);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.stat-card__detail {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  i {
+    font-size: 0.7rem;
+    color: #10b981;
+  }
+}
+
+/* ===========================
+   Content Grid
+=========================== */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.25rem;
+  align-items: start;
+
+  @media (max-width: 1100px) { grid-template-columns: 1fr; }
+}
+
+.content-grid__aside {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ===========================
+   Panels
+=========================== */
+.panel {
+  background: var(--surface-0);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.panel__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0 0 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  i {
+    color: var(--p-primary);
+    font-size: 0.95rem;
+  }
+}
+
+/* ===========================
+   Quick Actions
+=========================== */
+.quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quick-action {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text-color);
+  transition: background-color 0.15s;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--surface-100);
+  }
+
+  &__icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+
+    &--primary { background: rgba(var(--p-primary), 0.12); color: var(--p-primary); }
+    &--success { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+    &--warning { background: rgba(249, 115, 22, 0.12); color: #f97316; }
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-color);
+    line-height: 1.2;
+  }
+
+  &__desc {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+
+  &__arrow {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+}
+
+/* ===========================
+   Status List
+=========================== */
+.status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &--success { background: #10b981; }
+    &--warning { background: #f59e0b; }
+    &--danger { background: #ef4444; }
+    &--info { background: #3b82f6; }
+  }
+
+  &__label {
+    flex: 1;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  &__value {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text-color);
+  }
+}
+
+/* ===========================
+   Dark mode overrides
+=========================== */
+:host-context(.app-dark) {
+  .stat-card,
+  .panel {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  }
+}

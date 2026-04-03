@@ -1,0 +1,259 @@
+<app-dialog-wrapper
+  [(visible)]="visible"
+  [title]="pedidoId ? 'Pedido Nº ' + pedidoId : 'Novo Pedido'"
+  [isLoadingData]="isLoadingData"
+  [isSaving]="isSaving"
+  [saveDisabled]="form.invalid"
+  width="100vw"
+  height="100vh"
+  position="top"
+  (save)="onSave()">
+
+  <form [formGroup]="form" class="grid p-fluid">
+
+    <!-- ===================== LADO ESQUERDO ======================== -->
+    <div class="col-12 xl:col-9">
+
+      <!-- Cabeçalho do Pedido -->
+      <div class="mb-4">
+        <h3 class="section-title">
+          <i class="pi pi-file-edit"></i>
+          Dados do Pedido
+        </h3>
+
+        <div class="grid">
+          <div class="col-12 md:col-5 lg:col-5 field">
+            <label for="cod_cliente">Cliente *</label>
+            <p-select
+              id="cod_cliente"
+              formControlName="cod_cliente"
+              [options]="clientes"
+              optionLabel="razao_social"
+              optionValue="id"
+              placeholder="Selecione o Cliente"
+              [filter]="true"
+              filterBy="razao_social"
+              appendTo="body">
+            </p-select>
+          </div>
+
+          <div class="col-12 md:col-4 lg:col-4 field">
+            <label for="data_pedido">Data do Pedido *</label>
+            <p-datepicker id="data_pedido" formControlName="data_pedido" [showIcon]="true" dateFormat="dd/mm/yy"></p-datepicker>
+          </div>
+
+          <div class="col-12 md:col-3 lg:col-3 field">
+            <label for="status">Status *</label>
+            <p-select id="status" formControlName="status" [options]="statusOpcoes" appendTo="body"></p-select>
+          </div>
+
+          <div class="col-12 md:col-4 lg:col-4 field">
+            <label for="cod_meio_pagamento">Meio de Pagamento *</label>
+            <p-select
+              id="cod_meio_pagamento"
+              formControlName="cod_meio_pagamento"
+              [options]="meiosPagamento"
+              optionLabel="descricao"
+              optionValue="id"
+              placeholder="Selecione o meio de pagamento"
+              appendTo="body">
+            </p-select>
+            @if (form.get('cod_meio_pagamento')?.invalid && form.get('cod_meio_pagamento')?.touched) {
+              <small class="p-error">Meio de pagamento é obrigatório.</small>
+            }
+          </div>
+
+          <div class="col-12 field">
+            <label for="observacoes">Observações Internas</label>
+            <textarea id="observacoes" pInputTextarea formControlName="observacoes" rows="2"
+              placeholder="Notas sobre a fabricação ou entrega..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Itens do Pedido -->
+      <h3 class="section-title">
+        <i class="pi pi-list"></i>
+        Itens do Pedido
+        <p-button
+          label="Adicionar Item"
+          icon="pi pi-plus"
+          [text]="true"
+          severity="primary"
+          size="small"
+          (onClick)="adicionarItem()"
+          [style]="{'margin-left': 'auto'}">
+        </p-button>
+      </h3>
+
+      <p-table [value]="itens.controls" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 15%">Tipo</th>
+            <th style="width: 35%">Item</th>
+            <th style="width: 12%">Qtd.</th>
+            <th style="width: 15%">Vl. Unit.</th>
+            <th style="width: 15%">Subtotal</th>
+            <th style="width: 8%"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-control let-i="rowIndex">
+          <tr [formGroup]="$any(control)">
+            <td>
+              <p-select formControlName="tipo" [options]="tiposItem" (onChange)="onTipoChange(i)" appendTo="body"></p-select>
+            </td>
+            <td>
+              @if (control.get('tipo')?.value === ETipoItemPedido.Produto) {
+                <p-select
+                  formControlName="cod_produto"
+                  [options]="produtos"
+                  optionLabel="descricao"
+                  optionValue="id"
+                  [filter]="true"
+                  (onChange)="onSelecaoProduto(i, $event)"
+                  placeholder="Selecione Produto"
+                  appendTo="body">
+                </p-select>
+              } @else if (control.get('tipo')?.value === ETipoItemPedido.Corte) {
+                <div style="display:flex; flex-direction:column; gap:0.35rem;">
+
+                  <!-- 1. Chapa -->
+                  <p-select
+                    formControlName="cod_chapa"
+                    [options]="chapas"
+                    optionLabel="descricao"
+                    optionValue="id"
+                    placeholder="1. Selecione a Chapa"
+                    appendTo="body"
+                    (onChange)="onChapaChange(i)">
+                  </p-select>
+
+                  <!-- 2. Desenho (após chapa) -->
+                  @if (control.get('cod_chapa')?.value) {
+                    <p-select
+                      formControlName="cod_desenho"
+                      [options]="desenhos"
+                      optionLabel="descricao"
+                      optionValue="id"
+                      placeholder="2. Selecione o Desenho"
+                      appendTo="body">
+                    </p-select>
+                  }
+
+                  <!-- 3. Medidas (após desenho) -->
+                  @if (control.get('cod_desenho')?.value) {
+                    <p-button
+                      [label]="getMedidasLabel(control)"
+                      icon="pi pi-ruler"
+                      size="small"
+                      severity="secondary"
+                      [outlined]="true"
+                      (onClick)="abrirMedidas(i)"
+                      styleClass="w-full">
+                    </p-button>
+                  }
+
+                  <!-- 4. Resultado: corte detectado OU seleção manual -->
+                  @if (control.get('cod_corte')?.value && control.get('medidas')?.value?.length > 0) {
+                    <small style="color:#22c55e; display:flex; align-items:center; gap:0.3rem;">
+                      <i class="pi pi-check-circle"></i>
+                      {{ getNomeCorteDetectado(control) }}
+                    </small>
+                  } @else if (control.get('medidas')?.value?.length > 0) {
+                    <small class="p-error" style="display:flex; align-items:center; gap:0.3rem; margin-bottom:0.1rem;">
+                      <i class="pi pi-exclamation-triangle"></i>
+                      Nenhum corte compatível — selecione manualmente:
+                    </small>
+                    <p-select
+                      formControlName="cod_corte"
+                      [options]="getCortesDeChapa(control.get('cod_chapa')?.value)"
+                      optionLabel="descricao"
+                      optionValue="id"
+                      placeholder="Selecione o corte"
+                      appendTo="body"
+                      (onChange)="onCorteManualChange(i, $event)">
+                    </p-select>
+                  }
+
+                </div>
+              } @else {
+                <p-select
+                  formControlName="cod_servico"
+                  [options]="servicos"
+                  optionLabel="descricao"
+                  optionValue="id"
+                  [filter]="true"
+                  (onChange)="onSelecaoServico(i, $event)"
+                  placeholder="Selecione Serviço"
+                  appendTo="body">
+                </p-select>
+              }
+            </td>
+            <td>
+              <p-inputNumber formControlName="quantidade" mode="decimal" [minFractionDigits]="2" inputStyleClass="w-full"></p-inputNumber>
+            </td>
+            <td>
+              <input pInputText appCurrencyMask formControlName="valor_unitario" class="w-full" />
+            </td>
+            <td class="font-bold">
+              {{ control.get('subtotal').value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+            </td>
+            <td class="text-center">
+              <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" (onClick)="removerItem(i)"></p-button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="text-center p-4 text-600">Nenhum item adicionado.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- ===================== RESUMO (sidebar) ======================== -->
+    <div class="col-12 xl:col-3">
+      <div style="position: sticky; top: 0;">
+
+        <h3 class="section-title">
+          <i class="pi pi-calculator"></i>
+          Resumo do Pedido
+        </h3>
+
+        <div class="row" style="margin-bottom: 0.5rem;">
+          <div class="col-12" style="display:flex; justify-content:space-between; align-items:center; padding: 0.5rem 0.75rem;">
+            <span class="text-600">Material / Cortes:</span>
+            <span class="font-bold">{{ form.get('valor_material')?.value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+          </div>
+        </div>
+
+        <div class="row" style="margin-bottom: 0.5rem;">
+          <div class="col-12" style="display:flex; justify-content:space-between; align-items:center; padding: 0.5rem 0.75rem;">
+            <span class="text-600">Serviço:</span>
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+              <i class="pi pi-info-circle text-blue-500" pTooltip="Calculado automaticamente sobre o material"></i>
+              <span class="font-bold">{{ form.get('valor_servico')?.value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" style="border-top: 2px solid var(--border-color); padding-top: 0.75rem; margin-top: 0.5rem;">
+          <div class="col-12" style="display:flex; justify-content:space-between; align-items:center; padding: 0.5rem 0.75rem;">
+            <span class="font-bold" style="font-size: 1rem;">Total do Pedido:</span>
+            <span style="font-size: 1.5rem; font-weight: 700; color: var(--p-primary);">{{ form.get('valor_total')?.value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem; padding: 0.75rem; background: var(--surface-100); border-radius: 8px; border-left: 3px solid var(--p-primary);">
+          <p style="margin: 0; font-size: 0.75rem; color: var(--text-secondary); font-style: italic; line-height: 1.5;">
+            * O valor de serviço é calculado automaticamente sobre o valor dos itens de material (Produtos e Cortes).
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </form>
+</app-dialog-wrapper>
+
+<app-desenho-medida #medidasDialog (confirmed)="onMedidasConfirmadas($event)"></app-desenho-medida>

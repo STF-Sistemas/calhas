@@ -1,0 +1,757 @@
+@use 'sass:math';
+@import "primeicons/primeicons.css";
+
+:root {
+  /* Default Theme (Orange) */
+  --p-primary: #f97316;
+  --p-primary-hover: #ea580c;
+
+  --surface-0: #ffffff;
+  --surface-50: #f8fafc;
+  --surface-100: #f1f5f9;
+  --surface-200: #e2e8f0;
+  --surface-300: #cbd5e1;
+  --surface-400: #94a3b8;
+  --surface-500: #64748b;
+  --surface-600: #475569;
+  --surface-700: #334155;
+  --surface-800: #1e293b;
+  --surface-900: #0f172a;
+
+  --text-color: var(--surface-800);
+  --text-secondary: var(--surface-500);
+  --border-color: var(--surface-200);
+  --bg-color: var(--surface-50);
+
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 56px;
+  /* Sakai Special */
+  --transition-speed: 0.3s;
+
+  /* PrimeNG & Sakai Compatibility */
+  --primary-color: var(--p-primary);
+  --primary-color-text: #ffffff;
+  --p-primary-color: var(--p-primary);
+}
+
+/* Primary Color Overrides */
+.theme-orange {
+  --p-primary: #f97316;
+  --p-primary-hover: #ea580c;
+}
+
+.theme-blue {
+  --p-primary: #3b82f6;
+  --p-primary-hover: #2563eb;
+}
+
+.theme-emerald {
+  --p-primary: #10b981;
+  --p-primary-hover: #059669;
+}
+
+.theme-indigo {
+  --p-primary: #6366f1;
+  --p-primary-hover: #4f46e5;
+}
+
+.app-dark {
+  --surface-0: #18181b;
+  --surface-50: #09090b;
+  --surface-100: #27272a;
+  --surface-200: #3f3f46;
+  --surface-300: #52525b;
+  --surface-400: #71717a;
+  --surface-500: #a1a1aa;
+  --surface-600: #d4d4d8;
+  --surface-700: #e4e4e7;
+  --surface-800: #f4f4f5;
+  --surface-900: #fafafa;
+
+  --text-color: var(--surface-700);
+  --text-secondary: var(--surface-400);
+  --border-color: var(--surface-100);
+  --bg-color: #09090b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Sakai Layout Structure */
+.layout-wrapper {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: var(--bg-color);
+  transition: background-color var(--transition-speed);
+}
+
+.layout-topbar {
+  position: fixed;
+  height: 5rem;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  padding: 0 2rem;
+  background-color: var(--surface-0);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  transition: background-color var(--transition-speed);
+}
+
+.layout-topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.layout-topbar-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: auto;
+}
+
+.layout-sidebar {
+  position: fixed;
+  width: 300px;
+  height: calc(100vh - 5.5rem);
+  z-index: 999;
+  overflow-y: auto;
+  overflow-x: hidden;
+  user-select: none;
+  top: 5.5rem;
+  left: 1.5rem;
+  transition: left var(--transition-speed), transform var(--transition-speed);
+  background-color: var(--surface-0);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1.25rem 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.layout-main-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+  justify-content: space-between;
+  padding: 6.5rem 2.5rem 2.5rem calc(300px + 3.5rem);
+  transition: padding var(--transition-speed);
+}
+
+/* Sidebar oculta — desktop */
+.layout-wrapper.layout-static-inactive .layout-sidebar {
+  left: calc(-300px - 2rem);
+}
+
+.layout-wrapper.layout-static-inactive .layout-main-container {
+  padding-left: 2.5rem;
+}
+
+/* Mobile */
+@media (max-width: 991px) {
+  .layout-sidebar {
+    top: 0;
+    left: -320px;
+    height: 100vh;
+    border-radius: 0;
+    padding-top: 5.5rem;
+    z-index: 1001;
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.12);
+  }
+
+  .layout-wrapper.layout-mobile-active .layout-sidebar {
+    left: 0;
+  }
+
+  .layout-main-container {
+    padding: 6.5rem 1.25rem 2rem 1.25rem;
+  }
+}
+
+/* Sakai Menu Elements */
+.layout-menu-category {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 1.5rem;
+  margin-bottom: 0.375rem;
+  padding: 0 0.875rem;
+}
+
+.layout-menuitem-root-text {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 1.25rem 0 0.375rem 0;
+  padding: 0 0.875rem;
+}
+
+.layout-menu ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.layout-menu li a {
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  outline: 0 none;
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 0.675rem 0.875rem;
+  border-radius: 10px;
+  transition: background-color 0.15s, color 0.15s;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  i {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+
+  &:hover {
+    background-color: var(--surface-100);
+
+    i {
+      color: var(--p-primary);
+    }
+  }
+
+  &.active-route {
+    font-weight: 600;
+    color: var(--p-primary);
+    background-color: color-mix(in srgb, var(--p-primary) 10%, transparent);
+
+    i {
+      color: var(--p-primary);
+    }
+  }
+}
+
+
+.layout-mask {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 998;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+}
+
+.layout-wrapper.layout-mobile-active .layout-mask {
+  display: block;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface-200);
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--surface-300);
+}
+
+.app-dark ::-webkit-scrollbar-thumb {
+  background: var(--surface-100);
+}
+
+/* Utility Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Global Form Helpers */
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.75rem;
+  width: 100%;
+
+  label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--text-color);
+  }
+
+  /* Garante que inputs e masks preencham 100% do campo */
+  input,
+  input.p-inputtext,
+  p-inputmask,
+  p-inputmask input,
+  .p-inputmask,
+  .p-inputmask input {
+    width: 100%;
+    display: block;
+  }
+}
+
+/* ==========================================================
+   Grid Bootstrap-compatível (12 colunas)
+   Mesmas classes e breakpoints do Bootstrap 5:
+   row, col-{n}, col-sm-{n}, col-md-{n}, col-lg-{n}, col-xl-{n}
+   ========================================================== */
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -0.75rem;
+  margin-left: -0.75rem;
+}
+
+/* Padding lateral padrão em todas as colunas */
+[class^="col"],
+[class*=" col"] {
+  padding-right: 0.75rem;
+  padding-left: 0.75rem;
+  width: 100%;
+  min-width: 0;
+}
+
+/* col sem breakpoint (sempre aplica) */
+@for $i from 1 through 12 {
+  .col-#{$i} {
+    flex: 0 0 auto;
+    width: math.percentage(math.div($i, 12));
+  }
+}
+
+.col {
+  flex: 1 0 0%;
+}
+
+/* sm ≥ 576px */
+@media (min-width: 576px) {
+  @for $i from 1 through 12 {
+    .col-sm-#{$i} {
+      flex: 0 0 auto;
+      width: math.percentage(math.div($i, 12));
+    }
+  }
+
+  .col-sm {
+    flex: 1 0 0%;
+  }
+}
+
+/* md ≥ 768px */
+@media (min-width: 768px) {
+  @for $i from 1 through 12 {
+    .col-md-#{$i} {
+      flex: 0 0 auto;
+      width: math.percentage(math.div($i, 12));
+    }
+  }
+
+  .col-md {
+    flex: 1 0 0%;
+  }
+}
+
+/* lg ≥ 992px */
+@media (min-width: 992px) {
+  @for $i from 1 through 12 {
+    .col-lg-#{$i} {
+      flex: 0 0 auto;
+      width: math.percentage(math.div($i, 12));
+    }
+  }
+
+  .col-lg {
+    flex: 1 0 0%;
+  }
+}
+
+/* xl ≥ 1200px */
+@media (min-width: 1200px) {
+  @for $i from 1 through 12 {
+    .col-xl-#{$i} {
+      flex: 0 0 auto;
+      width: math.percentage(math.div($i, 12));
+    }
+  }
+
+  .col-xl {
+    flex: 1 0 0%;
+  }
+}
+
+/* Garante que o grid do PrimeFlex tenha espaçamento padrão */
+.grid {
+  margin-right: -0.5rem;
+  margin-left: -0.5rem;
+  margin-top: -0.5rem;
+}
+
+/* ==========================================================
+   Global PrimeNG Color Sync
+   Sincroniza TODOS os componentes com o tema ativo via --p-primary
+   ========================================================== */
+
+/* --- Checkbox --- */
+.p-checkbox.p-highlight>.p-checkbox-box,
+.p-checkbox .p-checkbox-box.p-highlight {
+  background-color: var(--p-primary) !important;
+  border-color: var(--p-primary) !important;
+}
+
+/* --- Radio Button --- */
+.p-radiobutton.p-highlight .p-radiobutton-box {
+  border-color: var(--p-primary) !important;
+
+  .p-radiobutton-icon {
+    background-color: var(--p-primary) !important;
+  }
+}
+
+/* --- Toggle Switch --- */
+.p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
+  background: var(--p-primary) !important;
+}
+
+/* --- Input Focus --- */
+.p-inputtext:focus,
+.p-password input:focus,
+.p-inputnumber .p-inputtext:focus,
+.p-textarea:focus {
+  border-color: var(--p-primary) !important;
+  box-shadow: 0 0 0 1px var(--p-primary) !important;
+}
+
+/* --- Dropdown / MultiSelect / Select foco --- */
+.p-dropdown:not(.p-disabled).p-focus,
+.p-multiselect:not(.p-disabled).p-focus,
+.p-select:not(.p-disabled).p-focus {
+  border-color: var(--p-primary) !important;
+  box-shadow: 0 0 0 1px var(--p-primary) !important;
+}
+
+/* --- Dropdown item selecionado --- */
+.p-dropdown-item.p-highlight,
+.p-multiselect-item.p-highlight,
+.p-select-option.p-select-option-selected {
+  background: color-mix(in srgb, var(--p-primary) 12%, transparent) !important;
+  color: var(--p-primary) !important;
+}
+
+/* --- Chips / Tags --- */
+.p-chip {
+  background-color: color-mix(in srgb, var(--p-primary) 12%, transparent);
+  color: var(--p-primary);
+}
+
+/* --- Progress Bar --- */
+.p-progressbar .p-progressbar-value {
+  background: var(--p-primary) !important;
+}
+
+/* --- Spinner --- */
+.p-progressspinner-circle {
+  stroke: var(--p-primary) !important;
+}
+
+/* --- Texto primário --- */
+.text-primary {
+  color: var(--p-primary) !important;
+}
+
+/* --- Menu / Sidebar ativo --- */
+.layout-menu li a.active-route,
+.layout-menu li a.active-route i {
+  color: var(--p-primary) !important;
+}
+
+.layout-menu li a.active-route {
+  background-color: color-mix(in srgb, var(--p-primary) 10%, transparent) !important;
+}
+
+/* --- Background primário (logo, badge, botão) --- */
+.bg-primary {
+  background-color: var(--p-primary) !important;
+}
+
+/* --- Borda primária --- */
+.border-primary {
+  border-color: var(--p-primary) !important;
+}
+
+/* ==========================================================
+   Botões p-button — garante a cor do tema ativo
+   ========================================================== */
+
+/* Botão primário (filled) */
+.p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-link):not(.p-button-secondary):not(.p-button-info):not(.p-button-success):not(.p-button-warning):not(.p-button-danger):not(.p-button-help),
+.p-button[severity="primary"] {
+  background-color: var(--p-primary) !important;
+  border-color: var(--p-primary) !important;
+  color: #fff !important;
+
+  &:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--p-primary) 88%, #000) !important;
+    border-color: color-mix(in srgb, var(--p-primary) 88%, #000) !important;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+  }
+}
+
+/* Botão texto (text=true) com severity primary */
+.p-button.p-button-text[severity="primary"],
+.p-button.p-button-text:not([severity]):not(.p-button-secondary):not(.p-button-info):not(.p-button-success):not(.p-button-warning):not(.p-button-danger):not(.p-button-help) {
+  color: var(--p-primary) !important;
+
+  &:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--p-primary) 10%, transparent) !important;
+    color: var(--p-primary) !important;
+  }
+}
+
+/* Botão de confirmação padrão do ConfirmDialog */
+.p-confirmdialog .p-button:not(.p-button-outlined):not(.p-button-text) {
+  background-color: var(--p-primary) !important;
+  border-color: var(--p-primary) !important;
+  color: #fff !important;
+}
+
+/* ==========================================================
+   Dialog Global — layout flex + suporte a altura fixa
+   PrimeNG renderiza o dialog em portal (body), portanto
+   ::ng-deep no componente não alcança estes elementos.
+   ========================================================== */
+
+/* Modal cobre tudo do topo ao rodapé */
+.p-dialog-mask {
+  top: 0 !important;
+  height: 90vh !important;
+  z-index: 1100 !important;
+}
+
+.p-dialog {
+  display: flex !important;
+  flex-direction: column !important;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.p-dialog>.p-dialog-content {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+}
+
+.p-dialog>.p-dialog-header {
+  border-bottom: 1px solid var(--border-color, var(--surface-200));
+  border-radius: 16px 16px 0 0;
+  background: var(--surface-0);
+  flex-shrink: 0;
+
+  .p-dialog-title {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--text-color);
+  }
+}
+
+.p-dialog>.p-dialog-footer {
+  border-top: 1px solid var(--border-color, var(--surface-200));
+  border-radius: 0 0 16px 16px;
+  background: var(--surface-50, var(--surface-0));
+  flex-shrink: 0;
+}
+
+/* ==========================================================
+   Page layout global
+   ========================================================== */
+
+.page-section {
+  display: block;
+}
+
+.page-header {
+  margin-bottom: 1.75rem;
+
+  &__info {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__title-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--p-primary) 12%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    i {
+      font-size: 1.3rem;
+      color: var(--p-primary);
+    }
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0 0 0.2rem;
+    line-height: 1.2;
+  }
+
+  &__subtitle {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+}
+
+/* ==========================================================
+   Form helpers globais
+   ========================================================== */
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--p-primary);
+  margin: 0 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color, var(--surface-200));
+
+  i {
+    font-size: 0.85rem;
+  }
+}
+
+.label-hint {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-left: 0.25rem;
+}
+
+/* ==========================================================
+   Dialog fullscreen mobile
+   ========================================================== */
+@media screen and (max-width: 640px) {
+  /* Remove padding/centering da mask para dialog fullscreen */
+  .p-dialog-mask:has(.dialog-fullscreen-mobile) {
+    padding: 0 !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+  }
+
+  .dialog-fullscreen-mobile {
+    position: fixed !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    top: 0 !important;
+    left: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+
+    > .p-dialog-header {
+      border-radius: 0 !important;
+      flex-shrink: 0;
+    }
+
+    > .p-dialog-content {
+      flex: 1 1 0 !important;
+      min-height: 0 !important;
+      overflow-y: auto !important;
+    }
+
+    > .p-dialog-footer {
+      border-radius: 0 !important;
+      padding: 0.5rem 0.75rem !important;
+      flex-shrink: 0;
+
+      /* Botões compactos: apenas ícone no mobile */
+      .dialog-footer-btn .p-button-label {
+        display: none !important;
+      }
+
+      .dialog-footer-btn.p-button {
+        width: 2.75rem !important;
+        height: 2.75rem !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        justify-content: center;
+      }
+    }
+  }
+}

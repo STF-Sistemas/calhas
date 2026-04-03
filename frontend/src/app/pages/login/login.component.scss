@@ -1,0 +1,154 @@
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1rem;
+    background-color: var(--bg-color);
+    transition: background-color var(--transition-speed);
+}
+
+.theme-switcher-fixed {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    display: flex;
+    gap: 1rem;
+    z-index: 1000;
+
+    .theme-button {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        background-color: var(--surface-0);
+        color: var(--text-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        transition: transform 0.2s, background-color 0.2s;
+        cursor: pointer;
+
+        &:hover {
+            transform: scale(1.1);
+            background-color: var(--surface-100);
+        }
+
+        i {
+            font-size: 1.5rem;
+        }
+    }
+}
+
+/* Sakai Card with Gradient Border */
+.login-card-wrapper {
+    padding: 1px;
+    border-radius: var(--radius-xl);
+    background: linear-gradient(180deg, var(--p-primary) 10%, color-mix(in srgb, var(--p-primary) 0%, transparent) 30%);
+    width: 30rem;
+    max-width: 95vw;
+}
+
+.login-card {
+    background-color: var(--surface-0);
+    border-radius: var(--radius-xl);
+    padding: 3.5rem;
+    width: 100%;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+
+    h1, span {
+        text-align: center !important;
+        width: 100%;
+    }
+}
+
+.login-footer-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    width: 100%;
+}
+
+.logo-box {
+    svg {
+        width: 3rem;
+        height: 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .login-card {
+        padding: 3rem 1.5rem;
+    }
+    
+    .theme-switcher-fixed {
+        top: 1rem;
+        right: 1rem;
+    }
+}
+
+:host ::ng-deep {
+    .p-inputtext, .p-password, .p-password input {
+        width: 100% !important;
+    }
+
+    .p-inputtext {
+        border-radius: var(--radius-md);
+        border-color: var(--border-color);
+        
+        &:focus {
+            border-color: var(--p-primary);
+            box-shadow: 0 0 0 2px color-mix(in srgb, var(--p-primary) 20%, transparent);
+        }
+    }
+
+    .p-password input {
+        border-radius: var(--radius-md);
+    }
+
+    .p-checkbox .p-checkbox-box {
+        &.p-highlight {
+            background: var(--p-primary) !important;
+            border-color: var(--p-primary) !important;
+        }
+        
+        &:not(.p-disabled):hover {
+            border-color: var(--p-primary) !important;
+        }
+    }
+
+    .p-button {
+        background-color: var(--p-primary);
+        border-color: var(--p-primary);
+        color: #ffffff;
+        border-radius: var(--radius-md);
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: var(--p-primary-hover);
+            border-color: var(--p-primary-hover);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            background-color: var(--surface-300);
+            border-color: var(--surface-300);
+            color: var(--surface-600);
+        }
+    }
+
+    /* Dark Mode Overrides for Sakai inputs appearance */
+    .app-dark {
+        .p-inputtext {
+            background-color: var(--surface-50);
+        }
+    }
+}
+
+.app-dark .login-card-wrapper {
+    background: linear-gradient(180deg, var(--p-primary) 10%, color-mix(in srgb, var(--p-primary) 5%, transparent) 50%);
+}

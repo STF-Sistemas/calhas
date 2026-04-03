@@ -1,0 +1,245 @@
+import { Injectable } from '@angular/core';
+import { IPedido, IPedidoItem } from '#shared/interfaces';
+import { ETipoItemPedido, EStatusPedido } from '#shared/enums';
+import { formatCurrency, formatNumber, formatCpfCnpj, formatPhone, formatDate } from '#shared/functions/format.functions';
+
+@Injectable({ providedIn: 'root' })
+export class PedidoImpressaoService {
+
+  imprimir(pedido: IPedido): void {
+    const html = this.gerarHtml(pedido);
+    const win = window.open('', '_blank');
+    if (!win) {
+      alert('Permita pop-ups para imprimir o pedido.');
+      return;
+    }
+    win.document.write(html);
+    win.document.close();
+    win.onload = () => win.print();
+  }
+
+  private statusLabel(status: number): string {
+    const map: Record<number, string> = {
+      [EStatusPedido.Aberto]: 'Aberto',
+      [EStatusPedido.EmProducao]: 'Em Produção',
+      [EStatusPedido.Concluido]: 'Finalizado',
+      [EStatusPedido.Cancelado]: 'Cancelado',
+    };
+    return map[status] ?? 'Desconhecido';
+  }
+
+  private tipoLabel(tipo: number): string {
+    if (tipo === ETipoItemPedido.Produto) return 'Produto';
+    if (tipo === ETipoItemPedido.Corte) return 'Corte';
+    if (tipo === ETipoItemPedido.Servico) return 'Serviço';
+    return '-';
+  }
+
+  private itemDescricao(item: IPedidoItem): string {
+    if (item.tipo === ETipoItemPedido.Produto) return item.produto?.descricao ?? '-';
+    if (item.tipo === ETipoItemPedido.Corte) return item.corte?.descricao ?? '-';
+    if (item.tipo === ETipoItemPedido.Servico) return item.servico?.descricao ?? '-';
+    return '-';
+  }
+
+  private gerarLinhasItens(itens: IPedidoItem[]): string {
+    return itens.map((item, i) => {
+      const subtotal = (item.quantidade ?? 0) * (item.valor_unitario ?? 0);
+      return `
+        <tr class="${i % 2 === 0 ? 'row-even' : 'row-odd'}">
+          <td class="center">${i + 1}</td>
+          <td>${this.tipoLabel(item.tipo)}</td>
+          <td>${this.itemDescricao(item)}</td>
+          <td class="center">${formatNumber(item.quantidade)}</td>
+          <td class="right">${formatCurrency(item.valor_unitario)}</td>
+          <td class="right"><strong>${formatCurrency(subtotal)}</strong></td>
+        </tr>`;
+    }).join('');
+  }
+
+  private gerarHtml(pedido: IPedido): string {
+    const itens = pedido.itens ?? [];
+    const status = this.statusLabel(pedido.status);
+    const marcaDagua = pedido.empresa?.marca_dagua?.trim() ?? '';
+    const meioPagamento = pedido.meio_pagamento?.descricao ?? '-';
+    const cliente = pedido.cliente?.razao_social ?? '-';
+    const cnpjCpf = pedido.cliente?.cpf_cnpj
+      ? `<span class="label">CPF/CNPJ:</span> ${formatCpfCnpj(pedido.cliente.cpf_cnpj)}`
+      : '';
+    const telefone = pedido.cliente?.telefone
+      ? ` &nbsp;|&nbsp; <span class="label">Telefone:</span> ${formatPhone(pedido.cliente.telefone)}`
+      : '';
+    const cidade = pedido.cliente?.cidade
+      ? ` &nbsp;|&nbsp; <span class="label">Cidade:</span> ${pedido.cliente.cidade.descricao} / ${pedido.cliente.cidade.uf}`
+      : '';
+
+    return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Pedido Nº ${pedido.id}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; font-size: 11px; color: #1a1a1a; background: #fff; }
+    .page { max-width: 800px; margin: 0 auto; padding: 24px 28px; }
+
+    /* Cabeçalho */
+    .header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 2px solid #1a1a1a; margin-bottom: 16px; }
+    .header-title { font-size: 22px; font-weight: 700; color: #1a1a1a; }
+    .header-sub { font-size: 11px; color: #555; margin-top: 2px; }
+    .pedido-badge { text-align: right; }
+    .pedido-num { font-size: 26px; font-weight: 800; color: #1a1a1a; }
+    .pedido-num span { font-size: 12px; font-weight: 400; display: block; color: #555; }
+    .status-badge { display: inline-block; margin-top: 4px; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; background: #e5e7eb; color: #374151; }
+
+    /* Seção de info */
+    .section { margin-bottom: 14px; }
+    .section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280; margin-bottom: 6px; border-bottom: 1px solid #e5e7eb; padding-bottom: 3px; }
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 16px; }
+    .info-item { }
+    .label { font-weight: 600; color: #374151; }
+    .info-row { margin-bottom: 3px; font-size: 11px; }
+    .cliente-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+
+    /* Tabela de itens */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+    thead tr { background: #1a1a1a; color: #fff; }
+    thead th { padding: 6px 8px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    thead th.center { text-align: center; }
+    thead th.right { text-align: right; }
+    tbody td { padding: 5px 8px; border-bottom: 1px solid #f0f0f0; font-size: 11px; vertical-align: middle; }
+    tbody td.center { text-align: center; }
+    tbody td.right { text-align: right; }
+    .row-even { background: #fff; }
+    .row-odd { background: #f9fafb; }
+
+    /* Totais */
+    .totais-wrapper { display: flex; justify-content: flex-end; }
+    .totais-box { width: 280px; }
+    .totais-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 11px; border-bottom: 1px solid #f0f0f0; }
+    .totais-row.total { border-top: 2px solid #1a1a1a; border-bottom: none; padding-top: 8px; margin-top: 4px; }
+    .totais-row.total .val { font-size: 16px; font-weight: 800; }
+
+    /* Observações */
+    .obs-box { background: #f9fafb; border-left: 3px solid #6b7280; padding: 8px 12px; border-radius: 4px; margin-bottom: 14px; font-size: 11px; color: #374151; }
+
+    /* Rodapé */
+    .footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #e5e7eb; font-size: 10px; color: #9ca3af; display: flex; justify-content: space-between; }
+
+    /* Marca d'água */
+    .watermark {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      font-size: 72px;
+      font-weight: 900;
+      color: rgba(0, 0, 0, 0.08);
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 0;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    .page { position: relative; z-index: 1; }
+
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .page { padding: 0; }
+      @page { margin: 15mm 15mm 15mm 15mm; }
+      .watermark { position: fixed; top: 50%; left: 50%; }
+    }
+  </style>
+</head>
+<body>
+${marcaDagua ? `<div class="watermark" aria-hidden="true">${marcaDagua}</div>` : ''}
+<div class="page">
+
+  <!-- Cabeçalho -->
+  <div class="header">
+    <div>
+      <div class="header-title">Pedido de Fabricação</div>
+      <div class="header-sub">Calhas &amp; Coberturas</div>
+    </div>
+    <div class="pedido-badge">
+      <div class="pedido-num"><span>Nº do Pedido</span>${pedido.id}</div>
+      <div class="status-badge">${status}</div>
+    </div>
+  </div>
+
+  <!-- Dados do Pedido -->
+  <div class="section">
+    <div class="section-title">Dados do Pedido</div>
+    <div class="info-grid">
+      <div class="info-item"><span class="label">Data:</span> ${formatDate(pedido.data_pedido)}</div>
+      <div class="info-item"><span class="label">Status:</span> ${status}</div>
+      <div class="info-item"><span class="label">Nº Pedido:</span> ${pedido.id}</div>
+      <div class="info-item"><span class="label">Meio de Pagamento:</span> ${meioPagamento}</div>
+    </div>
+  </div>
+
+  <!-- Cliente -->
+  <div class="section">
+    <div class="section-title">Cliente</div>
+    <div class="cliente-name">${cliente}</div>
+    <div class="info-row">${cnpjCpf}${telefone}${cidade}</div>
+  </div>
+
+  <!-- Itens -->
+  <div class="section">
+    <div class="section-title">Itens do Pedido</div>
+    <table>
+      <thead>
+        <tr>
+          <th class="center" style="width:3%">#</th>
+          <th style="width:10%">Tipo</th>
+          <th>Descrição</th>
+          <th class="center" style="width:14%">Qtd.</th>
+          <th class="right" style="width:14%">Vl. Unit.</th>
+          <th class="right" style="width:14%">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${this.gerarLinhasItens(itens)}
+        ${itens.length === 0 ? '<tr><td colspan="6" style="text-align:center;padding:12px;color:#9ca3af;">Nenhum item</td></tr>' : ''}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Totais -->
+  <div class="totais-wrapper">
+    <div class="totais-box">
+      <div class="totais-row">
+        <span>Material / Cortes:</span>
+        <span class="val">${formatCurrency(pedido.valor_material)}</span>
+      </div>
+      <div class="totais-row">
+        <span>Serviço:</span>
+        <span class="val">${formatCurrency(pedido.valor_servico)}</span>
+      </div>
+      <div class="totais-row total">
+        <span><strong>Total do Pedido:</strong></span>
+        <span class="val">${formatCurrency(pedido.valor_total)}</span>
+      </div>
+    </div>
+  </div>
+
+  ${pedido.observacoes ? `
+  <!-- Observações -->
+  <div class="section" style="margin-top:14px;">
+    <div class="section-title">Observações</div>
+    <div class="obs-box">${pedido.observacoes}</div>
+  </div>` : ''}
+
+  <!-- Rodapé -->
+  <div class="footer">
+    <span>Gerado em ${formatDate(new Date())} ${new Date().toTimeString().slice(0, 5)}</span>
+    <span>Pedido Nº ${pedido.id} — ${cliente}</span>
+  </div>
+
+</div>
+</body>
+</html>`;
+  }
+}

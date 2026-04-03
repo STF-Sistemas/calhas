@@ -1,0 +1,73 @@
+<app-dialog-wrapper
+  [(visible)]="visible"
+  [title]="desenhoId ? 'Editar Desenho' : 'Novo Desenho'"
+  [isLoadingData]="isLoadingData"
+  [isSaving]="isSaving"
+  [saveDisabled]="false"
+  [fullscreenMobile]="true"
+  width="900px"
+  height="calc(100vh - 4rem)"
+  position="top"
+  (save)="onSave()"
+  (show)="onDialogShow()">
+
+  <form [formGroup]="form" class="p-fluid mb-3">
+    <div class="field">
+      <label for="descricao">Descrição *</label>
+      <input pInputText id="descricao" formControlName="descricao" placeholder="Ex: Calha Meia Cana 20cm" />
+      @if (form.get('descricao')?.invalid && form.get('descricao')?.touched) {
+        <small class="p-error">Descrição é obrigatória.</small>
+      }
+    </div>
+  </form>
+
+  <!-- Toolbar do canvas -->
+  <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+    <span class="text-600 text-sm">
+      <i class="pi pi-info-circle mr-1"></i>
+      Clique no canvas para adicionar pontos e formar o perfil do corte.
+    </span>
+    <div style="margin-left:auto; display:flex; gap:0.4rem;">
+      <p-button
+        label="Desfazer"
+        icon="pi pi-undo"
+        severity="secondary"
+        [text]="true"
+        size="small"
+        [disabled]="pontos.length === 0"
+        (onClick)="undo()"
+        pTooltip="Remove o último ponto">
+      </p-button>
+      <p-button
+        label="Limpar"
+        icon="pi pi-trash"
+        severity="danger"
+        [text]="true"
+        size="small"
+        [disabled]="pontos.length === 0"
+        (onClick)="clear()"
+        pTooltip="Apaga o desenho inteiro">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- Canvas -->
+  <div style="position:relative; width:100%; border-radius:6px; overflow:hidden; border: 1px solid #2a2a2a;">
+    <canvas
+      #canvas
+      style="display:block; width:100%; cursor:crosshair; touch-action:none;"
+      (click)="onCanvasClick($event)"
+      (touchend)="onCanvasTouchEnd($event)"
+      (mousemove)="onCanvasMouseMove($event)"
+      (mouseleave)="onCanvasMouseLeave()">
+    </canvas>
+  </div>
+
+  <div style="margin-top:0.4rem; display:flex; justify-content:space-between; align-items:center;">
+    <small class="text-400">{{ pontos.length }} ponto{{ pontos.length !== 1 ? 's' : '' }} adicionado{{ pontos.length !== 1 ? 's' : '' }}</small>
+    @if (pontos.length < 2) {
+      <small class="p-error">Adicione ao menos 2 pontos para salvar.</small>
+    }
+  </div>
+
+</app-dialog-wrapper>
