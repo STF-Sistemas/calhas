@@ -101,8 +101,8 @@ export class ClienteFormComponent {
   }
 
   onSave() {
+    this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
       this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Preencha todos os campos obrigatórios.' });
       return;
     }

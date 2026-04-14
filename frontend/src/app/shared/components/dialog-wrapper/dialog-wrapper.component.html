@@ -2,14 +2,15 @@
     [(visible)]="visible"
     [modal]="true"
     [header]="title"
-    [style]="height ? { width: width, height: height } : { width: width }"
-    [contentStyle]="height ? { 'overflow-y': 'auto', 'flex': '1', 'min-height': '0', 'max-height': 'none' } : { 'overflow-y': 'auto' }"
+    [style]="{ width: width, height: height }"
+    [contentStyle]="{ 'overflow-y': 'auto', 'flex': '1', 'min-height': '0', 'max-height': 'none' }"
     [breakpoints]="{ '960px': '95vw', '640px': '95vw' }"
     [styleClass]="fullscreenMobile ? 'dialog-fullscreen-mobile' : ''"
     [position]="position"
     [draggable]="false"
     [resizable]="false"
-    [maximizable]="!!height"
+    [maximizable]="true"
+    appendTo="body"
     (onHide)="onClose()"
     (onShow)="show.emit()">
 
@@ -19,9 +20,7 @@
             <p-progressSpinner ariaLabel="Carregando dados"></p-progressSpinner>
         </div>
     } @else {
-        <div class="p-1">
-            <ng-content></ng-content>
-        </div>
+        <ng-content></ng-content>
     }
 
     <!-- Footer -->

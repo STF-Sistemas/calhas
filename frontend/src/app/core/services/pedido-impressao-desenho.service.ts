@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IPedido, IPedidoItem, IPonto } from '#shared/interfaces';
 import { ETipoItemPedido } from '#shared/enums';
-import { formatDate } from '#shared/functions/format.functions';
+import { formatDate, formatCpfCnpj, formatPhone } from '#shared/functions/format.functions';
 
 @Injectable({ providedIn: 'root' })
 export class PedidoImpressaoDesenhoService {
@@ -27,12 +27,13 @@ export class PedidoImpressaoDesenhoService {
     win.onload = () => win.print();
   }
 
-  private gerarSvg(pontos: IPonto[], medidas: number[]): string {
-    if (!pontos || pontos.length < 2) return '<em>Sem pontos</em>';
+  // ── SVG compacto — segmentos numerados ───────────────────────────────────────
+  private gerarSvg(pontos: IPonto[]): string {
+    if (!pontos || pontos.length < 2) return '<span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:9px;color:#9ca3af">Sem desenho</span>';
 
-    const PAD = 30;
-    const W = 500;
-    const H = 180;
+    const PAD = 14;
+    const VW  = 300;
+    const VH  = 160;
 
     const xs = pontos.map(p => p.x);
     const ys = pontos.map(p => p.y);
@@ -41,9 +42,8 @@ export class PedidoImpressaoDesenhoService {
     const rangeX = maxX - minX || 1;
     const rangeY = maxY - minY || 1;
 
-    // Mantém proporção dentro da área útil
-    const drawW = W - PAD * 2;
-    const drawH = H - PAD * 2;
+    const drawW = VW - PAD * 2;
+    const drawH = VH - PAD * 2;
     const scale = Math.min(drawW / rangeX, drawH / rangeY);
 
     const offsetX = PAD + (drawW - rangeX * scale) / 2;
@@ -57,156 +57,323 @@ export class PedidoImpressaoDesenhoService {
     const pts = pontos.map(norm);
     const polyline = pts.map(p => `${p.sx.toFixed(1)},${p.sy.toFixed(1)}`).join(' ');
 
-    // Rótulos de medida por segmento
-    const labels = pontos.slice(0, -1).map((_, i) => {
+    const nums = pontos.slice(0, -1).map((_, i) => {
       const a = pts[i];
       const b = pts[i + 1];
       const mx = (a.sx + b.sx) / 2;
       const my = (a.sy + b.sy) / 2;
-      const medida = medidas?.[i];
-      const label = medida != null && medida > 0 ? `${medida} cm` : '';
-
-      // Desloca o label levemente perpendicular ao segmento para não sobrepor a linha
       const dx = b.sx - a.sx;
       const dy = b.sy - a.sy;
       const len = Math.sqrt(dx * dx + dy * dy) || 1;
-      const nx = -dy / len * 12;
-      const ny = dx / len * 12;
-
-      return label
-        ? `<text x="${(mx + nx).toFixed(1)}" y="${(my + ny).toFixed(1)}" font-size="11" fill="#1a1a1a" text-anchor="middle" dominant-baseline="middle">${label}</text>`
-        : '';
+      const nx = -dy / len * 11;
+      const ny =  dx / len * 11;
+      return `<text x="${(mx + nx).toFixed(1)}" y="${(my + ny).toFixed(1)}"
+        font-size="9" fill="#3b82f6" font-weight="700"
+        text-anchor="middle" dominant-baseline="middle">${i + 1}</text>`;
     }).join('');
 
-    // Pontos vértice
     const dots = pts.map(p =>
-      `<circle cx="${p.sx.toFixed(1)}" cy="${p.sy.toFixed(1)}" r="3" fill="#ef4444"/>`
+      `<circle cx="${p.sx.toFixed(1)}" cy="${p.sy.toFixed(1)}" r="2.5" fill="#ef4444"/>`
     ).join('');
 
-    return `
-      <svg width="${W}" height="${H}" style="max-width:100%;display:block;border:1px solid #e5e7eb;border-radius:4px;background:#fafafa;">
-        <polyline points="${polyline}" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-        ${dots}
-        ${labels}
-      </svg>`;
+    return `<svg viewBox="0 0 ${VW} ${VH}" preserveAspectRatio="xMidYMid meet"
+      xmlns="http://www.w3.org/2000/svg"
+      style="position:absolute;top:0;left:0;width:100%;height:100%;background:#fafafa;border:1px solid #e5e7eb;border-radius:3px;">
+      <polyline points="${polyline}" fill="none" stroke="#1a1a1a" stroke-width="1.8"
+        stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}
+      ${nums}
+    </svg>`;
   }
 
-  private gerarBlocoItem(item: IPedidoItem, seq: number): string {
-    const chapa = item.corte?.chapa?.descricao ?? '-';
-    const corte = item.corte?.descricao ?? '-';
-    const corteTotal = item.corte?.corte != null ? `${item.corte.corte} cm` : '-';
-    const desenho = item.desenho?.descricao ?? '-';
+  // ── Coluna direita: lista de medidas ─────────────────────────────────────────
+  private gerarMedidasColuna(medidas: number[]): string {
+    if (!medidas.length) return '<span style="color:#9ca3af;font-size:9px">—</span>';
+    const total = medidas.reduce((s, m) => s + (Number(m) || 0), 0);
+    const linhas = medidas.map((m, i) =>
+      `<div class="med-row">
+        <span class="med-num">${i + 1}</span>
+        <span class="med-val">${m} cm</span>
+      </div>`
+    ).join('');
+    return `${linhas}<div class="med-total">Total: <strong>${total} cm</strong></div>`;
+  }
+
+  // ── Slot preenchido com dados do item ─────────────────────────────────────────
+  private gerarSlotItem(item: IPedidoItem, seq: number): string {
+    const chapa   = item.corte?.chapa?.descricao ?? '-';
+    const corte   = item.corte?.descricao ?? '-';
+    const corteRef = item.corte?.corte != null ? `${item.corte.corte} cm` : '-';
+    const desenho  = item.desenho?.descricao ?? '-';
     const medidas: number[] = item.medidas ?? [];
-    const totalMedidas = medidas.reduce((s, m) => s + (Number(m) || 0), 0);
-    const obs = item.observacoes ? `<div class="obs-item"><strong>Obs:</strong> ${item.observacoes}</div>` : '';
+    const obs = item.observacoes
+      ? `<div class="item-obs"><strong>Obs:</strong> ${item.observacoes}</div>` : '';
 
-    const medidasHtml = medidas.length > 0
-      ? medidas.map((m, i) => `<span class="medida-tag">Seg ${i + 1}: ${m} cm</span>`).join('')
-      : '<span class="text-muted">—</span>';
-
-    const svgHtml = this.gerarSvg(item.desenho?.pontos ?? [], medidas);
+    const svgHtml      = this.gerarSvg(item.desenho?.pontos ?? []);
+    const medidasHtml  = this.gerarMedidasColuna(medidas);
 
     return `
-      <div class="item-bloco">
-        <div class="item-header">
-          <span class="item-seq">${seq}</span>
-          <span class="item-title">${corte}</span>
-        </div>
-        <div class="item-info-grid">
-          <div><span class="label">Chapa:</span> ${chapa}</div>
-          <div><span class="label">Corte ref.:</span> ${corteTotal}</div>
-          <div><span class="label">Desenho:</span> ${desenho}</div>
-          <div><span class="label">Total medido:</span> ${totalMedidas}</div>
-          <div><span class="label">Quantidade:</span> ${item.quantidade}</div>
-        </div>
-        <div class="svg-wrapper">${svgHtml}</div>
-        <div class="medidas-row">${medidasHtml}</div>
-        ${obs}
-      </div>`;
+    <div class="item-slot item-slot--filled">
+      <div class="item-hdr">
+        <span class="item-seq">${seq}</span>
+        <span class="item-corte">${corte}</span>
+        <span class="item-chips">
+          <span class="chip">Chapa: ${chapa}</span>
+          <span class="chip">Ref: ${corteRef}</span>
+          <span class="chip">Desenho: ${desenho}</span>
+          <span class="chip">Qtd: ${item.quantidade}</span>
+        </span>
+      </div>
+      <div class="item-body">
+        <div class="item-svg">${svgHtml}</div>
+        <div class="item-medidas">${medidasHtml}</div>
+      </div>
+      ${obs}
+    </div>`;
   }
 
+  // ── Slot vazio (mantém proporção da página) ───────────────────────────────────
+  private gerarSlotVazio(): string {
+    return `<div class="item-slot item-slot--vazio"></div>`;
+  }
+
+  // ── Cabeçalho da empresa ──────────────────────────────────────────────────────
+  private gerarEmpresaHeader(pedido: IPedido): string {
+    const emp = pedido.empresa;
+    if (!emp) return '';
+
+    const nomeDisplay = emp.nome_fantasia || emp.razao_social;
+    const razaoSecundaria = emp.nome_fantasia
+      ? `<div class="empresa-razao">${emp.razao_social}</div>` : '';
+    const cnpj  = emp.cnpj    ? `<div class="empresa-detalhe">CNPJ: ${formatCpfCnpj(emp.cnpj)}</div>` : '';
+    const tel   = emp.telefone ? `<div class="empresa-detalhe">Tel: ${formatPhone(emp.telefone)}</div>` : '';
+    const email = emp.email    ? `<div class="empresa-detalhe">${emp.email}</div>` : '';
+
+    const partes: string[] = [];
+    if (emp.endereco) partes.push(emp.endereco + (emp.numero ? ', ' + emp.numero : ''));
+    if (emp.bairro) partes.push(emp.bairro);
+    const enderecoLinha = partes.length
+      ? `<div class="empresa-detalhe">${partes.join(' — ')}</div>` : '';
+    const cidadeLinha = emp.cidade
+      ? `<div class="empresa-detalhe">${emp.cidade.descricao}/${emp.cidade.uf}</div>` : '';
+    const cepLinha = emp.cep ? `<div class="empresa-detalhe">CEP: ${emp.cep}</div>` : '';
+
+    return `
+    <div class="empresa-header">
+      <div class="empresa-info-bloco">
+        <div class="empresa-nome">${nomeDisplay}</div>
+        ${razaoSecundaria}${cnpj}${tel}${email}
+      </div>
+      <div class="empresa-endereco-bloco">
+        ${enderecoLinha}${cidadeLinha}${cepLinha}
+      </div>
+    </div>`;
+  }
+
+  // ── Geração das páginas com slots fixos ───────────────────────────────────────
+  private gerarPaginas(pedido: IPedido, itens: IPedidoItem[], qtdPorFolha: number): string {
+    const cliente    = pedido.cliente?.razao_social ?? '-';
+    const agora      = new Date();
+    const dataGeracao = `${formatDate(agora)} ${agora.toTimeString().slice(0, 5)}`;
+    const cnpjCpf    = pedido.cliente?.cpf_cnpj
+      ? ` | CPF/CNPJ: ${formatCpfCnpj(pedido.cliente.cpf_cnpj)}` : '';
+    const telefone   = pedido.cliente?.telefone
+      ? ` | Tel: ${formatPhone(pedido.cliente.telefone)}` : '';
+    const cidade     = pedido.cliente?.cidade
+      ? ` | ${pedido.cliente.cidade.descricao}/${pedido.cliente.cidade.uf}` : '';
+
+    // Divide itens em grupos de qtdPorFolha
+    const paginas: IPedidoItem[][] = [];
+    for (let i = 0; i < itens.length; i += qtdPorFolha) {
+      paginas.push(itens.slice(i, i + qtdPorFolha));
+    }
+    // Garante pelo menos uma página
+    if (paginas.length === 0) paginas.push([]);
+
+    return paginas.map((grupo, pIdx) => {
+      // Gera slots: itens preenchidos + slots vazios para completar qtdPorFolha
+      const slots: string[] = [];
+      grupo.forEach((item, i) => {
+        const seq = pIdx * qtdPorFolha + i + 1;
+        slots.push(this.gerarSlotItem(item, seq));
+      });
+      while (slots.length < qtdPorFolha) {
+        slots.push(this.gerarSlotVazio());
+      }
+
+      const isFirstPage = pIdx === 0;
+
+      const infoCliente = isFirstPage ? `
+      <div class="section-cliente">
+        <div class="cliente-nome">${cliente}</div>
+        <div class="cliente-info">
+          <span class="label">Data do Pedido:</span> ${formatDate(pedido.data_pedido)}${cnpjCpf}${telefone}${cidade}
+        </div>
+      </div>
+      <div class="legenda">
+        <strong>${itens.length} ${itens.length === 1 ? 'item' : 'itens'} de corte</strong>
+        &nbsp;—&nbsp; Número azul = segmento do desenho
+      </div>` : '';
+
+      return `
+      <div class="pagina-wrapper">
+        ${this.gerarEmpresaHeader(pedido)}
+        <div class="titulo-row">
+          <h2 class="titulo">Ordem de Corte — Pedido Nº ${pedido.id}</h2>
+          <span class="titulo-data">Gerado em: ${dataGeracao}${paginas.length > 1 ? ` &nbsp;|&nbsp; Pág. ${pIdx + 1}/${paginas.length}` : ''}</span>
+        </div>
+        ${infoCliente}
+        <div class="slots-area">
+          ${slots.join('')}
+        </div>
+      </div>`;
+    }).join('\n');
+  }
+
+  // ── HTML completo ─────────────────────────────────────────────────────────────
   private gerarHtml(pedido: IPedido, itens: IPedidoItem[]): string {
-    const cliente = pedido.cliente?.razao_social ?? '-';
-    const blocos = itens.map((item, i) => this.gerarBlocoItem(item, i + 1)).join('');
+    const qtdPorFolha = Math.max(1, Math.min(20, pedido.empresa?.quantidade_desenho_por_folha ?? 5));
+    const paginas = this.gerarPaginas(pedido, itens, qtdPorFolha);
 
     return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Cortes — Pedido Nº ${pedido.id}</title>
+  <title>Ordem de Corte — Pedido Nº ${pedido.id}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; font-size: 11px; color: #1a1a1a; background: #fff; }
-    .page { max-width: 800px; margin: 0 auto; padding: 24px 28px; }
+    body { font-family: Arial, sans-serif; font-size: 10px; color: #1a1a1a; background: #fff; }
 
-    /* Cabeçalho */
-    .header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 2px solid #1a1a1a; margin-bottom: 16px; }
-    .header-title { font-size: 20px; font-weight: 700; }
-    .header-sub { font-size: 11px; color: #555; margin-top: 2px; }
-    .pedido-badge { text-align: right; }
-    .pedido-num { font-size: 24px; font-weight: 800; }
-    .pedido-num span { font-size: 11px; font-weight: 400; display: block; color: #555; }
+    /* ── Wrapper de página — altura exata A4 ── */
+    .pagina-wrapper {
+      display: flex;
+      flex-direction: column;
+      height: 277mm;
+      overflow: hidden;
+      page-break-after: always;
+    }
+    .pagina-wrapper:last-child { page-break-after: auto; }
 
-    /* Seção cliente */
-    .section { margin-bottom: 14px; }
-    .section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280; margin-bottom: 6px; border-bottom: 1px solid #e5e7eb; padding-bottom: 3px; }
-    .cliente-name { font-size: 13px; font-weight: 700; }
+    /* ── Cabeçalho da empresa ── */
+    .empresa-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 1rem; padding-bottom: 6px; border-bottom: 2px solid #f97316; margin-bottom: 6px;
+      flex-shrink: 0;
+    }
+    .empresa-nome { font-size: 12px; font-weight: 700; }
+    .empresa-razao { font-size: 9px; color: #6b7280; margin-top: 1px; }
+    .empresa-detalhe { font-size: 9px; color: #6b7280; margin-top: 1px; }
+    .empresa-endereco-bloco { text-align: right; }
+
+    /* ── Título ── */
+    .titulo-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding-bottom: 4px; border-bottom: 1px solid #e5e7eb; margin-bottom: 5px;
+      flex-shrink: 0;
+    }
+    .titulo { font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; }
+    .titulo-data { font-size: 9px; color: #6b7280; }
+
+    /* ── Seção cliente (só na pág. 1) ── */
+    .section-cliente {
+      margin-bottom: 4px; padding: 4px 7px; background: #f9fafb;
+      border-radius: 4px; border: 1px solid #e5e7eb; flex-shrink: 0;
+    }
+    .cliente-nome { font-size: 11px; font-weight: 700; }
+    .cliente-info { font-size: 9px; color: #6b7280; margin-top: 1px; }
     .label { font-weight: 600; color: #374151; }
+    .legenda { font-size: 9px; color: #6b7280; margin-bottom: 4px; flex-shrink: 0; }
 
-    /* Bloco de item */
-    .item-bloco { border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px 14px; margin-bottom: 16px; break-inside: avoid; page-break-inside: avoid; }
-    .item-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .item-seq { background: #1a1a1a; color: #fff; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
-    .item-title { font-size: 13px; font-weight: 700; }
-    .item-info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 16px; margin-bottom: 10px; font-size: 11px; }
-    .svg-wrapper { margin-bottom: 10px; }
-    .medidas-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
-    .medida-tag { background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px 8px; font-size: 11px; }
-    .obs-item { font-size: 10px; color: #6b7280; margin-top: 4px; }
-    .text-muted { color: #9ca3af; }
+    /* ── Área de slots: ocupa todo espaço restante ── */
+    .slots-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-height: 0;
+    }
 
-    /* Rodapé */
-    .footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #e5e7eb; font-size: 10px; color: #9ca3af; display: flex; justify-content: space-between; }
+    /* ── Slot individual — cada um ocupa 1/N do espaço ── */
+    .item-slot {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid #d1d5db;
+      border-radius: 3px;
+      padding: 4px 6px;
+      display: flex;
+      flex-direction: column;
+    }
 
+    /* Slot vazio */
+    .item-slot--vazio {
+      background: #f9fafb;
+      border-style: dashed;
+      border-color: #e5e7eb;
+    }
+
+    /* Cabeçalho do item */
+    .item-hdr {
+      display: flex; align-items: center; gap: 5px;
+      margin-bottom: 3px; flex-wrap: wrap; flex-shrink: 0;
+    }
+    .item-seq {
+      background: #1a1a1a; color: #fff; border-radius: 50%;
+      width: 16px; height: 16px; display: flex; align-items: center;
+      justify-content: center; font-size: 8px; font-weight: 700; flex-shrink: 0;
+    }
+    .item-corte { font-size: 10px; font-weight: 700; }
+    .item-chips { display: flex; flex-wrap: wrap; gap: 3px; }
+    .chip {
+      background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 3px;
+      padding: 1px 4px; font-size: 9px; color: #374151;
+    }
+
+    /* Corpo: 2 colunas, ocupa o espaço restante do slot */
+    .item-body {
+      display: flex; gap: 6px; flex: 1; min-height: 0;
+    }
+    .item-svg {
+      flex: 0 0 62%;
+      min-height: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .item-medidas {
+      flex: 1;
+      border-left: 1px solid #e5e7eb;
+      padding-left: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      overflow: hidden;
+    }
+    .med-row {
+      display: flex; gap: 5px; align-items: center;
+      font-size: 9px; line-height: 1.3;
+    }
+    .med-num {
+      background: #3b82f6; color: #fff; border-radius: 50%;
+      width: 13px; height: 13px; display: flex; align-items: center;
+      justify-content: center; font-size: 7px; font-weight: 700; flex-shrink: 0;
+    }
+    .med-val { color: #1a1a1a; }
+    .med-total {
+      margin-top: 2px; font-size: 9px; color: #374151;
+      border-top: 1px solid #e5e7eb; padding-top: 1px;
+    }
+    .item-obs { font-size: 8px; color: #6b7280; margin-top: 2px; flex-shrink: 0; }
+
+    /* ── Print ── */
     @media print {
       body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .page { padding: 0; }
-      @page { margin: 12mm 12mm 12mm 12mm; }
+      @page { size: A4 portrait; margin: 10mm 12mm 10mm 12mm; }
     }
   </style>
 </head>
 <body>
-<div class="page">
-
-  <div class="header">
-    <div>
-      <div class="header-title">Ordem de Corte</div>
-      <div class="header-sub">Calhas &amp; Coberturas</div>
-    </div>
-    <div class="pedido-badge">
-      <div class="pedido-num"><span>Nº do Pedido</span>${pedido.id}</div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Cliente</div>
-    <div class="cliente-name">${cliente}</div>
-    <div style="font-size:11px;color:#374151;margin-top:3px;">
-      <span class="label">Data:</span> ${formatDate(pedido.data_pedido)}
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Itens de Corte (${itens.length})</div>
-    ${blocos}
-  </div>
-
-  <div class="footer">
-    <span>Gerado em ${formatDate(new Date())} ${new Date().toTimeString().slice(0, 5)}</span>
-    <span>Pedido Nº ${pedido.id} — ${cliente}</span>
-  </div>
-
-</div>
+  ${paginas}
 </body>
 </html>`;
   }

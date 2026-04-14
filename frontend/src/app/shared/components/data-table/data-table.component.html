@@ -67,6 +67,8 @@
                             </p-tag>
                         } @else if (col.type === 'currency') {
                             {{ rowData[col.field] | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+                        } @else if (col.type === 'decimal') {
+                            {{ rowData[col.field] | number:'1.2-4':'pt-BR' }}
                         } @else if (col.type === 'date') {
                             {{ rowData[col.field] | date:'dd/MM/yyyy' }}
                         } @else if (col.type === 'phone') {
@@ -120,6 +122,29 @@
                                 pTooltip="Imprimir ordem de corte"
                                 aria-label="Imprimir ordem de corte"
                             ></p-button>
+                        }
+                        @if (showExtraButton) {
+                            <p-button
+                                [icon]="extraButtonIcon"
+                                [rounded]="true"
+                                [text]="true"
+                                [severity]="extraButtonSeverity"
+                                (onClick)="extraAction.emit(rowData)"
+                                [pTooltip]="extraButtonTooltip"
+                            ></p-button>
+                        }
+                        @for (action of rowActions; track action.key) {
+                            @if (!action.visible || action.visible(rowData)) {
+                                <p-button
+                                    [icon]="action.icon"
+                                    [rounded]="true"
+                                    [text]="true"
+                                    [severity]="action.severity"
+                                    [pTooltip]="action.tooltip"
+                                    [attr.aria-label]="action.ariaLabel"
+                                    (onClick)="rowActionClick.emit({ key: action.key, row: rowData })"
+                                ></p-button>
+                            }
                         }
                         @if (showEditButton) {
                             <p-button

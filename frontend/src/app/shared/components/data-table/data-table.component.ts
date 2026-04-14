@@ -1,4 +1,13 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+
+export interface IRowAction {
+  key: string;
+  icon: string;
+  tooltip: string;
+  ariaLabel: string;
+  severity: 'success' | 'info' | 'warn' | 'danger' | 'secondary';
+  visible?: (row: any) => boolean;
+}
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -42,6 +51,11 @@ export class DataTableComponent {
   @Input() showPrintDesenhoButton = false;
   @Input() showEditButton = true;
   @Input() showDeleteButton = true;
+  @Input() showExtraButton = false;
+  @Input() extraButtonIcon = 'pi pi-cog';
+  @Input() extraButtonTooltip = '';
+  @Input() extraButtonSeverity: 'success' | 'info' | 'warn' | 'danger' | 'secondary' = 'info';
+  @Input() rowActions: IRowAction[] = [];
 
   @Output() add = new EventEmitter<void>();
   @Output() edit = new EventEmitter<any>();
@@ -49,6 +63,8 @@ export class DataTableComponent {
   @Output() toggleStatus = new EventEmitter<any>();
   @Output() print = new EventEmitter<any>();
   @Output() printDesenho = new EventEmitter<any>();
+  @Output() extraAction = new EventEmitter<any>();
+  @Output() rowActionClick = new EventEmitter<{ key: string; row: any }>();
 
   trackById(index: number, item: any): any {
     return item.id || index;

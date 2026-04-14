@@ -9,6 +9,7 @@ import { MessageService } from 'primeng/api';
 import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { UsuarioService } from '#core/services/usuario.service';
 import { EmpresaService } from '#core/services/empresa.service';
+import { AuthService } from '#core/services/auth.service';
 import { IEmpresa } from '#shared/interfaces';
 import { EStatusGeral } from '#shared/enums';
 
@@ -47,6 +48,7 @@ export class UsuarioFormComponent implements OnInit {
     private fb: FormBuilder,
     private usuarioService: UsuarioService,
     private empresaService: EmpresaService,
+    public authService: AuthService,
     private messageService: MessageService
   ) {
     this.form = this.fb.group({
@@ -60,16 +62,26 @@ export class UsuarioFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.empresaService.listar().subscribe({
-      next: (res) => this.empresas = res.data,
-      error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar empresas' })
-    });
+    if (this.authService.isSuperAdmin()) {
+      this.empresaService.listar().subscribe({
+        next: (res) => this.empresas = res.data,
+        error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar empresas' })
+      });
+    }
   }
 
   abrir(id?: number) {
     this.usuarioId = id;
     this.visible = true;
     this.form.reset({ admin: false, status: EStatusGeral.Ativo });
+
+    if (!this.authService.isSuperAdmin()) {
+      const codEmpresa = this.authService.currentUser()?.cod_empresa ?? null;
+      this.form.get('cod_empresa')?.setValue(codEmpresa);
+      this.form.get('cod_empresa')?.disable();
+    } else {
+      this.form.get('cod_empresa')?.enable();
+    }
 
     if (id) {
       this.form.get('senha')?.clearValidators();
@@ -94,10 +106,11 @@ export class UsuarioFormComponent implements OnInit {
   }
 
   onSave() {
+    this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
     this.isSaving = true;
-    const dados = { ...this.form.value, id: this.usuarioId };
+    const dados = { ...this.form.getRawValue(), id: this.usuarioId };
 
     if (this.usuarioId && !dados.senha) {
       delete dados.senha;

@@ -1,0 +1,272 @@
+// ── Filtros ───────────────────────────────────────────────────────────────────
+.filtros-form {
+  width: 100%;
+}
+
+.filtros-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+.filtro-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 150px;
+
+  label {
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+}
+
+.filtro-wide {
+  min-width: 220px;
+  flex: 1 1 220px;
+}
+
+.filtros-acoes {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+  padding-bottom: 0;
+}
+
+// ── Filtros aplicados (impresso) ──────────────────────────────────────────────
+.filtros-aplicados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.82rem;
+  background: var(--surface-50);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--border-radius);
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+// ── Totais gerais ─────────────────────────────────────────────────────────────
+.totais-gerais {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.total-card {
+  flex: 1 1 calc(50% - 0.75rem); // 2 por linha em telas pequenas
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--border-radius);
+  background: var(--surface-50);
+  text-align: center;
+
+  @media (min-width: 640px) {
+    flex: 1 1 120px; // linha única em telas maiores
+  }
+
+  &--lucro {
+    background: #dcfce7;
+    border-color: #86efac;
+    color: #166534;
+  }
+
+  &--margem {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1e40af;
+  }
+}
+
+.total-label {
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.total-valor {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-color);
+  word-break: break-all;
+}
+
+// ── Bloco de pedido ───────────────────────────────────────────────────────────
+.pedido-bloco {
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+.pedido-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: var(--surface-100);
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.pedido-id {
+  font-weight: 700;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.pedido-info {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.82rem;
+  color: var(--text-color-secondary);
+  flex: 1;
+
+  i { margin-right: 0.25rem; }
+}
+
+.pedido-resumo {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  flex-wrap: wrap;
+}
+
+.resumo-item {
+  white-space: nowrap;
+}
+
+.resumo-lucro strong { color: #166534; }
+.resumo-margem { color: #1d4ed8; font-weight: 600; }
+
+// ── Scroll horizontal em tabelas (mobile) ────────────────────────────────────
+.tabela-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+// ── Tabela de itens ───────────────────────────────────────────────────────────
+.col-num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.col-desc {
+  min-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.col-qtd {
+  width: 80px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.lucro-positivo { color: #166534; }
+.lucro-negativo { color: #991b1b; }
+
+.footer-totais td {
+  background: var(--surface-50);
+  border-top: 2px solid var(--surface-border);
+}
+
+// ── Rodapé geral ─────────────────────────────────────────────────────────────
+.rodape-geral {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--primary-color);
+}
+
+.tabela-rodape {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  th, td {
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--surface-border);
+    text-align: left;
+  }
+
+  th {
+    background: var(--surface-100);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+  }
+}
+
+.sem-dados {
+  text-align: center;
+  color: var(--text-color-secondary);
+  padding: 2rem;
+  font-style: italic;
+}
+
+// ── Dark mode ────────────────────────────────────────────────────────────────
+// :host-context detecta a classe app-dark em qualquer ancestral (colocada no <html>)
+:host-context(.app-dark) {
+  .total-card--lucro {
+    background: rgba(74, 222, 128, 0.08);
+    border-color: rgba(74, 222, 128, 0.25);
+    color: #4ade80;
+  }
+
+  .total-card--margem {
+    background: rgba(96, 165, 250, 0.08);
+    border-color: rgba(96, 165, 250, 0.25);
+    color: #60a5fa;
+  }
+
+  .lucro-positivo { color: #4ade80; }
+  .lucro-negativo { color: #f87171; }
+
+  .resumo-lucro strong { color: #4ade80; }
+}
+
+// ── Print overrides ───────────────────────────────────────────────────────────
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 1cm;
+  }
+
+  // Garante que todos os containers deixem o conteúdo fluir entre páginas
+  .resultado,
+  .pedido-bloco,
+  .tabela-scroll {
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .pedido-bloco {
+    break-inside: avoid;
+    margin-bottom: 0.75rem;
+    // sem border-radius na impressão para evitar overflow:hidden do clip
+    border-radius: 0 !important;
+  }
+
+  .totais-gerais {
+    margin-bottom: 0.75rem;
+  }
+
+  .col-desc {
+    white-space: normal;
+  }
+}

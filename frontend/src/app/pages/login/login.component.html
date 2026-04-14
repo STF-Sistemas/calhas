@@ -49,7 +49,7 @@
             <p-checkbox [binary]="true" formControlName="remember" inputId="remember"></p-checkbox>
             <label for="remember" class="text-600 cursor-pointer">Lembrar de mim</label>
           </div>
-          <a href="#" class="text-primary font-medium no-underline hover:underline">Esqueceu a senha?</a>
+          <a routerLink="/esqueci-senha" class="text-primary font-medium no-underline hover:underline">Esqueceu a senha?</a>
         </div>
 
         <button pButton pRipple label="Acessar Conta" type="submit" [loading]="isLoading" [disabled]="loginForm.invalid"

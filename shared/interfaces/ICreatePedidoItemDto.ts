@@ -4,5 +4,6 @@ export interface ICreatePedidoItemDto {
   cod_corte?: number;
   quantidade: number;
   valor_unitario: number;
+  custo_unitario: number;
   observacoes?: string;
 }

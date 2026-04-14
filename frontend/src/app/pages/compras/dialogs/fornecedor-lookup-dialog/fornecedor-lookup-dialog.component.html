@@ -1,0 +1,71 @@
+<!-- Dialog de opções -->
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="true"
+  (onHide)="onDialogHide()"
+  [style]="{ width: modo === 'opcoes' ? '400px' : '720px' }"
+  [header]="modo === 'opcoes' ? 'Fornecedor não encontrado' : 'Selecionar Fornecedor'">
+
+  @if (modo === 'opcoes') {
+    <div class="opcoes">
+      <p>O CNPJ <strong>{{ cnpj }}</strong> não está cadastrado. O que deseja fazer?</p>
+      <div class="botoes">
+        <p-button label="Incluir Novo Fornecedor" icon="pi pi-plus"
+          aria-label="Incluir novo fornecedor com este CNPJ"
+          (onClick)="incluir()">
+        </p-button>
+        <p-button label="Relacionar Existente" icon="pi pi-link" severity="secondary"
+          aria-label="Selecionar fornecedor já cadastrado"
+          (onClick)="relacionar()">
+        </p-button>
+        <p-button label="Cancelar" icon="pi pi-times" severity="danger" [outlined]="true"
+          aria-label="Cancelar busca de fornecedor"
+          (onClick)="cancelar()">
+        </p-button>
+      </div>
+    </div>
+  } @else {
+    <div class="lookup-lista">
+      <input pInputText [(ngModel)]="filtro" (ngModelChange)="filtrar()"
+        placeholder="Filtrar por razão social ou CNPJ..."
+        class="w-full mb-3"
+        aria-label="Filtrar fornecedores" />
+
+      <p-table [value]="fornecedoresFiltrados" [paginator]="true" [rows]="8"
+        [scrollable]="true" scrollHeight="300px" selectionMode="single">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">CNPJ</th>
+            <th scope="col">Razão Social</th>
+            <th scope="col">Ação</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>{{ row.cnpj }}</td>
+            <td>{{ row.razao_social }}</td>
+            <td>
+              <p-button icon="pi pi-check" [rounded]="true" size="small"
+                aria-label="Selecionar este fornecedor"
+                (onClick)="selecionar(row)">
+              </p-button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="3">Nenhum fornecedor encontrado.</td></tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+</p-dialog>
+
+<!-- Form de criação rápida do fornecedor -->
+@if (showForm) {
+  <app-fornecedor-form
+    #fornecedorForm
+    [cnpjInicial]="cnpjParaForm"
+    (saved)="onFornecedorSalvo($event)">
+  </app-fornecedor-form>
+}

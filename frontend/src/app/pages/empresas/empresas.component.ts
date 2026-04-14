@@ -22,7 +22,7 @@ import { IEmpresa } from '#shared/interfaces';
   ],
   templateUrl: './empresas.component.html',
   styleUrls: ['./empresas.component.scss'],
-  providers: [MessageService, ConfirmationService]
+  providers: [ConfirmationService]
 })
 export class EmpresasComponent implements OnInit {
   @ViewChild('form') form!: EmpresaFormComponent;

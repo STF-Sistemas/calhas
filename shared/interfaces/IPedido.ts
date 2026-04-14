@@ -15,6 +15,7 @@ export interface IPedido {
   valor_total: number;
   observacoes: string | null;
   excluido: boolean;
+  estoque_baixado: boolean;
   empresa?: IEmpresa;
   cliente?: ICliente;
   meio_pagamento?: IMeioPagamento;

@@ -3,9 +3,7 @@
   [title]="pedidoId ? 'Pedido Nº ' + pedidoId : 'Novo Pedido'"
   [isLoadingData]="isLoadingData"
   [isSaving]="isSaving"
-  [saveDisabled]="form.invalid"
   width="100vw"
-  height="100vh"
   position="top"
   (save)="onSave()">
 
@@ -35,16 +33,25 @@
               filterBy="razao_social"
               appendTo="body">
             </p-select>
+            @if (form.get('cod_cliente')?.invalid && form.get('cod_cliente')?.touched) {
+              <small class="p-error">Cliente é obrigatório.</small>
+            }
           </div>
 
           <div class="col-12 md:col-4 lg:col-4 field">
             <label for="data_pedido">Data do Pedido *</label>
-            <p-datepicker id="data_pedido" formControlName="data_pedido" [showIcon]="true" dateFormat="dd/mm/yy"></p-datepicker>
+            <p-datepicker id="data_pedido" formControlName="data_pedido" [showIcon]="true" dateFormat="dd/mm/yy" appendTo="body"></p-datepicker>
+            @if (form.get('data_pedido')?.invalid && form.get('data_pedido')?.touched) {
+              <small class="p-error">Data do pedido é obrigatória.</small>
+            }
           </div>
 
           <div class="col-12 md:col-3 lg:col-3 field">
             <label for="status">Status *</label>
             <p-select id="status" formControlName="status" [options]="statusOpcoes" appendTo="body"></p-select>
+            @if (form.get('status')?.invalid && form.get('status')?.touched) {
+              <small class="p-error">Status é obrigatório.</small>
+            }
           </div>
 
           <div class="col-12 md:col-4 lg:col-4 field">
@@ -190,7 +197,7 @@
               }
             </td>
             <td>
-              <p-inputNumber formControlName="quantidade" mode="decimal" [minFractionDigits]="2" inputStyleClass="w-full"></p-inputNumber>
+              <input pInputText appCurrencyMask formControlName="quantidade" class="w-full" />
             </td>
             <td>
               <input pInputText appCurrencyMask formControlName="valor_unitario" class="w-full" />

@@ -1,0 +1,131 @@
+<app-dialog-wrapper
+  [(visible)]="visible"
+  [title]="fornecedorId ? 'Editar Fornecedor' : 'Novo Fornecedor'"
+  [isLoadingData]="isLoadingData"
+  [isSaving]="isSaving"
+  [saveDisabled]="false"
+  width="960px"
+  position="top"
+  (save)="onSave()">
+
+  <form [formGroup]="form" class="p-fluid">
+
+    <!-- ============ DADOS FISCAIS ============ -->
+    <h3 class="section-title">
+      <i class="pi pi-building"></i>
+      Dados Fiscais
+    </h3>
+
+    <div class="row">
+      <div class="field col-12 col-md-6">
+        <label for="razao_social">Razão Social *</label>
+        <input pInputText id="razao_social" formControlName="razao_social" placeholder="Razão social do fornecedor" />
+        @if (form.get('razao_social')?.invalid && form.get('razao_social')?.touched) {
+          <small class="p-error">Razão social é obrigatória.</small>
+        }
+      </div>
+      <div class="field col-12 col-md-6">
+        <label for="nome_fantasia">Nome Fantasia</label>
+        <input pInputText id="nome_fantasia" formControlName="nome_fantasia" placeholder="Nome fantasia (opcional)" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field col-12 col-md-4">
+        <label for="cnpj">CNPJ *</label>
+        <input pInputText id="cnpj" formControlName="cnpj"
+          placeholder="00.000.000/0000-00"
+          mask="00.000.000/0000-00"
+          [dropSpecialCharacters]="true" />
+        @if (form.get('cnpj')?.invalid && form.get('cnpj')?.touched) {
+          <small class="p-error">CNPJ inválido (14 dígitos).</small>
+        }
+      </div>
+      <div class="field col-12 col-md-3">
+        <label for="ie">Inscrição Estadual</label>
+        <input pInputText id="ie" formControlName="ie" placeholder="IE" />
+      </div>
+      <div class="field col-12 col-md-2">
+        <label for="im">Inscrição Municipal</label>
+        <input pInputText id="im" formControlName="im" placeholder="IM" />
+      </div>
+      <div class="field col-12 col-md-3">
+        <label for="crt">Regime Tributário *</label>
+        <p-select id="crt" formControlName="crt" [options]="crtOpcoes"
+          optionLabel="label" optionValue="value" placeholder="Selecione"
+          aria-label="Regime tributário">
+        </p-select>
+        @if (form.get('crt')?.invalid && form.get('crt')?.touched) {
+          <small class="p-error">Regime tributário é obrigatório.</small>
+        }
+      </div>
+    </div>
+
+    <!-- ============ CONTATO ============ -->
+    <h3 class="section-title mt-2">
+      <i class="pi pi-envelope"></i>
+      Contato
+    </h3>
+
+    <div class="row">
+      <div class="field col-12 col-md-6">
+        <label for="email">E-mail</label>
+        <input pInputText id="email" type="email" formControlName="email" placeholder="contato@fornecedor.com.br" />
+        @if (form.get('email')?.invalid && form.get('email')?.touched) {
+          <small class="p-error">E-mail inválido.</small>
+        }
+      </div>
+      <div class="field col-12 col-md-6">
+        <label for="fone">Telefone</label>
+        <input pInputText id="fone" formControlName="fone" type="tel"
+          placeholder="(00) 0000-0000 ou (00) 00000-0000"
+          mask="(00) 0000-0000||(00) 00000-0000" />
+      </div>
+    </div>
+
+    <!-- ============ ENDEREÇO ============ -->
+    <h3 class="section-title mt-2">
+      <i class="pi pi-map-marker"></i>
+      Endereço
+    </h3>
+
+    <div class="row">
+      <div class="field col-12 col-sm-4 col-md-3">
+        <label for="cep">CEP</label>
+        <p-inputMask id="cep" mask="99999-999" formControlName="cep"
+          placeholder="00000-000" (onComplete)="onCepChange()">
+        </p-inputMask>
+      </div>
+      <div class="field col-12 col-sm-8 col-md-9">
+        <label for="logradouro">Logradouro</label>
+        <input pInputText id="logradouro" formControlName="logradouro" placeholder="Rua, Avenida, etc." />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field col-12 col-sm-4 col-md-3">
+        <label for="numero">Número</label>
+        <input pInputText id="numero" formControlName="numero" placeholder="Ex: 123" />
+      </div>
+      <div class="field col-12 col-sm-8 col-md-9">
+        <label for="bairro">Bairro</label>
+        <input pInputText id="bairro" formControlName="bairro" placeholder="Nome do bairro" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field col-12 col-md-5">
+        <label for="complemento">Complemento</label>
+        <input pInputText id="complemento" formControlName="complemento" placeholder="Apto, Sala, Ref..." />
+      </div>
+      <div class="field col-12 col-md-7">
+        <label for="cidade_nome">
+          Cidade
+          <span class="label-hint">(preenchida via CEP)</span>
+        </label>
+        <input pInputText id="cidade_nome" formControlName="cidade_nome" placeholder="Preenchida via CEP" />
+      </div>
+    </div>
+
+  </form>
+</app-dialog-wrapper>

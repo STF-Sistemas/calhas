@@ -8,6 +8,9 @@ export interface IEmpresa {
   email: string | null;
   telefone: string | null;
   data_expiracao: Date | string | null;
+  valor_mensalidade: number;
+  validar_estoque: boolean;
+  quantidade_desenho_por_folha: number;
   ativo: number;
   excluido: boolean;
   created_at: Date | string;

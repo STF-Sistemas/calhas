@@ -1,0 +1,19 @@
+<main>
+  <h1>Fornecedores</h1>
+
+  <app-data-table
+    [data]="fornecedores"
+    [columns]="cols"
+    [loading]="loading"
+    addButtonLabel="Novo Fornecedor"
+    [showToggleStatus]="true"
+    (add)="onAdd()"
+    (edit)="onEdit($event)"
+    (toggleStatus)="onStatus($event)"
+    (delete)="onDelete($event)">
+  </app-data-table>
+
+  <app-fornecedor-form #form (saved)="carregar()"></app-fornecedor-form>
+
+  <p-confirmDialog></p-confirmDialog>
+</main>

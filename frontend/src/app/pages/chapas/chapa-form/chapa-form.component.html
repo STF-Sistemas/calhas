@@ -5,7 +5,6 @@
   [isSaving]="isSaving"
   [saveDisabled]="false"
   width="900px"
-  height="calc(100vh - 5rem)"
   position="top"
   (save)="onSave()">
 
@@ -50,6 +49,7 @@
         <th>Descrição *</th>
         <th style="width: 8rem">Corte (cm)</th>
         <th style="width: 10rem">Valor (R$) *</th>
+        <th style="width: 10rem">Custo (R$) *</th>
         <th style="width: 4rem"></th>
       </tr>
     </ng-template>
@@ -59,10 +59,13 @@
           <input pInputText [(ngModel)]="corte.descricao" class="p-inputtext-sm w-full" placeholder="Descrição do corte" />
         </td>
         <td>
-          <p-inputNumber [(ngModel)]="corte.corte" mode="decimal" [minFractionDigits]="2" inputStyleClass="w-full"></p-inputNumber>
+          <input pInputText appCurrencyMask [(ngModel)]="corte.corte" class="w-full" />
         </td>
         <td>
           <input pInputText appCurrencyMask [(ngModel)]="corte.valor" class="w-full" />
+        </td>
+        <td>
+          <input pInputText appCurrencyMask [(ngModel)]="corte.custo" class="w-full" />
         </td>
         <td class="text-center">
           <p-button
@@ -78,7 +81,7 @@
     </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="4" class="text-center p-3 text-600">
+        <td colspan="5" class="text-center p-3 text-600">
           Nenhum corte cadastrado.
         </td>
       </tr>

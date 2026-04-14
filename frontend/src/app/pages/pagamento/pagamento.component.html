@@ -1,0 +1,153 @@
+<!-- Seletor de tema (igual ao login) -->
+<div class="theme-switcher-fixed">
+  <button class="p-link theme-button" (click)="themeService.toggleTheme()"
+    [pTooltip]="themeService.isDarkMode() ? 'Modo Claro' : 'Modo Escuro'">
+    <i [class]="themeService.isDarkMode() ? 'pi pi-sun' : 'pi pi-moon'"></i>
+  </button>
+</div>
+
+<div class="pagamento-page">
+
+  <!-- ══ Pagamento confirmado ══ -->
+  @if (confirmado()) {
+    <div class="pag-card-wrapper pag-card-wrapper--success">
+      <div class="pag-card">
+        <div class="sucesso-icon">
+          <i class="pi pi-check-circle"></i>
+        </div>
+        <h1 class="pag-titulo">Pagamento confirmado!</h1>
+        <p class="pag-subtitulo">Sua licença foi renovada com sucesso por mais <strong>30 dias</strong>.</p>
+        @if (redirecionandoEm() > 0) {
+          <p class="redirect-info">
+            <i class="pi pi-spin pi-spinner"></i>
+            Redirecionando em {{ redirecionandoEm() }} segundo{{ redirecionandoEm() !== 1 ? 's' : '' }}...
+          </p>
+        }
+        <p-button label="Ir para o Dashboard" icon="pi pi-home" (onClick)="irParaDashboard()" styleClass="w-full mt-2"></p-button>
+      </div>
+    </div>
+  }
+
+  <!-- ══ Cobrança ══ -->
+  @else {
+    <div class="pag-card-wrapper">
+      <div class="pag-card">
+
+        <!-- Logo -->
+        <div class="pag-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" width="44" height="44">
+            <rect width="32" height="32" rx="7" fill="var(--p-primary)"/>
+            <path d="M5 12 L5 18 Q5 27 16 27 Q27 27 27 18 L27 12" stroke="white" stroke-width="3"
+                  stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <line x1="5" y1="12" x2="5" y2="10" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <line x1="27" y1="12" x2="27" y2="10" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="12" cy="5.5" r="1.3" fill="white" opacity="0.75"/>
+            <circle cx="16" cy="4" r="1.4" fill="white"/>
+            <circle cx="20" cy="5.5" r="1.3" fill="white" opacity="0.75"/>
+          </svg>
+          <span class="pag-logo-text">Calhas Pro</span>
+        </div>
+
+        <!-- Título -->
+        <div class="pag-titulo-bloco">
+          <h1 class="pag-titulo">
+            <i class="pi pi-lock"></i> Acesso bloqueado
+          </h1>
+          <p class="pag-subtitulo">
+            A licença desta empresa expirou. Efetue o pagamento via Pix para reativar o acesso por <strong>30 dias</strong>.
+          </p>
+        </div>
+
+        <!-- Loading -->
+        @if (carregando()) {
+          <div class="pag-loading">
+            <p-progressSpinner strokeWidth="4" animationDuration=".8s"></p-progressSpinner>
+            <span>Gerando cobrança Pix...</span>
+          </div>
+        }
+
+        <!-- Erro -->
+        @else if (erro()) {
+          <div class="pag-erro">
+            <p-message severity="error" [text]="erro()!"></p-message>
+            <p-button label="Tentar novamente" icon="pi pi-refresh" severity="secondary"
+              (onClick)="iniciarCobranca()" styleClass="w-full mt-3">
+            </p-button>
+          </div>
+        }
+
+        <!-- Pix gerado -->
+        @else if (pagamento()) {
+          <div class="pix-content">
+
+            <!-- Valor -->
+            <div class="pix-valor-row">
+              <span class="pix-valor-label">Valor da mensalidade</span>
+              <span class="pix-valor">{{ valor() | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+            </div>
+
+            <!-- QR Code (modo MP automático) -->
+            @if (qrCodeSrc()) {
+              <div class="pix-qr-section">
+                <p class="pix-instrucao">
+                  <span><strong>1.</strong> Abra o app do seu banco</span>
+                  <span><strong>2.</strong> Escolha Pix → Pagar com QR Code</span>
+                  <span><strong>3.</strong> Aponte a câmera para o código abaixo</span>
+                </p>
+                <div class="pix-qr-wrap">
+                  <img [src]="qrCodeSrc()!" alt="QR Code Pix" class="pix-qr-img" />
+                </div>
+              </div>
+            }
+
+            <!-- Pix Copia e Cola / Chave Manual -->
+            @if (pixCopiaECola()) {
+              <div class="pix-copia-section">
+                <span class="pix-copia-label">
+                  @if (manual()) {
+                    <i class="pi pi-key"></i> Chave Pix
+                  } @else {
+                    <i class="pi pi-copy"></i> Pix Copia e Cola
+                  }
+                </span>
+                <div class="pix-copia-box">
+                  <span class="pix-codigo-text">{{ pixCopiaECola() }}</span>
+                  <p-button
+                    [icon]="copiado() ? 'pi pi-check' : 'pi pi-copy'"
+                    [label]="copiado() ? 'Copiado!' : 'Copiar'"
+                    [severity]="copiado() ? 'success' : 'primary'"
+                    size="small"
+                    (onClick)="copiarCodigo()">
+                  </p-button>
+                </div>
+              </div>
+            }
+
+            <!-- Aguardando -->
+            <div class="pix-aguardando">
+              <p-progressSpinner strokeWidth="3" animationDuration="1s" styleClass="spinner-sm"></p-progressSpinner>
+              <span>Aguardando confirmação do pagamento...</span>
+            </div>
+
+            <!-- Modo manual -->
+            @if (manual()) {
+              <p-message severity="info"
+                text="Após efetuar o Pix, aguarde a confirmação do administrador do sistema para liberar o acesso.">
+              </p-message>
+            }
+
+          </div>
+        }
+
+        <!-- Rodapé -->
+        <div class="pag-rodape">
+          <p-button label="Sair do sistema" icon="pi pi-sign-out" severity="secondary"
+            [text]="true" size="small" (onClick)="logout()" styleClass="w-full">
+          </p-button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+</div>

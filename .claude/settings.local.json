@@ -4,7 +4,14 @@
       "Bash(\"d:/Pingo/calhas/frontend/src/styles.scss\")",
       "Bash(npm install:*)",
       "Bash(npx prisma:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(node -e ':*)",
+      "Bash(npx ng:*)",
+      "Bash(node:*)",
+      "Bash(xargs grep:*)",
+      "Bash(grep -n \"ICreateCompraDto\" D:/Pingo/calhas/shared/interfaces/index.ts D:/Pingo/calhas/shared/interfaces/*.ts)",
+      "Bash(grep -n \"status\\\\|estoque_baixado\\\\|EStatus\" D:/Pingo/calhas/shared/enums/EStatusCompra.ts D:/Pingo/calhas/shared/enums/*.ts)",
+      "Bash(grep:*)"
     ]
   }
 }

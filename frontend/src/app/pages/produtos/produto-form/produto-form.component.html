@@ -4,7 +4,8 @@
   [isLoadingData]="isLoadingData"
   [isSaving]="isSaving"
   [saveDisabled]="false"
-  width="500px"
+  width="520px"
+  position="top"
   (save)="onSave()">
 
   <form [formGroup]="form" class="p-fluid">
@@ -14,32 +15,79 @@
       Dados do Produto
     </h3>
 
+    <div class="field">
+      <label for="descricao">Descrição *</label>
+      <input pInputText id="descricao" formControlName="descricao" placeholder="Ex: Vedacalha 280g" />
+      @if (form.get('descricao')?.invalid && form.get('descricao')?.touched) {
+        <small class="p-error">Descrição é obrigatória.</small>
+      }
+    </div>
+
     <div class="row">
-      <div class="field col-12">
-        <label for="descricao">Descrição *</label>
-        <input pInputText id="descricao" formControlName="descricao" placeholder="Ex: Vedacalha 280g" />
-        @if (form.get('descricao')?.invalid && form.get('descricao')?.touched) {
-          <small class="p-error">Descrição é obrigatória.</small>
+      <div class="field col-4">
+        <label for="unidade_medida">Unidade *</label>
+        <input pInputText id="unidade_medida" formControlName="unidade_medida" maxlength="10" placeholder="UN" />
+        @if (form.get('unidade_medida')?.invalid && form.get('unidade_medida')?.touched) {
+          <small class="p-error">Obrigatório.</small>
+        }
+      </div>
+
+      <div class="field col-4">
+        <label for="estoque_atual">Estoque Atual</label>
+        <input pInputText appCurrencyMask id="estoque_atual" formControlName="estoque_atual"
+          class="w-full" readonly tabindex="-1" />
+      </div>
+
+      <div class="field col-8">
+        <label for="custo">Custo (R$)</label>
+        <input pInputText appCurrencyMask id="custo" formControlName="custo" class="w-full"
+          placeholder="0,00" />
+        @if (form.get('custo')?.invalid && form.get('custo')?.touched) {
+          <small class="p-error">Custo inválido.</small>
         }
       </div>
     </div>
 
-    <div class="row">
-      <div class="field col-12 col-md-6">
-        <label for="unidade_medida">Unidade (UN, PC, KG) *</label>
-        <input pInputText id="unidade_medida" formControlName="unidade_medida" maxlength="10" />
-        @if (form.get('unidade_medida')?.invalid && form.get('unidade_medida')?.touched) {
-          <small class="p-error">Unidade de medida é obrigatória.</small>
-        }
-      </div>
+    <!-- Markup e Valor Unitário com indicação visual de cálculo -->
+    <h3 class="section-title mt-2">
+      <i class="pi pi-percentage"></i>
+      Precificação
+    </h3>
 
-      <div class="field col-12 col-md-6">
-        <label for="valor_unitario">Valor Unitário *</label>
-        <input pInputText appCurrencyMask id="valor_unitario" formControlName="valor_unitario" class="w-full" />
-        @if (form.get('valor_unitario')?.invalid && form.get('valor_unitario')?.touched) {
-          <small class="p-error">Valor unitário deve ser maior que zero.</small>
-        }
+    <div class="markup-card">
+      <div class="markup-formula">
+        <div class="formula-item">
+          <label for="custo_display">Custo</label>
+          <span class="formula-value readonly">R$ {{ form.get('custo')?.value | number:'1.2-4' }}</span>
+        </div>
+        <span class="formula-op">×</span>
+        <div class="formula-item">
+          <label for="markup">(1 + Markup %)</label>
+          <div class="markup-input-wrap">
+            <input pInputText appCurrencyMask id="markup" formControlName="markup"
+              aria-label="Markup percentual de ganho" />
+            <span class="markup-suffix">%</span>
+          </div>
+          @if (form.get('markup')?.invalid && form.get('markup')?.touched) {
+            <small class="p-error">Markup inválido.</small>
+          }
+        </div>
+        <span class="formula-op">=</span>
+        <div class="formula-item">
+          <label for="valor_unitario">Preço de Venda *</label>
+          <input pInputText appCurrencyMask id="valor_unitario" formControlName="valor_unitario"
+            class="formula-result"
+            placeholder="0,00"
+            aria-label="Preço de venda calculado" />
+          @if (form.get('valor_unitario')?.invalid && form.get('valor_unitario')?.touched) {
+            <small class="p-error">Valor obrigatório.</small>
+          }
+        </div>
       </div>
+      <p class="markup-hint">
+        Altere o <strong>Markup %</strong> para calcular o preço automaticamente,
+        ou edite o <strong>Preço de Venda</strong> para recalcular o markup.
+      </p>
     </div>
 
   </form>

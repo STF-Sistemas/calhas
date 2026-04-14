@@ -36,14 +36,15 @@ export class ServicoFormComponent {
   ) {
     this.form = this.fb.group({
       descricao: ['', [Validators.required, Validators.maxLength(200)]],
-      valor: [0, [Validators.required, Validators.min(0.01)]]
+      valor: [0, [Validators.required, Validators.min(0.01)]],
+      custo: [0, [Validators.required, Validators.min(0)]]
     });
   }
 
   abrir(id?: number) {
     this.servicoId = id;
     this.visible = true;
-    this.form.reset({ valor: 0 });
+    this.form.reset({ valor: 0, custo: 0 });
 
     if (id) {
       this.isLoadingData = true;
@@ -61,8 +62,8 @@ export class ServicoFormComponent {
   }
 
   onSave() {
+    this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
       this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Preencha todos os campos obrigatórios.' });
       return;
     }

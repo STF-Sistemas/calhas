@@ -21,7 +21,7 @@ import { EStatusGeral } from '#shared/enums';
   ],
   templateUrl: './meios-pagamento.component.html',
   styleUrls: ['./meios-pagamento.component.scss'],
-  providers: [MessageService, ConfirmationService]
+  providers: [ConfirmationService]
 })
 export class MeiosPagamentoComponent implements OnInit {
   @ViewChild('form') form!: MeioPagamentoFormComponent;

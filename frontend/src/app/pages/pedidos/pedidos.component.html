@@ -1,5 +1,4 @@
 <section class="page-section" aria-labelledby="pedidos-title">
-  <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
   <div class="page-header">
@@ -25,11 +24,13 @@
     [addButtonLabel]="'Novo Pedido'"
     [showPrintButton]="true"
     [showPrintDesenhoButton]="true"
+    [rowActions]="rowActions"
     (add)="onAdd()"
     (edit)="onEdit($event)"
     (delete)="onDelete($event)"
     (print)="onPrint($event)"
-    (printDesenho)="onPrintDesenho($event)">
+    (printDesenho)="onPrintDesenho($event)"
+    (rowActionClick)="onRowAction($event)">
   </app-data-table>
 
   <app-pedido-form #form (saved)="carregarPedidos()"></app-pedido-form>

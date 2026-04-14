@@ -57,12 +57,46 @@ export class PedidoImpressaoService {
     }).join('');
   }
 
+  private gerarEmpresaHeader(pedido: IPedido): string {
+    const emp = pedido.empresa;
+    if (!emp) return '';
+
+    const nomeDisplay = emp.nome_fantasia || emp.razao_social;
+    const razaoSecundaria = emp.nome_fantasia
+      ? `<div class="empresa-razao">${emp.razao_social}</div>` : '';
+    const cnpj = emp.cnpj ? `<div class="empresa-detalhe">CNPJ: ${formatCpfCnpj(emp.cnpj)}</div>` : '';
+    const tel = emp.telefone ? `<div class="empresa-detalhe">Tel: ${formatPhone(emp.telefone)}</div>` : '';
+    const email = emp.email ? `<div class="empresa-detalhe">${emp.email}</div>` : '';
+
+    const partes: string[] = [];
+    if (emp.endereco) partes.push(emp.endereco + (emp.numero ? ', ' + emp.numero : ''));
+    if (emp.bairro) partes.push(emp.bairro);
+    const enderecoLinha = partes.length ? `<div class="empresa-detalhe">${partes.join(' — ')}</div>` : '';
+    const cidadeLinha = emp.cidade
+      ? `<div class="empresa-detalhe">${emp.cidade.descricao}/${emp.cidade.uf}</div>` : '';
+    const cepLinha = emp.cep ? `<div class="empresa-detalhe">CEP: ${emp.cep}</div>` : '';
+
+    return `
+    <div class="empresa-header">
+      <div class="empresa-info-bloco">
+        <div class="empresa-nome">${nomeDisplay}</div>
+        ${razaoSecundaria}
+        ${cnpj}${tel}${email}
+      </div>
+      <div class="empresa-endereco-bloco">
+        ${enderecoLinha}${cidadeLinha}${cepLinha}
+      </div>
+    </div>`;
+  }
+
   private gerarHtml(pedido: IPedido): string {
     const itens = pedido.itens ?? [];
     const status = this.statusLabel(pedido.status);
     const marcaDagua = pedido.empresa?.marca_dagua?.trim() ?? '';
     const meioPagamento = pedido.meio_pagamento?.descricao ?? '-';
     const cliente = pedido.cliente?.razao_social ?? '-';
+    const agora = new Date();
+    const dataGeracao = `${formatDate(agora)} ${agora.toTimeString().slice(0, 5)}`;
     const cnpjCpf = pedido.cliente?.cpf_cnpj
       ? `<span class="label">CPF/CNPJ:</span> ${formatCpfCnpj(pedido.cliente.cpf_cnpj)}`
       : '';
@@ -83,14 +117,18 @@ export class PedidoImpressaoService {
     body { font-family: Arial, sans-serif; font-size: 11px; color: #1a1a1a; background: #fff; }
     .page { max-width: 800px; margin: 0 auto; padding: 24px 28px; }
 
-    /* Cabeçalho */
-    .header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 2px solid #1a1a1a; margin-bottom: 16px; }
-    .header-title { font-size: 22px; font-weight: 700; color: #1a1a1a; }
-    .header-sub { font-size: 11px; color: #555; margin-top: 2px; }
-    .pedido-badge { text-align: right; }
-    .pedido-num { font-size: 26px; font-weight: 800; color: #1a1a1a; }
-    .pedido-num span { font-size: 12px; font-weight: 400; display: block; color: #555; }
-    .status-badge { display: inline-block; margin-top: 4px; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; background: #e5e7eb; color: #374151; }
+    /* Cabeçalho da empresa — idêntico ao relatorio-wrapper */
+    .empresa-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding-bottom: 12px; border-bottom: 2px solid #f97316; margin-bottom: 14px; }
+    .empresa-nome { font-size: 13px; font-weight: 700; color: #1a1a1a; }
+    .empresa-razao { font-size: 10px; color: #6b7280; margin-top: 2px; }
+    .empresa-detalhe { font-size: 10px; color: #6b7280; margin-top: 2px; }
+    .empresa-endereco-bloco { text-align: right; }
+
+    /* Título do relatório */
+    .titulo-row { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb; margin-bottom: 14px; }
+    .titulo { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #1a1a1a; margin: 0; }
+    .titulo-data { font-size: 10px; color: #6b7280; }
+    .status-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; background: #e5e7eb; color: #374151; }
 
     /* Seção de info */
     .section { margin-bottom: 14px; }
@@ -156,16 +194,11 @@ export class PedidoImpressaoService {
 ${marcaDagua ? `<div class="watermark" aria-hidden="true">${marcaDagua}</div>` : ''}
 <div class="page">
 
-  <!-- Cabeçalho -->
-  <div class="header">
-    <div>
-      <div class="header-title">Pedido de Fabricação</div>
-      <div class="header-sub">Calhas &amp; Coberturas</div>
-    </div>
-    <div class="pedido-badge">
-      <div class="pedido-num"><span>Nº do Pedido</span>${pedido.id}</div>
-      <div class="status-badge">${status}</div>
-    </div>
+  ${this.gerarEmpresaHeader(pedido)}
+
+  <div class="titulo-row">
+    <h2 class="titulo">Pedido de Fabricação — Nº ${pedido.id} &nbsp;<span class="status-badge">${status}</span></h2>
+    <span class="titulo-data">Gerado em: ${dataGeracao}</span>
   </div>
 
   <!-- Dados do Pedido -->
@@ -234,7 +267,7 @@ ${marcaDagua ? `<div class="watermark" aria-hidden="true">${marcaDagua}</div>` :
 
   <!-- Rodapé -->
   <div class="footer">
-    <span>Gerado em ${formatDate(new Date())} ${new Date().toTimeString().slice(0, 5)}</span>
+    <span>Gerado em ${dataGeracao}</span>
     <span>Pedido Nº ${pedido.id} — ${cliente}</span>
   </div>
 

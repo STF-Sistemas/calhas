@@ -35,9 +35,37 @@
       </button>
       <p-menu #colorMenu [model]="colorMenuItems" [popup]="true"></p-menu>
 
-      <button class="p-link layout-topbar-button" pTooltip="Notificações" aria-label="Notificações">
+      <button class="p-link layout-topbar-button notif-btn" (click)="notifPanel.toggle($event)"
+        pTooltip="Notificações" aria-label="Notificações">
         <i class="pi pi-bell"></i>
+        @if (notificacaoLicenca()) {
+          <span class="notif-badge" [class.notif-badge--urgente]="notificacaoLicenca()!.urgente"></span>
+        }
       </button>
+      <p-popover #notifPanel styleClass="notif-popover">
+        <div class="notif-panel">
+          @if (notificacaoLicenca(); as notif) {
+            <div class="notif-item" [class.notif-item--urgente]="notif.urgente">
+              <div class="notif-item-header">
+                <i class="pi" [class]="notif.urgente ? 'pi-exclamation-circle' : 'pi-clock'"></i>
+                <span class="notif-item-title">Licença</span>
+              </div>
+              <p class="notif-item-texto">{{ notif.texto }}</p>
+              @if (!authService.isSuperAdmin()) {
+                <button pButton class="p-button-sm p-button-danger w-full mt-2"
+                  label="Efetuar pagamento" icon="pi pi-credit-card"
+                  (click)="irParaPagamento(); notifPanel.hide()">
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="notif-vazia">
+              <i class="pi pi-check-circle"></i>
+              <span>Nenhuma notificação</span>
+            </div>
+          }
+        </div>
+      </p-popover>
       <button class="p-link layout-topbar-button" (click)="profileMenu.toggle($event)"
         pTooltip="Meu Perfil" aria-label="Meu Perfil">
         <i class="pi pi-user"></i>
@@ -45,6 +73,19 @@
       <p-menu #profileMenu [model]="profileMenuItems" [popup]="true"></p-menu>
     </div>
   </header>
+
+  <!-- Banner de vencimento de licença (somente no dia do vencimento) -->
+  @if (alertaLicenca()) {
+    <div class="licenca-banner licenca-banner--{{ alertaLicenca()!.severity }} no-print">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>
+        <strong>Licença:</strong> {{ alertaLicenca()!.label }}.
+        @if (authService.isAdmin() && !authService.isSuperAdmin()) {
+          <a routerLink="/pagamento" class="licenca-link">Renovar agora</a>
+        }
+      </span>
+    </div>
+  }
 
   <!-- Sidebar -->
   <aside class="layout-sidebar">
@@ -54,9 +95,12 @@
           <li class="layout-menuitem-root-text">{{ group.label }}</li>
           @for (item of group.items; track item.label) {
             <li>
-              <a pRipple [routerLink]="item.routerLink" routerLinkActive="active-route"
-                (click)="isMobile() && sidebarVisible.set(false)"
-                [attr.aria-label]="item.label">
+              <a pRipple
+                [routerLink]="item.routerLink"
+                [routerLinkActive]="item.routerLink ? 'active-route' : ''"
+                (click)="onSidebarItemClick(item)"
+                [attr.aria-label]="item.label"
+                [class.cursor-pointer]="!item.routerLink">
                 <i [class]="item.icon"></i>
                 <span>{{ item.label }}</span>
               </a>
@@ -91,3 +135,7 @@
   <!-- Mask mobile -->
   <div class="layout-mask" (click)="sidebarVisible.set(false)" aria-hidden="true"></div>
 </div>
+
+<!-- Dialog: Minha Empresa (admin/super_admin) -->
+<app-empresa-form #empresaForm></app-empresa-form>
+<p-toast></p-toast>

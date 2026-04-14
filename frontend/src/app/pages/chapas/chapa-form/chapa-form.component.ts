@@ -2,7 +2,6 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { TableModule } from 'primeng/table';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { ButtonModule } from 'primeng/button';
@@ -20,7 +19,6 @@ import { forkJoin, of, switchMap, Observable } from 'rxjs';
     ReactiveFormsModule,
     FormsModule,
     InputTextModule,
-    InputNumberModule,
     TableModule,
     ButtonModule,
     CurrencyMaskDirective,
@@ -77,7 +75,7 @@ export class ChapaFormComponent {
   }
 
   adicionarCorte() {
-    this.cortes = [...this.cortes, { descricao: '', corte: 0, valor: 0, excluido: false } as ICorte];
+    this.cortes = [...this.cortes, { descricao: '', corte: 0, valor: 0, custo: 0, excluido: false } as ICorte];
   }
 
   removerCorte(corte: ICorte) {
@@ -92,9 +90,9 @@ export class ChapaFormComponent {
   }
 
   onSave() {
+    this.form.markAllAsTouched();
     if (this.form.invalid) {
       this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Informe a descrição da chapa.' });
-      this.form.markAllAsTouched();
       return;
     }
 
@@ -104,9 +102,9 @@ export class ChapaFormComponent {
       return;
     }
 
-    const cortesInvalidos = cortesAtivos.filter(c => !c.descricao?.trim() || c.valor == null);
+    const cortesInvalidos = cortesAtivos.filter(c => !c.descricao?.trim() || c.valor == null || c.custo == null);
     if (cortesInvalidos.length > 0) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Todos os cortes precisam ter descrição e valor preenchidos.' });
+      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Todos os cortes precisam ter descrição, valor e custo preenchidos.' });
       return;
     }
 

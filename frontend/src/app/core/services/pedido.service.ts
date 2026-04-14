@@ -27,6 +27,10 @@ export class PedidoService {
     return this.http.post<TApiResponse<IPedido>>(this.apiUrl, pedido);
   }
 
+  alterarStatus(id: number, status: number) {
+    return this.http.patch<TApiResponse<IPedido>>(`${this.apiUrl}/${id}/status`, { status });
+  }
+
   remover(id: number) {
     return this.http.delete<TApiResponse<void>>(`${this.apiUrl}/${id}`);
   }

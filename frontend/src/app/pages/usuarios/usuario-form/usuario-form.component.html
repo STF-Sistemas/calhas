@@ -3,35 +3,38 @@
   [title]="usuarioId ? 'Editar Usuário' : 'Novo Usuário'"
   [isLoadingData]="isLoadingData"
   [isSaving]="isSaving"
-  [saveDisabled]="form.invalid"
   width="500px"
   position="top"
-  height="calc(100vh - 5rem)"
   (save)="onSave()">
 
   <form [formGroup]="form" class="p-fluid">
 
-    <!-- ===================== EMPRESA ======================== -->
-    <h3 class="section-title">
-      <i class="pi pi-building"></i>
-      Empresa
-    </h3>
+    <!-- ===================== EMPRESA (somente superAdmin) ======================== -->
+    @if (authService.isSuperAdmin()) {
+      <h3 class="section-title">
+        <i class="pi pi-building"></i>
+        Empresa
+      </h3>
 
-    <div class="row">
-      <div class="field col-12">
-        <label for="cod_empresa">Empresa *</label>
-        <p-select
-          id="cod_empresa"
-          formControlName="cod_empresa"
-          [options]="empresas"
-          optionLabel="razao_social"
-          optionValue="id"
-          placeholder="Selecione a Empresa"
-          [filter]="true"
-          filterBy="razao_social">
-        </p-select>
+      <div class="row">
+        <div class="field col-12">
+          <label for="cod_empresa">Empresa *</label>
+          <p-select
+            id="cod_empresa"
+            formControlName="cod_empresa"
+            [options]="empresas"
+            optionLabel="razao_social"
+            optionValue="id"
+            placeholder="Selecione a Empresa"
+            [filter]="true"
+            filterBy="razao_social">
+          </p-select>
+          @if (form.get('cod_empresa')?.invalid && form.get('cod_empresa')?.touched) {
+            <small class="p-error">Empresa é obrigatória.</small>
+          }
+        </div>
       </div>
-    </div>
+    }
 
     <!-- ===================== DADOS DE ACESSO ======================== -->
     <h3 class="section-title mt-2">
@@ -42,14 +45,27 @@
     <div class="row">
       <div class="field col-12">
         <label for="nome">Nome Completo *</label>
-        <input pInputText id="nome" formControlName="nome" placeholder="Nome do colaborador" />
+        <input pInputText id="nome" formControlName="nome" placeholder="Nome do colaborador"
+          [class.ng-invalid]="form.get('nome')?.invalid && form.get('nome')?.touched"
+          [class.ng-dirty]="form.get('nome')?.touched" />
+        @if (form.get('nome')?.invalid && form.get('nome')?.touched) {
+          <small class="p-error">Nome é obrigatório.</small>
+        }
       </div>
     </div>
 
     <div class="row">
       <div class="field col-12">
         <label for="email">E-mail de Acesso *</label>
-        <input pInputText id="email" type="email" formControlName="email" placeholder="email@empresa.com.br" />
+        <input pInputText id="email" type="email" formControlName="email" placeholder="email@empresa.com.br"
+          [class.ng-invalid]="form.get('email')?.invalid && form.get('email')?.touched"
+          [class.ng-dirty]="form.get('email')?.touched" />
+        @if (form.get('email')?.errors?.['required'] && form.get('email')?.touched) {
+          <small class="p-error">E-mail é obrigatório.</small>
+        }
+        @if (form.get('email')?.errors?.['email'] && form.get('email')?.touched) {
+          <small class="p-error">Informe um e-mail válido.</small>
+        }
       </div>
     </div>
 
@@ -64,6 +80,12 @@
           placeholder="Mínimo 6 caracteres"
           inputStyleClass="w-full">
         </p-password>
+        @if (form.get('senha')?.errors?.['required'] && form.get('senha')?.touched) {
+          <small class="p-error">Senha é obrigatória.</small>
+        }
+        @if (form.get('senha')?.errors?.['minlength'] && form.get('senha')?.touched) {
+          <small class="p-error">Senha deve ter no mínimo 6 caracteres.</small>
+        }
       </div>
     </div>
 
@@ -77,6 +99,9 @@
       <div class="field col-12 md:col-6">
         <label for="status">Status *</label>
         <p-select id="status" formControlName="status" [options]="statusOpcoes"></p-select>
+        @if (form.get('status')?.invalid && form.get('status')?.touched) {
+          <small class="p-error">Status é obrigatório.</small>
+        }
       </div>
     </div>
 

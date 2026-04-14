@@ -37,16 +37,11 @@
             </span>
             Segmento {{ seg + 1 }}
           </label>
-          <p-inputNumber
+          <input pInputText appCurrencyMask
             [ngModel]="medidas[seg]"
             (ngModelChange)="onMedidaChange(seg, $event)"
-            [min]="0"
-            suffix=" cm"
-            [minFractionDigits]="0"
-            [maxFractionDigits]="2"
-            inputStyleClass="w-full"
-            placeholder="0 cm">
-          </p-inputNumber>
+            class="w-full"
+            placeholder="0,00" />
         </div>
       }
     </div>

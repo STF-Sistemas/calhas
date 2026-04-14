@@ -1,0 +1,61 @@
+<main>
+  <div class="page-header">
+    <h1 class="page-title">
+      <i class="pi pi-lock mr-2"></i>
+      Alterar Senha
+    </h1>
+    <p class="page-subtitle">Defina uma nova senha para sua conta</p>
+  </div>
+
+  <p-card styleClass="max-w-lg mx-auto">
+    <form [formGroup]="form">
+      <div class="field">
+        <label for="senha_atual">Senha Atual *</label>
+        <p-password id="senha_atual" formControlName="senha_atual"
+          [toggleMask]="true" [feedback]="false"
+          placeholder="Sua senha atual"
+          styleClass="w-full" inputStyleClass="w-full">
+        </p-password>
+        @if (form.get('senha_atual')?.invalid && form.get('senha_atual')?.touched) {
+          <small class="p-error">Senha atual é obrigatória.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="nova_senha">Nova Senha *</label>
+        <p-password id="nova_senha" formControlName="nova_senha"
+          [toggleMask]="true" [feedback]="true"
+          placeholder="Mínimo 8 caracteres"
+          styleClass="w-full" inputStyleClass="w-full">
+        </p-password>
+        @if (form.get('nova_senha')?.invalid && form.get('nova_senha')?.touched) {
+          <small class="p-error">A nova senha deve ter pelo menos 8 caracteres.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="confirmar_senha">Confirmar Nova Senha *</label>
+        <p-password id="confirmar_senha" formControlName="confirmar_senha"
+          [toggleMask]="true" [feedback]="false"
+          placeholder="Repita a nova senha"
+          styleClass="w-full" inputStyleClass="w-full">
+        </p-password>
+        @if (form.get('confirmar_senha')?.touched && form.hasError('senhasDiferentes')) {
+          <small class="p-error">As senhas não coincidem.</small>
+        }
+      </div>
+
+      <div class="form-actions">
+        <p-button
+          label="Alterar Senha"
+          icon="pi pi-lock"
+          severity="primary"
+          [loading]="isSaving"
+          [disabled]="form.invalid"
+          (onClick)="onSave()">
+        </p-button>
+      </div>
+    </form>
+  </p-card>
+
+</main>

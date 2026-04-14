@@ -14,6 +14,21 @@ export const authGuard = () => {
   return false;
 };
 
+export const validadeGuard = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  // Super admin nunca é bloqueado
+  if (authService.isSuperAdmin()) return true;
+
+  if (authService.empresaExpirada()) {
+    router.navigate(['/pagamento']);
+    return false;
+  }
+
+  return true;
+};
+
 export const adminGuard = () => {
     const authService = inject(AuthService);
     const router = inject(Router);

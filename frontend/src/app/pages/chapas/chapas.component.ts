@@ -21,7 +21,7 @@ import { EStatusGeral } from '#shared/enums';
   ],
   templateUrl: './chapas.component.html',
   styleUrls: ['./chapas.component.scss'],
-  providers: [MessageService, ConfirmationService]
+  providers: [ConfirmationService]
 })
 export class ChapasComponent implements OnInit {
   @ViewChild('form') form!: ChapaFormComponent;

@@ -21,7 +21,7 @@ import { EStatusGeral } from '#shared/enums';
   ],
   templateUrl: './servicos.component.html',
   styleUrls: ['./servicos.component.scss'],
-  providers: [MessageService, ConfirmationService]
+  providers: [ConfirmationService]
 })
 export class ServicosComponent implements OnInit {
   @ViewChild('form') form!: ServicoFormComponent;

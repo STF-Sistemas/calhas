@@ -141,3 +141,133 @@
     display: none;
   }
 }
+
+// ── Banner de vencimento de licença ───────────────────────────────────────────
+.licenca-banner {
+  position: fixed;
+  top: 5rem;
+  left: 0;
+  right: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+
+  i { font-size: 1rem; flex-shrink: 0; }
+
+  span { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
+
+  .licenca-link {
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  &--error {
+    background: #fef2f2;
+    color: #991b1b;
+    border-bottom: 1px solid #fecaca;
+    .licenca-link { color: #991b1b; }
+  }
+}
+
+:host-context(.app-dark) {
+  .licenca-banner--error { background: rgba(239,68,68,0.1); color: #f87171; border-bottom-color: rgba(239,68,68,0.2); }
+}
+
+// ── Notification bell badge ───────────────────────────────────────────────────
+// O badge usa var(--surface-0) para a borda, que já muda com o tema.
+.notif-btn {
+  position: relative;
+
+  .notif-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--p-amber-400, #fbbf24);
+    border: 2px solid var(--surface-0);
+
+    &--urgente {
+      background-color: var(--p-red-500, #ef4444);
+    }
+  }
+}
+
+// ── Notification popover panel ────────────────────────────────────────────────
+// O overlay do PrimeNG renderiza diretamente sob <html> (onde .app-dark é
+// aplicado), portanto usa apenas CSS variables do tema — sem hardcode de cor —
+// para que claro/escuro funcione automaticamente sem nenhum override extra.
+:host ::ng-deep {
+  .notif-popover .p-popover-content {
+    padding: 0.5rem;
+  }
+}
+
+.notif-panel {
+  min-width: 260px;
+  max-width: 300px;
+}
+
+.notif-item {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: var(--surface-50);
+  border: 1px solid var(--surface-border);
+  border-left: 3px solid var(--p-amber-400, #fbbf24);
+
+  &--urgente {
+    border-left-color: var(--p-red-500, #ef4444);
+  }
+}
+
+.notif-item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+
+  i {
+    font-size: 0.9rem;
+    color: var(--p-amber-500, #f59e0b);
+  }
+}
+
+.notif-item--urgente .notif-item-header i {
+  color: var(--p-red-500, #ef4444);
+}
+
+.notif-item-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-color);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.notif-item-texto {
+  font-size: 0.875rem;
+  color: var(--text-color);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.notif-vazia {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: var(--text-color-secondary);
+  font-size: 0.875rem;
+
+  i { color: var(--p-green-500, #22c55e); font-size: 1rem; }
+}
+

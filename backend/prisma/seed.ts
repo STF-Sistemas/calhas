@@ -1,6 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import { EStatusGeral, EPerfilUsuario, EStatusPedido, ETipoItemPedido } from '#shared/enums';
+
+// Valores inline para evitar dependência do alias #shared não resolvido pelo tsx
+const EStatusGeral   = { Ativo: 1, Inativo: 2 } as const;
+const EPerfilUsuario = { SuperAdmin: 3, Admin: 4, Usuario: 5 } as const;
+const EStatusPedido  = { Aberto: 6, EmProducao: 7, Concluido: 8, Cancelado: 9 } as const;
+const ETipoItemPedido = { Produto: 10, Corte: 11, Servico: 12 } as const;
 
 const prisma = new PrismaClient();
 
@@ -40,11 +45,25 @@ async function main() {
   
   console.log(`✅ ${tipos.length} tipos inseridos no schema util`);
 
+  // Empresa do sistema (vinculada ao super admin)
+  const empresaSistema = await prisma.empresa.upsert({
+    where: { cnpj: '00000000000000' },
+    update: {},
+    create: {
+      razao_social: 'Sistema Calhas',
+      nome_fantasia: 'Sistema',
+      cnpj: '00000000000000',
+      ativo: 1,
+      data_expiracao: null, // sem expiração
+    },
+  });
+  console.log(`✅ Empresa do sistema criada/encontrada: id=${empresaSistema.id}`);
+
   // Superusuário global
   const senhaHash = await bcrypt.hash('admin@2024', 10);
   await prisma.usuario.upsert({
     where: { email: 'super@calhas.com' },
-    update: {},
+    update: { cod_empresa: empresaSistema.id },
     create: {
       nome: 'Super Administrador',
       email: 'super@calhas.com',
@@ -52,7 +71,7 @@ async function main() {
       status: EStatusGeral.Ativo,
       admin: true,
       super_admin: true,
-      cod_empresa: null,
+      cod_empresa: empresaSistema.id,
     },
   });
   console.log('✅ Superusuário criado: super@calhas.com / admin@2024');

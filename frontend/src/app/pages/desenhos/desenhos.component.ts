@@ -14,7 +14,7 @@ import { IDesenho } from '#shared/interfaces';
   imports: [CommonModule, DataTableComponent, DesenhoFormComponent, ConfirmDialogModule, ToastModule],
   templateUrl: './desenhos.component.html',
   styleUrls: ['./desenhos.component.scss'],
-  providers: [MessageService, ConfirmationService]
+  providers: [ConfirmationService]
 })
 export class DesenhosComponent implements OnInit {
   @ViewChild('form') form!: DesenhoFormComponent;

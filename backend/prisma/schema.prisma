@@ -29,16 +29,18 @@ model Tipo {
 // =============================================
 
 model Usuario {
-  id           Int      @id @default(autoincrement())
-  nome         String   @db.VarChar(150)
-  email        String   @unique @db.VarChar(200)
-  senha        String   @db.VarChar(255)
-  status       Int      @default(1)
-  data_criacao DateTime @default(now())
-  admin        Boolean  @default(false)
-  super_admin  Boolean  @default(false)
-  cod_empresa  Int?
-  excluido     Boolean  @default(false)
+  id                    Int       @id @default(autoincrement())
+  nome                  String    @db.VarChar(150)
+  email                 String    @unique @db.VarChar(200)
+  senha                 String    @db.VarChar(255)
+  status                Int       @default(1)
+  data_criacao          DateTime  @default(now())
+  admin                 Boolean   @default(false)
+  super_admin           Boolean   @default(false)
+  cod_empresa           Int?
+  excluido              Boolean   @default(false)
+  reset_token           String?   @db.VarChar(255)
+  reset_token_expiracao DateTime?
 
   empresa Empresa? @relation(fields: [cod_empresa], references: [id])
 
@@ -56,8 +58,9 @@ model Cidade {
   uf          String @db.VarChar(2)
   codigo_ibge String @db.VarChar(10)
 
-  empresas Empresa[]
-  clientes Cliente[]
+  empresas     Empresa[]
+  clientes     Cliente[]
+  fornecedores Fornecedor[]
 
   @@map("cidades")
   @@schema("calhas")
@@ -70,8 +73,11 @@ model Empresa {
   cnpj           String    @unique @db.VarChar(20)
   email          String?   @db.VarChar(200)
   telefone       String?   @db.VarChar(20)
-  data_expiracao DateTime?
-  ativo          Int       @default(1)
+  data_expiracao              DateTime?
+  valor_mensalidade           Decimal   @default(150) @db.Decimal(10, 2)
+  validar_estoque             Boolean   @default(false)
+  quantidade_desenho_por_folha Int      @default(5)
+  ativo                       Int       @default(1)
   excluido       Boolean   @default(false)
   created_at     DateTime  @default(now())
   updated_at     DateTime  @updatedAt
@@ -92,8 +98,27 @@ model Empresa {
   pedidos         Pedido[]
   desenhos        Desenho[]
   meios_pagamento MeioPagamento[]
+  fornecedores    Fornecedor[]
+  pagamentos_pix  PagamentoPix[]
 
   @@map("empresas")
+  @@schema("calhas")
+}
+
+model PagamentoPix {
+  id             Int       @id @default(autoincrement())
+  cod_empresa    Int
+  mp_payment_id  String?   @db.VarChar(100)
+  valor          Decimal   @db.Decimal(10, 2)
+  status         String    @default("pendente") @db.VarChar(30)
+  qr_code        String?   @db.Text
+  qr_code_base64 String?   @db.Text
+  created_at     DateTime  @default(now())
+  pago_em        DateTime?
+
+  empresa Empresa @relation(fields: [cod_empresa], references: [id])
+
+  @@map("pagamentos_pix")
   @@schema("calhas")
 }
 
@@ -131,13 +156,37 @@ model Produto {
   descricao      String  @db.VarChar(200)
   unidade_medida String  @db.VarChar(10)
   valor_unitario Decimal @db.Decimal(10, 4)
+  custo          Decimal @default(0) @db.Decimal(10, 4)
+  markup         Decimal @default(0) @db.Decimal(10, 4)
+  estoque_atual  Decimal @default(0) @db.Decimal(10, 4)
+  ncm            String? @db.VarChar(10)
+  cest           String? @db.VarChar(7)
+  gtin           String? @db.VarChar(14)
+  cfop_padrao    String? @db.VarChar(5)
+  origem         Int     @default(0)
   status         Int     @default(1)
   excluido       Boolean @default(false)
 
-  empresa       Empresa      @relation(fields: [cod_empresa], references: [id])
-  pedidos_itens PedidoItem[]
+  empresa            Empresa              @relation(fields: [cod_empresa], references: [id])
+  pedidos_itens      PedidoItem[]
+  compra_itens       CompraItem[]
+  codigos_fornecedor ProdutoFornecedor[]
 
   @@map("produtos")
+  @@schema("calhas")
+}
+
+model ProdutoFornecedor {
+  id                        Int    @id @default(autoincrement())
+  cod_produto               Int
+  cod_fornecedor            Int
+  codigo_produto_fornecedor String @db.VarChar(60)
+
+  produto    Produto    @relation(fields: [cod_produto], references: [id])
+  fornecedor Fornecedor @relation(fields: [cod_fornecedor], references: [id])
+
+  @@unique([cod_fornecedor, codigo_produto_fornecedor])
+  @@map("produtos_fornecedor")
   @@schema("calhas")
 }
 
@@ -161,6 +210,7 @@ model Corte {
   descricao String  @db.VarChar(200)
   corte     Decimal @db.Decimal(10, 4)
   valor     Decimal @db.Decimal(10, 4)
+  custo     Decimal @default(0) @db.Decimal(10, 4)
   status    Int     @default(1)
   excluido  Boolean @default(false)
 
@@ -176,6 +226,7 @@ model Servico {
   cod_empresa Int
   descricao   String  @db.VarChar(200)
   valor       Decimal @db.Decimal(10, 4)
+  custo       Decimal @default(0) @db.Decimal(10, 4)
   status      Int     @default(1)
   excluido    Boolean @default(false)
 
@@ -198,6 +249,7 @@ model Pedido {
   valor_total        Decimal  @default(0) @db.Decimal(10, 4)
   observacoes        String?  @db.Text
   excluido           Boolean  @default(false)
+  estoque_baixado    Boolean  @default(false)
   created_at         DateTime @default(now())
   updated_at         DateTime @updatedAt
 
@@ -241,19 +293,128 @@ model Desenho {
   @@schema("calhas")
 }
 
+model Fornecedor {
+  id            Int      @id @default(autoincrement())
+  cod_empresa   Int
+  razao_social  String   @db.VarChar(200)
+  nome_fantasia String?  @db.VarChar(200)
+  cnpj          String   @db.VarChar(14)
+  ie            String?  @db.VarChar(20)
+  iest          String?  @db.VarChar(20)
+  im            String?  @db.VarChar(20)
+  crt           Int      @default(1)
+  email         String?  @db.VarChar(200)
+  fone          String?  @db.VarChar(20)
+  cep           String?  @db.VarChar(8)
+  logradouro    String?  @db.VarChar(200)
+  numero        String?  @db.VarChar(20)
+  complemento   String?  @db.VarChar(100)
+  bairro        String?  @db.VarChar(100)
+  cod_cidade    Int?
+  status        Int      @default(1)
+  excluido      Boolean  @default(false)
+
+  empresa            Empresa             @relation(fields: [cod_empresa], references: [id])
+  cidade             Cidade?             @relation(fields: [cod_cidade], references: [id])
+  compras            Compra[]
+  codigos_produtos   ProdutoFornecedor[]
+
+  @@map("fornecedores")
+  @@schema("calhas")
+}
+
+model Compra {
+  id              Int          @id @default(autoincrement())
+  cod_empresa     Int
+  cod_fornecedor  Int
+  numero_nfe      String?      @db.VarChar(20)
+  serie           String?      @db.VarChar(5)
+  chave_acesso    String?      @db.VarChar(44)
+  data_emissao    DateTime?
+  data_entrada    DateTime?
+  valor_produtos  Decimal      @default(0) @db.Decimal(10, 2)
+  valor_frete     Decimal      @default(0) @db.Decimal(10, 2)
+  valor_seguro    Decimal      @default(0) @db.Decimal(10, 2)
+  valor_desconto  Decimal      @default(0) @db.Decimal(10, 2)
+  valor_outros    Decimal      @default(0) @db.Decimal(10, 2)
+  valor_ipi       Decimal      @default(0) @db.Decimal(10, 2)
+  valor_total     Decimal      @default(0) @db.Decimal(10, 2)
+  status                Int          @default(1)
+  observacao            String?      @db.VarChar(500)
+  motivo_cancelamento   String?      @db.VarChar(500)
+  excluido              Boolean      @default(false)
+
+  fornecedor  Fornecedor   @relation(fields: [cod_fornecedor], references: [id])
+  itens       CompraItem[]
+  xml         CompraXml?
+
+  @@map("compras")
+  @@schema("calhas")
+}
+
+model CompraXml {
+  id          Int      @id @default(autoincrement())
+  cod_compra  Int      @unique
+  xml_content String   @db.Text
+  created_at  DateTime @default(now())
+
+  compra Compra @relation(fields: [cod_compra], references: [id])
+
+  @@map("compras_xml")
+  @@schema("calhas")
+}
+
+model CompraItem {
+  id                Int      @id @default(autoincrement())
+  cod_compra        Int
+  cod_produto       Int
+  descricao_xml     String?  @db.VarChar(200)
+  descricao         String   @db.VarChar(200)
+  ncm               String?  @db.VarChar(10)
+  cfop              String?  @db.VarChar(5)
+  unidade           String   @db.VarChar(10)
+  quantidade        Decimal  @db.Decimal(10, 4)
+  valor_unitario    Decimal  @db.Decimal(10, 4)
+  valor_total       Decimal  @db.Decimal(10, 2)
+  desconto          Decimal  @default(0) @db.Decimal(10, 2)
+  base_icms         Decimal  @default(0) @db.Decimal(10, 2)
+  aliq_icms         Decimal  @default(0) @db.Decimal(5, 2)
+  valor_icms        Decimal  @default(0) @db.Decimal(10, 2)
+  base_icms_st      Decimal  @default(0) @db.Decimal(10, 2)
+  valor_icms_st     Decimal  @default(0) @db.Decimal(10, 2)
+  valor_ipi         Decimal  @default(0) @db.Decimal(10, 2)
+  aliq_pis          Decimal  @default(0) @db.Decimal(5, 4)
+  valor_pis         Decimal  @default(0) @db.Decimal(10, 2)
+  aliq_cofins       Decimal  @default(0) @db.Decimal(5, 4)
+  valor_cofins      Decimal  @default(0) @db.Decimal(10, 2)
+  rateio_frete      Decimal  @default(0) @db.Decimal(10, 4)
+  rateio_seguro     Decimal  @default(0) @db.Decimal(10, 4)
+  rateio_outros     Decimal  @default(0) @db.Decimal(10, 4)
+  rateio_desconto   Decimal  @default(0) @db.Decimal(10, 4)
+  custo_unitario    Decimal  @default(0) @db.Decimal(10, 4)
+  excluido          Boolean  @default(false)
+
+  compra   Compra   @relation(fields: [cod_compra], references: [id])
+  produto  Produto  @relation(fields: [cod_produto], references: [id])
+
+  @@map("compras_itens")
+  @@schema("calhas")
+}
+
 model PedidoItem {
-  id             Int     @id @default(autoincrement())
-  cod_pedido     Int
-  cod_produto    Int?
-  cod_servico    Int?
-  cod_corte      Int?
-  cod_desenho    Int?
-  tipo           Int     @default(1)
-  quantidade     Decimal @db.Decimal(10, 4)
-  valor_unitario Decimal @db.Decimal(10, 4)
-  valor_total    Decimal @db.Decimal(10, 4)
-  observacoes    String? @db.Text
-  medidas        Json?
+  id              Int     @id @default(autoincrement())
+  cod_pedido      Int
+  cod_produto     Int?
+  cod_servico     Int?
+  cod_corte       Int?
+  cod_desenho     Int?
+  tipo            Int     @default(1)
+  quantidade      Decimal @db.Decimal(10, 4)
+  valor_unitario  Decimal @db.Decimal(10, 4)
+  valor_total     Decimal @db.Decimal(10, 4)
+  custo_unitario  Decimal @default(0) @db.Decimal(10, 4)
+  observacoes     String? @db.Text
+  medidas         Json?
 
   pedido  Pedido   @relation(fields: [cod_pedido], references: [id], onDelete: Cascade)
   produto Produto? @relation(fields: [cod_produto], references: [id])

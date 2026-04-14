@@ -20,7 +20,7 @@ import { ICliente } from '#shared/interfaces';
   ],
   templateUrl: './clientes.component.html',
   styleUrls: ['./clientes.component.scss'],
-  providers: [MessageService, ConfirmationService]
+  providers: [ConfirmationService]
 })
 export class ClientesComponent implements OnInit {
   @ViewChild('form') form!: ClienteFormComponent;

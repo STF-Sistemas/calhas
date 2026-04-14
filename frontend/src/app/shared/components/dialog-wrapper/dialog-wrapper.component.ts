@@ -25,7 +25,7 @@ export class DialogWrapperComponent {
   @Input() isSaving = false;
   @Input() hasFooter = true;
   @Input() width = '500px';
-  @Input() height = '';
+  @Input() height = '100dvh';
   @Input() maxHeight = '95vh';
   @Input() position: 'center' | 'top' | 'bottom' | 'left' | 'right' | 'topleft' | 'topright' | 'bottomleft' | 'bottomright' = 'center';
   @Input() saveLabel = 'Salvar';

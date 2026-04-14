@@ -572,10 +572,15 @@ body {
    ::ng-deep no componente não alcança estes elementos.
    ========================================================== */
 
+/* Toast sempre acima de tudo */
+.p-toast {
+  z-index: 99999 !important;
+}
+
 /* Modal cobre tudo do topo ao rodapé */
 .p-dialog-mask {
   top: 0 !important;
-  height: 90vh !important;
+  height: 100% !important;
   z-index: 1100 !important;
 }
 
@@ -593,6 +598,7 @@ body {
   max-height: none !important;
   overflow-y: auto !important;
   overflow-x: hidden;
+  padding: 1.5rem !important;
 }
 
 .p-dialog>.p-dialog-header {

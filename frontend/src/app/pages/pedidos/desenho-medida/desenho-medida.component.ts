@@ -1,15 +1,16 @@
 import { Component, EventEmitter, Output, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { IDesenho, IPonto } from '#shared/interfaces';
 
 @Component({
   selector: 'app-desenho-medida',
   standalone: true,
-  imports: [CommonModule, FormsModule, InputNumberModule, ButtonModule, DialogModule],
+  imports: [CommonModule, FormsModule, ButtonModule, DialogModule, InputTextModule, CurrencyMaskDirective],
   templateUrl: './desenho-medida.component.html',
   styleUrls: ['./desenho-medida.component.scss']
 })

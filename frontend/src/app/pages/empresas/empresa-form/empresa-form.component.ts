@@ -3,13 +3,23 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputMaskModule } from 'primeng/inputmask';
+import { DatePickerModule } from 'primeng/datepicker';
+import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { Textarea } from 'primeng/textarea';
+import { TagModule } from 'primeng/tag';
+import { CheckboxModule } from 'primeng/checkbox';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { MessageService } from 'primeng/api';
 import { NgxMaskDirective } from 'ngx-mask';
 import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { EmpresaService } from '#core/services/empresa.service';
 import { ClienteService } from '#core/services/cliente.service';
+import { AuthService } from '#core/services/auth.service';
+import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-empresa-form',
@@ -19,10 +29,17 @@ import { ClienteService } from '#core/services/cliente.service';
     ReactiveFormsModule,
     InputTextModule,
     InputMaskModule,
+    DatePickerModule,
+    ButtonModule,
+    TooltipModule,
     Tabs, TabList, Tab, TabPanels, TabPanel,
     Textarea,
+    TagModule,
+    CheckboxModule,
+    InputNumberModule,
     NgxMaskDirective,
-    DialogWrapperComponent
+    CurrencyMaskDirective,
+    DialogWrapperComponent,
   ],
   templateUrl: './empresa-form.component.html',
   styleUrls: ['./empresa-form.component.scss']
@@ -34,13 +51,16 @@ export class EmpresaFormComponent {
   visible = false;
   isLoadingData = false;
   isSaving = false;
+  isSavingValidade = false;
   empresaId?: number;
 
   constructor(
     private fb: FormBuilder,
     private empresaService: EmpresaService,
     private clienteService: ClienteService, // Usado para buscar CEP (rota compartilhada no backend /cep)
-    private messageService: MessageService
+    private messageService: MessageService,
+    private http: HttpClient,
+    public authService: AuthService,
   ) {
     this.form = this.fb.group({
       razao_social: ['', [Validators.required, Validators.maxLength(200)]],
@@ -54,7 +74,45 @@ export class EmpresaFormComponent {
       bairro: ['', [Validators.required, Validators.maxLength(100)]],
       cod_cidade: [null, [Validators.required]],
       cidade_nome: [{ value: '', disabled: true }],
-      marca_dagua: ['', [Validators.maxLength(250)]]
+      marca_dagua: ['', [Validators.maxLength(250)]],
+      validar_estoque: [false],
+      quantidade_desenho_por_folha: [5, [Validators.required, Validators.min(1), Validators.max(20)]],
+      data_expiracao: [null as Date | null],
+      valor_mensalidade: [150, [Validators.required, Validators.min(0.01)]],
+    });
+  }
+
+  get statusLicenca(): 'ativa' | 'expirada' | 'sem-validade' {
+    const val = this.form.get('data_expiracao')?.value as Date | null;
+    if (!val) return 'sem-validade';
+    return new Date(val) > new Date() ? 'ativa' : 'expirada';
+  }
+
+  prorrogar30Dias() {
+    const atual = this.form.get('data_expiracao')?.value as Date | null;
+    const base = atual && new Date(atual) > new Date() ? new Date(atual) : new Date();
+    const nova = new Date(base);
+    nova.setDate(nova.getDate() + 30);
+    this.form.get('data_expiracao')?.setValue(nova);
+  }
+
+  salvarValidade() {
+    if (!this.empresaId) return;
+    this.isSavingValidade = true;
+    const val = this.form.get('data_expiracao')?.value as Date | null;
+    const valorMensalidade = Number(this.form.get('valor_mensalidade')?.value ?? 150);
+    this.http.put(`${environment.apiUrl}/empresas/${this.empresaId}/validade`, {
+      data_expiracao: val ? val.toISOString() : null,
+      valor_mensalidade: valorMensalidade,
+    }).subscribe({
+      next: () => {
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Licença atualizada.' });
+        this.isSavingValidade = false;
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar licença.' });
+        this.isSavingValidade = false;
+      },
     });
   }
 
@@ -69,7 +127,9 @@ export class EmpresaFormComponent {
         next: (res) => {
           this.form.patchValue({
              ...res.data,
-             cidade_nome: res.data.cidade?.descricao
+             cidade_nome: res.data.cidade?.descricao,
+             data_expiracao: res.data.data_expiracao ? new Date(res.data.data_expiracao) : null,
+             valor_mensalidade: Number(res.data.valor_mensalidade ?? 150),
           });
           this.isLoadingData = false;
         },
@@ -101,6 +161,7 @@ export class EmpresaFormComponent {
   }
 
   onSave() {
+    this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
     this.isSaving = true;

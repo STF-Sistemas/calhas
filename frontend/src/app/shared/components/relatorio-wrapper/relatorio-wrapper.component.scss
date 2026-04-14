@@ -1,0 +1,161 @@
+.relatorio-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.relatorio-filtros {
+  width: 100%;
+}
+
+.relatorio-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.relatorio-acoes {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.relatorio-card {
+  background: var(--surface-0);
+  color: var(--text-color);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--border-radius);
+  padding: 1.5rem 2rem;
+
+  @media (max-width: 600px) {
+    padding: 1rem;
+  }
+}
+
+// ── Cabeçalho da empresa ──────────────────────────────────────────────────────
+.empresa-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--primary-color);
+  flex-wrap: wrap;
+}
+
+.empresa-nome {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.empresa-razao {
+  font-size: 0.82rem;
+  color: var(--text-color-secondary);
+}
+
+.empresa-detalhe {
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+  margin-top: 0.15rem;
+}
+
+.empresa-endereco-bloco {
+  text-align: right;
+
+  @media (max-width: 480px) {
+    text-align: left;
+  }
+}
+
+// ── Título do relatório ───────────────────────────────────────────────────────
+.relatorio-titulo-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.relatorio-titulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.relatorio-data-geracao {
+  font-size: 0.78rem;
+  color: var(--text-color-secondary);
+}
+
+// ── Loading ───────────────────────────────────────────────────────────────────
+.relatorio-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 3rem;
+  color: var(--text-color-secondary);
+}
+
+// ── Print ─────────────────────────────────────────────────────────────────────
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .layout-topbar,
+  .layout-sidebar {
+    display: none !important;
+  }
+
+  // Garante que os containers de layout não cortam o conteúdo
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .layout-main-container {
+    margin-left: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .layout-main {
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .relatorio-page {
+    padding: 0;
+    gap: 0;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .relatorio-card-wrapper {
+    gap: 0;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  // Força fundo branco e texto preto para impressão independente do tema
+  .relatorio-card {
+    border: none;
+    border-radius: 0;
+    padding: 0.5rem 1rem;
+    box-shadow: none;
+    background: #fff !important;
+    color: #000 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+}

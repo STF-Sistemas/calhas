@@ -2,7 +2,6 @@ import { Component, EventEmitter, Output, OnInit, ViewChild } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -20,7 +19,7 @@ import { ServicoService } from '#core/services/servico.service';
 import { DesenhoService } from '#core/services/desenho.service';
 import { MeioPagamentoService } from '#core/services/meio-pagamento.service';
 import { ICliente, IProduto, IChapa, IServico, IPedidoItem, IDesenho, IMeioPagamento } from '#shared/interfaces';
-import { EStatusPedido, ETipoItemPedido } from '#shared/enums';
+import { EStatusGeral, EStatusPedido, ETipoItemPedido } from '#shared/enums';
 
 @Component({
   selector: 'app-pedido-form',
@@ -29,7 +28,6 @@ import { EStatusPedido, ETipoItemPedido } from '#shared/enums';
     CommonModule,
     ReactiveFormsModule,
     InputTextModule,
-    InputNumberModule,
     SelectModule,
     ButtonModule,
     TableModule,
@@ -107,9 +105,17 @@ export class PedidoFormComponent implements OnInit {
 
   carregarAuxiliares() {
     this.clienteService.listar().subscribe(res => this.clientes = res.data);
-    this.produtoService.listar().subscribe(res => this.produtos = res.data);
-    this.chapaService.listar().subscribe(res => this.chapas = res.data);
-    this.servicoService.listar().subscribe(res => this.servicos = res.data);
+    this.produtoService.listar().subscribe(res =>
+      this.produtos = res.data.filter(p => p.status === EStatusGeral.Ativo)
+    );
+    this.chapaService.listar().subscribe(res =>
+      this.chapas = res.data
+        .filter(ch => ch.status === EStatusGeral.Ativo)
+        .map(ch => ({ ...ch, cortes: (ch.cortes ?? []).filter(c => c.status === EStatusGeral.Ativo) }))
+    );
+    this.servicoService.listar().subscribe(res =>
+      this.servicos = res.data.filter(s => s.status === EStatusGeral.Ativo)
+    );
     this.desenhoService.listar().subscribe(res => this.desenhos = res.data);
     this.meioPagamentoService.listar().subscribe(res => this.meiosPagamento = res.data.filter(m => m.ativo === 1));
   }
@@ -146,19 +152,24 @@ export class PedidoFormComponent implements OnInit {
   adicionarItem(data?: Partial<IPedidoItem>) {
     const codChapa = this.getChapaIdDoCorteid(data?.cod_corte);
 
+    const qtd   = Number(data?.quantidade)    || 1;
+    const vUnit = Number(data?.valor_unitario) || 0;
+    const custo = Number(data?.custo_unitario) || 0;
+
     const itemForm = this.fb.group({
-      id: [data?.id],
+      id: [data?.id ?? null],
       tipo: [data?.tipo || ETipoItemPedido.Produto, [Validators.required]],
-      cod_produto: [data?.cod_produto],
+      cod_produto: [data?.cod_produto ?? null],
       // cod_chapa é apenas UI — não é salvo no backend diretamente
       cod_chapa: [codChapa],
       cod_corte: [data?.cod_corte ?? null],
-      cod_servico: [data?.cod_servico],
+      cod_servico: [data?.cod_servico ?? null],
       cod_desenho: [data?.cod_desenho ?? null],
       medidas: [data?.medidas ?? []],
-      quantidade: [data?.quantidade || 1, [Validators.required, Validators.min(0.01)]],
-      valor_unitario: [data?.valor_unitario || 0, [Validators.required, Validators.min(0)]],
-      subtotal: [{ value: (data?.quantidade || 1) * (data?.valor_unitario || 0), disabled: true }]
+      quantidade: [qtd, [Validators.required, Validators.min(0.01)]],
+      valor_unitario: [vUnit, [Validators.required, Validators.min(0)]],
+      custo_unitario: [custo],
+      subtotal: [{ value: qtd * vUnit, disabled: true }]
     });
 
     itemForm.valueChanges.subscribe(() => {
@@ -193,14 +204,14 @@ export class PedidoFormComponent implements OnInit {
   }
 
   onSelecaoProduto(index: number, event: { value: number }) {
-    const valor = this.produtos.find(p => p.id === event.value)?.valor_unitario || 0;
-    this.itens.at(index).patchValue({ valor_unitario: valor });
+    const produto = this.produtos.find(p => p.id === event.value);
+    this.itens.at(index).patchValue({ valor_unitario: Number(produto?.valor_unitario) || 0, custo_unitario: Number(produto?.custo) || 0 });
     this.recalcularTotais();
   }
 
   onSelecaoServico(index: number, event: { value: number }) {
-    const valor = this.servicos.find(s => s.id === event.value)?.valor || 0;
-    this.itens.at(index).patchValue({ valor_unitario: valor });
+    const servico = this.servicos.find(s => s.id === event.value);
+    this.itens.at(index).patchValue({ valor_unitario: Number(servico?.valor) || 0, custo_unitario: Number(servico?.custo) || 0 });
     this.recalcularTotais();
   }
 
@@ -243,7 +254,7 @@ export class PedidoFormComponent implements OnInit {
     if (candidatos.length > 0) {
       const corte = candidatos[0];
       const valor = Number(corte.valor_venda ?? corte.valor ?? 0);
-      control.patchValue({ cod_corte: corte.id, quantidade: totalMedida, valor_unitario: valor }, { emitEvent: false });
+      control.patchValue({ cod_corte: corte.id, quantidade: Number(totalMedida), valor_unitario: valor, custo_unitario: Number(corte.custo ?? 0) }, { emitEvent: false });
       this.atualizarSubtotal(control as FormGroup);
       this.recalcularTotais();
       this.messageService.add({
@@ -286,7 +297,7 @@ export class PedidoFormComponent implements OnInit {
       const medidas: number[] = control.get('medidas')?.value || [];
       const totalMedida = medidas.reduce((sum, m) => sum + (Number(m) || 0), 0);
       control.patchValue(
-        { quantidade: totalMedida || 1, valor_unitario: Number(corte.valor_venda ?? corte.valor ?? 0) },
+        { quantidade: Number(totalMedida) || 1, valor_unitario: Number(corte.valor_venda ?? corte.valor ?? 0), custo_unitario: Number(corte.custo ?? 0) },
         { emitEvent: false }
       );
       this.atualizarSubtotal(control as FormGroup);
@@ -333,7 +344,27 @@ export class PedidoFormComponent implements OnInit {
   }
 
   onSave() {
+    this.form.markAllAsTouched();
     if (this.form.invalid) return;
+
+    // Valida itens antes de enviar
+    const itemInvalido = this.itens.controls.findIndex(c => {
+      const tipo = c.get('tipo')?.value;
+      if (tipo === ETipoItemPedido.Produto) return !c.get('cod_produto')?.value;
+      if (tipo === ETipoItemPedido.Corte)   return !c.get('cod_corte')?.value;
+      if (tipo === ETipoItemPedido.Servico) return !c.get('cod_servico')?.value;
+      return true;
+    });
+
+    if (this.itens.length === 0) {
+      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Adicione pelo menos um item ao pedido.' });
+      return;
+    }
+
+    if (itemInvalido !== -1) {
+      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: `Item ${itemInvalido + 1}: selecione o produto, corte ou serviço.` });
+      return;
+    }
 
     this.isSaving = true;
     const dados = {
@@ -351,8 +382,13 @@ export class PedidoFormComponent implements OnInit {
         }
         this.isSaving = false;
       },
-      error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao salvar pedido' });
+      error: (err) => {
+        const erros: string[] = err.error?.erros ?? [];
+        const summary = err.error?.message || 'Falha ao salvar pedido';
+        this.messageService.add({ severity: 'error', summary, life: 6000 });
+        erros.forEach(e =>
+          this.messageService.add({ severity: 'warn', summary: 'Estoque insuficiente', detail: e, life: 8000 })
+        );
         this.isSaving = false;
       }
     });

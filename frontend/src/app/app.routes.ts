@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, adminGuard } from '#core/guards/auth.guard';
+import { authGuard, adminGuard, validadeGuard } from '#core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -7,9 +7,22 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
   },
   {
+    path: 'esqueci-senha',
+    loadComponent: () => import('./pages/esqueci-senha/esqueci-senha.component').then(m => m.EsqueciSenhaComponent)
+  },
+  {
+    path: 'redefinir-senha',
+    loadComponent: () => import('./pages/redefinir-senha/redefinir-senha.component').then(m => m.RedefinirSenhaComponent)
+  },
+  {
+    path: 'pagamento',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/pagamento/pagamento.component').then(m => m.PagamentoComponent)
+  },
+  {
     path: '',
     loadComponent: () => import('./layout/shell/shell.component').then(m => m.ShellComponent),
-    canActivate: [authGuard],
+    canActivate: [authGuard, validadeGuard],
     children: [
       {
         path: '',
@@ -50,12 +63,37 @@ export const routes: Routes = [
         canActivate: [adminGuard]
       },
       {
+        path: 'minha-empresa',
+        loadComponent: () => import('./pages/minha-empresa/minha-empresa.component').then(m => m.MinhaEmpresaComponent),
+        canActivate: [adminGuard]
+      },
+      {
+        path: 'perfil',
+        loadComponent: () => import('./pages/perfil/perfil.component').then(m => m.PerfilComponent)
+      },
+      {
+        path: 'alterar-senha',
+        loadComponent: () => import('./pages/alterar-senha/alterar-senha.component').then(m => m.AlterarSenhaComponent)
+      },
+      {
         path: 'pedidos',
         loadComponent: () => import('./pages/pedidos/pedidos.component').then(m => m.PedidosComponent)
       },
       {
         path: 'desenhos',
         loadComponent: () => import('./pages/desenhos/desenhos.component').then(m => m.DesenhosComponent)
+      },
+      {
+        path: 'fornecedores',
+        loadComponent: () => import('./pages/fornecedores/fornecedores.component').then(m => m.FornecedoresComponent)
+      },
+      {
+        path: 'compras',
+        loadComponent: () => import('./pages/compras/compras.component').then(m => m.ComprasComponent)
+      },
+      {
+        path: 'relatorios/pedidos-lucros',
+        loadComponent: () => import('./pages/relatorios/pedidos-lucros/pedidos-lucros.component').then(m => m.PedidosLucrosComponent)
       },
     ]
   },

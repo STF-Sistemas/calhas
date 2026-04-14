@@ -4,7 +4,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { TagModule } from 'primeng/tag';
-import { DataTableComponent } from '#shared-frontend/components/data-table/data-table.component';
+import { DataTableComponent, IRowAction } from '#shared-frontend/components/data-table/data-table.component';
 import { PedidoFormComponent } from './pedido-form/pedido-form.component';
 import { PedidoService } from '#core/services/pedido.service';
 import { PedidoImpressaoService } from '#core/services/pedido-impressao.service';
@@ -25,7 +25,7 @@ import { EStatusPedido } from '#shared/enums';
   ],
   templateUrl: './pedidos.component.html',
   styleUrls: ['./pedidos.component.scss'],
-  providers: [MessageService, ConfirmationService]
+  providers: [ConfirmationService]
 })
 export class PedidosComponent implements OnInit {
   @ViewChild('form') form!: PedidoFormComponent;
@@ -33,6 +33,33 @@ export class PedidosComponent implements OnInit {
   pedidos: IPedido[] = [];
   loading = false;
   
+  rowActions: IRowAction[] = [
+    {
+      key: 'iniciar',
+      icon: 'pi pi-play',
+      tooltip: 'Iniciar Produção',
+      ariaLabel: 'Mover para Em Produção',
+      severity: 'warn',
+      visible: (row) => row.status === EStatusPedido.Aberto,
+    },
+    {
+      key: 'concluir',
+      icon: 'pi pi-check',
+      tooltip: 'Concluir Pedido',
+      ariaLabel: 'Mover para Concluído',
+      severity: 'success',
+      visible: (row) => row.status === EStatusPedido.EmProducao,
+    },
+    {
+      key: 'reabrir',
+      icon: 'pi pi-replay',
+      tooltip: 'Reabrir Pedido',
+      ariaLabel: 'Voltar para Aberto',
+      severity: 'secondary',
+      visible: (row) => row.status === EStatusPedido.Concluido,
+    },
+  ];
+
   cols = [
     { field: 'id', header: 'Nº Pedido' },
     { field: 'cliente_nome', header: 'Cliente' },
@@ -98,6 +125,40 @@ export class PedidosComponent implements OnInit {
     this.pedidoService.buscarPorId(pedido.id).subscribe({
       next: (res) => this.impressaoDesenhoService.imprimir(res.data),
       error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar dados do pedido' })
+    });
+  }
+
+  onRowAction(event: { key: string; row: IPedido }) {
+    const mapa: Record<string, { status: EStatusPedido; label: string }> = {
+      iniciar:  { status: EStatusPedido.EmProducao, label: 'mover para Em Produção' },
+      concluir: { status: EStatusPedido.Concluido,  label: 'concluir' },
+      reabrir:  { status: EStatusPedido.Aberto,     label: 'reabrir (voltar para Aberto)' },
+    };
+    const acao = mapa[event.key];
+    if (!acao) return;
+
+    this.confirmationService.confirm({
+      message: `Deseja ${acao.label} o Pedido Nº <strong>${event.row.id}</strong>?`,
+      header: 'Alterar Status',
+      icon: 'pi pi-question-circle',
+      acceptLabel: 'Sim',
+      rejectLabel: 'Não',
+      accept: () => {
+        this.pedidoService.alterarStatus(event.row.id, acao.status).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Status do pedido atualizado.' });
+            this.carregarPedidos();
+          },
+          error: (err) => {
+            const erros: string[] = err.error?.erros ?? [];
+            const summary = err.error?.message || 'Falha ao alterar status';
+            this.messageService.add({ severity: 'error', summary, life: 6000 });
+            erros.forEach(e =>
+              this.messageService.add({ severity: 'warn', summary: 'Estoque insuficiente', detail: e, life: 8000 })
+            );
+          }
+        });
+      }
     });
   }
 

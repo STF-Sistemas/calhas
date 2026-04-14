@@ -1,0 +1,214 @@
+<app-relatorio-wrapper
+  titulo="Pedidos / Lucros"
+  [empresa]="relatorio?.empresa ?? empresa"
+  [isLoading]="isLoading">
+
+  <!-- ===== FILTROS (tela) ===== -->
+  <div filtros class="filtros-form">
+    <form [formGroup]="form" class="filtros-row">
+
+      <div class="filtro-field">
+        <label>Data Início</label>
+        <p-datepicker formControlName="data_inicio" dateFormat="dd/mm/yy"
+          [showIcon]="true" appendTo="body" placeholder="dd/mm/aaaa">
+        </p-datepicker>
+      </div>
+
+      <div class="filtro-field">
+        <label>Data Fim</label>
+        <p-datepicker formControlName="data_fim" dateFormat="dd/mm/yy"
+          [showIcon]="true" appendTo="body" placeholder="dd/mm/aaaa">
+        </p-datepicker>
+      </div>
+
+      <div class="filtro-field filtro-wide">
+        <label>Cliente</label>
+        <p-autoComplete
+          formControlName="cliente"
+          [suggestions]="clientesSugestoes"
+          field="razao_social"
+          placeholder="Todos os clientes"
+          (completeMethod)="buscarClientes($event)"
+          (onSelect)="onClienteSelecionado($event.value)"
+          (onClear)="onClienteLimpo()"
+          [forceSelection]="true"
+          appendTo="body">
+        </p-autoComplete>
+      </div>
+
+      <div class="filtro-field filtro-wide">
+        <label>Produto</label>
+        <p-autoComplete
+          formControlName="produto"
+          [suggestions]="produtosSugestoes"
+          field="descricao"
+          placeholder="Todos os produtos"
+          (completeMethod)="buscarProdutos($event)"
+          (onSelect)="onProdutoSelecionado($event.value)"
+          (onClear)="onProdutoLimpo()"
+          [forceSelection]="true"
+          appendTo="body">
+        </p-autoComplete>
+      </div>
+
+      <div class="filtros-acoes">
+        <p-button icon="pi pi-search" label="Gerar" (onClick)="gerar()" [loading]="isLoading"></p-button>
+        <p-button icon="pi pi-times" label="Limpar" severity="secondary" [outlined]="true" (onClick)="limpar()"></p-button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- ===== FILTROS APLICADOS (impresso junto) ===== -->
+  @if (relatorio) {
+    <div filtros-aplicados class="filtros-aplicados">
+      @if (relatorio.filtros.data_inicio || relatorio.filtros.data_fim) {
+        <span><strong>Período:</strong>
+          {{ relatorio.filtros.data_inicio | date:'dd/MM/yyyy' }}
+          @if (relatorio.filtros.data_fim) { a {{ relatorio.filtros.data_fim | date:'dd/MM/yyyy' }} }
+        </span>
+      }
+      @if (relatorio.filtros.cliente) {
+        <span><strong>Cliente:</strong> {{ relatorio.filtros.cliente }}</span>
+      }
+      @if (relatorio.filtros.produto) {
+        <span><strong>Produto:</strong> {{ relatorio.filtros.produto }}</span>
+      }
+    </div>
+  }
+
+  <!-- ===== ERRO ===== -->
+  @if (erro) {
+    <p-message severity="error" [text]="erro" styleClass="w-full mt-2"></p-message>
+  }
+
+  <!-- ===== RESULTADO ===== -->
+  @if (relatorio) {
+    <div class="resultado">
+
+      <!-- Totais gerais -->
+      <div class="totais-gerais">
+        <div class="total-card">
+          <span class="total-label">Pedidos</span>
+          <span class="total-valor">{{ relatorio.totais.quantidade_pedidos }}</span>
+        </div>
+        <div class="total-card">
+          <span class="total-label">Faturamento</span>
+          <span class="total-valor">{{ relatorio.totais.valor_total | number:'1.2-2' }}</span>
+        </div>
+        <div class="total-card">
+          <span class="total-label">Custo Total</span>
+          <span class="total-valor">{{ relatorio.totais.custo_total | number:'1.2-2' }}</span>
+        </div>
+        <div class="total-card total-card--lucro">
+          <span class="total-label">Lucro Total</span>
+          <span class="total-valor">{{ relatorio.totais.lucro | number:'1.2-2' }}</span>
+        </div>
+        <div class="total-card total-card--margem">
+          <span class="total-label">Margem</span>
+          <span class="total-valor">{{ margem(relatorio.totais.lucro, relatorio.totais.valor_total) | number:'1.1-1' }}%</span>
+        </div>
+      </div>
+
+      <!-- Tabela de pedidos com itens -->
+      @for (pedido of relatorio.pedidos; track pedido.id) {
+        <div class="pedido-bloco">
+
+          <!-- Cabeçalho do pedido -->
+          <div class="pedido-header">
+            <div class="pedido-id">Pedido #{{ pedido.id }}</div>
+            <div class="pedido-info">
+              <span><i class="pi pi-calendar"></i> {{ pedido.data_pedido | date:'dd/MM/yyyy' }}</span>
+              <span><i class="pi pi-user"></i> {{ pedido.cliente.razao_social }}</span>
+            </div>
+            <div class="pedido-resumo">
+              <span class="resumo-item">Venda: <strong>{{ pedido.valor_total | number:'1.2-2' }}</strong></span>
+              <span class="resumo-item">Custo: <strong>{{ pedido.custo_total | number:'1.2-2' }}</strong></span>
+              <span class="resumo-item resumo-lucro">Lucro: <strong>{{ pedido.lucro | number:'1.2-2' }}</strong></span>
+              <span class="resumo-item resumo-margem">{{ margem(pedido.lucro, pedido.valor_total) | number:'1.1-1' }}%</span>
+            </div>
+          </div>
+
+          <!-- Itens do pedido -->
+          <div class="tabela-scroll">
+          <p-table [value]="pedido.itens" styleClass="p-datatable-sm p-datatable-gridlines">
+            <ng-template pTemplate="header">
+              <tr>
+                <th class="col-desc">Descrição</th>
+                <th class="col-qtd">Qtd</th>
+                <th class="col-num">Vlr Unit.</th>
+                <th class="col-num">Vlr Total</th>
+                <th class="col-num">Custo Unit.</th>
+                <th class="col-num">Custo Total</th>
+                <th class="col-num">Lucro</th>
+                <th class="col-num">Margem</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item>
+              <tr>
+                <td class="col-desc">{{ item.descricao }}</td>
+                <td class="col-qtd">{{ item.quantidade | number:'1.2-4' }}</td>
+                <td class="col-num">{{ item.valor_unitario | number:'1.2-4' }}</td>
+                <td class="col-num">{{ item.valor_total | number:'1.2-2' }}</td>
+                <td class="col-num">{{ item.custo_unitario | number:'1.2-4' }}</td>
+                <td class="col-num">{{ item.custo_total | number:'1.2-2' }}</td>
+                <td class="col-num" [class.lucro-positivo]="item.lucro > 0" [class.lucro-negativo]="item.lucro < 0">
+                  {{ item.lucro | number:'1.2-2' }}
+                </td>
+                <td class="col-num">{{ margem(item.lucro, item.valor_total) | number:'1.1-1' }}%</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr class="footer-totais">
+                <td><strong>Total do Pedido</strong></td>
+                <td></td>
+                <td></td>
+                <td class="col-num"><strong>{{ pedido.valor_total | number:'1.2-2' }}</strong></td>
+                <td></td>
+                <td class="col-num"><strong>{{ pedido.custo_total | number:'1.2-2' }}</strong></td>
+                <td class="col-num" [class.lucro-positivo]="pedido.lucro > 0" [class.lucro-negativo]="pedido.lucro < 0">
+                  <strong>{{ pedido.lucro | number:'1.2-2' }}</strong>
+                </td>
+                <td class="col-num"><strong>{{ margem(pedido.lucro, pedido.valor_total) | number:'1.1-1' }}%</strong></td>
+              </tr>
+            </ng-template>
+          </p-table>
+          </div>
+
+        </div>
+      }
+
+      <!-- Rodapé geral -->
+      @if (relatorio.pedidos.length === 0) {
+        <div class="sem-dados">Nenhum pedido encontrado para os filtros selecionados.</div>
+      } @else {
+        <div class="rodape-geral">
+          <div class="tabela-scroll">
+          <table class="tabela-rodape">
+            <thead>
+              <tr>
+                <th>Pedidos</th>
+                <th>Faturamento Total</th>
+                <th>Custo Total</th>
+                <th>Lucro Total</th>
+                <th>Margem Geral</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="col-num">{{ relatorio.totais.quantidade_pedidos }}</td>
+                <td class="col-num">{{ relatorio.totais.valor_total | number:'1.2-2' }}</td>
+                <td class="col-num">{{ relatorio.totais.custo_total | number:'1.2-2' }}</td>
+                <td class="col-num lucro-positivo"><strong>{{ relatorio.totais.lucro | number:'1.2-2' }}</strong></td>
+                <td class="col-num"><strong>{{ margem(relatorio.totais.lucro, relatorio.totais.valor_total) | number:'1.1-1' }}%</strong></td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      }
+
+    </div>
+  }
+
+</app-relatorio-wrapper>

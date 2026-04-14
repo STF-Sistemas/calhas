@@ -1,6 +1,6 @@
 <app-dialog-wrapper [(visible)]="visible" [title]="empresaId ? 'Editar Empresa' : 'Nova Empresa'"
-  [isLoadingData]="isLoadingData" [isSaving]="isSaving" [saveDisabled]="form.invalid" width="900px"
-  height="calc(100vh - 5rem)" position="top" (save)="onSave()">
+  [isLoadingData]="isLoadingData" [isSaving]="isSaving" width="900px"
+  position="top" (save)="onSave()">
 
   <form [formGroup]="form">
     <p-tabs value="0">
@@ -13,6 +13,12 @@
           <i class="pi pi-cog mr-2"></i>
           Configurações
         </p-tab>
+        @if (empresaId && authService.isSuperAdmin()) {
+          <p-tab value="2">
+            <i class="pi pi-calendar mr-2"></i>
+            Licença
+          </p-tab>
+        }
       </p-tablist>
 
       <p-tabpanels>
@@ -29,7 +35,12 @@
           <div class="row">
             <div class="field col-12 col-md-6">
               <label for="razao_social">Razão Social *</label>
-              <input pInputText id="razao_social" formControlName="razao_social" placeholder="Nome completo da empresa" />
+              <input pInputText id="razao_social" formControlName="razao_social" placeholder="Nome completo da empresa"
+                [class.ng-invalid]="form.get('razao_social')?.invalid && form.get('razao_social')?.touched"
+                [class.ng-dirty]="form.get('razao_social')?.touched" />
+              @if (form.get('razao_social')?.invalid && form.get('razao_social')?.touched) {
+                <small class="p-error">Razão Social é obrigatória.</small>
+              }
             </div>
 
             <div class="field col-12 col-md-6">
@@ -42,8 +53,13 @@
           <div class="row">
             <div class="field col-12 col-md-6">
               <label for="cnpj">CNPJ *</label>
-              <p-inputMask id="cnpj" mask="99.999.999/9999-99" formControlName="cnpj" placeholder="00.000.000/0000-00">
+              <p-inputMask id="cnpj" mask="99.999.999/9999-99" formControlName="cnpj" placeholder="00.000.000/0000-00"
+                [class.ng-invalid]="form.get('cnpj')?.invalid && form.get('cnpj')?.touched"
+                [class.ng-dirty]="form.get('cnpj')?.touched">
               </p-inputMask>
+              @if (form.get('cnpj')?.invalid && form.get('cnpj')?.touched) {
+                <small class="p-error">CNPJ é obrigatório.</small>
+              }
             </div>
 
             <div class="field col-12 col-md-6">
@@ -72,13 +88,23 @@
             <div class="field col-12 col-sm-4 col-md-3">
               <label for="cep">CEP *</label>
               <p-inputMask id="cep" mask="99999-999" formControlName="cep" placeholder="00000-000"
-                (onComplete)="onCepChange()">
+                (onComplete)="onCepChange()"
+                [class.ng-invalid]="form.get('cep')?.invalid && form.get('cep')?.touched"
+                [class.ng-dirty]="form.get('cep')?.touched">
               </p-inputMask>
+              @if (form.get('cep')?.invalid && form.get('cep')?.touched) {
+                <small class="p-error">CEP é obrigatório.</small>
+              }
             </div>
 
             <div class="field col-12 col-sm-8 col-md-9">
               <label for="endereco">Logradouro *</label>
-              <input pInputText id="endereco" formControlName="endereco" placeholder="Rua, Avenida, etc." />
+              <input pInputText id="endereco" formControlName="endereco" placeholder="Rua, Avenida, etc."
+                [class.ng-invalid]="form.get('endereco')?.invalid && form.get('endereco')?.touched"
+                [class.ng-dirty]="form.get('endereco')?.touched" />
+              @if (form.get('endereco')?.invalid && form.get('endereco')?.touched) {
+                <small class="p-error">Logradouro é obrigatório.</small>
+              }
             </div>
           </div>
 
@@ -86,12 +112,22 @@
           <div class="row">
             <div class="field col-12 col-sm-4 col-md-3">
               <label for="numero">Número *</label>
-              <input pInputText id="numero" formControlName="numero" placeholder="Ex: 123" />
+              <input pInputText id="numero" formControlName="numero" placeholder="Ex: 123"
+                [class.ng-invalid]="form.get('numero')?.invalid && form.get('numero')?.touched"
+                [class.ng-dirty]="form.get('numero')?.touched" />
+              @if (form.get('numero')?.invalid && form.get('numero')?.touched) {
+                <small class="p-error">Número é obrigatório.</small>
+              }
             </div>
 
             <div class="field col-12 col-sm-8 col-md-9">
               <label for="bairro">Bairro *</label>
-              <input pInputText id="bairro" formControlName="bairro" placeholder="Nome do bairro" />
+              <input pInputText id="bairro" formControlName="bairro" placeholder="Nome do bairro"
+                [class.ng-invalid]="form.get('bairro')?.invalid && form.get('bairro')?.touched"
+                [class.ng-dirty]="form.get('bairro')?.touched" />
+              @if (form.get('bairro')?.invalid && form.get('bairro')?.touched) {
+                <small class="p-error">Bairro é obrigatório.</small>
+              }
             </div>
           </div>
 
@@ -102,7 +138,12 @@
                 Cidade *
                 <span class="label-hint">(preenchida automaticamente via CEP)</span>
               </label>
-              <input pInputText id="cidade" formControlName="cidade_nome" placeholder="Preenchida via CEP" />
+              <input pInputText id="cidade" formControlName="cidade_nome" placeholder="Preenchida via CEP"
+                [class.ng-invalid]="form.get('cod_cidade')?.invalid && form.get('cod_cidade')?.touched"
+                [class.ng-dirty]="form.get('cod_cidade')?.touched" />
+              @if (form.get('cod_cidade')?.invalid && form.get('cod_cidade')?.touched) {
+                <small class="p-error">Cidade é obrigatória. Informe um CEP válido para preenchimento automático.</small>
+              }
             </div>
           </div>
 
@@ -134,7 +175,106 @@
             </div>
           </div>
 
+          <div class="row">
+            <div class="field col-12 col-sm-4 col-md-3">
+              <label for="quantidade_desenho_por_folha">Desenhos por Folha</label>
+              <span class="label-hint">Quantidade de desenhos impressos por página A4 (1 a 20).</span>
+              <p-inputNumber
+                id="quantidade_desenho_por_folha"
+                formControlName="quantidade_desenho_por_folha"
+                [min]="1" [max]="20" [showButtons]="true"
+                placeholder="5"
+                aria-label="Quantidade de desenhos por folha">
+              </p-inputNumber>
+              @if (form.get('quantidade_desenho_por_folha')?.invalid && form.get('quantidade_desenho_por_folha')?.touched) {
+                <small class="p-error">Informe um valor entre 1 e 20.</small>
+              }
+            </div>
+          </div>
+
+          <h3 class="section-title mt-2">
+            <i class="pi pi-box"></i>
+            Estoque
+          </h3>
+
+          <div class="row">
+            <div class="col-12" style="padding: 0 0.75rem; display:flex; flex-direction:column; gap:0.25rem;">
+              <div style="display:flex; flex-direction:row; align-items:center; gap:0.6rem;">
+                <label for="validar_estoque" style="margin:0; cursor:pointer;">
+                  Validar estoque nos pedidos
+                </label>
+                <p-checkbox
+                  inputId="validar_estoque"
+                  formControlName="validar_estoque"
+                  [binary]="true"
+                  aria-label="Validar estoque ao movimentar pedidos">
+                </p-checkbox>
+              </div>
+              <small class="field-hint">
+                Se marcado, o estoque será validado ao colocar um pedido <strong>Em Produção</strong>.
+              </small>
+            </div>
+          </div>
+
         </p-tabpanel>
+
+        <!-- ==================== ABA: LICENÇA ==================== -->
+        @if (empresaId && authService.isSuperAdmin()) {
+          <p-tabpanel value="2">
+
+            <h3 class="section-title">
+              <i class="pi pi-calendar"></i>
+              Controle de Licença
+            </h3>
+
+            <!-- Valor da mensalidade (somente super admin) -->
+            <div class="row">
+              <div class="field col-12">
+                <label for="valor_mensalidade">Valor da Mensalidade (R$)</label>
+                <input pInputText appCurrencyMask id="valor_mensalidade"
+                  formControlName="valor_mensalidade" placeholder="0,00" style="max-width: 200px;" />
+                <small class="field-hint">Valor cobrado mensalmente por Pix para renovação da licença.</small>
+                @if (form.get('valor_mensalidade')?.invalid && form.get('valor_mensalidade')?.touched) {
+                  <small class="p-error">Informe um valor válido.</small>
+                }
+              </div>
+            </div>
+
+            <div class="licenca-status-row">
+              <span class="licenca-label">Status atual:</span>
+              @if (statusLicenca === 'ativa') {
+                <p-tag severity="success" value="Licença Ativa"></p-tag>
+              } @else if (statusLicenca === 'expirada') {
+                <p-tag severity="danger" value="Licença Expirada"></p-tag>
+              } @else {
+                <p-tag severity="secondary" value="Sem validade definida"></p-tag>
+              }
+            </div>
+
+            <div class="row mt-2">
+              <div class="field col-12">
+                <label for="data_expiracao">Data de Vencimento da Licença</label>
+                <p-datepicker formControlName="data_expiracao" dateFormat="dd/mm/yy"
+                  [showIcon]="true" appendTo="body" placeholder="dd/mm/aaaa"
+                  id="data_expiracao">
+                </p-datepicker>
+                <small class="field-hint">
+                  Deixe em branco para licença sem prazo de vencimento.
+                </small>
+              </div>
+            </div>
+
+            <div class="licenca-acoes">
+              <p-button icon="pi pi-plus" label="+30 dias" severity="secondary" [outlined]="true"
+                size="small" (onClick)="prorrogar30Dias()" pTooltip="Prorrogar 30 dias a partir da validade atual">
+              </p-button>
+              <p-button icon="pi pi-save" label="Salvar Validade" severity="primary"
+                [loading]="isSavingValidade" (onClick)="salvarValidade()">
+              </p-button>
+            </div>
+
+          </p-tabpanel>
+        }
 
       </p-tabpanels>
     </p-tabs>

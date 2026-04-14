@@ -15,6 +15,7 @@ export interface IPedidoItem {
   quantidade: number;
   valor_unitario: number;
   valor_total: number;
+  custo_unitario: number;
   observacoes: string | null;
   produto?: IProduto;
   corte?: ICorte;

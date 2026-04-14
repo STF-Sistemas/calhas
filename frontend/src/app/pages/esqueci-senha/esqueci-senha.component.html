@@ -1,0 +1,57 @@
+<div class="login-container flex align-items-center justify-content-center min-h-screen p-3 fade-in">
+  <div class="login-card-wrapper">
+    <div class="login-card flex flex-column align-items-center">
+
+      <!-- Logo -->
+      <div class="flex flex-column align-items-center mb-5 w-full">
+        <div class="logo-box mb-4">
+          <svg width="45" height="42" viewBox="0 0 45 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19.3407 10.3644C19.3407 8.01633 21.2443 6.1127 23.5924 6.1127C25.9404 6.1127 27.8441 8.01633 27.8441 10.3644"
+              stroke="var(--p-primary)" stroke-width="3" stroke-linecap="round" />
+            <path d="M15.4093 15.421C15.4093 10.8988 19.0747 7.2334 23.5969 7.2334C28.1191 7.2334 31.7845 10.8988 31.7845 15.421"
+              stroke="var(--p-primary)" stroke-width="3" stroke-linecap="round" />
+            <circle cx="23.5924" cy="24.4371" r="14.375" stroke="var(--p-primary)" stroke-width="3" />
+            <circle cx="23.5925" cy="24.4371" r="8.625" stroke="var(--p-primary)" stroke-width="3" />
+          </svg>
+        </div>
+        <h1 class="text-900 text-2xl font-bold mb-2 text-center">Recuperar Senha</h1>
+        <span class="text-600 font-medium text-center text-sm">Calhas Pro</span>
+      </div>
+
+      @if (!enviado) {
+        <p class="text-600 text-center mb-4" style="font-size: 0.95rem;">
+          Informe seu e-mail de acesso. Enviaremos um link para redefinir sua senha.
+        </p>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-column w-full">
+          <div class="field w-full">
+            <label for="email">E-mail</label>
+            <input pInputText id="email" type="email" formControlName="email"
+              placeholder="Endereço de e-mail" class="w-full p-3 text-lg" />
+            @if (form.get('email')?.invalid && form.get('email')?.touched) {
+              <small class="p-error">Informe um e-mail válido.</small>
+            }
+          </div>
+
+          <button pButton pRipple label="Enviar link de recuperação" type="submit"
+            [loading]="isLoading" [disabled]="form.invalid"
+            class="mt-3 w-full p-3 text-base font-bold"></button>
+        </form>
+      } @else {
+        <div class="flex flex-column align-items-center gap-3 w-full">
+          <i class="pi pi-envelope-open text-primary" style="font-size: 3rem;"></i>
+          <h3 class="text-900 font-semibold text-center m-0">Verifique seu e-mail</h3>
+          <p class="text-600 text-center m-0" style="font-size: 0.95rem;">
+            Se o e-mail estiver cadastrado, você receberá as instruções para redefinir a senha em breve.
+            Verifique também a caixa de spam.
+          </p>
+        </div>
+      }
+
+      <a routerLink="/login" class="mt-4 text-primary font-medium no-underline hover:underline text-sm">
+        <i class="pi pi-arrow-left mr-1"></i>Voltar ao login
+      </a>
+    </div>
+  </div>
+</div>
+

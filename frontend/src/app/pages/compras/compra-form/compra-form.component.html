@@ -1,0 +1,410 @@
+<app-dialog-wrapper
+  [(visible)]="visible"
+  [title]="compraId ? 'Editar Compra' : 'Nova Compra'"
+  [isLoadingData]="isLoadingData"
+  [isSaving]="isSaving"
+  [saveDisabled]="!isRascunho()"
+  width="1200px"
+  position="top"
+  (save)="onSave()">
+
+  <form [formGroup]="form" class="p-fluid compra-form">
+
+    <!-- ============ TOOLBAR DE AÇÕES ============ -->
+    <div class="form-toolbar">
+      <label class="xml-btn" aria-label="Importar XML NF-e">
+        <i class="pi pi-file-import"></i> Importar XML NF-e
+        <input type="file" accept=".xml" (change)="onImportarXml($event)" hidden />
+      </label>
+
+      @if (compraId && isRascunho()) {
+        <p-button label="Confirmar Compra" icon="pi pi-check-circle" severity="success"
+          aria-label="Confirmar compra e atualizar estoque"
+          (onClick)="onConfirmar()">
+        </p-button>
+      }
+
+      @if (statusAtual !== undefined) {
+        <span class="status-badge status-{{ statusAtual }}">
+          {{ statusAtual === 1 ? 'Rascunho' : statusAtual === 2 ? 'Confirmada' : 'Cancelada' }}
+        </span>
+      }
+    </div>
+
+    <!-- ============ CABEÇALHO NF-e ============ -->
+    <h3 class="section-title">
+      <i class="pi pi-file"></i>
+      Cabeçalho da NF-e
+    </h3>
+
+    <!-- Fornecedor -->
+    <div class="row">
+      <div class="field col-12 col-md-6">
+        <label for="cnpj_lookup">CNPJ do Fornecedor</label>
+        <div class="campo-com-icone">
+          <button type="button" class="campo-icone-btn"
+            pTooltip="Buscar fornecedor" tooltipPosition="top"
+            aria-label="Buscar fornecedor na listagem"
+            (click)="onBuscarFornecedor()">
+            <i class="pi pi-search"></i>
+          </button>
+          <input pInputText id="cnpj_lookup" formControlName="cnpj_lookup"
+            class="w-full"
+            placeholder="00.000.000/0000-00"
+            mask="00.000.000/0000-00"
+            [dropSpecialCharacters]="true"
+            (blur)="onCnpjBlur()" />
+        </div>
+      </div>
+      <div class="field col-12 col-md-6">
+        <label for="razao_social_fornecedor">Fornecedor</label>
+        <input pInputText id="razao_social_fornecedor" formControlName="razao_social_fornecedor" class="w-full" placeholder="Preenchido automaticamente" />
+        @if (form.get('cod_fornecedor')?.invalid && form.get('cod_fornecedor')?.touched) {
+          <small class="p-error">Fornecedor é obrigatório.</small>
+        }
+      </div>
+    </div>
+
+    <!-- Dados NF-e: Número + Série + Emissão + Entrada -->
+    <div class="row">
+      <div class="field col-12 col-md-2">
+        <label for="numero_nfe">N° NF-e</label>
+        <input pInputText id="numero_nfe" formControlName="numero_nfe" class="w-full" placeholder="000000000" />
+      </div>
+      <div class="field col-12 col-md-2">
+        <label for="serie">Série</label>
+        <input pInputText id="serie" formControlName="serie" class="w-full" placeholder="1" />
+      </div>
+      <div class="field col-12 col-md-4">
+        <label for="data_emissao">Emissão</label>
+        <p-datepicker id="data_emissao" formControlName="data_emissao"
+          class="w-full" dateFormat="dd/mm/yy" [showIcon]="true" appendTo="body"
+          aria-label="Data de emissão da NF-e">
+        </p-datepicker>
+      </div>
+      <div class="field col-12 col-md-4">
+        <label for="data_entrada">Entrada</label>
+        <p-datepicker id="data_entrada" formControlName="data_entrada"
+          class="w-full" dateFormat="dd/mm/yy" [showIcon]="true" appendTo="body"
+          aria-label="Data de entrada da NF-e">
+        </p-datepicker>
+      </div>
+    </div>
+
+    <!-- Chave de Acesso -->
+    <div class="row">
+      <div class="field col-12">
+        <label for="chave_acesso">Chave de Acesso (44 dígitos)</label>
+        <input pInputText id="chave_acesso" formControlName="chave_acesso" class="w-full" placeholder="44 dígitos" />
+      </div>
+    </div>
+
+    <!-- Totais de cabeçalho -->
+    <div class="row">
+      <div class="field col-12 col-md-3 col-lg-3">
+        <label for="valor_frete">Frete (R$)</label>
+        <input pInputText appCurrencyMask id="valor_frete" formControlName="valor_frete"
+          class="w-full" aria-label="Valor do frete" />
+      </div>
+      <div class="field col-12 col-md-3 col-lg-3">
+        <label for="valor_seguro">Seguro (R$)</label>
+        <input pInputText appCurrencyMask id="valor_seguro" formControlName="valor_seguro"
+          class="w-full" aria-label="Valor do seguro" />
+      </div>
+      <div class="field col-12 col-md-3 col-lg-3">
+        <label for="valor_desconto">Desconto (R$)</label>
+        <input pInputText appCurrencyMask id="valor_desconto" formControlName="valor_desconto"
+          class="w-full" aria-label="Valor do desconto" />
+      </div>
+      <div class="field col-12 col-md-3 col-lg-3">
+        <label for="valor_outros">Outros (R$)</label>
+        <input pInputText appCurrencyMask id="valor_outros" formControlName="valor_outros"
+          class="w-full" aria-label="Outros valores" />
+      </div>
+    </div>
+
+    <!-- ============ ITENS ============ -->
+    <h3 class="section-title mt-2">
+      <i class="pi pi-list"></i>
+      Itens da NF-e
+      @if (isRascunho()) {
+        <p-button icon="pi pi-plus" label="Adicionar Item" size="small" [outlined]="true"
+          aria-label="Adicionar item à compra"
+          class="ml-auto"
+          (onClick)="adicionarItem()">
+        </p-button>
+      }
+    </h3>
+
+    <div class="itens-tabela" formArrayName="itens">
+      <p-table [value]="itens.controls" [scrollable]="true" scrollHeight="360px"
+        styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col" style="width:80px">Cód.</th>
+            <th scope="col" style="min-width:180px">Descrição *</th>
+            <th scope="col" style="width:60px">Un</th>
+            <th scope="col" style="width:90px">Qtd *</th>
+            <th scope="col" style="width:100px">Vlr Unit</th>
+            <th scope="col" style="width:110px">Vlr Total *</th>
+            <th scope="col" style="width:90px">Desc.</th>
+            <th scope="col" style="width:90px">IPI</th>
+            <th scope="col" style="width:90px">ICMS ST</th>
+            <th scope="col" style="width:110px">
+              Custo Unit.
+              <p-button icon="pi pi-question-circle" [rounded]="true" [text]="true" size="small"
+                pTooltip="Como o custo é calculado?" tooltipPosition="top"
+                aria-label="Ajuda sobre cálculo do custo unitário"
+                (onClick)="showHelp = true; $event.stopPropagation()">
+              </p-button>
+            </th>
+            <th scope="col" style="width:60px"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-ctrl let-i="rowIndex">
+          <tr [formGroupName]="i">
+            <td>
+              <div class="cod-produto-cell">
+                <span class="cod-produto-valor">{{ ctrl.get('cod_produto')?.value || '—' }}</span>
+                @if (isRascunho()) {
+                  <p-button icon="pi pi-search" severity="secondary" [rounded]="true" size="small" [text]="true"
+                    pTooltip="Buscar produto" tooltipPosition="top"
+                    aria-label="Buscar produto na listagem"
+                    (onClick)="onBuscarProduto(i)">
+                  </p-button>
+                }
+              </div>
+            </td>
+            <td>
+              @if (ctrl.get('descricao_xml')?.value) {
+                <div class="col-descricao">
+                  <span class="desc-xml" title="Descrição conforme NF-e">
+                    {{ ctrl.get('descricao_xml')?.value }}
+                  </span>
+                  <input pInputText formControlName="descricao" class="input-sm w-full"
+                    readonly aria-label="Descrição do item no sistema" />
+                </div>
+              } @else {
+                <input pInputText formControlName="descricao" class="input-sm w-full"
+                  readonly aria-label="Descrição do item no sistema" />
+              }
+            </td>
+            <td>
+              <input pInputText formControlName="unidade" class="input-sm" style="width:50px"
+                aria-label="Unidade de medida" />
+            </td>
+            <td>
+              <input pInputText appCurrencyMask [decimals]="4" formControlName="quantidade"
+                class="input-sm w-full" aria-label="Quantidade" />
+            </td>
+            <td>
+              <input pInputText appCurrencyMask [decimals]="4" formControlName="valor_unitario"
+                class="input-sm w-full" aria-label="Valor unitário" />
+            </td>
+            <td>
+              <input pInputText appCurrencyMask formControlName="valor_total"
+                class="input-sm w-full custo-field" readonly aria-label="Valor total do item" />
+            </td>
+            <td>
+              <input pInputText appCurrencyMask formControlName="desconto"
+                class="input-sm w-full" aria-label="Desconto" />
+            </td>
+            <td>
+              <input pInputText appCurrencyMask formControlName="valor_ipi"
+                class="input-sm w-full" aria-label="Valor IPI" />
+            </td>
+            <td>
+              <input pInputText appCurrencyMask formControlName="valor_icms_st"
+                class="input-sm w-full" aria-label="Valor ICMS ST" />
+            </td>
+            <td>
+              <input pInputText formControlName="custo_unitario" class="input-sm custo-field"
+                readonly aria-label="Custo unitário calculado" />
+            </td>
+            <td>
+              @if (isRascunho()) {
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" size="small" [text]="true"
+                  aria-label="Remover item"
+                  (onClick)="removerItem(i)">
+                </p-button>
+              }
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="11" class="text-center">Nenhum item adicionado.</td></tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr class="totais-row">
+            <td colspan="5" class="text-right font-bold">Totais:</td>
+            <td class="font-bold">{{ calcularTotalProdutos() | number:'1.2-2' }}</td>
+            <td colspan="3"></td>
+            <td class="font-bold total-geral">{{ calcularTotalGeral() | number:'1.2-2' }}</td>
+            <td></td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- Observação -->
+    <div class="row mt-2">
+      <div class="field col-12">
+        <label for="observacao">Observação</label>
+        <textarea pInputTextarea id="observacao" formControlName="observacao"
+          rows="2" class="w-full" style="width:100%" placeholder="Observações sobre a compra...">
+        </textarea>
+      </div>
+    </div>
+
+  </form>
+
+  <!-- Dialog de confirmação de produto não encontrado -->
+  <p-dialog
+    [(visible)]="showProdutoConfirma"
+    [modal]="true"
+    [closable]="false"
+    header="Produto não encontrado"
+    [style]="{ width: '480px' }">
+
+    @if (produtoConfirmaAtual) {
+      <div class="produto-confirma">
+        <p class="produto-confirma__msg">
+          O produto a seguir <strong>não está cadastrado</strong> no sistema.<br>
+          Deseja cadastrá-lo agora?
+        </p>
+        <table class="produto-confirma__info">
+          <tr>
+            <th scope="row">Código de barras</th>
+            <td>{{ produtoConfirmaAtual['gtin'] || '(sem GTIN)' }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Descrição</th>
+            <td>{{ produtoConfirmaAtual['descricao'] }}</td>
+          </tr>
+          <tr>
+            <th scope="row">NCM</th>
+            <td>{{ produtoConfirmaAtual['ncm'] || '—' }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Unidade</th>
+            <td>{{ produtoConfirmaAtual['unidade'] }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Quantidade</th>
+            <td>{{ +produtoConfirmaAtual['quantidade']! | number:'1.2-4' }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Valor unitário</th>
+            <td>{{ +produtoConfirmaAtual['valor_unitario']! | number:'1.4-4' }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Valor total</th>
+            <td><strong>{{ +produtoConfirmaAtual['valor_total']! | number:'1.2-2' }}</strong></td>
+          </tr>
+        </table>
+        <p class="produto-confirma__hint">
+          Restam {{ filaProdutosPendentes.length - filaProdutoIndex }} produto(s) a verificar.
+        </p>
+      </div>
+    }
+
+    <ng-template pTemplate="footer">
+      <p-button label="Sim, cadastrar" icon="pi pi-check" severity="success"
+        aria-label="Abrir formulário para cadastrar produto"
+        (onClick)="onConfirmarCadastrarProduto()">
+      </p-button>
+      <p-button label="Relacionar existente" icon="pi pi-link" severity="info" [outlined]="true"
+        aria-label="Selecionar produto já cadastrado para relacionar"
+        (onClick)="onRelacionarProdutoExistente()">
+      </p-button>
+      <p-button label="Não, pular item" icon="pi pi-skip-forward" severity="secondary" [outlined]="true"
+        aria-label="Pular este item e ir para o próximo"
+        (onClick)="onPularProduto()">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Lookup Dialogs -->
+  <app-fornecedor-lookup-dialog #fornecedorLookup
+    (selecionado)="onFornecedorSelecionado($event)"
+    (cancelado)="onFornecedorCancelado()">
+  </app-fornecedor-lookup-dialog>
+
+  <app-produto-lookup-dialog #produtoLookup
+    (selecionado)="onProdutoSelecionado($event)"
+    (cancelado)="produtoLookup.visible = false">
+  </app-produto-lookup-dialog>
+
+  <app-produto-form #produtoForm
+    (saved)="onProdutoSalvoDoXml($event)">
+  </app-produto-form>
+
+  <!-- ── Diálogo: Atualizar custo dos produtos ───────────────────────────────── -->
+  <p-dialog
+    [(visible)]="showConfirmaAtualizacaoCusto"
+    [modal]="true"
+    [closable]="false"
+    header="Atualizar Custo dos Produtos"
+    [style]="{ width: '440px' }">
+    <p style="margin:0 0 0.5rem">
+      Deseja atualizar o <strong>custo dos produtos cadastrados</strong> com base nos valores desta compra?
+    </p>
+    <p style="margin:0; color: var(--text-color-secondary); font-size:0.875rem">
+      O custo será recalculado considerando impostos e rateio de frete/seguro/outros.
+    </p>
+    <ng-template pTemplate="footer">
+      <p-button label="Sim, atualizar" icon="pi pi-check" severity="success"
+        [loading]="isAtualizandoCusto"
+        aria-label="Confirmar atualização do custo dos produtos"
+        (onClick)="onConfirmarAtualizacaoCusto()">
+      </p-button>
+      <p-button label="Não" icon="pi pi-times" severity="secondary" [outlined]="true"
+        [disabled]="isAtualizandoCusto"
+        aria-label="Não atualizar custo dos produtos"
+        (onClick)="onNaoAtualizarCusto()">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- ── Diálogo: Help do cálculo de custo ──────────────────────────────────── -->
+  <p-dialog
+    [(visible)]="showHelp"
+    [modal]="true"
+    [closable]="true"
+    header="Como o Custo Unitário é Calculado"
+    [style]="{ width: '520px' }">
+    <div class="help-custo">
+      <p class="help-custo__intro">
+        O custo de aquisição por unidade é calculado no momento em que a compra é confirmada,
+        usando a seguinte fórmula:
+      </p>
+      <div class="help-custo__formula">
+        <table>
+          <tr><td class="op"></td>    <td>Valor do Produto <span class="field">(vProd da NF-e)</span></td></tr>
+          <tr><td class="op minus">−</td><td>Desconto do Item</td></tr>
+          <tr><td class="op plus">+</td> <td>IPI <span class="field">(encargo extra ao comprador)</span></td></tr>
+          <tr><td class="op plus">+</td> <td>ICMS Substituição Tributária <span class="field">(ST)</span></td></tr>
+          <tr><td class="op plus">+</td> <td>Rateio do Frete <span class="field">proporcional ao valor do item</span></td></tr>
+          <tr><td class="op plus">+</td> <td>Rateio do Seguro <span class="field">proporcional ao valor do item</span></td></tr>
+          <tr><td class="op plus">+</td> <td>Rateio de Outros <span class="field">proporcional ao valor do item</span></td></tr>
+          <tr><td class="op minus">−</td><td>Rateio do Desconto da Nota <span class="field">proporcional ao valor do item</span></td></tr>
+          <tr class="divisor"><td colspan="2"><hr /></td></tr>
+          <tr class="resultado"><td class="op">÷</td><td><strong>Quantidade</strong> = <strong>Custo Unitário</strong></td></tr>
+        </table>
+      </div>
+      <p class="help-custo__obs">
+        <i class="pi pi-info-circle"></i>
+        O ICMS normal, PIS e COFINS já estão embutidos no valor do produto (regime Simples Nacional)
+        e por isso não são somados separadamente.
+        O rateio do frete, seguro e outros é feito proporcionalmente ao valor de cada item em relação
+        ao total da nota.
+      </p>
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button label="Fechar" icon="pi pi-times" severity="secondary"
+        (onClick)="showHelp = false">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+
+</app-dialog-wrapper>

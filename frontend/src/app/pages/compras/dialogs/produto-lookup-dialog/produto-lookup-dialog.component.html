@@ -1,0 +1,59 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="true"
+  (onHide)="cancelar()"
+  [style]="{ width: modo === 'opcoes' ? '400px' : '720px' }"
+  [header]="modo === 'opcoes' ? 'Produto não encontrado' : 'Selecionar Produto'">
+
+  @if (modo === 'opcoes') {
+    <div class="opcoes">
+      <p>O código <strong>{{ codigoDigitado }}</strong> não corresponde a nenhum produto cadastrado.</p>
+      <div class="botoes">
+        <p-button label="Relacionar Produto Existente" icon="pi pi-link"
+          aria-label="Selecionar produto já cadastrado"
+          (onClick)="relacionar()">
+        </p-button>
+        <p-button label="Cancelar" icon="pi pi-times" severity="danger" [outlined]="true"
+          aria-label="Cancelar busca de produto"
+          (onClick)="cancelar()">
+        </p-button>
+      </div>
+    </div>
+  } @else {
+    <div class="lookup-lista">
+      <input pInputText [(ngModel)]="filtro" (ngModelChange)="filtrar()"
+        placeholder="Filtrar por descrição ou código..."
+        class="w-full mb-3"
+        aria-label="Filtrar produtos" />
+
+      <p-table [value]="produtosFiltrados" [paginator]="true" [rows]="8"
+        [scrollable]="true" scrollHeight="300px">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">Cód</th>
+            <th scope="col">Descrição</th>
+            <th scope="col">Un</th>
+            <th scope="col">Ação</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>{{ row.id }}</td>
+            <td>{{ row.descricao }}</td>
+            <td>{{ row.unidade_medida }}</td>
+            <td>
+              <p-button icon="pi pi-check" [rounded]="true" size="small"
+                aria-label="Selecionar este produto"
+                (onClick)="selecionar(row)">
+              </p-button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="4">Nenhum produto encontrado.</td></tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+</p-dialog>

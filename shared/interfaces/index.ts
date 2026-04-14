@@ -11,9 +11,16 @@ export * from './IServico';
 export * from './IPedido';
 export * from './IPedidoItem';
 export * from './IMeioPagamento';
+export * from './IFornecedor';
+export * from './ICompra';
+export * from './ICompraItem';
 // DTOs
 export * from './ILoginDto';
 export * from './ILoginResponse';
 export * from './ICreatePedidoDto';
 export * from './ICreatePedidoItemDto';
+export * from './ICreateCompraDto';
 export * from './ICepResponse';
+export * from './IRelatorioPedidosLucros';
+export * from './IPagamentoPix';
+export * from './IDanfeData';

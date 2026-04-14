@@ -196,8 +196,8 @@ export class DesenhoFormComponent implements AfterViewInit {
   }
 
   onSave() {
+    this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
       this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Informe a descrição do desenho.' });
       return;
     }

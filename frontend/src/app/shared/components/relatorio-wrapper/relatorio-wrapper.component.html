@@ -1,0 +1,75 @@
+<div class="relatorio-page">
+
+  <!-- Filtros — apenas na tela, não imprime -->
+  <div class="relatorio-filtros no-print">
+    <ng-content select="[filtros]"></ng-content>
+  </div>
+
+  <!-- Botão de impressão + card imprimível -->
+  <div class="relatorio-card-wrapper">
+
+    <div class="relatorio-acoes no-print">
+      <p-button
+        icon="pi pi-print"
+        label="Imprimir Relatório"
+        [disabled]="isLoading"
+        (onClick)="imprimir()">
+      </p-button>
+    </div>
+
+    <!-- Área imprimível -->
+    <div class="relatorio-card" id="relatorio-print-area">
+
+      @if (isLoading) {
+        <div class="relatorio-loading">
+          <p-progressSpinner strokeWidth="4" [style]="{ width: '48px', height: '48px' }"></p-progressSpinner>
+          <span>Gerando relatório...</span>
+        </div>
+      } @else {
+
+        <!-- Cabeçalho da empresa -->
+        @if (empresa) {
+          <div class="empresa-header">
+            <div class="empresa-info-bloco">
+              <div class="empresa-nome">{{ empresa.nome_fantasia || empresa.razao_social }}</div>
+              <div class="empresa-razao" *ngIf="empresa.nome_fantasia">{{ empresa.razao_social }}</div>
+              <div class="empresa-detalhe">CNPJ: {{ empresa.cnpj }}</div>
+              @if (empresa.telefone) {
+                <div class="empresa-detalhe">Tel: {{ empresa.telefone }}</div>
+              }
+              @if (empresa.email) {
+                <div class="empresa-detalhe">{{ empresa.email }}</div>
+              }
+            </div>
+            <div class="empresa-endereco-bloco">
+              @if (enderecoEmpresa) {
+                <div class="empresa-detalhe">{{ enderecoEmpresa }}</div>
+              }
+              @if (empresa.cidade) {
+                <div class="empresa-detalhe">{{ empresa.cidade.descricao }}/{{ empresa.cidade.uf }}</div>
+              }
+              @if (empresa.cep) {
+                <div class="empresa-detalhe">CEP: {{ empresa.cep }}</div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Título do relatório -->
+        <div class="relatorio-titulo-row">
+          <h2 class="relatorio-titulo">{{ titulo }}</h2>
+          <span class="relatorio-data-geracao">Gerado em: {{ hoje | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+
+        <!-- Filtros aplicados (slot para cada relatório preencher) -->
+        <ng-content select="[filtros-aplicados]"></ng-content>
+
+        <!-- Corpo do relatório -->
+        <ng-content></ng-content>
+
+      }
+    </div>
+
+  </div>
+
+</div>

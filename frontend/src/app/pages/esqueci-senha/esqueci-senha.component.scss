@@ -1,0 +1,61 @@
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1rem;
+    background-color: var(--bg-color);
+    transition: background-color var(--transition-speed);
+}
+
+.login-card-wrapper {
+    padding: 1px;
+    border-radius: var(--radius-xl);
+    background: linear-gradient(180deg, var(--p-primary) 10%, color-mix(in srgb, var(--p-primary) 0%, transparent) 30%);
+    width: 30rem;
+    max-width: 95vw;
+}
+
+.login-card {
+    background-color: var(--surface-0);
+    border-radius: var(--radius-xl);
+    padding: 3.5rem;
+    width: 100%;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+}
+
+.logo-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .login-card { padding: 3rem 1.5rem; }
+}
+
+:host ::ng-deep {
+    .p-inputtext {
+        width: 100% !important;
+        border-radius: var(--radius-md);
+        border-color: var(--border-color);
+        &:focus {
+            border-color: var(--p-primary);
+            box-shadow: 0 0 0 2px color-mix(in srgb, var(--p-primary) 20%, transparent);
+        }
+    }
+    .p-button {
+        background-color: var(--p-primary);
+        border-color: var(--p-primary);
+        color: #ffffff;
+        border-radius: var(--radius-md);
+        &:hover { background-color: var(--p-primary-hover); border-color: var(--p-primary-hover); }
+        &:disabled { opacity: 0.6; }
+    }
+}
+
+.app-dark .login-card-wrapper {
+    background: linear-gradient(180deg, var(--p-primary) 10%, color-mix(in srgb, var(--p-primary) 5%, transparent) 50%);
+}

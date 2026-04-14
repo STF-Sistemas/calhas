@@ -1,0 +1,262 @@
+// ── Página ────────────────────────────────────────────────────────────────────
+.pagamento-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background-color: var(--bg-color);
+  transition: background-color var(--transition-speed, 0.2s);
+}
+
+// ── Theme toggle (idêntico ao login) ─────────────────────────────────────────
+.theme-switcher-fixed {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  z-index: 1000;
+
+  .theme-button {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: var(--surface-0);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, background-color 0.2s;
+    cursor: pointer;
+    border: none;
+
+    &:hover {
+      transform: scale(1.1);
+      background-color: var(--surface-100);
+    }
+
+    i { font-size: 1.25rem; }
+  }
+}
+
+// ── Card com borda gradiente (idêntico ao login) ──────────────────────────────
+.pag-card-wrapper {
+  padding: 1px;
+  border-radius: var(--radius-xl, 16px);
+  background: linear-gradient(
+    180deg,
+    var(--p-primary) 10%,
+    color-mix(in srgb, var(--p-primary) 0%, transparent) 30%
+  );
+  width: 38rem;
+  max-width: 95vw;
+
+  &--success {
+    background: linear-gradient(
+      180deg,
+      #22c55e 10%,
+      color-mix(in srgb, #22c55e 0%, transparent) 30%
+    );
+  }
+}
+
+.pag-card {
+  background-color: var(--surface-0);
+  border-radius: var(--radius-xl, 16px);
+  padding: 2.5rem 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  @media (max-width: 480px) {
+    padding: 2rem 1.25rem 1.5rem;
+  }
+}
+
+// ── Logo ──────────────────────────────────────────────────────────────────────
+.pag-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+}
+
+.pag-logo-text {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+// ── Título / subtítulo ────────────────────────────────────────────────────────
+.pag-titulo-bloco {
+  text-align: center;
+}
+
+.pag-titulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0 0 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  i { color: var(--red-400, #f87171); }
+}
+
+.pag-subtitulo {
+  font-size: 0.875rem;
+  color: var(--text-color-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+// ── Loading / Erro ────────────────────────────────────────────────────────────
+.pag-loading,
+.pag-erro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 0;
+  color: var(--text-color-secondary);
+  font-size: 0.9rem;
+}
+
+// ── Pix content ───────────────────────────────────────────────────────────────
+.pix-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+// ── Valor ─────────────────────────────────────────────────────────────────────
+.pix-valor-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--surface-50);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--border-radius, 6px);
+}
+
+.pix-valor-label {
+  font-size: 0.85rem;
+  color: var(--text-color-secondary);
+}
+
+.pix-valor {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+// ── QR Code ───────────────────────────────────────────────────────────────────
+.pix-qr-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pix-instrucao {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.82rem;
+  color: var(--text-color-secondary);
+  text-align: center;
+  margin: 0;
+}
+
+.pix-qr-wrap {
+  background: #fff;    // QR code precisa de fundo branco para leitura
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  padding: 0.875rem;
+  display: inline-flex;
+}
+
+.pix-qr-img {
+  width: 190px;
+  height: 190px;
+  display: block;
+}
+
+// ── Copia e Cola ──────────────────────────────────────────────────────────────
+.pix-copia-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.pix-copia-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-color-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.pix-copia-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface-50);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--border-radius, 6px);
+  padding: 0.5rem 0.75rem;
+}
+
+.pix-codigo-text {
+  flex: 1;
+  font-size: 0.75rem;
+  font-family: monospace;
+  color: var(--text-color);
+  word-break: break-all;
+}
+
+// ── Aguardando ────────────────────────────────────────────────────────────────
+.pix-aguardando {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--text-color-secondary);
+  padding: 0.25rem 0;
+}
+
+::ng-deep .spinner-sm {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+// ── Rodapé ────────────────────────────────────────────────────────────────────
+.pag-rodape {
+  border-top: 1px solid var(--surface-border);
+  padding-top: 1rem;
+  margin-top: 0.25rem;
+}
+
+// ── Tela de sucesso ───────────────────────────────────────────────────────────
+.sucesso-icon {
+  text-align: center;
+  font-size: 3.5rem;
+  color: #22c55e;
+  line-height: 1;
+}
+
+.redirect-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-color-secondary);
+  margin: 0;
+}

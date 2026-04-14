@@ -3,8 +3,8 @@
   [title]="meioId ? 'Editar Meio de Pagamento' : 'Novo Meio de Pagamento'"
   [isLoadingData]="isLoadingData"
   [isSaving]="isSaving"
-  [saveDisabled]="form.invalid"
   width="480px"
+  position="top"
   (save)="onSave()">
 
   <form [formGroup]="form" class="p-fluid">

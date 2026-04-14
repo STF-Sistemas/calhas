@@ -1,4 +1,3 @@
-<p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 <app-pedido-form #form (saved)="ngOnInit()"></app-pedido-form>
 
@@ -90,10 +89,12 @@
           [showAddButton]="false"
           [showPrintButton]="true"
           [showPrintDesenhoButton]="true"
+          [rowActions]="rowActions"
           (print)="onPrint($event)"
           (printDesenho)="onPrintDesenho($event)"
           (edit)="onEdit($event)"
-          (delete)="onDelete($event)">
+          (delete)="onDelete($event)"
+          (rowActionClick)="onRowAction($event)">
         </app-data-table>
       </div>
 

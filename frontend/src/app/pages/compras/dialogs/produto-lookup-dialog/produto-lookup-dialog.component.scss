@@ -1,0 +1,18 @@
+.opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  p { margin: 0; }
+}
+
+.botoes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lookup-lista {
+  display: flex;
+  flex-direction: column;
+}

@@ -22,7 +22,7 @@ import { IUsuario } from '#shared/interfaces';
   ],
   templateUrl: './usuarios.component.html',
   styleUrls: ['./usuarios.component.scss'],
-  providers: [MessageService, ConfirmationService]
+  providers: [ConfirmationService]
 })
 export class UsuariosComponent implements OnInit {
   @ViewChild('form') form!: UsuarioFormComponent;
