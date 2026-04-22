@@ -10,6 +10,7 @@ import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapp
 import { ChapaService } from '#core/services/chapa.service';
 import { ICorte } from '#shared/interfaces';
 import { forkJoin, of, switchMap, Observable } from 'rxjs';
+import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 
 @Component({
   selector: 'app-chapa-form',
@@ -22,6 +23,7 @@ import { forkJoin, of, switchMap, Observable } from 'rxjs';
     TableModule,
     ButtonModule,
     CurrencyMaskDirective,
+    EnterFocusNextDirective,
     DialogWrapperComponent
   ],
   templateUrl: './chapa-form.component.html',
@@ -75,7 +77,7 @@ export class ChapaFormComponent {
   }
 
   adicionarCorte() {
-    this.cortes = [...this.cortes, { descricao: '', corte: 0, valor: 0, custo: 0, excluido: false } as ICorte];
+    this.cortes = [...this.cortes, { descricao: '', corte: 0, valor: 0, excluido: false } as ICorte];
   }
 
   removerCorte(corte: ICorte) {
@@ -102,9 +104,9 @@ export class ChapaFormComponent {
       return;
     }
 
-    const cortesInvalidos = cortesAtivos.filter(c => !c.descricao?.trim() || c.valor == null || c.custo == null);
+    const cortesInvalidos = cortesAtivos.filter(c => !c.descricao?.trim() || c.valor == null);
     if (cortesInvalidos.length > 0) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Todos os cortes precisam ter descrição, valor e custo preenchidos.' });
+      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Todos os cortes precisam ter descrição e valor preenchidos.' });
       return;
     }
 

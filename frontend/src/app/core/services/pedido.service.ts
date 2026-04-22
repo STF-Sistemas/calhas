@@ -12,8 +12,16 @@ export class PedidoService {
 
   constructor(private http: HttpClient) {}
 
-  listar() {
-    return this.http.get<TApiResponse<IPedido[]>>(this.apiUrl);
+  listar(params?: { dataInicio?: string; dataFim?: string; codCliente?: number; status?: number; pagina?: number; limite?: number }) {
+    const query = new URLSearchParams();
+    if (params?.dataInicio) query.set('dataInicio', params.dataInicio);
+    if (params?.dataFim) query.set('dataFim', params.dataFim);
+    if (params?.codCliente != null) query.set('codCliente', String(params.codCliente));
+    if (params?.status != null) query.set('status', String(params.status));
+    if (params?.pagina != null) query.set('pagina', String(params.pagina));
+    if (params?.limite != null) query.set('limite', String(params.limite));
+    const qs = query.toString();
+    return this.http.get<TApiResponse<IPedido[]> & { total: number; pagina: number; totalPaginas: number }>(`${this.apiUrl}${qs ? '?' + qs : ''}`);
   }
 
   buscarPorId(id: number) {
@@ -38,5 +46,13 @@ export class PedidoService {
   // Itens do Pedido
   removerItem(pedidoId: number, itemId: number) {
     return this.http.delete<TApiResponse<void>>(`${this.apiUrl}/${pedidoId}/itens/${itemId}`);
+  }
+
+  gerarLink(id: number) {
+    return this.http.post<TApiResponse<{ token: string; expiracao: string; mensagem_padrao: string }>>(`${this.apiUrl}/${id}/gerar-link`, {});
+  }
+
+  buscarPublico(token: string) {
+    return this.http.get<TApiResponse<any>>(`${environment.apiUrl}/pedidos-publico/${token}`);
   }
 }

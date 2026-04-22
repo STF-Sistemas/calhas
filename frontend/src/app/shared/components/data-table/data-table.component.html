@@ -5,7 +5,7 @@
         [columns]="columns" 
         [loading]="loading"
         [rows]="rows" 
-        [paginator]="true" 
+        [paginator]="paginator"
         [globalFilterFields]="globalFilterFields"
         [rowHover]="true" 
         dataKey="id"
@@ -78,9 +78,13 @@
                         } @else if (col.type === 'drawing') {
                             @if (rowData[col.field]?.length >= 2) {
                               <svg width="96" height="44" style="display:block;border-radius:4px;">
-                                <rect width="96" height="44" fill="#141414" rx="4"/>
+                                <rect class="drawing-bg" width="96" height="44" rx="4"/>
                                 <polyline [attr.points]="getDrawingPoints(rowData[col.field])"
                                           fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+                                @for (d of rowData['diagonais'] ?? []; track $index) {
+                                  <polyline [attr.points]="getDrawingDiagonalPoints(d, rowData[col.field])"
+                                            fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/>
+                                }
                               </svg>
                             } @else {
                               <span class="text-400 text-sm">Sem desenho</span>

@@ -5,6 +5,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
 import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { MeioPagamentoService } from '#core/services/meio-pagamento.service';
+import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 
 @Component({
   selector: 'app-meio-pagamento-form',
@@ -13,6 +14,7 @@ import { MeioPagamentoService } from '#core/services/meio-pagamento.service';
     CommonModule,
     ReactiveFormsModule,
     InputTextModule,
+    EnterFocusNextDirective,
     DialogWrapperComponent
   ],
   templateUrl: './meio-pagamento-form.component.html',

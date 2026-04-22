@@ -1,27 +1,41 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { TagModule } from 'primeng/tag';
+import { PanelModule } from 'primeng/panel';
+import { DatePickerModule } from 'primeng/datepicker';
+import { SelectModule } from 'primeng/select';
+import { PaginatorModule } from 'primeng/paginator';
+import { ButtonModule } from 'primeng/button';
 import { DataTableComponent, IRowAction } from '#shared-frontend/components/data-table/data-table.component';
 import { PedidoFormComponent } from './pedido-form/pedido-form.component';
 import { PedidoService } from '#core/services/pedido.service';
+import { ClienteService } from '#core/services/cliente.service';
 import { PedidoImpressaoService } from '#core/services/pedido-impressao.service';
 import { PedidoImpressaoDesenhoService } from '#core/services/pedido-impressao-desenho.service';
-import { IPedido } from '#shared/interfaces';
+import { IPedido, ICliente } from '#shared/interfaces';
 import { EStatusPedido } from '#shared/enums';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-pedidos',
   standalone: true,
   imports: [
-    CommonModule, 
-    DataTableComponent, 
-    PedidoFormComponent, 
+    CommonModule,
+    FormsModule,
+    DataTableComponent,
+    PedidoFormComponent,
     ConfirmDialogModule,
     ToastModule,
-    TagModule
+    TagModule,
+    PanelModule,
+    DatePickerModule,
+    SelectModule,
+    PaginatorModule,
+    ButtonModule,
   ],
   templateUrl: './pedidos.component.html',
   styleUrls: ['./pedidos.component.scss'],
@@ -29,11 +43,39 @@ import { EStatusPedido } from '#shared/enums';
 })
 export class PedidosComponent implements OnInit {
   @ViewChild('form') form!: PedidoFormComponent;
-  
+
   pedidos: IPedido[] = [];
   loading = false;
-  
+
+  filtros = {
+    dataInicio: null as Date | null,
+    dataFim: null as Date | null,
+    codCliente: null as number | null,
+    status: null as number | null,
+  };
+
+  pagina = 1;
+  limite = 10;
+  totalRegistros = 0;
+
+  clienteOptions: { label: string; value: number }[] = [];
+
+  statusOptions = [
+    { label: 'Aberto', value: EStatusPedido.Aberto },
+    { label: 'Em Produção', value: EStatusPedido.EmProducao },
+    { label: 'Finalizado', value: EStatusPedido.Concluido },
+    { label: 'Cancelado', value: EStatusPedido.Cancelado },
+  ];
+
   rowActions: IRowAction[] = [
+    {
+      key: 'whatsapp',
+      icon: 'pi pi-whatsapp',
+      tooltip: 'Enviar pelo WhatsApp',
+      ariaLabel: 'Enviar orçamento pelo WhatsApp',
+      severity: 'success',
+      visible: (row) => row.status !== EStatusPedido.Cancelado,
+    },
     {
       key: 'iniciar',
       icon: 'pi pi-play',
@@ -70,6 +112,7 @@ export class PedidosComponent implements OnInit {
 
   constructor(
     private pedidoService: PedidoService,
+    private clienteService: ClienteService,
     private impressaoService: PedidoImpressaoService,
     private impressaoDesenhoService: PedidoImpressaoDesenhoService,
     private messageService: MessageService,
@@ -77,25 +120,44 @@ export class PedidosComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.clienteService.listar().subscribe({
+      next: (res) => {
+        this.clienteOptions = res.data.map((c: ICliente) => ({ label: c.razao_social, value: c.id }));
+      }
+    });
+    this.carregarPedidos();
+  }
+
+  private formatDate(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  filtrar() {
+    this.pagina = 1;
     this.carregarPedidos();
   }
 
   carregarPedidos() {
     this.loading = true;
-    this.pedidoService.listar().subscribe({
+    const params: any = { pagina: this.pagina, limite: this.limite };
+    if (this.filtros.dataInicio) params.dataInicio = this.formatDate(this.filtros.dataInicio);
+    if (this.filtros.dataFim) params.dataFim = this.formatDate(this.filtros.dataFim);
+    if (this.filtros.codCliente != null) params.codCliente = this.filtros.codCliente;
+    if (this.filtros.status != null) params.status = this.filtros.status;
+
+    this.pedidoService.listar(params).subscribe({
       next: (res) => {
+        this.totalRegistros = res.total ?? 0;
         this.pedidos = res.data.map((p: IPedido) => {
           let statusLabel = 'Desconhecido';
           if (p.status === EStatusPedido.Aberto) statusLabel = 'Aberto';
           else if (p.status === EStatusPedido.EmProducao) statusLabel = 'Em Produção';
           else if (p.status === EStatusPedido.Concluido) statusLabel = 'Finalizado';
           else if (p.status === EStatusPedido.Cancelado) statusLabel = 'Cancelado';
-          
-          return {
-            ...p,
-            cliente_nome: p.cliente?.razao_social,
-            status_label: statusLabel
-          };
+          return { ...p, cliente_nome: p.cliente?.razao_social, status_label: statusLabel };
         });
         this.loading = false;
       },
@@ -104,6 +166,12 @@ export class PedidosComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  onPageChange(event: { first?: number; rows?: number }) {
+    this.limite = event.rows ?? this.limite;
+    this.pagina = Math.floor((event.first ?? 0) / this.limite) + 1;
+    this.carregarPedidos();
   }
 
   onAdd() {
@@ -129,6 +197,11 @@ export class PedidosComponent implements OnInit {
   }
 
   onRowAction(event: { key: string; row: IPedido }) {
+    if (event.key === 'whatsapp') {
+      this.onEnviarWhatsApp(event.row);
+      return;
+    }
+
     const mapa: Record<string, { status: EStatusPedido; label: string }> = {
       iniciar:  { status: EStatusPedido.EmProducao, label: 'mover para Em Produção' },
       concluir: { status: EStatusPedido.Concluido,  label: 'concluir' },
@@ -162,12 +235,30 @@ export class PedidosComponent implements OnInit {
     });
   }
 
-  onDelete(pedido: IPedido) {
-      if (pedido.status !== EStatusPedido.Aberto) {
-           this.messageService.add({ severity: 'warn', summary: 'Não permitido', detail: 'Apenas pedidos em status ABERTO podem ser excluídos.' });
-           return;
-      }
+  onEnviarWhatsApp(pedido: IPedido) {
+    this.pedidoService.gerarLink(pedido.id).subscribe({
+      next: (res) => {
+        const baseUrl = window.location.origin;
+        const url = `${baseUrl}/orcamento/${res.data.token}`;
+        const mensagem = (res.data.mensagem_padrao || 'Segue o seu orçamento: {link}').replace('{link}', url);
+        const telefone = (pedido as any).cliente?.telefone ?? '';
+        const tel = telefone.replace(/\D/g, '');
+        const waUrl = tel
+          ? `https://wa.me/55${tel}?text=${encodeURIComponent(mensagem)}`
+          : `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
+        window.open(waUrl, '_blank', 'noopener,noreferrer');
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao gerar link do WhatsApp.' });
+      },
+    });
+  }
 
+  onDelete(pedido: IPedido) {
+    if (pedido.status !== EStatusPedido.Aberto) {
+      this.messageService.add({ severity: 'warn', summary: 'Não permitido', detail: 'Apenas pedidos em status ABERTO podem ser excluídos.' });
+      return;
+    }
     this.confirmationService.confirm({
       message: `Deseja realmente excluir o pedido Nº ${pedido.id}? Esta ação é irreversível.`,
       header: 'Confirmar Exclusão',

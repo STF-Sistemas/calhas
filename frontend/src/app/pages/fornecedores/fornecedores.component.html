@@ -1,19 +1,194 @@
-<main>
-  <h1>Fornecedores</h1>
+<section class="page-section" aria-labelledby="fornecedores-title">
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="page-header">
+    <div class="page-header__info">
+      <div class="page-header__title-row">
+        <div class="page-header__icon">
+          <i class="pi pi-truck"></i>
+        </div>
+        <div>
+          <h1 id="fornecedores-title" class="page-header__title">Gestão de Fornecedores</h1>
+          <p class="page-header__subtitle">Administre o cadastro de fornecedores da sua empresa.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Painel de Filtros -->
+  <p-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:1rem; align-items:flex-end;">
+
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-size:0.85rem; font-weight:600;">Razão Social</label>
+        <input pInputText [(ngModel)]="filtros.razaoSocial" placeholder="Buscar razão social..." (keydown.enter)="filtrar()" />
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-size:0.85rem; font-weight:600;">Nome Fantasia</label>
+        <input pInputText [(ngModel)]="filtros.nomeFantasia" placeholder="Buscar nome fantasia..." (keydown.enter)="filtrar()" />
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-size:0.85rem; font-weight:600;">CNPJ</label>
+        <input pInputText [(ngModel)]="filtros.cnpj" placeholder="00.000.000/0000-00" (keydown.enter)="filtrar()" />
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-size:0.85rem; font-weight:600;">Telefone</label>
+        <input pInputText [(ngModel)]="filtros.telefone" placeholder="(00) 00000-0000" (keydown.enter)="filtrar()" />
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-size:0.85rem; font-weight:600;">Status</label>
+        <p-select [(ngModel)]="filtros.status" [options]="statusOptions"
+                  optionLabel="label" optionValue="value"
+                  placeholder="Todos" [showClear]="true"
+                  appendTo="body" />
+      </div>
+
+      <div style="display:flex; align-items:flex-end;">
+        <p-button label="Filtrar" icon="pi pi-search" (onClick)="filtrar()" />
+      </div>
+
+    </div>
+  </p-panel>
 
   <app-data-table
+    title="Fornecedores Cadastrados"
+    addButtonLabel="Novo Fornecedor"
     [data]="fornecedores"
     [columns]="cols"
     [loading]="loading"
-    addButtonLabel="Novo Fornecedor"
+    [globalFilterFields]="['cnpj', 'razao_social', 'nome_fantasia', 'cidade_nome', 'fone']"
     [showToggleStatus]="true"
+    [paginator]="false"
+    [showExtraButton]="true"
+    extraButtonIcon="pi pi-history"
+    extraButtonTooltip="Histórico de compras"
+    extraButtonSeverity="info"
     (add)="onAdd()"
     (edit)="onEdit($event)"
     (toggleStatus)="onStatus($event)"
-    (delete)="onDelete($event)">
+    (delete)="onDelete($event)"
+    (extraAction)="onHistorico($event)">
   </app-data-table>
+
+  <p-paginator
+    [rows]="limite"
+    [totalRecords]="totalRegistros"
+    [first]="(pagina - 1) * limite"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    (onPageChange)="onPageChange($event)"
+    styleClass="mt-2">
+  </p-paginator>
 
   <app-fornecedor-form #form (saved)="carregar()"></app-fornecedor-form>
 
-  <p-confirmDialog></p-confirmDialog>
-</main>
+  <!-- ── Dialog: Histórico de compras do fornecedor ──────────────────────────── -->
+  <p-dialog
+    [(visible)]="showHistorico"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body"
+    position="top"
+    [style]="{ width: '950px' }"
+    [breakpoints]="{ '960px': '95vw', '640px': '95vw' }"
+    [header]="'Histórico de Compras — ' + fornecedorHistoricoNome">
+
+    <!-- Filtros de período -->
+    <p-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:1rem; align-items:flex-end;">
+
+        <div style="display:flex; flex-direction:column; gap:0.25rem;">
+          <label style="font-size:0.85rem; font-weight:600;">Data Emissão Início</label>
+          <p-datepicker
+            [(ngModel)]="historicoFiltros.dataInicio"
+            dateFormat="dd/mm/yy"
+            [showIcon]="true"
+            appendTo="body"
+            placeholder="dd/mm/aaaa">
+          </p-datepicker>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:0.25rem;">
+          <label style="font-size:0.85rem; font-weight:600;">Data Emissão Fim</label>
+          <p-datepicker
+            [(ngModel)]="historicoFiltros.dataFim"
+            dateFormat="dd/mm/yy"
+            [showIcon]="true"
+            appendTo="body"
+            placeholder="dd/mm/aaaa">
+          </p-datepicker>
+        </div>
+
+        <div style="display:flex; gap:0.5rem; align-items:flex-end;">
+          <p-button icon="pi pi-search" label="Filtrar" (onClick)="filtrarHistorico()" [loading]="historicoLoading"></p-button>
+          <p-button icon="pi pi-times" label="Limpar" severity="secondary" [outlined]="true" (onClick)="limparHistoricoFiltros()"></p-button>
+        </div>
+
+      </div>
+    </p-panel>
+
+    <!-- Tabela de compras -->
+    <p-table
+      [value]="historicoCompras"
+      [loading]="historicoLoading"
+      styleClass="p-datatable-sm"
+      [scrollable]="true"
+      scrollHeight="340px">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th scope="col" style="width:80px">NF-e</th>
+          <th scope="col" style="width:60px">Série</th>
+          <th scope="col" style="width:110px">Emissão</th>
+          <th scope="col" style="width:110px">Entrada</th>
+          <th scope="col" style="width:120px">Status</th>
+          <th scope="col" style="text-align:right">Valor Total</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-compra>
+        <tr>
+          <td>{{ compra.numero_nfe || '—' }}</td>
+          <td>{{ compra.serie || '—' }}</td>
+          <td>{{ compra.data_emissao ? (compra.data_emissao | date:'dd/MM/yyyy') : '—' }}</td>
+          <td>{{ compra.data_entrada ? (compra.data_entrada | date:'dd/MM/yyyy') : '—' }}</td>
+          <td>
+            <p-tag [value]="compra.status_label" [severity]="compra.status_severity"></p-tag>
+          </td>
+          <td style="text-align:right">{{ compra.valor_total | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center p-4">
+            @if (!historicoLoading) {
+              Nenhuma compra encontrada para este fornecedor.
+            }
+          </td>
+        </tr>
+      </ng-template>
+
+    </p-table>
+
+    <p-paginator
+      [rows]="historicoLimite"
+      [totalRecords]="historicoTotal"
+      [first]="(historicoPagina - 1) * historicoLimite"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      (onPageChange)="onHistoricoPageChange($event)"
+      styleClass="mt-2">
+    </p-paginator>
+
+    <ng-template pTemplate="footer">
+      <p-button label="Fechar" icon="pi pi-times" severity="secondary"
+        (onClick)="showHistorico = false">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+</section>

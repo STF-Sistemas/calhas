@@ -29,12 +29,8 @@ router.get('/pedidos-lucros', async (req: Request, res: Response) => {
 
     if (data_inicio || data_fim) {
       where.data_pedido = {};
-      if (data_inicio) where.data_pedido.gte = new Date(String(data_inicio));
-      if (data_fim) {
-        const fim = new Date(String(data_fim));
-        fim.setHours(23, 59, 59, 999);
-        where.data_pedido.lte = fim;
-      }
+      if (data_inicio) where.data_pedido.gte = new Date(String(data_inicio) + 'T00:00:00.000Z');
+      if (data_fim)    where.data_pedido.lte = new Date(String(data_fim)    + 'T23:59:59.999Z');
     }
 
     if (cod_cliente) where.cod_cliente = Number(cod_cliente);

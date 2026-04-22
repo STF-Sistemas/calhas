@@ -3,9 +3,14 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputMaskModule } from 'primeng/inputmask';
+import { ButtonModule } from 'primeng/button';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { ClienteService } from '#core/services/cliente.service';
 
 @Component({
@@ -16,7 +21,12 @@ import { ClienteService } from '#core/services/cliente.service';
     ReactiveFormsModule,
     InputTextModule,
     InputMaskModule,
+    ButtonModule,
+    IconFieldModule,
+    InputIconModule,
+    TooltipModule,
     NgxMaskDirective,
+    EnterFocusNextDirective,
     DialogWrapperComponent
   ],
   providers: [provideNgxMask()],
@@ -30,6 +40,7 @@ export class ClienteFormComponent {
   visible = false;
   isLoadingData = false;
   isSaving = false;
+  buscandoCpfCnpj = false;
   clienteId?: number;
 
   constructor(
@@ -75,6 +86,27 @@ export class ClienteFormComponent {
         }
       });
     }
+  }
+
+  onBuscarCpfCnpj() {
+    const cpfCnpj = this.form.get('cpf_cnpj')?.value?.replace(/\D/g, '');
+    if (!cpfCnpj || (cpfCnpj.length !== 11 && cpfCnpj.length !== 14)) {
+      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Informe um CPF (11 dígitos) ou CNPJ (14 dígitos) completo.' });
+      return;
+    }
+    this.buscandoCpfCnpj = true;
+    this.clienteService.consultarReceita(cpfCnpj).subscribe({
+      next: (res) => {
+        this.form.patchValue(res.data);
+        this.messageService.add({ severity: 'success', summary: 'Receita Federal', detail: 'Dados preenchidos automaticamente.' });
+        this.buscandoCpfCnpj = false;
+      },
+      error: (err) => {
+        const detail = err?.error?.message ?? 'Não foi possível consultar o CPF/CNPJ.';
+        this.messageService.add({ severity: 'warn', summary: 'Receita Federal', detail });
+        this.buscandoCpfCnpj = false;
+      }
+    });
   }
 
   onCepChange() {

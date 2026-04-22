@@ -15,16 +15,56 @@
     </div>
   </div>
 
+  <!-- Painel de Filtros -->
+  <p-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:1rem; align-items:flex-end;">
+
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-size:0.85rem; font-weight:600;">Data Inicial</label>
+        <p-datepicker [(ngModel)]="filtros.dataInicio" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"
+                      [showIcon]="true" appendTo="body" />
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-size:0.85rem; font-weight:600;">Data Final</label>
+        <p-datepicker [(ngModel)]="filtros.dataFim" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"
+                      [showIcon]="true" appendTo="body" />
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-size:0.85rem; font-weight:600;">Cliente</label>
+        <p-select [(ngModel)]="filtros.codCliente" [options]="clienteOptions"
+                  optionLabel="label" optionValue="value"
+                  placeholder="Todos" [filter]="true" [showClear]="true"
+                  appendTo="body" />
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-size:0.85rem; font-weight:600;">Status</label>
+        <p-select [(ngModel)]="filtros.status" [options]="statusOptions"
+                  optionLabel="label" optionValue="value"
+                  placeholder="Todos" [showClear]="true"
+                  appendTo="body" />
+      </div>
+
+      <div style="display:flex; align-items:flex-end;">
+        <p-button label="Filtrar" icon="pi pi-search" (onClick)="filtrar()" />
+      </div>
+
+    </div>
+  </p-panel>
+
   <app-data-table
     title="Histórico de Pedidos"
     [data]="pedidos"
     [columns]="cols"
     [loading]="loading"
-    [globalFilterFields]="['id', 'cliente_nome']"
+    [globalFilterFields]="['id', 'cliente_nome', 'status_label']"
     [addButtonLabel]="'Novo Pedido'"
     [showPrintButton]="true"
     [showPrintDesenhoButton]="true"
     [rowActions]="rowActions"
+    [paginator]="false"
     (add)="onAdd()"
     (edit)="onEdit($event)"
     (delete)="onDelete($event)"
@@ -32,6 +72,15 @@
     (printDesenho)="onPrintDesenho($event)"
     (rowActionClick)="onRowAction($event)">
   </app-data-table>
+
+  <p-paginator
+    [rows]="limite"
+    [totalRecords]="totalRegistros"
+    [first]="(pagina - 1) * limite"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    (onPageChange)="onPageChange($event)"
+    styleClass="mt-2">
+  </p-paginator>
 
   <app-pedido-form #form (saved)="carregarPedidos()"></app-pedido-form>
 </section>

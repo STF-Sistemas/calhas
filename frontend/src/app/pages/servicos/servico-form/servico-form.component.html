@@ -8,7 +8,7 @@
   position="top"
   (save)="onSave()">
 
-  <form [formGroup]="form" class="p-fluid">
+  <form [formGroup]="form" class="p-fluid" appEnterNext>
 
     <h3 class="section-title">
       <i class="pi pi-wrench"></i>
@@ -26,21 +26,13 @@
     </div>
 
     <div class="row">
-      <div class="field col-12 col-md-6">
+      <div class="field col-12">
         <label for="valor">Valor Sugerido *</label>
         <input pInputText appCurrencyMask id="valor" formControlName="valor" class="w-full" />
         @if (form.get('valor')?.invalid && form.get('valor')?.touched) {
           <small class="p-error">Valor deve ser maior que zero.</small>
         }
         <small class="text-600" style="margin-top: 0.25rem;">Este valor pode ser alterado no momento do pedido.</small>
-      </div>
-
-      <div class="field col-12 col-md-6">
-        <label for="custo">Custo *</label>
-        <input pInputText appCurrencyMask id="custo" formControlName="custo" class="w-full" />
-        @if (form.get('custo')?.invalid && form.get('custo')?.touched) {
-          <small class="p-error">Custo deve ser maior ou igual a zero.</small>
-        }
       </div>
     </div>
 

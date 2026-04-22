@@ -6,6 +6,7 @@ import { MessageService } from 'primeng/api';
 import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { ServicoService } from '#core/services/servico.service';
+import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 
 @Component({
   selector: 'app-servico-form',
@@ -15,6 +16,7 @@ import { ServicoService } from '#core/services/servico.service';
     ReactiveFormsModule,
     InputTextModule,
     CurrencyMaskDirective,
+    EnterFocusNextDirective,
     DialogWrapperComponent
   ],
   templateUrl: './servico-form.component.html',
@@ -37,14 +39,13 @@ export class ServicoFormComponent {
     this.form = this.fb.group({
       descricao: ['', [Validators.required, Validators.maxLength(200)]],
       valor: [0, [Validators.required, Validators.min(0.01)]],
-      custo: [0, [Validators.required, Validators.min(0)]]
     });
   }
 
   abrir(id?: number) {
     this.servicoId = id;
     this.visible = true;
-    this.form.reset({ valor: 0, custo: 0 });
+    this.form.reset({ valor: 0 });
 
     if (id) {
       this.isLoadingData = true;

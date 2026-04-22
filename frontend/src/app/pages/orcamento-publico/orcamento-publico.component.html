@@ -1,0 +1,121 @@
+<main class="orcamento-publico">
+
+  @if (estado === 'carregando') {
+    <div class="estado-mensagem">
+      <i class="pi pi-spin pi-spinner" style="font-size:2rem; color:var(--primary-color)"></i>
+      <p>Carregando orçamento...</p>
+    </div>
+  }
+
+  @if (estado === 'expirado') {
+    <div class="estado-mensagem estado-erro">
+      <i class="pi pi-clock" style="font-size:2.5rem; color:var(--orange-500)"></i>
+      <h2>Link de acesso expirado</h2>
+      <p>O prazo de validade deste orçamento foi encerrado.<br>Entre em contato com a empresa para obter um novo link.</p>
+    </div>
+  }
+
+  @if (estado === 'cancelado') {
+    <div class="estado-mensagem estado-erro">
+      <i class="pi pi-times-circle" style="font-size:2.5rem; color:var(--red-500)"></i>
+      <h2>Orçamento cancelado</h2>
+      <p>Este orçamento foi cancelado e não está mais disponível.</p>
+    </div>
+  }
+
+  @if (estado === 'invalido') {
+    <div class="estado-mensagem estado-erro">
+      <i class="pi pi-ban" style="font-size:2.5rem; color:var(--red-500)"></i>
+      <h2>Link inválido</h2>
+      <p>O link acessado não existe ou é inválido.</p>
+    </div>
+  }
+
+  @if (estado === 'ok' && pedido) {
+    <div class="orcamento-card">
+
+      <!-- Cabeçalho empresa -->
+      <header class="orcamento-header">
+        <div class="empresa-info">
+          <h1>{{ pedido.empresa.nome_fantasia || pedido.empresa.razao_social }}</h1>
+          @if (pedido.empresa.nome_fantasia) {
+            <p class="razao-social">{{ pedido.empresa.razao_social }}</p>
+          }
+          @if (pedido.empresa.telefone) {
+            <p><i class="pi pi-phone"></i> {{ pedido.empresa.telefone }}</p>
+          }
+          @if (pedido.empresa.email) {
+            <p><i class="pi pi-envelope"></i> {{ pedido.empresa.email }}</p>
+          }
+        </div>
+        <div class="pedido-id">
+          <span class="label">Orçamento</span>
+          <span class="numero">#{{ pedido.id }}</span>
+          <p-tag [value]="pedido.status_label" [severity]="severityStatus()"></p-tag>
+        </div>
+      </header>
+
+      <!-- Cliente e data -->
+      <section class="orcamento-meta">
+        <div>
+          <span class="meta-label">Cliente</span>
+          <span class="meta-valor">{{ pedido.cliente.razao_social }}</span>
+        </div>
+        <div>
+          <span class="meta-label">Data</span>
+          <span class="meta-valor">{{ pedido.data_pedido | date:'dd/MM/yyyy' }}</span>
+        </div>
+        @if (pedido.meio_pagamento) {
+          <div>
+            <span class="meta-label">Pagamento</span>
+            <span class="meta-valor">{{ pedido.meio_pagamento }}</span>
+          </div>
+        }
+      </section>
+
+      <!-- Itens -->
+      <section class="orcamento-itens">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-desc">Descrição</th>
+              <th class="col-num">Qtd</th>
+              <th class="col-num">Vl. Unit.</th>
+              <th class="col-num">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of pedido.itens; track item.id) {
+              <tr>
+                <td>{{ item.descricao }}</td>
+                <td class="col-num">{{ item.quantidade | number:'1.2-4':'pt-BR' }}</td>
+                <td class="col-num">{{ item.valor_unitario | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+                <td class="col-num">{{ item.valor_total | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="3" class="total-label">Total do Orçamento</td>
+              <td class="total-valor">{{ pedido.valor_total | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </section>
+
+      @if (pedido.observacoes) {
+        <section class="orcamento-obs">
+          <span class="meta-label">Observações</span>
+          <p>{{ pedido.observacoes }}</p>
+        </section>
+      }
+
+      <footer class="orcamento-footer">
+        <p>Este orçamento é atualizado em tempo real.</p>
+        <p>Válido até {{ pedido.token_expiracao | date:'dd/MM/yyyy' }}.</p>
+      </footer>
+
+    </div>
+  }
+
+</main>

@@ -4,6 +4,10 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { InputTextModule } from 'primeng/inputtext';
 import { InputMaskModule } from 'primeng/inputmask';
 import { SelectModule } from 'primeng/select';
+import { ButtonModule } from 'primeng/button';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
@@ -11,6 +15,7 @@ import { FornecedorService } from '#core/services/fornecedor.service';
 import { ClienteService } from '#core/services/cliente.service';
 import { IFornecedor } from '#shared/interfaces';
 import { ECrt } from '#shared/enums';
+import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 
 @Component({
   selector: 'app-fornecedor-form',
@@ -21,7 +26,12 @@ import { ECrt } from '#shared/enums';
     InputTextModule,
     InputMaskModule,
     SelectModule,
+    ButtonModule,
+    IconFieldModule,
+    InputIconModule,
+    TooltipModule,
     NgxMaskDirective,
+    EnterFocusNextDirective,
     DialogWrapperComponent,
   ],
   providers: [provideNgxMask()],
@@ -37,6 +47,7 @@ export class FornecedorFormComponent implements OnInit {
   visible = false;
   isLoadingData = false;
   isSaving = false;
+  buscandoCnpj = false;
   fornecedorId?: number;
 
   crtOpcoes = [
@@ -128,6 +139,40 @@ export class FornecedorFormComponent implements OnInit {
     } else if (this.cnpjInicial) {
       this.form.patchValue({ cnpj: this.cnpjInicial.replace(/\D/g, '') });
     }
+  }
+
+  onBuscarCnpj() {
+    const cnpj = this.form.get('cnpj')?.value?.replace(/\D/g, '');
+    if (!cnpj || cnpj.length !== 14) {
+      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Informe um CNPJ completo (14 dígitos).' });
+      return;
+    }
+    this.buscandoCnpj = true;
+    this.clienteService.consultarReceita(cnpj).subscribe({
+      next: (res) => {
+        const d = res.data;
+        this.form.patchValue({
+          razao_social: d.razao_social,
+          nome_fantasia: d.nome_fantasia,
+          email: d.email,
+          fone: d.telefone,
+          cep: d.cep,
+          logradouro: d.endereco,
+          numero: d.numero,
+          bairro: d.bairro,
+          complemento: d.complemento,
+          cod_cidade: d.cod_cidade,
+          cidade_nome: d.cidade_nome && d.uf ? `${d.cidade_nome}/${d.uf}` : d.cidade_nome,
+        });
+        this.messageService.add({ severity: 'success', summary: 'Receita Federal', detail: 'Dados preenchidos automaticamente.' });
+        this.buscandoCnpj = false;
+      },
+      error: (err) => {
+        const detail = err?.error?.message ?? 'Não foi possível consultar o CNPJ.';
+        this.messageService.add({ severity: 'warn', summary: 'Receita Federal', detail });
+        this.buscandoCnpj = false;
+      },
+    });
   }
 
   onCepChange() {

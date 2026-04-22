@@ -8,7 +8,7 @@
   position="top"
   (save)="onSave()">
 
-  <form [formGroup]="form" class="p-fluid">
+  <form [formGroup]="form" class="p-fluid" appEnterNext>
 
     <!-- ===================== DADOS DA CHAPA ======================== -->
     <h3 class="section-title">
@@ -49,7 +49,6 @@
         <th>Descrição *</th>
         <th style="width: 8rem">Corte (cm)</th>
         <th style="width: 10rem">Valor (R$) *</th>
-        <th style="width: 10rem">Custo (R$) *</th>
         <th style="width: 4rem"></th>
       </tr>
     </ng-template>
@@ -63,9 +62,6 @@
         </td>
         <td>
           <input pInputText appCurrencyMask [(ngModel)]="corte.valor" class="w-full" />
-        </td>
-        <td>
-          <input pInputText appCurrencyMask [(ngModel)]="corte.custo" class="w-full" />
         </td>
         <td class="text-center">
           <p-button
@@ -81,7 +77,7 @@
     </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="5" class="text-center p-3 text-600">
+        <td colspan="4" class="text-center p-3 text-600">
           Nenhum corte cadastrado.
         </td>
       </tr>

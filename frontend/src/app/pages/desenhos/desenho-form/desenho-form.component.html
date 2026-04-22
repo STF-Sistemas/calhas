@@ -21,21 +21,37 @@
   </form>
 
   <!-- Toolbar do canvas -->
-  <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+  <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; flex-wrap:wrap;">
     <span class="text-600 text-sm">
       <i class="pi pi-info-circle mr-1"></i>
-      Clique no canvas para adicionar pontos e formar o perfil do corte.
+      @if (!modoInserir) {
+        Clique no canvas para adicionar pontos e formar o perfil do corte.
+      } @else if (diagonalStep === 0) {
+        <span style="color:#f97316; font-weight:600;">Diagonal — Passo 1/2:</span> Clique para definir o início da diagonal.
+      } @else {
+        <span style="color:#f97316; font-weight:600;">Diagonal — Passo 2/2:</span> Clique para definir o fim da diagonal.
+      }
     </span>
-    <div style="margin-left:auto; display:flex; gap:0.4rem;">
+    <div style="margin-left:auto; display:flex; gap:0.4rem; flex-wrap:wrap;">
+      <p-button
+        [label]="modoInserir ? 'Modo: Diagonal' : 'Inserir Diagonal'"
+        icon="pi pi-arrows-alt"
+        [severity]="modoInserir ? 'warn' : 'secondary'"
+        [outlined]="true"
+        size="small"
+        [disabled]="pontos.length < 2"
+        (onClick)="toggleModoInserir()"
+        pTooltip="Insere 2 pontos sobre um segmento criando uma linha diagonal">
+      </p-button>
       <p-button
         label="Desfazer"
         icon="pi pi-undo"
         severity="secondary"
         [text]="true"
         size="small"
-        [disabled]="pontos.length === 0"
+        [disabled]="pontos.length === 0 && diagonalStep === 0"
         (onClick)="undo()"
-        pTooltip="Remove o último ponto">
+        pTooltip="Remove o último ponto (ou cancela P1 pendente)">
       </p-button>
       <p-button
         label="Limpar"
@@ -51,10 +67,11 @@
   </div>
 
   <!-- Canvas -->
-  <div style="position:relative; width:100%; border-radius:6px; overflow:hidden; border: 1px solid #2a2a2a;">
+  <div style="position:relative; width:100%; border-radius:6px; overflow:hidden; border: 1px solid var(--p-content-border-color);">
     <canvas
       #canvas
-      style="display:block; width:100%; cursor:crosshair; touch-action:none;"
+      [style.cursor]="cursorStyle"
+      style="display:block; width:100%; touch-action:none;"
       (click)="onCanvasClick($event)"
       (touchend)="onCanvasTouchEnd($event)"
       (mousemove)="onCanvasMouseMove($event)"
@@ -62,7 +79,7 @@
     </canvas>
   </div>
 
-  <div style="margin-top:0.4rem; display:flex; justify-content:space-between; align-items:center;">
+  <div style="margin-top:0.4rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.25rem;">
     <small class="text-400">{{ pontos.length }} ponto{{ pontos.length !== 1 ? 's' : '' }} adicionado{{ pontos.length !== 1 ? 's' : '' }}</small>
     @if (pontos.length < 2) {
       <small class="p-error">Adicione ao menos 2 pontos para salvar.</small>

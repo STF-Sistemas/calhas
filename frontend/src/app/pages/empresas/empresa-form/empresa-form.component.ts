@@ -19,6 +19,7 @@ import { ClienteService } from '#core/services/cliente.service';
 import { AuthService } from '#core/services/auth.service';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { HttpClient } from '@angular/common/http';
+import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -39,6 +40,7 @@ import { environment } from 'src/environments/environment';
     InputNumberModule,
     NgxMaskDirective,
     CurrencyMaskDirective,
+    EnterFocusNextDirective,
     DialogWrapperComponent,
   ],
   templateUrl: './empresa-form.component.html',
@@ -77,6 +79,8 @@ export class EmpresaFormComponent {
       marca_dagua: ['', [Validators.maxLength(250)]],
       validar_estoque: [false],
       quantidade_desenho_por_folha: [5, [Validators.required, Validators.min(1), Validators.max(20)]],
+      whatsapp_mensagem_padrao: [''],
+      link_validade_dias: [7, [Validators.min(1), Validators.max(365)]],
       data_expiracao: [null as Date | null],
       valor_mensalidade: [150, [Validators.required, Validators.min(0.01)]],
     });
@@ -158,6 +162,14 @@ export class EmpresaFormComponent {
         }
       });
     }
+  }
+
+  inserirTagLink(el: HTMLTextAreaElement): void {
+    const ctrl = this.form.get('whatsapp_mensagem_padrao')!;
+    const val = ctrl.value ?? '';
+    const pos = el.selectionStart ?? val.length;
+    ctrl.setValue(val.slice(0, pos) + '{link}' + val.slice(pos));
+    setTimeout(() => { el.selectionStart = el.selectionEnd = pos + 6; el.focus(); });
   }
 
   onSave() {

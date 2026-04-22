@@ -86,7 +86,9 @@ model Empresa {
   numero         String?   @db.VarChar(10)
   bairro         String?   @db.VarChar(100)
   complemento    String?   @db.VarChar(100)
-  marca_dagua    String?   @db.VarChar(250)
+  marca_dagua                  String?   @db.VarChar(250)
+  whatsapp_mensagem_padrao     String?   @db.Text
+  link_validade_dias           Int       @default(7)
   cod_cidade     Int?
 
   cidade          Cidade?          @relation(fields: [cod_cidade], references: [id])
@@ -210,7 +212,6 @@ model Corte {
   descricao String  @db.VarChar(200)
   corte     Decimal @db.Decimal(10, 4)
   valor     Decimal @db.Decimal(10, 4)
-  custo     Decimal @default(0) @db.Decimal(10, 4)
   status    Int     @default(1)
   excluido  Boolean @default(false)
 
@@ -226,7 +227,6 @@ model Servico {
   cod_empresa Int
   descricao   String  @db.VarChar(200)
   valor       Decimal @db.Decimal(10, 4)
-  custo       Decimal @default(0) @db.Decimal(10, 4)
   status      Int     @default(1)
   excluido    Boolean @default(false)
 
@@ -250,6 +250,8 @@ model Pedido {
   observacoes        String?  @db.Text
   excluido           Boolean  @default(false)
   estoque_baixado    Boolean  @default(false)
+  token_acesso       String?  @unique @db.VarChar(100)
+  token_expiracao    DateTime?
   created_at         DateTime @default(now())
   updated_at         DateTime @updatedAt
 
@@ -281,6 +283,7 @@ model Desenho {
   cod_empresa Int
   descricao   String   @db.VarChar(200)
   pontos      Json     @default("[]")
+  diagonais   Json     @default("[]")
   status      Int      @default(1)
   excluido    Boolean  @default(false)
   created_at  DateTime @default(now())

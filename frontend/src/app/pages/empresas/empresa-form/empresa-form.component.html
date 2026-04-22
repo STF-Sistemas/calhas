@@ -2,7 +2,7 @@
   [isLoadingData]="isLoadingData" [isSaving]="isSaving" width="900px"
   position="top" (save)="onSave()">
 
-  <form [formGroup]="form">
+  <form [formGroup]="form" appEnterNext>
     <p-tabs value="0">
       <p-tablist>
         <p-tab value="0">
@@ -189,6 +189,43 @@
               @if (form.get('quantidade_desenho_por_folha')?.invalid && form.get('quantidade_desenho_por_folha')?.touched) {
                 <small class="p-error">Informe um valor entre 1 e 20.</small>
               }
+            </div>
+          </div>
+
+          <h3 class="section-title mt-2">
+            <i class="pi pi-whatsapp"></i>
+            WhatsApp / Link de Orçamento
+          </h3>
+
+          <div class="row">
+            <div class="field col-12 col-md-3">
+              <label for="link_validade_dias">Validade do link (dias)</label>
+              <p-inputNumber
+                inputId="link_validade_dias"
+                formControlName="link_validade_dias"
+                [min]="1" [max]="365"
+                [showButtons]="true"
+                placeholder="Ex: 7"
+                aria-label="Validade do link de orçamento em dias">
+              </p-inputNumber>
+              <small class="field-hint">Após este prazo o link expira e o cliente não consegue mais acessar.</small>
+              @if (form.get('link_validade_dias')?.invalid && form.get('link_validade_dias')?.touched) {
+                <small class="p-error">Informe um valor entre 1 e 365.</small>
+              }
+            </div>
+            <div class="field col-12 col-md-9">
+              <div style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin-bottom:.4rem;">
+                <label for="whatsapp_mensagem_padrao" style="margin:0;">Mensagem padrão do WhatsApp</label>
+                <p-button label="{link}" icon="pi pi-tag" size="small" severity="secondary" [outlined]="true"
+                  pTooltip="Inserir tag do link na posição do cursor"
+                  (onClick)="inserirTagLink(msgTextarea)">
+                </p-button>
+              </div>
+              <textarea #msgTextarea pTextarea id="whatsapp_mensagem_padrao" formControlName="whatsapp_mensagem_padrao" rows="3"
+                placeholder="Ex: Olá! Segue o seu orçamento: {link}"
+                aria-label="Mensagem padrão para envio pelo WhatsApp"
+                [autoResize]="true">
+              </textarea>
             </div>
           </div>
 

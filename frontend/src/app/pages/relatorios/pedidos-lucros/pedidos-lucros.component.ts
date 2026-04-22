@@ -1,19 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
-import { AutoCompleteModule } from 'primeng/autocomplete';
+import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageModule } from 'primeng/message';
+import { PanelModule } from 'primeng/panel';
 import { RelatorioWrapperComponent } from 'src/app/shared/components/relatorio-wrapper/relatorio-wrapper.component';
 import { RelatorioService } from 'src/app/core/services/relatorio.service';
 import { ClienteService } from 'src/app/core/services/cliente.service';
 import { ProdutoService } from 'src/app/core/services/produto.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { EmpresaService } from 'src/app/core/services/empresa.service';
-import { IRelatorioPedidosLucros, IEmpresa, ICliente, IProduto } from '#shared/interfaces';
+import { IRelatorioPedidosLucros, IEmpresa } from '#shared/interfaces';
 
 @Component({
   selector: 'app-pedidos-lucros',
@@ -23,10 +24,11 @@ import { IRelatorioPedidosLucros, IEmpresa, ICliente, IProduto } from '#shared/i
     ReactiveFormsModule,
     ButtonModule,
     DatePickerModule,
-    AutoCompleteModule,
+    SelectModule,
     TableModule,
     TooltipModule,
     MessageModule,
+    PanelModule,
     RelatorioWrapperComponent,
   ],
   templateUrl: './pedidos-lucros.component.html',
@@ -39,13 +41,8 @@ export class PedidosLucrosComponent implements OnInit {
   isLoading = false;
   erro = '';
 
-  // Autocomplete clientes
-  clientesSugestoes: ICliente[] = [];
-  clienteSelecionado: ICliente | null = null;
-
-  // Autocomplete produtos
-  produtosSugestoes: IProduto[] = [];
-  produtoSelecionado: IProduto | null = null;
+  clienteOptions: { label: string; value: number }[] = [];
+  produtoOptions: { label: string; value: number }[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -56,10 +53,10 @@ export class PedidosLucrosComponent implements OnInit {
     private empresaService: EmpresaService,
   ) {
     this.form = this.fb.group({
-      data_inicio: [null],
-      data_fim: [null],
-      cliente: [null],
-      produto: [null],
+      data_inicio: [null, Validators.required],
+      data_fim: [null, Validators.required],
+      cod_cliente: [null],
+      cod_produto: [null],
     });
   }
 
@@ -70,63 +67,37 @@ export class PedidosLucrosComponent implements OnInit {
         next: res => { if (res.success) this.empresa = res.data; },
       });
     }
-  }
 
-  buscarClientes(evento: { query: string }) {
-    this.clienteService.listar().subscribe({
+    this.clienteService.listar({ limite: 1000 }).subscribe({
       next: res => {
-        if (res.success) {
-          const q = evento.query.toLowerCase();
-          this.clientesSugestoes = res.data.filter(c =>
-            c.razao_social.toLowerCase().includes(q) ||
-            (c.nome_fantasia?.toLowerCase().includes(q) ?? false)
-          );
-        }
+        this.clienteOptions = res.data.map(c => ({ label: c.razao_social, value: c.id }));
       },
     });
-  }
 
-  buscarProdutos(evento: { query: string }) {
     this.produtoService.listar().subscribe({
       next: res => {
-        if (res.success) {
-          const q = evento.query.toLowerCase();
-          this.produtosSugestoes = (res.data as IProduto[]).filter(p =>
-            p.descricao.toLowerCase().includes(q)
-          );
-        }
+        this.produtoOptions = (res.data as any[]).map(p => ({ label: p.descricao, value: p.id }));
       },
     });
-  }
-
-  onClienteSelecionado(cliente: ICliente) {
-    this.clienteSelecionado = cliente;
-  }
-
-  onClienteLimpo() {
-    this.clienteSelecionado = null;
-  }
-
-  onProdutoSelecionado(produto: IProduto) {
-    this.produtoSelecionado = produto;
-  }
-
-  onProdutoLimpo() {
-    this.produtoSelecionado = null;
   }
 
   gerar() {
+    this.form.markAllAsTouched();
+    if (this.form.invalid) {
+      this.erro = 'Informe a Data Início e a Data Fim para gerar o relatório.';
+      return;
+    }
     this.erro = '';
     this.relatorio = null;
     this.isLoading = true;
 
-    const { data_inicio, data_fim } = this.form.value;
+    const { data_inicio, data_fim, cod_cliente, cod_produto } = this.form.value;
 
     this.relatorioService.pedidosLucros({
       data_inicio: data_inicio ? this.toISODate(data_inicio) : undefined,
       data_fim:    data_fim    ? this.toISODate(data_fim)    : undefined,
-      cod_cliente: this.clienteSelecionado?.id,
-      cod_produto: this.produtoSelecionado?.id,
+      cod_cliente: cod_cliente ?? undefined,
+      cod_produto: cod_produto ?? undefined,
     }).subscribe({
       next: res => {
         this.isLoading = false;
@@ -142,8 +113,7 @@ export class PedidosLucrosComponent implements OnInit {
 
   limpar() {
     this.form.reset();
-    this.clienteSelecionado = null;
-    this.produtoSelecionado = null;
+    this.form.markAsUntouched();
     this.relatorio = null;
     this.erro = '';
   }

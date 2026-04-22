@@ -1,3 +1,4 @@
+<p-toast></p-toast>
 <main>
   <div class="page-header">
     <h1 class="page-title">
@@ -140,6 +141,38 @@
                   <textarea pTextarea id="marca_dagua" formControlName="marca_dagua" rows="3"
                     placeholder="Ex.: CÓPIA NÃO VÁLIDA, RASCUNHO..."
                     aria-label="Marca d'água para impressão"
+                    [autoResize]="true">
+                  </textarea>
+                </div>
+              </div>
+
+              <h3 class="section-title mt-2">
+                <i class="pi pi-whatsapp"></i>WhatsApp / Link de Orçamento
+              </h3>
+
+              <div class="row">
+                <div class="field col-12 col-md-3">
+                  <label for="link_validade_dias">Validade do link (dias)</label>
+                  <p-inputnumber
+                    inputId="link_validade_dias"
+                    formControlName="link_validade_dias"
+                    [min]="1" [max]="365"
+                    [showButtons]="true"
+                    placeholder="Ex: 7">
+                  </p-inputnumber>
+                  <small class="field-hint">Após este prazo o link expira e o cliente não consegue mais acessar.</small>
+                </div>
+                <div class="field col-12 col-md-9">
+                  <div style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin-bottom:.4rem;">
+                    <label for="whatsapp_mensagem_padrao" style="margin:0;">Mensagem padrão do WhatsApp</label>
+                    <p-button label="{link}" icon="pi pi-tag" size="small" severity="secondary" [outlined]="true"
+                      pTooltip="Inserir tag do link na posição do cursor"
+                      (onClick)="inserirTagLink(msgTextarea)">
+                    </p-button>
+                  </div>
+                  <textarea #msgTextarea pTextarea id="whatsapp_mensagem_padrao" formControlName="whatsapp_mensagem_padrao" rows="3"
+                    placeholder="Ex: Olá! Segue o seu orçamento: {link}"
+                    aria-label="Mensagem padrão para envio pelo WhatsApp"
                     [autoResize]="true">
                   </textarea>
                 </div>

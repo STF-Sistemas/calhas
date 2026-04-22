@@ -4,59 +4,69 @@
   [isLoading]="isLoading">
 
   <!-- ===== FILTROS (tela) ===== -->
-  <div filtros class="filtros-form">
-    <form [formGroup]="form" class="filtros-row">
+  <div filtros>
+    <p-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
+      <form [formGroup]="form" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:1rem; align-items:flex-end;">
 
-      <div class="filtro-field">
-        <label>Data Início</label>
-        <p-datepicker formControlName="data_inicio" dateFormat="dd/mm/yy"
-          [showIcon]="true" appendTo="body" placeholder="dd/mm/aaaa">
-        </p-datepicker>
-      </div>
+        <div style="display:flex; flex-direction:column; gap:0.25rem;">
+          <label style="font-size:0.85rem; font-weight:600;">Data Início <span style="color:var(--red-500)">*</span></label>
+          <p-datepicker formControlName="data_inicio" dateFormat="dd/mm/yy"
+            [showIcon]="true" appendTo="body" placeholder="dd/mm/aaaa"
+            [class.ng-invalid]="form.get('data_inicio')?.invalid && form.get('data_inicio')?.touched"
+            [class.ng-dirty]="form.get('data_inicio')?.touched">
+          </p-datepicker>
+          @if (form.get('data_inicio')?.invalid && form.get('data_inicio')?.touched) {
+            <small style="color:var(--red-500)">Obrigatório.</small>
+          }
+        </div>
 
-      <div class="filtro-field">
-        <label>Data Fim</label>
-        <p-datepicker formControlName="data_fim" dateFormat="dd/mm/yy"
-          [showIcon]="true" appendTo="body" placeholder="dd/mm/aaaa">
-        </p-datepicker>
-      </div>
+        <div style="display:flex; flex-direction:column; gap:0.25rem;">
+          <label style="font-size:0.85rem; font-weight:600;">Data Fim <span style="color:var(--red-500)">*</span></label>
+          <p-datepicker formControlName="data_fim" dateFormat="dd/mm/yy"
+            [showIcon]="true" appendTo="body" placeholder="dd/mm/aaaa"
+            [class.ng-invalid]="form.get('data_fim')?.invalid && form.get('data_fim')?.touched"
+            [class.ng-dirty]="form.get('data_fim')?.touched">
+          </p-datepicker>
+          @if (form.get('data_fim')?.invalid && form.get('data_fim')?.touched) {
+            <small style="color:var(--red-500)">Obrigatório.</small>
+          }
+        </div>
 
-      <div class="filtro-field filtro-wide">
-        <label>Cliente</label>
-        <p-autoComplete
-          formControlName="cliente"
-          [suggestions]="clientesSugestoes"
-          field="razao_social"
-          placeholder="Todos os clientes"
-          (completeMethod)="buscarClientes($event)"
-          (onSelect)="onClienteSelecionado($event.value)"
-          (onClear)="onClienteLimpo()"
-          [forceSelection]="true"
-          appendTo="body">
-        </p-autoComplete>
-      </div>
+        <div style="display:flex; flex-direction:column; gap:0.25rem; min-width:0;">
+          <label style="font-size:0.85rem; font-weight:600;">Cliente</label>
+          <p-select
+            formControlName="cod_cliente"
+            [options]="clienteOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Todos os clientes"
+            [filter]="true"
+            [showClear]="true"
+            appendTo="body">
+          </p-select>
+        </div>
 
-      <div class="filtro-field filtro-wide">
-        <label>Produto</label>
-        <p-autoComplete
-          formControlName="produto"
-          [suggestions]="produtosSugestoes"
-          field="descricao"
-          placeholder="Todos os produtos"
-          (completeMethod)="buscarProdutos($event)"
-          (onSelect)="onProdutoSelecionado($event.value)"
-          (onClear)="onProdutoLimpo()"
-          [forceSelection]="true"
-          appendTo="body">
-        </p-autoComplete>
-      </div>
+        <div style="display:flex; flex-direction:column; gap:0.25rem; min-width:0;">
+          <label style="font-size:0.85rem; font-weight:600;">Produto</label>
+          <p-select
+            formControlName="cod_produto"
+            [options]="produtoOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Todos os produtos"
+            [filter]="true"
+            [showClear]="true"
+            appendTo="body">
+          </p-select>
+        </div>
 
-      <div class="filtros-acoes">
-        <p-button icon="pi pi-search" label="Gerar" (onClick)="gerar()" [loading]="isLoading"></p-button>
-        <p-button icon="pi pi-times" label="Limpar" severity="secondary" [outlined]="true" (onClick)="limpar()"></p-button>
-      </div>
+        <div style="display:flex; gap:0.5rem; align-items:flex-end;">
+          <p-button icon="pi pi-search" label="Gerar" (onClick)="gerar()" [loading]="isLoading"></p-button>
+          <p-button icon="pi pi-times" label="Limpar" severity="secondary" [outlined]="true" (onClick)="limpar()"></p-button>
+        </div>
 
-    </form>
+      </form>
+    </p-panel>
   </div>
 
   <!-- ===== FILTROS APLICADOS (impresso junto) ===== -->

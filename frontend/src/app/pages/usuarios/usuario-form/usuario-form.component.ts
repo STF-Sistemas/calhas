@@ -12,6 +12,7 @@ import { EmpresaService } from '#core/services/empresa.service';
 import { AuthService } from '#core/services/auth.service';
 import { IEmpresa } from '#shared/interfaces';
 import { EStatusGeral } from '#shared/enums';
+import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 
 @Component({
   selector: 'app-usuario-form',
@@ -23,6 +24,7 @@ import { EStatusGeral } from '#shared/enums';
     PasswordModule,
     SelectModule,
     CheckboxModule,
+    EnterFocusNextDirective,
     DialogWrapperComponent
   ],
   templateUrl: './usuario-form.component.html',

@@ -16,6 +16,8 @@ export interface IPedido {
   observacoes: string | null;
   excluido: boolean;
   estoque_baixado: boolean;
+  token_acesso?: string | null;
+  token_expiracao?: Date | string | null;
   empresa?: IEmpresa;
   cliente?: ICliente;
   meio_pagamento?: IMeioPagamento;

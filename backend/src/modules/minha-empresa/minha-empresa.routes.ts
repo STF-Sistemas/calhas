@@ -47,9 +47,11 @@ const minhaEmpresaSchema = z.object({
   bairro:         z.string().max(100).nullable().optional(),
   complemento:    z.string().max(100).nullable().optional(),
   cod_cidade:     z.number().int().positive().nullable().optional(),
-  marca_dagua:                 z.string().max(250).nullable().optional(),
-  validar_estoque:             z.boolean().optional(),
+  marca_dagua:                  z.string().max(250).nullable().optional(),
+  validar_estoque:              z.boolean().optional(),
   quantidade_desenho_por_folha: z.number().int().min(1).max(20).optional(),
+  whatsapp_mensagem_padrao:     z.string().nullable().optional(),
+  link_validade_dias:           z.number().int().min(1).max(365).optional(),
 });
 
 // ── PUT / — atualiza dados da própria empresa ────────────────────────────────

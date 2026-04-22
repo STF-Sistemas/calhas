@@ -156,8 +156,36 @@ async function atualizarCustoProdutos(compraId: number, codEmpresa: number) {
 // ── GET / — lista compras ──────────────────────────────────────────────────────
 router.get('/', async (req: Request, res: Response) => {
   try {
+    const codEmpresa = req.user!.cod_empresa!;
+    const { codFornecedor, dataInicio, dataFim, pagina, limite } = req.query;
+
+    const where: any = { cod_empresa: codEmpresa, excluido: false };
+    if (codFornecedor) where.cod_fornecedor = Number(codFornecedor);
+    if (dataInicio || dataFim) {
+      where.data_emissao = {};
+      if (dataInicio) where.data_emissao.gte = String(dataInicio);
+      if (dataFim)    where.data_emissao.lte = String(dataFim);
+    }
+
+    if (pagina || limite) {
+      const skip = (Number(pagina ?? 1) - 1) * Number(limite ?? 10);
+      const take = Number(limite ?? 10);
+      const [compras, total] = await Promise.all([
+        prisma.compra.findMany({
+          where,
+          include: { fornecedor: { select: { id: true, razao_social: true, cnpj: true } } },
+          orderBy: { id: 'desc' },
+          skip,
+          take,
+        }),
+        prisma.compra.count({ where }),
+      ]);
+      res.json({ success: true, data: compras, total, pagina: Number(pagina ?? 1), totalPaginas: Math.ceil(total / take) });
+      return;
+    }
+
     const compras = await prisma.compra.findMany({
-      where: { cod_empresa: req.user!.cod_empresa!, excluido: false },
+      where,
       include: { fornecedor: { select: { id: true, razao_social: true, cnpj: true } } },
       orderBy: { id: 'desc' },
     });

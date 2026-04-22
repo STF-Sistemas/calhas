@@ -14,7 +14,7 @@
     </div>
 
     <!-- Legenda -->
-    <div style="display:flex; gap:1rem; margin-bottom:1rem; font-size:0.8rem;">
+    <div style="display:flex; gap:1.2rem; margin-bottom:1rem; font-size:0.8rem; flex-wrap:wrap;">
       <span style="display:flex; align-items:center; gap:0.3rem;">
         <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:#ef4444;"></span>
         Sem medida
@@ -23,28 +23,83 @@
         <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:#22c55e;"></span>
         Medida definida
       </span>
+      @if (segmentosCobertos.size > 0) {
+        <span style="display:flex; align-items:center; gap:0.3rem;">
+          <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:#444;"></span>
+          Coberto por diagonal (sem medida)
+        </span>
+      }
     </div>
 
-    <!-- Inputs de medidas -->
-    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:0.75rem; margin-bottom:1.5rem;">
-      @for (seg of segmentos; track seg) {
-        <div style="display:flex; flex-direction:column; gap:0.25rem;">
+    <!-- Segmentos base -->
+    <div appEnterNext style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:0.75rem; margin-bottom:1rem;">
+      @for (seg of segmentosBase; track seg) {
+        @let coberto = segmentosCobertos.has(seg);
+        <div style="display:flex; flex-direction:column; gap:0.25rem;" [style.opacity]="coberto ? '0.4' : '1'">
           <label style="font-size:0.85rem; font-weight:600; display:flex; align-items:center; gap:0.4rem;">
-            <span style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; font-size:0.7rem; font-weight:700;"
-                  [style.background]="medidas[seg] > 0 ? '#22c55e' : '#ef4444'"
-                  style="color:#fff;">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; font-size:0.7rem; font-weight:700; color:#fff;"
+                  [style.background]="coberto ? '#444' : (medidas[seg] > 0 ? '#22c55e' : '#ef4444')">
               {{ seg + 1 }}
             </span>
             Segmento {{ seg + 1 }}
+            @if (coberto) { <span style="font-size:0.7rem; color:#888;">(coberto)</span> }
           </label>
           <input pInputText appCurrencyMask
             [ngModel]="medidas[seg]"
             (ngModelChange)="onMedidaChange(seg, $event)"
+            [disabled]="coberto"
             class="w-full"
             placeholder="0,00" />
         </div>
       }
     </div>
+
+    <!-- Diagonais -->
+    @if (segmentosDiagonaisInfo.length > 0) {
+      <div style="border-top:1px solid var(--surface-200); padding-top:0.75rem; margin-bottom:1rem;">
+        <p style="font-size:0.8rem; font-weight:600; margin:0 0 0.75rem; color: var(--text-color);">
+          <i class="pi pi-arrows-alt mr-1"></i>Diagonais
+          <span style="font-size:0.75rem; font-weight:400; color:var(--text-color-secondary); margin-left:0.5rem;">
+            — o maior valor entre as duas pontas será usado no total.
+          </span>
+        </p>
+        <div appEnterNext style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:0.75rem;">
+          @for (info of segmentosDiagonaisInfo; track info.diagIdx) {
+            <div style="border:1px solid var(--surface-200); border-radius:6px; padding:0.75rem; display:flex; flex-direction:column; gap:0.5rem;">
+              <span style="font-size:0.8rem; font-weight:600;">Diagonal {{ info.diagIdx + 1 }}</span>
+              <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+                <div style="display:flex; flex-direction:column; gap:0.25rem; flex:1; min-width:100px;">
+                  <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.3rem;">
+                    <span style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; font-size:0.65rem; font-weight:700; color:#fff;"
+                          [style.background]="medidas[info.p1Idx] > 0 ? '#22c55e' : '#ef4444'">P1</span>
+                    Ponta 1
+                  </label>
+                  <input pInputText appCurrencyMask
+                    [ngModel]="medidas[info.p1Idx]"
+                    (ngModelChange)="onMedidaChange(info.p1Idx, $event)"
+                    class="w-full" placeholder="0,00" />
+                </div>
+                <div style="display:flex; flex-direction:column; gap:0.25rem; flex:1; min-width:100px;">
+                  <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.3rem;">
+                    <span style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; font-size:0.65rem; font-weight:700; color:#fff;"
+                          [style.background]="medidas[info.p2Idx] > 0 ? '#22c55e' : '#ef4444'">P2</span>
+                    Ponta 2
+                  </label>
+                  <input pInputText appCurrencyMask
+                    [ngModel]="medidas[info.p2Idx]"
+                    (ngModelChange)="onMedidaChange(info.p2Idx, $event)"
+                    class="w-full" placeholder="0,00" />
+                </div>
+              </div>
+              @let maior = medidas[info.p1Idx] > medidas[info.p2Idx] ? medidas[info.p1Idx] : medidas[info.p2Idx];
+              @if (maior > 0) {
+                <small style="color:#22c55e;">Valor considerado no total: {{ maior }} cm</small>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
 
     <!-- Rodapé -->
     <div style="display:flex; justify-content:flex-end; gap:0.5rem; border-top:1px solid var(--surface-200); padding-top:1rem;">

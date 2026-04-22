@@ -6,7 +6,6 @@ export interface ICorte {
   descricao: string;
   corte: number;
   valor: number;
-  custo: number;
   valor_venda?: number;
   largura?: number;
   status: number;

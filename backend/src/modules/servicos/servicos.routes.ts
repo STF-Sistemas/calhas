@@ -9,8 +9,7 @@ router.use(authMiddleware);
 
 const servicoSchema = z.object({
   descricao: z.string().min(1).max(200),
-  valor: z.number().min(0),
-  custo: z.preprocess(v => v ?? 0, z.number().min(0)),
+  valor: z.preprocess(v => Number(v) || 0, z.number().min(0)),
 });
 
 router.get('/', async (req: Request, res: Response) => {
@@ -64,9 +63,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     if (!parse.success) {
       res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: parse.error.issues[0].message }); return;
     }
-    // custo não é alterado no PUT
-    const { custo, ...dadosSemCusto } = parse.data;
-    const servico = await prisma.servico.update({ where: { id: Number(req.params['id']) }, data: dadosSemCusto });
+    const servico = await prisma.servico.update({ where: { id: Number(req.params['id']) }, data: parse.data });
     res.json({ success: true, data: servico });
   } catch (err) {
     console.error('[SERVICOS_PUT]', err);

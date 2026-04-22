@@ -8,7 +8,7 @@
   position="top"
   (save)="onSave()">
 
-  <form [formGroup]="form" class="p-fluid">
+  <form [formGroup]="form" class="p-fluid" appEnterNext>
 
     <!-- ===================== DADOS DO CLIENTE ======================== -->
     <h3 class="section-title">
@@ -36,9 +36,18 @@
     <div class="row">
       <div class="field col-12 col-md-4">
         <label for="cpf_cnpj">CPF / CNPJ *</label>
-        <input pInputText id="cpf_cnpj" formControlName="cpf_cnpj"
-          placeholder="000.000.000-00 ou 00.000.000/0000-00"
-          mask="000.000.000-00||00.000.000/0000-00" />
+        <p-iconField iconPosition="right">
+          <p-inputIcon>
+            <i [class]="buscandoCpfCnpj ? 'pi pi-spin pi-spinner' : 'pi pi-search'"
+               style="cursor:pointer"
+               pTooltip="Consultar dados pelo CPF / CNPJ"
+               (click)="onBuscarCpfCnpj()">
+            </i>
+          </p-inputIcon>
+          <input pInputText id="cpf_cnpj" formControlName="cpf_cnpj"
+            placeholder="000.000.000-00 ou 00.000.000/0000-00"
+            mask="000.000.000-00||00.000.000/0000-00" />
+        </p-iconField>
         @if (form.get('cpf_cnpj')?.invalid && form.get('cpf_cnpj')?.touched) {
           <small class="p-error">CPF / CNPJ é obrigatório.</small>
         }

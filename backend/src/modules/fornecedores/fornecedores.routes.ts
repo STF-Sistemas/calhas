@@ -30,12 +30,25 @@ const fornecedorSchema = z.object({
 // GET / — lista fornecedores da empresa
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const fornecedores = await prisma.fornecedor.findMany({
-      where: { cod_empresa: req.user!.cod_empresa!, excluido: false },
-      include,
-      orderBy: { razao_social: 'asc' },
-    });
-    res.json({ success: true, data: fornecedores });
+    const { razaoSocial, nomeFantasia, cnpj, telefone, status, pagina = '1', limite = '10' } = req.query as Record<string, string>;
+    const where: any = { cod_empresa: req.user!.cod_empresa!, excluido: false };
+    const conditions: any[] = [];
+
+    if (razaoSocial) conditions.push({ razao_social: { contains: razaoSocial, mode: 'insensitive' } });
+    if (nomeFantasia) conditions.push({ nome_fantasia: { contains: nomeFantasia, mode: 'insensitive' } });
+    if (cnpj) conditions.push({ cnpj: { contains: cnpj.replace(/\D/g, '') } });
+    if (telefone) conditions.push({ fone: { contains: telefone } });
+    if (status) conditions.push({ status: Number(status) });
+    if (conditions.length > 0) where.AND = conditions;
+
+    const paginaNum = Math.max(1, parseInt(pagina) || 1);
+    const limiteNum = Math.min(100, Math.max(1, parseInt(limite) || 10));
+
+    const [total, fornecedores] = await Promise.all([
+      prisma.fornecedor.count({ where }),
+      prisma.fornecedor.findMany({ where, include, orderBy: { razao_social: 'asc' }, skip: (paginaNum - 1) * limiteNum, take: limiteNum }),
+    ]);
+    res.json({ success: true, data: fornecedores, total, pagina: paginaNum, totalPaginas: Math.ceil(total / limiteNum) });
   } catch {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Erro ao listar fornecedores.' });
   }

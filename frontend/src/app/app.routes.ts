@@ -3,6 +3,10 @@ import { authGuard, adminGuard, validadeGuard } from '#core/guards/auth.guard';
 
 export const routes: Routes = [
   {
+    path: 'orcamento/:token',
+    loadComponent: () => import('./pages/orcamento-publico/orcamento-publico.component').then(m => m.OrcamentoPublicoComponent)
+  },
+  {
     path: 'login',
     loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
   },

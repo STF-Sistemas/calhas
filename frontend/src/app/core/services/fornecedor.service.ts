@@ -10,8 +10,17 @@ export class FornecedorService {
 
   constructor(private http: HttpClient) {}
 
-  listar() {
-    return this.http.get<TApiResponse<IFornecedor[]>>(this.apiUrl);
+  listar(params?: { razaoSocial?: string; nomeFantasia?: string; cnpj?: string; telefone?: string; status?: number; pagina?: number; limite?: number }) {
+    const query = new URLSearchParams();
+    if (params?.razaoSocial) query.set('razaoSocial', params.razaoSocial);
+    if (params?.nomeFantasia) query.set('nomeFantasia', params.nomeFantasia);
+    if (params?.cnpj) query.set('cnpj', params.cnpj);
+    if (params?.telefone) query.set('telefone', params.telefone);
+    if (params?.status != null) query.set('status', String(params.status));
+    if (params?.pagina != null) query.set('pagina', String(params.pagina));
+    if (params?.limite != null) query.set('limite', String(params.limite));
+    const qs = query.toString();
+    return this.http.get<TApiResponse<IFornecedor[]> & { total: number; pagina: number; totalPaginas: number }>(`${this.apiUrl}${qs ? '?' + qs : ''}`);
   }
 
   buscarPorId(id: number) {

@@ -20,6 +20,7 @@ import { ProdutoLookupDialogComponent } from '../dialogs/produto-lookup-dialog/p
 import { ProdutoFormComponent } from '../../produtos/produto-form/produto-form.component';
 import { ICompra, IFornecedor, IProduto } from '#shared/interfaces';
 import { EStatusCompra } from '#shared/enums';
+import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 
 @Component({
   selector: 'app-compra-form',
@@ -37,6 +38,7 @@ import { EStatusCompra } from '#shared/enums';
     SelectModule,
     DialogModule,
     NgxMaskDirective,
+    EnterFocusNextDirective,
     DialogWrapperComponent,
     FornecedorLookupDialogComponent,
     ProdutoLookupDialogComponent,

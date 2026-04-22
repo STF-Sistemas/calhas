@@ -3,6 +3,7 @@ import { Decimal } from '@prisma/client/runtime/library';
 import { Prisma } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
+import { randomUUID } from 'crypto';
 import { prisma } from '#config/prisma';
 import { authMiddleware } from '#middlewares/auth.middleware';
 import { EStatusPedido } from '#shared/enums';
@@ -60,14 +61,8 @@ async function buscarCustoDoItem(item: z.infer<typeof itemSchema>): Promise<Deci
     const p = await prisma.produto.findUnique({ where: { id: item.cod_produto }, select: { custo: true } });
     return p ? new Decimal(p.custo) : new Decimal(0);
   }
-  if (item.cod_servico) {
-    const s = await prisma.servico.findUnique({ where: { id: item.cod_servico }, select: { custo: true } });
-    return s ? new Decimal(s.custo) : new Decimal(0);
-  }
-  if (item.cod_corte) {
-    const c = await prisma.corte.findUnique({ where: { id: item.cod_corte }, select: { custo: true } });
-    return c ? new Decimal(c.custo) : new Decimal(0);
-  }
+  if (item.cod_servico) return new Decimal(0);
+  if (item.cod_corte) return new Decimal(0);
   return new Decimal(0);
 }
 
@@ -144,15 +139,31 @@ async function validarOwnershipItem(itemId: number, pedidoId: number): Promise<b
 
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const { status } = req.query;
+    const { status, dataInicio, dataFim, codCliente, pagina = '1', limite = '10' } = req.query as Record<string, string>;
     const where: any = { cod_empresa: req.user!.cod_empresa!, excluido: false };
-    if (status !== undefined) {
+
+    if (status !== undefined && status !== '') {
       const s = Number(status);
       if (!Number.isInteger(s)) { res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: 'Status inválido.' }); return; }
       where.status = s;
     }
-    const pedidos = await prisma.pedido.findMany({ where, include, orderBy: { data_pedido: 'desc' } });
-    res.json({ success: true, data: pedidos });
+    if (codCliente) where.cod_cliente = Number(codCliente);
+    if (dataInicio || dataFim) {
+      where.data_pedido = {};
+      if (dataInicio) where.data_pedido.gte = new Date(dataInicio + 'T00:00:00');
+      if (dataFim) where.data_pedido.lte = new Date(dataFim + 'T23:59:59.999');
+    }
+
+    const paginaNum = Math.max(1, parseInt(pagina) || 1);
+    const limiteNum = Math.min(100, Math.max(1, parseInt(limite) || 10));
+    const skip = (paginaNum - 1) * limiteNum;
+
+    const [total, pedidos] = await Promise.all([
+      prisma.pedido.count({ where }),
+      prisma.pedido.findMany({ where, include, orderBy: { data_pedido: 'desc' }, skip, take: limiteNum }),
+    ]);
+
+    res.json({ success: true, data: pedidos, total, pagina: paginaNum, totalPaginas: Math.ceil(total / limiteNum) });
   } catch (err) {
     console.error('[PEDIDOS_GET]', err);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Erro ao listar pedidos.' });
@@ -544,6 +555,41 @@ router.delete('/:id/itens/:itemId', async (req: Request, res: Response) => {
   } catch (err) {
     console.error('[PEDIDOS_DELETE_ITEM]', err);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Erro ao remover item.' });
+  }
+});
+
+// ── POST /:id/gerar-link — gera (ou regenera) token de acesso público ──────────
+router.post('/:id/gerar-link', async (req: Request, res: Response) => {
+  try {
+    const pedidoId = Number(req.params['id']);
+    const codEmpresa = req.user!.cod_empresa!;
+
+    const pedido = await prisma.pedido.findFirst({
+      where: { id: pedidoId, cod_empresa: codEmpresa, excluido: false },
+    });
+    if (!pedido) {
+      res.status(StatusCodes.NOT_FOUND).json({ success: false, message: 'Pedido não encontrado.' });
+      return;
+    }
+
+    const empresa = await prisma.empresa.findUnique({ where: { id: codEmpresa } });
+    const diasValidade = empresa?.link_validade_dias ?? 7;
+    const expiracao = new Date();
+    expiracao.setDate(expiracao.getDate() + diasValidade);
+
+    const token = randomUUID();
+
+    await prisma.pedido.update({
+      where: { id: pedidoId },
+      data: { token_acesso: token, token_expiracao: expiracao },
+    });
+
+    const mensagem = empresa?.whatsapp_mensagem_padrao ?? 'Segue o link com o seu orçamento: {link}';
+
+    res.json({ success: true, data: { token, expiracao, mensagem_padrao: mensagem } });
+  } catch (err) {
+    console.error('[PEDIDOS_GERAR_LINK]', err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Erro ao gerar link.' });
   }
 });
 

@@ -5,6 +5,7 @@ import { Title } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputMaskModule } from 'primeng/inputmask';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -27,6 +28,7 @@ import { TApiResponse } from '#shared/types';
     ReactiveFormsModule,
     InputTextModule,
     InputMaskModule,
+    InputNumberModule,
     ButtonModule,
     TooltipModule,
     CheckboxModule,
@@ -70,6 +72,8 @@ export class MinhaEmpresaComponent implements OnInit {
       cidade_nome:     [{ value: '', disabled: true }],
       marca_dagua:     ['', [Validators.maxLength(250)]],
       validar_estoque: [false],
+      whatsapp_mensagem_padrao: [''],
+      link_validade_dias: [7, [Validators.min(1), Validators.max(365)]],
     });
 
     this.carregar();
@@ -109,6 +113,14 @@ export class MinhaEmpresaComponent implements OnInit {
         },
       });
     }
+  }
+
+  inserirTagLink(el: HTMLTextAreaElement): void {
+    const ctrl = this.form.get('whatsapp_mensagem_padrao')!;
+    const val = ctrl.value ?? '';
+    const pos = el.selectionStart ?? val.length;
+    ctrl.setValue(val.slice(0, pos) + '{link}' + val.slice(pos));
+    setTimeout(() => { el.selectionStart = el.selectionEnd = pos + 6; el.focus(); });
   }
 
   onSave(): void {

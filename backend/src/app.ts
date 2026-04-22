@@ -24,6 +24,7 @@ import comprasRoutes from './modules/compras/compras.routes';
 import relatoriosRoutes from './modules/relatorios/relatorios.routes';
 import pagamentosRoutes from './modules/pagamentos/pagamentos.routes';
 import minhaEmpresaRoutes from './modules/minha-empresa/minha-empresa.routes';
+import pedidosPublicoRoutes from './modules/pedidos-publico/pedidos-publico.routes';
 import perfilRoutes from './modules/perfil/perfil.routes';
 import { empresaValidadeMiddleware } from './middlewares/empresa-validade.middleware';
 import { errorMiddleware } from './middlewares/error.middleware';
@@ -82,6 +83,7 @@ app.use('/api/', globalLimiter);
 // ── Rotas públicas ────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/pagamentos', pagamentosRoutes); // webhook é público; autenticação por rota
+app.use('/api/pedidos-publico', pedidosPublicoRoutes);
 
 // ── Verificação de validade de licença (todas as rotas protegidas) ────────────
 app.use('/api', empresaValidadeMiddleware);

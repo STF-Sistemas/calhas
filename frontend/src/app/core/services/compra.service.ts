@@ -10,8 +10,15 @@ export class CompraService {
 
   constructor(private http: HttpClient) {}
 
-  listar() {
-    return this.http.get<TApiResponse<ICompra[]>>(this.apiUrl);
+  listar(params?: { codFornecedor?: number; dataInicio?: string; dataFim?: string; pagina?: number; limite?: number }) {
+    const query = new URLSearchParams();
+    if (params?.codFornecedor != null) query.set('codFornecedor', String(params.codFornecedor));
+    if (params?.dataInicio) query.set('dataInicio', params.dataInicio);
+    if (params?.dataFim) query.set('dataFim', params.dataFim);
+    if (params?.pagina != null) query.set('pagina', String(params.pagina));
+    if (params?.limite != null) query.set('limite', String(params.limite));
+    const qs = query.toString();
+    return this.http.get<TApiResponse<ICompra[]> & { total: number; pagina: number; totalPaginas: number }>(`${this.apiUrl}${qs ? '?' + qs : ''}`);
   }
 
   buscarPorId(id: number) {

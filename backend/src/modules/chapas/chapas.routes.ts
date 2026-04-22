@@ -13,9 +13,8 @@ const chapaSchema = z.object({
 
 const corteSchema = z.object({
   descricao: z.string().min(1).max(200),
-  corte: z.number().min(0),
-  valor: z.number().min(0),
-  custo: z.preprocess(v => v ?? 0, z.number().min(0)),
+  corte: z.preprocess(v => Number(v) || 0, z.number().min(0)),
+  valor: z.preprocess(v => Number(v) || 0, z.number().min(0)),
 });
 
 router.get('/', async (req: Request, res: Response) => {
@@ -165,9 +164,7 @@ router.put('/:id/cortes/:corteId', async (req: Request, res: Response) => {
       res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: parse.error.issues[0].message }); return;
     }
 
-    // custo não deve ser alterado em updates
-    const { custo, ...dadosSemCusto } = parse.data;
-    const corte = await prisma.corte.update({ where: { id: Number(req.params['corteId']) }, data: dadosSemCusto });
+    const corte = await prisma.corte.update({ where: { id: Number(req.params['corteId']) }, data: parse.data });
     res.json({ success: true, data: corte });
   } catch (err) {
     console.error('[CORTES_PUT]', err);

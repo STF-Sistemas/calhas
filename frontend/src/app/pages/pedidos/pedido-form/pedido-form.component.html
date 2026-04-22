@@ -7,7 +7,7 @@
   position="top"
   (save)="onSave()">
 
-  <form [formGroup]="form" class="grid p-fluid">
+  <form [formGroup]="form" class="grid p-fluid" appEnterNext>
 
     <!-- ===================== LADO ESQUERDO ======================== -->
     <div class="col-12 xl:col-9">
@@ -144,10 +144,48 @@
                       optionValue="id"
                       placeholder="2. Selecione o Desenho"
                       appendTo="body">
+                      <ng-template pTemplate="selectedItem" let-opt>
+                        @if (opt) {
+                          <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <svg width="56" height="26" style="display:block; border-radius:3px; flex-shrink:0;">
+                              <rect width="56" height="26" rx="3"
+                                [attr.fill]="themeService.isDarkMode() ? '#141414' : '#f0f0f0'"/>
+                              @if (opt.pontos?.length >= 2) {
+                                <polyline [attr.points]="getDesenhoPoints(opt.pontos, 56, 26)"
+                                  fill="none" stroke="#ef4444" stroke-width="1.5"
+                                  stroke-linejoin="round" stroke-linecap="round"/>
+                                @for (d of opt.diagonais ?? []; track $index) {
+                                  <polyline [attr.points]="getDesenhoDiagonalPoints(d, opt.pontos, 56, 26)"
+                                    fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/>
+                                }
+                              }
+                            </svg>
+                            <span>{{ opt.descricao }}</span>
+                          </div>
+                        }
+                      </ng-template>
+                      <ng-template pTemplate="item" let-opt>
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                          <svg width="56" height="26" style="display:block; border-radius:3px; flex-shrink:0;">
+                            <rect width="56" height="26" rx="3"
+                              [attr.fill]="themeService.isDarkMode() ? '#141414' : '#f0f0f0'"/>
+                            @if (opt.pontos?.length >= 2) {
+                              <polyline [attr.points]="getDesenhoPoints(opt.pontos, 56, 26)"
+                                fill="none" stroke="#ef4444" stroke-width="1.5"
+                                stroke-linejoin="round" stroke-linecap="round"/>
+                              @for (d of opt.diagonais ?? []; track $index) {
+                                <polyline [attr.points]="getDesenhoDiagonalPoints(d, opt.pontos, 56, 26)"
+                                  fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/>
+                              }
+                            }
+                          </svg>
+                          <span>{{ opt.descricao }}</span>
+                        </div>
+                      </ng-template>
                     </p-select>
                   }
 
-                  <!-- 3. Medidas (após desenho) -->
+                  <!-- 3. Medidas + Corte (após desenho) -->
                   @if (control.get('cod_desenho')?.value) {
                     <p-button
                       [label]="getMedidasLabel(control)"
@@ -158,25 +196,13 @@
                       (onClick)="abrirMedidas(i)"
                       styleClass="w-full">
                     </p-button>
-                  }
 
-                  <!-- 4. Resultado: corte detectado OU seleção manual -->
-                  @if (control.get('cod_corte')?.value && control.get('medidas')?.value?.length > 0) {
-                    <small style="color:#22c55e; display:flex; align-items:center; gap:0.3rem;">
-                      <i class="pi pi-check-circle"></i>
-                      {{ getNomeCorteDetectado(control) }}
-                    </small>
-                  } @else if (control.get('medidas')?.value?.length > 0) {
-                    <small class="p-error" style="display:flex; align-items:center; gap:0.3rem; margin-bottom:0.1rem;">
-                      <i class="pi pi-exclamation-triangle"></i>
-                      Nenhum corte compatível — selecione manualmente:
-                    </small>
                     <p-select
                       formControlName="cod_corte"
                       [options]="getCortesDeChapa(control.get('cod_chapa')?.value)"
                       optionLabel="descricao"
                       optionValue="id"
-                      placeholder="Selecione o corte"
+                      placeholder="4. Selecione o Corte"
                       appendTo="body"
                       (onChange)="onCorteManualChange(i, $event)">
                     </p-select>

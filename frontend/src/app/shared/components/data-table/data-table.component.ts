@@ -56,6 +56,7 @@ export class DataTableComponent {
   @Input() extraButtonTooltip = '';
   @Input() extraButtonSeverity: 'success' | 'info' | 'warn' | 'danger' | 'secondary' = 'info';
   @Input() rowActions: IRowAction[] = [];
+  @Input() paginator = true;
 
   @Output() add = new EventEmitter<void>();
   @Output() edit = new EventEmitter<any>();
@@ -98,5 +99,22 @@ export class DataTableComponent {
     return pontos.map(p =>
       `${pad + ((p.x - minX) / rangeX) * w},${pad + ((p.y - minY) / rangeY) * h}`
     ).join(' ');
+  }
+
+  getDrawingDiagonalPoints(
+    diagonal: { p1: { x: number; y: number }; p2: { x: number; y: number } },
+    pontos: { x: number; y: number }[]
+  ): string {
+    if (!pontos || pontos.length < 2) return '';
+    const xs = pontos.map(p => p.x);
+    const ys = pontos.map(p => p.y);
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const rangeX = maxX - minX || 1;
+    const rangeY = maxY - minY || 1;
+    const pad = 4, w = 88, h = 36;
+    const n = (p: { x: number; y: number }) =>
+      `${pad + ((p.x - minX) / rangeX) * w},${pad + ((p.y - minY) / rangeY) * h}`;
+    return `${n(diagonal.p1)} ${n(diagonal.p2)}`;
   }
 }

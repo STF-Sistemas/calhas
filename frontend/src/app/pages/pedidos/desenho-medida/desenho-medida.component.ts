@@ -5,12 +5,13 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
-import { IDesenho, IPonto } from '#shared/interfaces';
+import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
+import { IDiagonal, IDesenho, IPonto } from '#shared/interfaces';
 
 @Component({
   selector: 'app-desenho-medida',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, DialogModule, InputTextModule, CurrencyMaskDirective],
+  imports: [CommonModule, FormsModule, ButtonModule, DialogModule, InputTextModule, CurrencyMaskDirective, EnterFocusNextDirective],
   templateUrl: './desenho-medida.component.html',
   styleUrls: ['./desenho-medida.component.scss']
 })
@@ -27,19 +28,67 @@ export class DesenhoMedidaComponent implements AfterViewInit {
   readonly CANVAS_W = 800;
   readonly CANVAS_H = 320;
 
-  get segmentos(): number[] {
-    return this.medidas.map((_, i) => i);
+  // ── Getters ───────────────────────────────────────────────────────────────
+
+  get segmentosBase(): number[] {
+    const n = this.desenho ? Math.max(0, this.desenho.pontos.length - 1) : 0;
+    return Array.from({ length: n }, (_, i) => i);
   }
 
-  ngAfterViewInit() {
-    this.initCanvas();
+  get segmentosCobertos(): Set<number> {
+    const set = new Set<number>();
+    (this.desenho?.diagonais ?? []).forEach((_, i) => {
+      const idx = this.segmentoCoberto(i);
+      if (idx >= 0) set.add(idx);
+    });
+    return set;
   }
+
+  /** Cada diagonal gera 2 entradas: p1 e p2. */
+  get segmentosDiagonaisInfo(): { diagIdx: number; p1Idx: number; p2Idx: number; coberto: number }[] {
+    const base = this.segmentosBase.length;
+    return (this.desenho?.diagonais ?? []).map((_, i) => ({
+      diagIdx: i,
+      p1Idx: base + i * 2,
+      p2Idx: base + i * 2 + 1,
+      coberto: this.segmentoCoberto(i),
+    }));
+  }
+
+  /** Retorna o índice do segmento base mais próximo do ponto médio da diagonal. */
+  segmentoCoberto(diagIdx: number): number {
+    const pontos = this.desenho?.pontos ?? [];
+    const d = this.desenho?.diagonais?.[diagIdx];
+    if (!d || pontos.length < 2) return -1;
+    const mid: IPonto = { x: (d.p1.x + d.p2.x) / 2, y: (d.p1.y + d.p2.y) / 2 };
+    let minDist = Infinity, idx = -1;
+    for (let i = 0; i < pontos.length - 1; i++) {
+      const dist = this.distToSegment(mid, pontos[i], pontos[i + 1]);
+      if (dist < minDist) { minDist = dist; idx = i; }
+    }
+    return idx;
+  }
+
+  private distToSegment(p: IPonto, a: IPonto, b: IPonto): number {
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const lenSq = dx * dx + dy * dy;
+    if (lenSq === 0) return Math.hypot(p.x - a.x, p.y - a.y);
+    const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / lenSq));
+    return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
+  }
+
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+
+  ngAfterViewInit() { this.initCanvas(); }
 
   abrir(index: number, desenho: IDesenho, medidasAtuais: number[]) {
     this.itemIndex = index;
     this.desenho = desenho;
-    const segCount = Math.max(0, desenho.pontos.length - 1);
-    this.medidas = Array.from({ length: segCount }, (_, i) => medidasAtuais[i] ?? 0);
+    const baseSeg = Math.max(0, desenho.pontos.length - 1);
+    const diagCount = (desenho.diagonais ?? []).length;
+    // 2 medidas por diagonal (ponta 1 e ponta 2)
+    const total = baseSeg + diagCount * 2;
+    this.medidas = Array.from({ length: total }, (_, i) => medidasAtuais[i] ?? 0);
     this.ctx = undefined;
     this.visible = true;
     setTimeout(() => this.initCanvas(), 0);
@@ -64,73 +113,91 @@ export class DesenhoMedidaComponent implements AfterViewInit {
     this.visible = false;
   }
 
+  // ── Canvas ────────────────────────────────────────────────────────────────
+
   redraw() {
     if (!this.ctx || !this.desenho) return;
     const ctx = this.ctx;
     const pontos = this.desenho.pontos as IPonto[];
+    const diagonais: IDiagonal[] = (this.desenho.diagonais as IDiagonal[]) ?? [];
+    const cobertos = this.segmentosCobertos;
     const W = this.CANVAS_W, H = this.CANVAS_H;
 
-    // Fundo
     ctx.fillStyle = '#141414';
     ctx.fillRect(0, 0, W, H);
 
-    // Grade
     ctx.strokeStyle = '#252525';
     ctx.lineWidth = 1;
-    for (let x = 0; x <= W; x += 40) {
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-    }
-    for (let y = 0; y <= H; y += 40) {
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-    }
+    for (let x = 0; x <= W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+    for (let y = 0; y <= H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
 
     if (pontos.length < 2) return;
 
-    // Desenha cada segmento com cor baseada se tem medida
-    for (let i = 0; i < pontos.length - 1; i++) {
+    const base = pontos.length - 1;
+
+    // Segmentos base
+    for (let i = 0; i < base; i++) {
       const p1 = pontos[i], p2 = pontos[i + 1];
-      const temMedida = this.medidas[i] > 0;
+      const coberto = cobertos.has(i);
+      const temMedida = !coberto && this.medidas[i] > 0;
       const cor = temMedida ? '#22c55e' : '#ef4444';
 
       ctx.strokeStyle = cor;
       ctx.lineWidth = 2.5;
-      ctx.lineJoin = 'round';
-      ctx.lineCap = 'round';
       ctx.setLineDash([]);
-      ctx.beginPath();
-      ctx.moveTo(p1.x, p1.y);
-      ctx.lineTo(p2.x, p2.y);
-      ctx.stroke();
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
 
-      // Badge numerado no meio do segmento
-      const mx = (p1.x + p2.x) / 2;
-      const my = (p1.y + p2.y) / 2;
-
-      ctx.fillStyle = cor;
-      ctx.beginPath();
-      ctx.arc(mx, my, 13, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 11px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(String(i + 1), mx, my);
-
-      // Medida abaixo do badge
-      if (temMedida) {
-        ctx.fillStyle = '#22c55e';
-        ctx.font = '11px sans-serif';
-        ctx.fillText(`${this.medidas[i]} cm`, mx, my + 20);
+      if (!coberto) {
+        const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
+        this.desenharBadge(ctx, mx, my, i + 1, cor);
+        if (temMedida) this.desenharMedidaLabel(ctx, mx, my, this.medidas[i], cor);
       }
+    }
+
+    // Diagonais (por cima)
+    for (let i = 0; i < diagonais.length; i++) {
+      const d = diagonais[i];
+      const p1Idx = base + i * 2;
+      const p2Idx = base + i * 2 + 1;
+      const m1 = this.medidas[p1Idx] ?? 0;
+      const m2 = this.medidas[p2Idx] ?? 0;
+      const temQualquer = m1 > 0 || m2 > 0;
+      const cor = temQualquer ? '#22c55e' : '#ef4444';
+
+      ctx.strokeStyle = cor;
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([]);
+      ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(d.p1.x, d.p1.y); ctx.lineTo(d.p2.x, d.p2.y); ctx.stroke();
+
+      // Badge no meio com número sequencial
+      const mx = (d.p1.x + d.p2.x) / 2, my = (d.p1.y + d.p2.y) / 2;
+      this.desenharBadge(ctx, mx, my, base + i + 1, cor);
+
+      // Labels nas pontas
+      if (m1 > 0) this.desenharMedidaLabel(ctx, d.p1.x, d.p1.y - 18, m1, '#22c55e');
+      if (m2 > 0) this.desenharMedidaLabel(ctx, d.p2.x, d.p2.y - 18, m2, '#22c55e');
     }
 
     // Pontos
     ctx.fillStyle = '#888';
-    pontos.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
-      ctx.fill();
-    });
+    pontos.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI * 2); ctx.fill(); });
+  }
+
+  private desenharBadge(ctx: CanvasRenderingContext2D, x: number, y: number, num: number, cor: string) {
+    ctx.fillStyle = cor;
+    ctx.beginPath(); ctx.arc(x, y, 13, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 11px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(String(num), x, y);
+  }
+
+  private desenharMedidaLabel(ctx: CanvasRenderingContext2D, x: number, y: number, medida: number, cor: string) {
+    ctx.fillStyle = cor;
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(`${medida} cm`, x, y + 20);
   }
 }

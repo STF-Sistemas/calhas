@@ -1,3 +1,11 @@
+.drawing-bg {
+  fill: #f8f8f8;
+}
+
+:host-context(.app-dark) .drawing-bg {
+  fill: #141414;
+}
+
 :host ::ng-deep {
     .p-datatable {
         .p-datatable-header {

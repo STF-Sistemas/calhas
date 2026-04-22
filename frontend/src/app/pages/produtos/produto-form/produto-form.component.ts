@@ -8,6 +8,7 @@ import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapp
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { ProdutoService } from '#core/services/produto.service';
 import { IProduto } from '#shared/interfaces';
+import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 
 @Component({
   selector: 'app-produto-form',
@@ -17,6 +18,7 @@ import { IProduto } from '#shared/interfaces';
     ReactiveFormsModule,
     InputTextModule,
     CurrencyMaskDirective,
+    EnterFocusNextDirective,
     DialogWrapperComponent,
   ],
   templateUrl: './produto-form.component.html',
