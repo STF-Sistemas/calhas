@@ -73,6 +73,8 @@
       [style.cursor]="cursorStyle"
       style="display:block; width:100%; touch-action:none;"
       (click)="onCanvasClick($event)"
+      (touchstart)="onCanvasTouchStart($event)"
+      (touchmove)="onCanvasTouchMove($event)"
       (touchend)="onCanvasTouchEnd($event)"
       (mousemove)="onCanvasMouseMove($event)"
       (mouseleave)="onCanvasMouseLeave()">

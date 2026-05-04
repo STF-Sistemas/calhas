@@ -152,11 +152,11 @@
                                 [attr.fill]="themeService.isDarkMode() ? '#141414' : '#f0f0f0'"/>
                               @if (opt.pontos?.length >= 2) {
                                 <polyline [attr.points]="getDesenhoPoints(opt.pontos, 56, 26)"
-                                  fill="none" stroke="#ef4444" stroke-width="1.5"
+                                  fill="none" [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'" stroke-width="2"
                                   stroke-linejoin="round" stroke-linecap="round"/>
                                 @for (d of opt.diagonais ?? []; track $index) {
                                   <polyline [attr.points]="getDesenhoDiagonalPoints(d, opt.pontos, 56, 26)"
-                                    fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/>
+                                    fill="none" [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'" stroke-width="2" stroke-linecap="round"/>
                                 }
                               }
                             </svg>
@@ -171,11 +171,11 @@
                               [attr.fill]="themeService.isDarkMode() ? '#141414' : '#f0f0f0'"/>
                             @if (opt.pontos?.length >= 2) {
                               <polyline [attr.points]="getDesenhoPoints(opt.pontos, 56, 26)"
-                                fill="none" stroke="#ef4444" stroke-width="1.5"
+                                fill="none" [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'" stroke-width="2"
                                 stroke-linejoin="round" stroke-linecap="round"/>
                               @for (d of opt.diagonais ?? []; track $index) {
                                 <polyline [attr.points]="getDesenhoDiagonalPoints(d, opt.pontos, 56, 26)"
-                                  fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/>
+                                  fill="none" [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'" stroke-width="2" stroke-linecap="round"/>
                               }
                             }
                           </svg>

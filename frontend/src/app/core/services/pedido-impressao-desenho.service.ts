@@ -161,7 +161,7 @@ export class PedidoImpressaoDesenhoService {
       diagLines.push(
         `<line x1="${dp1.sx.toFixed(1)}" y1="${dp1.sy.toFixed(1)}"
                x2="${dp2.sx.toFixed(1)}" y2="${dp2.sy.toFixed(1)}"
-               stroke="#1a1a1a" stroke-width="1.8" stroke-linecap="round"/>`
+               stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round"/>`
       );
 
       const dx = dp2.sx - dp1.sx, dy = dp2.sy - dp1.sy;
@@ -210,13 +210,13 @@ export class PedidoImpressaoDesenhoService {
     }).join('');
 
     const dots = pts.map(p =>
-      `<circle cx="${p.sx.toFixed(1)}" cy="${p.sy.toFixed(1)}" r="2.5" fill="#ef4444"/>`
+      `<circle cx="${p.sx.toFixed(1)}" cy="${p.sy.toFixed(1)}" r="2.5" fill="#1a1a1a"/>`
     ).join('');
 
     return `<svg viewBox="0 0 ${VW} ${VH}" preserveAspectRatio="xMidYMid meet"
       xmlns="http://www.w3.org/2000/svg"
       style="position:absolute;top:0;left:0;width:100%;height:100%;background:#fafafa;border:1px solid #e5e7eb;border-radius:3px;">
-      <polyline points="${polyline}" fill="none" stroke="#1a1a1a" stroke-width="1.8"
+      <polyline points="${polyline}" fill="none" stroke="#1a1a1a" stroke-width="2.2"
         stroke-linejoin="round" stroke-linecap="round"/>
       ${diagLines.join('')}
       ${dots}

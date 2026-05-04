@@ -104,7 +104,8 @@ export class DesenhoFormComponent implements AfterViewInit {
     this.redraw();
   }
 
-  // ── Clique ────────────────────────────────────────────────────────────────
+  // ── Clique / Touch ────────────────────────────────────────────────────────
+
   onCanvasClick(event: MouseEvent) {
     const p = this.toCanvasPoint(event);
 
@@ -116,7 +117,6 @@ export class DesenhoFormComponent implements AfterViewInit {
         return;
       }
 
-      // P2 definido — salva a diagonal, pontos NÃO são modificados
       const diagonal: IDiagonal = {
         p1: this.diagonalP1!,
         p2: { x: p.x, y: p.y },
@@ -143,28 +143,50 @@ export class DesenhoFormComponent implements AfterViewInit {
     this.redraw();
   }
 
+  onCanvasTouchStart(event: TouchEvent) {
+    event.preventDefault();
+    const touch = event.touches[0];
+    if (!touch) return;
+    this.mousePos = this.touchToCanvas(touch);
+    this.redraw();
+  }
+
+  onCanvasTouchMove(event: TouchEvent) {
+    event.preventDefault();
+    const touch = event.touches[0];
+    if (!touch) return;
+    this.mousePos = this.touchToCanvas(touch);
+    this.redraw();
+  }
+
   onCanvasTouchEnd(event: TouchEvent) {
     event.preventDefault();
     const touch = event.changedTouches[0];
     if (!touch) return;
+    const synthetic = { clientX: touch.clientX, clientY: touch.clientY } as MouseEvent;
+    this.onCanvasClick(synthetic);
+    this.mousePos = undefined;
+    this.redraw();
+  }
+
+  private touchToCanvas(touch: Touch): IPonto {
     const canvas = this.canvasRef.nativeElement;
     const rect = canvas.getBoundingClientRect();
-    const synthetic = {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    } as MouseEvent;
-    this.onCanvasClick(synthetic);
+    return {
+      x: Math.round((touch.clientX - rect.left) * (this.CANVAS_W / rect.width)),
+      y: Math.round((touch.clientY - rect.top) * (this.CANVAS_H / rect.height))
+    };
   }
+
+  // ── Edição ────────────────────────────────────────────────────────────────
 
   undo() {
     if (this.modoInserir) {
       if (this.diagonalStep === 1) {
-        // Cancela P1 pendente
         this.diagonalP1 = undefined;
         this.diagonalStep = 0;
         this.redraw();
       } else if (this.diagonais.length > 0) {
-        // Remove última diagonal
         this.diagonais = this.diagonais.slice(0, -1);
         this.redraw();
       }
@@ -185,6 +207,7 @@ export class DesenhoFormComponent implements AfterViewInit {
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
+
   private toCanvasPoint(event: MouseEvent): IPonto {
     const canvas = this.canvasRef.nativeElement;
     const rect = canvas.getBoundingClientRect();
@@ -195,6 +218,7 @@ export class DesenhoFormComponent implements AfterViewInit {
   }
 
   // ── Renderização ──────────────────────────────────────────────────────────
+
   private redraw() {
     if (!this.ctx) return;
     const ctx = this.ctx;
@@ -204,17 +228,18 @@ export class DesenhoFormComponent implements AfterViewInit {
     ctx.fillStyle = dark ? '#141414' : '#f8f8f8';
     ctx.fillRect(0, 0, W, H);
 
-    // Grade
     ctx.strokeStyle = dark ? '#252525' : '#e0e0e0';
     ctx.lineWidth = 1;
     const grid = 40;
     for (let x = 0; x <= W; x += grid) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
     for (let y = 0; y <= H; y += grid) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
 
-    // Perfil base (vermelho)
+    const lineColor = dark ? '#ef4444' : '#1a1a1a';
+    const previewColor = dark ? 'rgba(239,68,68,0.45)' : 'rgba(26,26,26,0.35)';
+
     if (this.pontos.length >= 2) {
-      ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth = 3;
       ctx.lineJoin = 'round';
       ctx.lineCap = 'round';
       ctx.setLineDash([]);
@@ -224,23 +249,21 @@ export class DesenhoFormComponent implements AfterViewInit {
       ctx.stroke();
     }
 
-    // Diagonais já salvas (laranja, por cima)
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 3.5;
     ctx.lineCap = 'round';
     ctx.setLineDash([]);
     for (const d of this.diagonais) {
-      ctx.strokeStyle = '#ef4444';
+      ctx.strokeStyle = lineColor;
       ctx.beginPath();
       ctx.moveTo(d.p1.x, d.p1.y);
       ctx.lineTo(d.p2.x, d.p2.y);
       ctx.stroke();
-      this.desenharDiamante(ctx, d.p1.x, d.p1.y, '#ef4444');
-      this.desenharDiamante(ctx, d.p2.x, d.p2.y, '#ef4444');
+      this.desenharDiamante(ctx, d.p1.x, d.p1.y, lineColor);
+      this.desenharDiamante(ctx, d.p2.x, d.p2.y, lineColor);
     }
 
-    // Prévia da diagonal em andamento
     if (this.modoInserir && this.diagonalP1 && this.mousePos) {
-      ctx.strokeStyle = 'rgba(249,115,22,0.55)';
+      ctx.strokeStyle = dark ? 'rgba(249,115,22,0.55)' : 'rgba(26,26,26,0.4)';
       ctx.lineWidth = 1.5;
       ctx.setLineDash([6, 5]);
       ctx.beginPath();
@@ -248,13 +271,12 @@ export class DesenhoFormComponent implements AfterViewInit {
       ctx.lineTo(this.mousePos.x, this.mousePos.y);
       ctx.stroke();
       ctx.setLineDash([]);
-      this.desenharDiamante(ctx, this.diagonalP1.x, this.diagonalP1.y, '#ef4444');
+      this.desenharDiamante(ctx, this.diagonalP1.x, this.diagonalP1.y, lineColor);
     }
 
-    // Prévia do próximo ponto do perfil (modo normal)
     if (!this.modoInserir && this.pontos.length > 0 && this.mousePos) {
       const last = this.pontos[this.pontos.length - 1];
-      ctx.strokeStyle = 'rgba(239,68,68,0.45)';
+      ctx.strokeStyle = previewColor;
       ctx.lineWidth = 1.5;
       ctx.setLineDash([6, 5]);
       ctx.beginPath();
@@ -266,10 +288,9 @@ export class DesenhoFormComponent implements AfterViewInit {
 
     ctx.setLineDash([]);
 
-    // Pontos do perfil base
     this.pontos.forEach((p, i) => {
       const isLast = !this.modoInserir && i === this.pontos.length - 1;
-      ctx.fillStyle = '#ef4444';
+      ctx.fillStyle = lineColor;
       ctx.beginPath();
       ctx.arc(p.x, p.y, isLast ? 5 : 3, 0, Math.PI * 2);
       ctx.fill();
@@ -286,6 +307,7 @@ export class DesenhoFormComponent implements AfterViewInit {
   }
 
   // ── Salvar ────────────────────────────────────────────────────────────────
+
   onSave() {
     this.form.markAllAsTouched();
     if (this.form.invalid) {

@@ -80,10 +80,10 @@
                               <svg width="96" height="44" style="display:block;border-radius:4px;">
                                 <rect class="drawing-bg" width="96" height="44" rx="4"/>
                                 <polyline [attr.points]="getDrawingPoints(rowData[col.field])"
-                                          fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+                                          fill="none" [attr.stroke]="drawingLineColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
                                 @for (d of rowData['diagonais'] ?? []; track $index) {
                                   <polyline [attr.points]="getDrawingDiagonalPoints(d, rowData[col.field])"
-                                            fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/>
+                                            fill="none" [attr.stroke]="drawingLineColor" stroke-width="2" stroke-linecap="round"/>
                                 }
                               </svg>
                             } @else {

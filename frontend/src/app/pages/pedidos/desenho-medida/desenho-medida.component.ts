@@ -7,6 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { IDiagonal, IDesenho, IPonto } from '#shared/interfaces';
+import { ThemeService } from '#core/services/theme.service';
 
 @Component({
   selector: 'app-desenho-medida',
@@ -25,6 +26,8 @@ export class DesenhoMedidaComponent implements AfterViewInit {
   itemIndex = 0;
 
   private ctx?: CanvasRenderingContext2D;
+
+  constructor(private themeService: ThemeService) {}
   readonly CANVAS_W = 800;
   readonly CANVAS_H = 320;
 
@@ -123,10 +126,13 @@ export class DesenhoMedidaComponent implements AfterViewInit {
     const cobertos = this.segmentosCobertos;
     const W = this.CANVAS_W, H = this.CANVAS_H;
 
-    ctx.fillStyle = '#141414';
+    const dark = this.themeService.isDarkMode();
+    const baseColor = dark ? '#ef4444' : '#1a1a1a';
+
+    ctx.fillStyle = dark ? '#141414' : '#f8f8f8';
     ctx.fillRect(0, 0, W, H);
 
-    ctx.strokeStyle = '#252525';
+    ctx.strokeStyle = dark ? '#252525' : '#e0e0e0';
     ctx.lineWidth = 1;
     for (let x = 0; x <= W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
     for (let y = 0; y <= H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
@@ -140,10 +146,10 @@ export class DesenhoMedidaComponent implements AfterViewInit {
       const p1 = pontos[i], p2 = pontos[i + 1];
       const coberto = cobertos.has(i);
       const temMedida = !coberto && this.medidas[i] > 0;
-      const cor = temMedida ? '#22c55e' : '#ef4444';
+      const cor = temMedida ? '#22c55e' : baseColor;
 
       ctx.strokeStyle = cor;
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 3.5;
       ctx.setLineDash([]);
       ctx.lineJoin = 'round'; ctx.lineCap = 'round';
       ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
@@ -163,10 +169,10 @@ export class DesenhoMedidaComponent implements AfterViewInit {
       const m1 = this.medidas[p1Idx] ?? 0;
       const m2 = this.medidas[p2Idx] ?? 0;
       const temQualquer = m1 > 0 || m2 > 0;
-      const cor = temQualquer ? '#22c55e' : '#ef4444';
+      const cor = temQualquer ? '#22c55e' : baseColor;
 
       ctx.strokeStyle = cor;
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 3.5;
       ctx.setLineDash([]);
       ctx.lineCap = 'round';
       ctx.beginPath(); ctx.moveTo(d.p1.x, d.p1.y); ctx.lineTo(d.p2.x, d.p2.y); ctx.stroke();
@@ -181,7 +187,7 @@ export class DesenhoMedidaComponent implements AfterViewInit {
     }
 
     // Pontos
-    ctx.fillStyle = '#888';
+    ctx.fillStyle = dark ? '#888' : '#555';
     pontos.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI * 2); ctx.fill(); });
   }
 

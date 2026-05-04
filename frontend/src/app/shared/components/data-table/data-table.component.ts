@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { ThemeService } from '#core/services/theme.service';
 
 export interface IRowAction {
   key: string;
@@ -37,6 +38,12 @@ import { NgxMaskPipe, provideNgxMask } from 'ngx-mask';
   styleUrls: ['./data-table.component.scss']
 })
 export class DataTableComponent {
+  constructor(public themeService: ThemeService) {}
+
+  get drawingLineColor(): string {
+    return this.themeService.isDarkMode() ? '#ef4444' : '#1a1a1a';
+  }
+
   @Input() data: any[] = [];
   @Input() columns: any[] = [];
   @Input() loading = false;
