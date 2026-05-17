@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Output, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild, ElementRef, AfterViewInit, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
+import { DialogModule } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
 import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { DesenhoService } from '#core/services/desenho.service';
@@ -13,12 +14,13 @@ import { IDiagonal, IPonto } from '#shared/interfaces';
 @Component({
   selector: 'app-desenho-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, InputTextModule, ButtonModule, TooltipModule, DialogWrapperComponent],
+  imports: [CommonModule, ReactiveFormsModule, InputTextModule, ButtonModule, TooltipModule, DialogModule, DialogWrapperComponent],
   templateUrl: './desenho-form.component.html',
   styleUrls: ['./desenho-form.component.scss']
 })
-export class DesenhoFormComponent implements AfterViewInit {
+export class DesenhoFormComponent implements OnInit, AfterViewInit {
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvasMobile') canvasMobileRef?: ElementRef<HTMLCanvasElement>;
   @Output() saved = new EventEmitter<void>();
 
   form: FormGroup;
@@ -36,7 +38,13 @@ export class DesenhoFormComponent implements AfterViewInit {
   private diagonalP1?: IPonto;
 
   private ctx?: CanvasRenderingContext2D;
+  private mobileCtx?: CanvasRenderingContext2D;
   private mousePos?: IPonto;
+
+  isMobile = false;
+  canvasMobileAberto = false;
+  private pontosSnapshot: IPonto[] = [];
+  private diagonaisSnapshot: IDiagonal[] = [];
 
   readonly CANVAS_W = 800;
   readonly CANVAS_H = 320;
@@ -52,6 +60,23 @@ export class DesenhoFormComponent implements AfterViewInit {
     });
   }
 
+  ngOnInit() {
+    this.isMobile = window.innerWidth < 768;
+  }
+
+  @HostListener('window:resize')
+  onWindowResize() {
+    this.isMobile = window.innerWidth < 768;
+  }
+
+  @HostListener('window:orientationchange')
+  onOrientationChange() {
+    if (this.canvasMobileAberto) {
+      // Aguarda a animação de rotação do OS antes de redesenhar
+      setTimeout(() => { this.redraw(); }, 350);
+    }
+  }
+
   ngAfterViewInit() { this.initCanvas(); }
   onDialogShow() { this.initCanvas(); }
 
@@ -61,6 +86,15 @@ export class DesenhoFormComponent implements AfterViewInit {
     canvas.width = this.CANVAS_W;
     canvas.height = this.CANVAS_H;
     this.ctx = canvas.getContext('2d') ?? undefined;
+    this.redraw();
+  }
+
+  private initCanvasMobile() {
+    const canvas = this.canvasMobileRef?.nativeElement;
+    if (!canvas) return;
+    canvas.width = this.CANVAS_W;
+    canvas.height = this.CANVAS_H;
+    this.mobileCtx = canvas.getContext('2d') ?? undefined;
     this.redraw();
   }
 
@@ -92,6 +126,56 @@ export class DesenhoFormComponent implements AfterViewInit {
         }
       });
     }
+  }
+
+  // ── Canvas mobile ─────────────────────────────────────────────────────────
+
+  async abrirCanvasMobile() {
+    this.pontosSnapshot = [...this.pontos];
+    this.diagonaisSnapshot = [...this.diagonais];
+    this.canvasMobileAberto = true;
+
+    try {
+      await (screen as any).orientation?.lock?.('landscape');
+    } catch { /* não suportado; prossegue normalmente */ }
+  }
+
+  onMobileDialogShow() {
+    this.initCanvasMobile();
+  }
+
+  salvarCanvasMobile() {
+    this.modoInserir = false;
+    this.diagonalStep = 0;
+    this.diagonalP1 = undefined;
+    this.mousePos = undefined;
+    this.canvasMobileAberto = false;
+    this.mobileCtx = undefined;
+    this.tryUnlockOrientation();
+  }
+
+  fecharCanvasMobile() {
+    this.pontos = [...this.pontosSnapshot];
+    this.diagonais = [...this.diagonaisSnapshot];
+    this.modoInserir = false;
+    this.diagonalStep = 0;
+    this.diagonalP1 = undefined;
+    this.mousePos = undefined;
+    this.canvasMobileAberto = false;
+    this.mobileCtx = undefined;
+    this.tryUnlockOrientation();
+  }
+
+  private tryUnlockOrientation() {
+    try { screen.orientation?.unlock(); } catch { }
+  }
+
+  // ── Helpers de canvas ativo ───────────────────────────────────────────────
+
+  private get activeCanvas(): HTMLCanvasElement {
+    return (this.canvasMobileAberto && this.canvasMobileRef?.nativeElement)
+      ? this.canvasMobileRef.nativeElement
+      : this.canvasRef.nativeElement;
   }
 
   get cursorStyle(): string { return 'crosshair'; }
@@ -144,7 +228,6 @@ export class DesenhoFormComponent implements AfterViewInit {
   }
 
   onCanvasTouchStart(event: TouchEvent) {
-    event.preventDefault();
     const touch = event.touches[0];
     if (!touch) return;
     this.mousePos = this.touchToCanvas(touch);
@@ -152,7 +235,6 @@ export class DesenhoFormComponent implements AfterViewInit {
   }
 
   onCanvasTouchMove(event: TouchEvent) {
-    event.preventDefault();
     const touch = event.touches[0];
     if (!touch) return;
     this.mousePos = this.touchToCanvas(touch);
@@ -160,7 +242,6 @@ export class DesenhoFormComponent implements AfterViewInit {
   }
 
   onCanvasTouchEnd(event: TouchEvent) {
-    event.preventDefault();
     const touch = event.changedTouches[0];
     if (!touch) return;
     const synthetic = { clientX: touch.clientX, clientY: touch.clientY } as MouseEvent;
@@ -170,12 +251,9 @@ export class DesenhoFormComponent implements AfterViewInit {
   }
 
   private touchToCanvas(touch: Touch): IPonto {
-    const canvas = this.canvasRef.nativeElement;
+    const canvas = this.activeCanvas;
     const rect = canvas.getBoundingClientRect();
-    return {
-      x: Math.round((touch.clientX - rect.left) * (this.CANVAS_W / rect.width)),
-      y: Math.round((touch.clientY - rect.top) * (this.CANVAS_H / rect.height))
-    };
+    return this.mapToCanvas(touch.clientX, touch.clientY, rect);
   }
 
   // ── Edição ────────────────────────────────────────────────────────────────
@@ -209,19 +287,40 @@ export class DesenhoFormComponent implements AfterViewInit {
   // ── Helpers ───────────────────────────────────────────────────────────────
 
   private toCanvasPoint(event: MouseEvent): IPonto {
-    const canvas = this.canvasRef.nativeElement;
+    const canvas = this.activeCanvas;
     const rect = canvas.getBoundingClientRect();
+    return this.mapToCanvas(event.clientX, event.clientY, rect);
+  }
+
+  /**
+   * Mapeia coordenadas de viewport para coordenadas internas do canvas.
+   * Quando o canvas está rotacionado -90° via CSS (fallback portrait),
+   * o bounding rect está em espaço portrait mas os pontos precisam ser
+   * mapeados para o espaço landscape do canvas.
+   *
+   * Rotação -90° CCW: elemento (ex, ey) → viewport (ey, 812 - ex)
+   * Inverso:          viewport (vx, vy) → elemento (rect.bottom - vy, vx - rect.left)
+   */
+  private mapToCanvas(clientX: number, clientY: number, rect: DOMRect): IPonto {
+    const rotated = this.canvasMobileAberto && window.innerHeight > window.innerWidth;
+    if (rotated) {
+      // Rect está em portrait: width = canvas_css_height, height = canvas_css_width
+      return {
+        x: Math.round((rect.bottom - clientY) / rect.height * this.CANVAS_W),
+        y: Math.round((clientX - rect.left) / rect.width * this.CANVAS_H)
+      };
+    }
     return {
-      x: Math.round((event.clientX - rect.left) * (this.CANVAS_W / rect.width)),
-      y: Math.round((event.clientY - rect.top) * (this.CANVAS_H / rect.height))
+      x: Math.round((clientX - rect.left) * (this.CANVAS_W / rect.width)),
+      y: Math.round((clientY - rect.top) * (this.CANVAS_H / rect.height))
     };
   }
 
   // ── Renderização ──────────────────────────────────────────────────────────
 
   private redraw() {
-    if (!this.ctx) return;
-    const ctx = this.ctx;
+    const ctx = this.canvasMobileAberto && this.mobileCtx ? this.mobileCtx : this.ctx;
+    if (!ctx) return;
     const W = this.CANVAS_W, H = this.CANVAS_H;
     const dark = this.themeService.isDarkMode();
 
