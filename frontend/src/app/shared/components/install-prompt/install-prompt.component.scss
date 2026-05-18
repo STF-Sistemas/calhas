@@ -1,0 +1,114 @@
+.install-prompt {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99998;
+
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  width: calc(100vw - 2rem);
+  max-width: 420px;
+
+  background: var(--surface-0);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 0.875rem 1rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+  /* Só aparece em mobile — em desktop fica escondido mesmo que visible=true */
+  @media (min-width: 768px) {
+    display: none;
+  }
+
+  &__icon {
+    flex-shrink: 0;
+
+    img {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: block;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  &__title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__sub {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  &__btn {
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background 0.15s, opacity 0.15s;
+
+    &--install {
+      background: var(--p-primary, #f97316);
+      color: #fff;
+      font-size: 0.85rem;
+      padding: 0.45rem 0.9rem;
+
+      &:hover {
+        opacity: 0.88;
+      }
+    }
+
+    &--dismiss {
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 1rem;
+      padding: 0.3rem 0.4rem;
+      line-height: 1;
+
+      &:hover {
+        background: var(--surface-100);
+        color: var(--text-color);
+      }
+    }
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}

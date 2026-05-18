@@ -11,7 +11,15 @@
       "Bash(xargs grep:*)",
       "Bash(grep -n \"ICreateCompraDto\" D:/Pingo/calhas/shared/interfaces/index.ts D:/Pingo/calhas/shared/interfaces/*.ts)",
       "Bash(grep -n \"status\\\\|estoque_baixado\\\\|EStatus\" D:/Pingo/calhas/shared/enums/EStatusCompra.ts D:/Pingo/calhas/shared/enums/*.ts)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(Get-ChildItem \"D:\\\\Pingo\\\\calhas\\\\frontend\\\\src\\\\assets\" -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object Name)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); build=d['projects']['frontend']['architect']['build']; print\\(json.dumps\\({'builder':build['builder'],'options_keys':list\\(build['options'].keys\\(\\)\\),'configurations':list\\(build.get\\('configurations',{}\\).keys\\(\\)\\)}, indent=2\\)\\)\")",
+      "Bash(Select-String -Pattern \"ngsw|manifest|icon\")",
+      "PowerShell(Get-ChildItem \"D:\\\\Pingo\\\\calhas\\\\frontend\\\\dist\\\\frontend\\\\browser\" | Where-Object { $_.Name -match \"ngsw|manifest|icon\" } | Select-Object Name)",
+      "PowerShell(Get-ChildItem \"D:\\\\Pingo\\\\calhas\\\\frontend\\\\dist\\\\frontend\" -Recurse | Where-Object { $_.Name -match \"ngsw|manifest|icon\" } | Select-Object FullName)",
+      "PowerShell(head *)",
+      "PowerShell(Get-ChildItem \"D:\\\\Pingo\\\\calhas\\\\frontend\\\\dist\\\\frontend\\\\browser\" | Where-Object { $_.Name -match \"ngsw|manifest|icon\" } | Format-Table Name)"
     ]
   }
 }

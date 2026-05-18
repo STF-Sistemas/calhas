@@ -1,0 +1,20 @@
+@if (visible) {
+  <div class="install-prompt" role="dialog" aria-label="Instalar Calhas Pro">
+    <div class="install-prompt__icon">
+      <img src="icons/icon-96x96.png" alt="Calhas Pro" width="48" height="48" />
+    </div>
+    <div class="install-prompt__body">
+      <span class="install-prompt__title">Instalar Calhas Pro</span>
+      <span class="install-prompt__sub">Adicione à tela inicial para acesso rápido</span>
+    </div>
+    <div class="install-prompt__actions">
+      <button class="install-prompt__btn install-prompt__btn--install" (click)="instalar()">
+        Instalar
+      </button>
+      <button class="install-prompt__btn install-prompt__btn--dismiss" (click)="dispensar()"
+              aria-label="Fechar">
+        ✕
+      </button>
+    </div>
+  </div>
+}
