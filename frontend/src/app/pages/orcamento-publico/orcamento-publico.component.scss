@@ -1,5 +1,17 @@
 * { box-sizing: border-box; }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .orcamento-publico {
   min-height: 100vh;
   background: #f0f4f8;
@@ -33,12 +45,45 @@
 // ---- Card principal ----
 
 .orcamento-card {
+  position: relative;
   width: 100%;
   max-width: 800px;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,.10);
   overflow: hidden;
+}
+
+// ---- Marca d'água ----
+
+.watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: space-around;
+  justify-content: space-around;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+
+  span {
+    display: inline-block;
+    transform: rotate(-30deg);
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: rgba(0, 0, 0, 0.09);
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin: 1.5rem 3rem;
+  }
+}
+
+.orcamento-card > *:not(.watermark) {
+  position: relative;
+  z-index: 1;
 }
 
 // ---- Cabeçalho da empresa ----
@@ -70,6 +115,29 @@
     font-size: .82rem;
     color: rgba(255,255,255,.70);
   }
+}
+
+.empresa-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.empresa-logo {
+  max-width: 140px;
+  max-height: 56px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 6px;
+  padding: .3rem .5rem;
+  flex-shrink: 0;
+}
+
+.empresa-textos {
+  min-width: 0;
 }
 
 .pedido-id {
@@ -169,6 +237,27 @@
   background: #f8fafc;
 }
 
+.subtotal-row td {
+  border-bottom: none !important;
+  padding-top: .3rem;
+  padding-bottom: .3rem;
+}
+
+.subtotal-label {
+  font-size: .82rem;
+  font-weight: 500;
+  color: #64748b;
+  text-align: right;
+}
+
+.subtotal-valor {
+  font-size: .9rem;
+  font-weight: 700;
+  color: #475569;
+  text-align: right;
+  white-space: nowrap;
+}
+
 .text-right { text-align: right; }
 
 .total-label {
@@ -206,6 +295,87 @@
   }
 }
 
+// ---- Seção de ações (autorizar / recusar) ----
+
+.orcamento-acoes {
+  padding: 0 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+}
+
+.acao-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.acao-erro {
+  margin: 0;
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
+  background: #fef2f2;
+  border-left: 3px solid #dc2626;
+  color: #991b1b;
+  font-size: 0.85rem;
+}
+
+.assinatura-area,
+.motivo-recusa-area {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+
+  textarea {
+    width: 100%;
+    resize: vertical;
+    font-family: inherit;
+  }
+}
+
+.resultado-decisao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+
+  i { font-size: 2rem; }
+
+  p { margin: 0; font-size: 0.95rem; }
+
+  .resultado-motivo { font-size: 0.85rem; color: inherit; opacity: 0.9; }
+
+  &--sucesso {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+
+    i { color: #16a34a; }
+  }
+
+  &--recusado {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+
+    i { color: #64748b; }
+  }
+}
+
 // ---- Rodapé ----
 
 .orcamento-footer {
@@ -235,4 +405,6 @@
   .orcamento-itens { padding: 1rem; }
   .orcamento-obs { padding: 0 1rem 1rem; }
   .orcamento-footer { padding: .75rem 1rem; }
+  .empresa-logo { max-width: 110px; max-height: 44px; }
+  .watermark span { font-size: 1.4rem; margin: 1rem 1.5rem; }
 }

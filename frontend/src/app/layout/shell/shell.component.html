@@ -35,35 +35,68 @@
       </button>
       <p-menu #colorMenu [model]="colorMenuItems" [popup]="true"></p-menu>
 
-      <button class="p-link layout-topbar-button notif-btn" (click)="notifPanel.toggle($event)"
+      <button class="p-link layout-topbar-button notif-btn" (click)="notifPanel.toggle($event); abrirNotificacoes()"
         pTooltip="Notificações" aria-label="Notificações">
         <i class="pi pi-bell"></i>
-        @if (notificacaoLicenca()) {
-          <span class="notif-badge" [class.notif-badge--urgente]="notificacaoLicenca()!.urgente"></span>
+        @if (temNotificacaoPendente()) {
+          <span class="notif-badge" [class.notif-badge--urgente]="notificacaoLicenca()?.urgente"></span>
         }
       </button>
       <p-popover #notifPanel styleClass="notif-popover">
         <div class="notif-panel">
-          @if (notificacaoLicenca(); as notif) {
-            <div class="notif-item" [class.notif-item--urgente]="notif.urgente">
-              <div class="notif-item-header">
-                <i class="pi" [class]="notif.urgente ? 'pi-exclamation-circle' : 'pi-clock'"></i>
-                <span class="notif-item-title">Licença</span>
-              </div>
-              <p class="notif-item-texto">{{ notif.texto }}</p>
-              @if (!authService.isSuperAdmin()) {
-                <button pButton class="p-button-sm p-button-danger w-full mt-2"
-                  label="Efetuar pagamento" icon="pi pi-credit-card"
-                  (click)="irParaPagamento(); notifPanel.hide()">
-                </button>
-              }
-            </div>
-          } @else {
-            <div class="notif-vazia">
-              <i class="pi pi-check-circle"></i>
-              <span>Nenhuma notificação</span>
-            </div>
+
+          @if (notificacaoService.naoLidasCount() > 0) {
+            <button pButton class="p-button-sm p-button-text w-full mb-2"
+              label="Marcar todas como lidas" icon="pi pi-check"
+              (click)="marcarTodasNotificacoesComoLidas()">
+            </button>
           }
+
+          <div class="notif-lista">
+            @if (notificacaoLicenca(); as notif) {
+              <div class="notif-item" [class.notif-item--urgente]="notif.urgente">
+                <div class="notif-item-header">
+                  <i class="pi" [class]="notif.urgente ? 'pi-exclamation-circle' : 'pi-clock'"></i>
+                  <span class="notif-item-title">Licença</span>
+                </div>
+                <p class="notif-item-texto">{{ notif.texto }}</p>
+                @if (!authService.isSuperAdmin()) {
+                  <button pButton class="p-button-sm p-button-danger w-full mt-2"
+                    label="Efetuar pagamento" icon="pi pi-credit-card"
+                    (click)="irParaPagamento(); notifPanel.hide()">
+                  </button>
+                }
+              </div>
+            }
+
+            @if (carregandoNotificacoes()) {
+              <div class="notif-vazia">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Carregando...</span>
+              </div>
+            } @else {
+              @for (notificacao of notificacoes(); track notificacao.id) {
+                <div class="notif-item" [class.notif-item--nao-lida]="!notificacao.lida"
+                  role="button" tabindex="0"
+                  (click)="marcarNotificacaoComoLida(notificacao)"
+                  [attr.aria-label]="'Notificação: ' + notificacao.titulo"
+                  (keydown.enter)="marcarNotificacaoComoLida(notificacao)">
+                  <div class="notif-item-header">
+                    <i class="pi" [class]="notificacao.tipo === 'pedido_recusado' ? 'pi-times-circle' : 'pi-check-circle'"></i>
+                    <span class="notif-item-title">{{ notificacao.titulo }}</span>
+                  </div>
+                  <p class="notif-item-texto">{{ notificacao.mensagem }}</p>
+                </div>
+              }
+              @if (!notificacaoLicenca() && notificacoes().length === 0) {
+                <div class="notif-vazia">
+                  <i class="pi pi-check-circle"></i>
+                  <span>Nenhuma notificação</span>
+                </div>
+              }
+            }
+          </div>
+
         </div>
       </p-popover>
       <button class="p-link layout-topbar-button" (click)="profileMenu.toggle($event)"

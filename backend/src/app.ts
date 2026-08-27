@@ -25,7 +25,10 @@ import relatoriosRoutes from './modules/relatorios/relatorios.routes';
 import pagamentosRoutes from './modules/pagamentos/pagamentos.routes';
 import minhaEmpresaRoutes from './modules/minha-empresa/minha-empresa.routes';
 import pedidosPublicoRoutes from './modules/pedidos-publico/pedidos-publico.routes';
+import ordemCortePublicoRoutes from './modules/ordem-corte-publico/ordem-corte-publico.routes';
 import perfilRoutes from './modules/perfil/perfil.routes';
+import notificacoesRoutes from './modules/notificacoes/notificacoes.routes';
+import pushSubscriptionRoutes from './modules/push-subscription/push-subscription.routes';
 import { empresaValidadeMiddleware } from './middlewares/empresa-validade.middleware';
 import { errorMiddleware } from './middlewares/error.middleware';
 
@@ -84,6 +87,7 @@ app.use('/api/', globalLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/pagamentos', pagamentosRoutes); // webhook é público; autenticação por rota
 app.use('/api/pedidos-publico', pedidosPublicoRoutes);
+app.use('/api/ordem-corte-publico', ordemCortePublicoRoutes);
 
 // ── Verificação de validade de licença (todas as rotas protegidas) ────────────
 app.use('/api', empresaValidadeMiddleware);
@@ -106,6 +110,8 @@ app.use('/api/compras', comprasRoutes);
 app.use('/api/relatorios', relatoriosRoutes);
 app.use('/api/minha-empresa', minhaEmpresaRoutes);
 app.use('/api/perfil', perfilRoutes);
+app.use('/api/notificacoes', notificacoesRoutes);
+app.use('/api/push-subscription', pushSubscriptionRoutes);
 
 // ── Healthcheck ───────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => {

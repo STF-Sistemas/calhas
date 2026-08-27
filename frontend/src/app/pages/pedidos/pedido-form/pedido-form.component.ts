@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -19,10 +21,11 @@ import { ServicoService } from '#core/services/servico.service';
 import { DesenhoService } from '#core/services/desenho.service';
 import { MeioPagamentoService } from '#core/services/meio-pagamento.service';
 import { ICliente, IProduto, IChapa, IServico, IPedidoItem, IDesenho, IMeioPagamento, IDiagonal } from '#shared/interfaces';
-import { EStatusGeral, EStatusPedido, ETipoItemPedido } from '#shared/enums';
+import { EStatusGeral, EStatusPedido, ETipoItemPedido, EDescontoTipo } from '#shared/enums';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { ThemeService } from '#core/services/theme.service';
 import { IPonto } from '#shared/interfaces';
+import { calcularValorDesconto, calcularValorLiquido } from '#shared/functions/desconto.functions';
 
 @Component({
   selector: 'app-pedido-form',
@@ -32,6 +35,8 @@ import { IPonto } from '#shared/interfaces';
     ReactiveFormsModule,
     InputTextModule,
     SelectModule,
+    SelectButtonModule,
+    InputNumberModule,
     ButtonModule,
     TableModule,
     DatePickerModule,
@@ -51,6 +56,7 @@ export class PedidoFormComponent implements OnInit {
   form: FormGroup;
   ETipoItemPedido = ETipoItemPedido;
   EStatusPedido = EStatusPedido;
+  EDescontoTipo = EDescontoTipo;
   visible = false;
   isLoadingData = false;
   isSaving = false;
@@ -74,6 +80,10 @@ export class PedidoFormComponent implements OnInit {
     { label: 'Corte', value: ETipoItemPedido.Corte },
     { label: 'Serviço Direto', value: ETipoItemPedido.Servico }
   ];
+  descontoTipoOpcoes = [
+    { label: 'R$', value: EDescontoTipo.Reais },
+    { label: '%', value: EDescontoTipo.Percentual },
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -96,8 +106,22 @@ export class PedidoFormComponent implements OnInit {
       valor_material: [{ value: 0, disabled: true }],
       valor_servico: [{ value: 0, disabled: true }],
       valor_total: [{ value: 0, disabled: true }],
+      desconto_tipo: [EDescontoTipo.Reais],
+      desconto_valor: [0, [Validators.min(0)]],
+      valor_desconto: [{ value: 0, disabled: true }],
+      valor_liquido: [{ value: 0, disabled: true }],
       itens: this.fb.array([])
     });
+
+    this.form.get('desconto_tipo')?.valueChanges.subscribe((tipo) => {
+      const ctrl = this.form.get('desconto_valor');
+      ctrl?.setValidators(
+        tipo === EDescontoTipo.Percentual ? [Validators.min(0), Validators.max(100)] : [Validators.min(0)]
+      );
+      ctrl?.updateValueAndValidity({ emitEvent: false });
+      this.recalcularTotais();
+    });
+    this.form.get('desconto_valor')?.valueChanges.subscribe(() => this.recalcularTotais());
   }
 
   ngOnInit() {
@@ -398,6 +422,12 @@ export class PedidoFormComponent implements OnInit {
     item.get('subtotal')?.setValue(qtd * val, { emitEvent: false });
   }
 
+  onDescontoTipoChange(): void {
+    // Zera o valor ao trocar o tipo (interação do usuário) — evita reaproveitar
+    // um número em reais como se fosse percentual (ou vice-versa).
+    this.form.get('desconto_valor')?.setValue(0);
+  }
+
   recalcularTotais() {
     let material = 0;
     let servicosDiretos = 0;
@@ -413,10 +443,19 @@ export class PedidoFormComponent implements OnInit {
     });
 
     const servicoCalculado = material;
+    const total = material + servicoCalculado + servicosDiretos;
+
+    const descontoTipo = this.form.get('desconto_tipo')?.value ?? EDescontoTipo.Reais;
+    const descontoValor = this.form.get('desconto_valor')?.value ?? 0;
+    const valorDesconto = calcularValorDesconto(total, descontoTipo, descontoValor);
+    const valorLiquido = calcularValorLiquido(total, valorDesconto);
+
     this.form.patchValue({
       valor_material: material,
       valor_servico: servicoCalculado,
-      valor_total: (material + servicoCalculado + servicosDiretos)
+      valor_total: total,
+      valor_desconto: valorDesconto,
+      valor_liquido: valorLiquido,
     }, { emitEvent: false });
   }
 

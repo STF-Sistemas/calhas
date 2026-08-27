@@ -7,6 +7,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/orcamento-publico/orcamento-publico.component').then(m => m.OrcamentoPublicoComponent)
   },
   {
+    path: 'ordem-corte/:token',
+    loadComponent: () => import('./pages/ordem-corte-publico/ordem-corte-publico.component').then(m => m.OrdemCortePublicoComponent)
+  },
+  {
     path: 'login',
     loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
   },

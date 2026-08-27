@@ -2,6 +2,13 @@
   fill: #f8f8f8;
 }
 
+// A tabela pode ficar mais larga que o cartão que a envolve (muitas colunas
+// ou colunas de conteúdo longo). Este wrapper garante que a rolagem
+// horizontal fique contida aqui dentro, e nunca vaze para a página inteira.
+.table-scroll-wrapper {
+  overflow-x: auto;
+}
+
 :host-context(.app-dark) .drawing-bg {
   fill: #141414;
 }

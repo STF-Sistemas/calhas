@@ -43,8 +43,25 @@ model Usuario {
   reset_token_expiracao DateTime?
 
   empresa Empresa? @relation(fields: [cod_empresa], references: [id])
+  push_subscriptions PushSubscription[]
 
   @@map("usuarios")
+  @@schema("conf")
+}
+
+model PushSubscription {
+  id          Int      @id @default(autoincrement())
+  cod_usuario Int
+  endpoint    String   @db.Text
+  p256dh      String   @db.Text
+  auth        String   @db.Text
+  user_agent  String?  @db.VarChar(255)
+  created_at  DateTime @default(now())
+
+  usuario Usuario @relation(fields: [cod_usuario], references: [id])
+
+  @@unique([cod_usuario, endpoint])
+  @@map("push_subscriptions")
   @@schema("conf")
 }
 
@@ -87,6 +104,7 @@ model Empresa {
   bairro         String?   @db.VarChar(100)
   complemento    String?   @db.VarChar(100)
   marca_dagua                  String?   @db.VarChar(250)
+  logo_url                     String?   @db.Text
   whatsapp_mensagem_padrao     String?   @db.Text
   link_validade_dias           Int       @default(7)
   cod_cidade     Int?
@@ -102,6 +120,7 @@ model Empresa {
   meios_pagamento MeioPagamento[]
   fornecedores    Fornecedor[]
   pagamentos_pix  PagamentoPix[]
+  notificacoes    Notificacao[]
 
   @@map("empresas")
   @@schema("calhas")
@@ -247,11 +266,22 @@ model Pedido {
   valor_material     Decimal  @default(0) @db.Decimal(10, 4)
   valor_servico      Decimal  @default(0) @db.Decimal(10, 4)
   valor_total        Decimal  @default(0) @db.Decimal(10, 4)
+  desconto_tipo      Int      @default(1)
+  desconto_valor     Decimal  @default(0) @db.Decimal(10, 4)
+  valor_desconto     Decimal  @default(0) @db.Decimal(10, 4)
+  valor_liquido      Decimal  @default(0) @db.Decimal(10, 4)
   observacoes        String?  @db.Text
   excluido           Boolean  @default(false)
   estoque_baixado    Boolean  @default(false)
   token_acesso       String?  @unique @db.VarChar(100)
   token_expiracao    DateTime?
+  token_acesso_corte    String?   @unique @db.VarChar(100)
+  token_expiracao_corte DateTime?
+  aprovacao_status     Int       @default(0)
+  aprovacao_data       DateTime?
+  aprovacao_assinatura String?   @db.Text
+  aprovacao_ip         String?   @db.VarChar(45)
+  recusa_motivo        String?   @db.Text
   created_at         DateTime @default(now())
   updated_at         DateTime @updatedAt
 
@@ -259,8 +289,28 @@ model Pedido {
   cliente         Cliente        @relation(fields: [cod_cliente], references: [id])
   meio_pagamento  MeioPagamento? @relation(fields: [cod_meio_pagamento], references: [id])
   itens           PedidoItem[]
+  notificacoes    Notificacao[]
 
   @@map("pedidos")
+  @@schema("calhas")
+}
+
+model Notificacao {
+  id          Int       @id @default(autoincrement())
+  cod_empresa Int
+  cod_pedido  Int?
+  tipo        String    @db.VarChar(40)
+  titulo      String    @db.VarChar(150)
+  mensagem    String    @db.Text
+  lida        Boolean   @default(false)
+  lida_em     DateTime?
+  created_at  DateTime  @default(now())
+
+  empresa Empresa @relation(fields: [cod_empresa], references: [id])
+  pedido  Pedido? @relation(fields: [cod_pedido], references: [id])
+
+  @@index([cod_empresa, lida])
+  @@map("notificacoes")
   @@schema("calhas")
 }
 

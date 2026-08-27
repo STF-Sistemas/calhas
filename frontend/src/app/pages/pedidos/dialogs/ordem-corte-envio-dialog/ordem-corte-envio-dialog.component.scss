@@ -1,0 +1,98 @@
+.opcoes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .85rem;
+  padding: .25rem 0 .5rem;
+}
+
+.opcao-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: .5rem;
+  padding: 1.25rem .75rem;
+  border-radius: 12px;
+  border: 1px solid var(--surface-300);
+  background: var(--surface-0);
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  font: inherit;
+  color: var(--text-color);
+
+  i { font-size: 1.8rem; }
+
+  &:hover, &:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,.10);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--p-primary, #f97316);
+    outline-offset: 2px;
+  }
+}
+
+.opcao-card--imprimir {
+  i { color: var(--p-primary, #f97316); }
+  &:hover, &:focus-visible { border-color: var(--p-primary, #f97316); }
+}
+
+.opcao-card--whatsapp {
+  i { color: var(--p-green-500, #22c55e); }
+  &:hover, &:focus-visible { border-color: var(--p-green-500, #22c55e); }
+}
+
+.opcao-titulo {
+  font-weight: 700;
+  font-size: .95rem;
+}
+
+.opcao-desc {
+  font-size: .78rem;
+  color: var(--text-color-secondary);
+  line-height: 1.35;
+}
+
+// ---- Passo: seleção de fornecedor ----
+
+.fornecedor-passo {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.fornecedor-intro {
+  margin: 0 0 .25rem;
+  font-size: .88rem;
+  color: var(--text-color-secondary);
+}
+
+.fornecedor-loading {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: 1rem 0;
+  color: var(--text-color-secondary);
+  font-size: .88rem;
+}
+
+.fornecedor-item {
+  display: flex;
+  flex-direction: column;
+  gap: .1rem;
+
+  small { color: var(--text-color-secondary); }
+}
+
+.fornecedor-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: .5rem;
+  margin-top: .75rem;
+}
+
+small.p-error {
+  color: var(--red-500, #ef4444);
+  font-size: .78rem;
+}

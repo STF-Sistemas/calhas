@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { IPedido, IPedidoItem } from '#shared/interfaces';
-import { ETipoItemPedido, EStatusPedido } from '#shared/enums';
+import { ETipoItemPedido, EStatusPedido, EDescontoTipo } from '#shared/enums';
 import { formatCurrency, formatNumber, formatCpfCnpj, formatPhone, formatDate } from '#shared/functions/format.functions';
 
 @Injectable({ providedIn: 'root' })
@@ -76,12 +76,19 @@ export class PedidoImpressaoService {
       ? `<div class="empresa-detalhe">${emp.cidade.descricao}/${emp.cidade.uf}</div>` : '';
     const cepLinha = emp.cep ? `<div class="empresa-detalhe">CEP: ${emp.cep}</div>` : '';
 
+    const logo = emp.logo_url
+      ? `<img class="empresa-logo" src="${emp.logo_url}" alt="Logo de ${nomeDisplay}" width="120" height="60">`
+      : '';
+
     return `
     <div class="empresa-header">
-      <div class="empresa-info-bloco">
-        <div class="empresa-nome">${nomeDisplay}</div>
-        ${razaoSecundaria}
-        ${cnpj}${tel}${email}
+      <div class="empresa-header-principal">
+        ${logo}
+        <div class="empresa-info-bloco">
+          <div class="empresa-nome">${nomeDisplay}</div>
+          ${razaoSecundaria}
+          ${cnpj}${tel}${email}
+        </div>
       </div>
       <div class="empresa-endereco-bloco">
         ${enderecoLinha}${cidadeLinha}${cepLinha}
@@ -119,6 +126,8 @@ export class PedidoImpressaoService {
 
     /* Cabeçalho da empresa — idêntico ao relatorio-wrapper */
     .empresa-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding-bottom: 12px; border-bottom: 2px solid #f97316; margin-bottom: 14px; }
+    .empresa-header-principal { display: flex; align-items: center; gap: 12px; }
+    .empresa-logo { max-width: 120px; max-height: 60px; width: auto; height: auto; object-fit: contain; flex-shrink: 0; }
     .empresa-nome { font-size: 13px; font-weight: 700; color: #1a1a1a; }
     .empresa-razao { font-size: 10px; color: #6b7280; margin-top: 2px; }
     .empresa-detalhe { font-size: 10px; color: #6b7280; margin-top: 2px; }
@@ -251,10 +260,23 @@ ${marcaDagua ? `<div class="watermark" aria-hidden="true">${marcaDagua}</div>` :
         <span>Serviço:</span>
         <span class="val">${formatCurrency(pedido.valor_servico)}</span>
       </div>
+      ${pedido.valor_desconto > 0 ? `
+      <div class="totais-row">
+        <span>Total do Pedido:</span>
+        <span class="val">${formatCurrency(pedido.valor_total)}</span>
+      </div>
+      <div class="totais-row">
+        <span>Desconto (${pedido.desconto_tipo === EDescontoTipo.Percentual ? `${formatNumber(pedido.desconto_valor)}%` : 'R$'}):</span>
+        <span class="val">- ${formatCurrency(pedido.valor_desconto)}</span>
+      </div>
+      <div class="totais-row total">
+        <span><strong>Total Líquido:</strong></span>
+        <span class="val">${formatCurrency(pedido.valor_liquido)}</span>
+      </div>` : `
       <div class="totais-row total">
         <span><strong>Total do Pedido:</strong></span>
         <span class="val">${formatCurrency(pedido.valor_total)}</span>
-      </div>
+      </div>`}
     </div>
   </div>
 

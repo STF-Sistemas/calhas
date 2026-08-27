@@ -14,6 +14,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { MessageService } from 'primeng/api';
 import { NgxMaskDirective } from 'ngx-mask';
 import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { LogoUploaderComponent } from '#shared-frontend/components/logo-uploader/logo-uploader.component';
 import { EmpresaService } from '#core/services/empresa.service';
 import { ClienteService } from '#core/services/cliente.service';
 import { AuthService } from '#core/services/auth.service';
@@ -42,6 +43,7 @@ import { environment } from 'src/environments/environment';
     CurrencyMaskDirective,
     EnterFocusNextDirective,
     DialogWrapperComponent,
+    LogoUploaderComponent,
   ],
   templateUrl: './empresa-form.component.html',
   styleUrls: ['./empresa-form.component.scss']
@@ -77,6 +79,7 @@ export class EmpresaFormComponent {
       cod_cidade: [null, [Validators.required]],
       cidade_nome: [{ value: '', disabled: true }],
       marca_dagua: ['', [Validators.maxLength(250)]],
+      logo_url: [null as string | null],
       validar_estoque: [false],
       quantidade_desenho_por_folha: [5, [Validators.required, Validators.min(1), Validators.max(20)]],
       whatsapp_mensagem_padrao: [''],

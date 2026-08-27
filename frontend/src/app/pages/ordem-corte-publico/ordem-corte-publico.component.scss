@@ -1,0 +1,282 @@
+* { box-sizing: border-box; }
+
+.ordem-corte-publico {
+  min-height: 100vh;
+  background: #f0f4f8;
+  padding: 2rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #1e293b;
+}
+
+// ---- Estados ----
+
+.estado-mensagem {
+  margin: 5rem auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: 480px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  box-shadow: 0 2px 16px rgba(0,0,0,.08);
+
+  h2 { font-size: 1.4rem; margin: 0; color: #1e293b; }
+  p  { color: #475569; margin: 0; line-height: 1.6; font-size: .95rem; }
+}
+
+// ---- Card principal ----
+
+.ordem-card {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.10);
+  overflow: hidden;
+}
+
+// ---- Marca d'água ----
+
+.watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: space-around;
+  justify-content: space-around;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+
+  span {
+    display: inline-block;
+    transform: rotate(-30deg);
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: rgba(0, 0, 0, 0.09);
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin: 1.5rem 3rem;
+  }
+}
+
+.ordem-card > *:not(.watermark) {
+  position: relative;
+  z-index: 1;
+}
+
+// ---- Cabeçalho da empresa ----
+
+.ordem-header {
+  background: #1a1a1a;
+  color: #fff;
+  padding: 1.75rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+
+  h1 {
+    margin: 0 0 .3rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  p {
+    margin: .2rem 0;
+    font-size: .9rem;
+    color: rgba(255,255,255,.88);
+  }
+
+  .razao-social {
+    font-size: .82rem;
+    color: rgba(255,255,255,.70);
+  }
+}
+
+.empresa-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.empresa-logo {
+  max-width: 140px;
+  max-height: 56px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 6px;
+  padding: .3rem .5rem;
+  flex-shrink: 0;
+}
+
+.empresa-textos {
+  min-width: 0;
+}
+
+.pedido-id {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .2rem;
+  flex-shrink: 0;
+
+  .label {
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: rgba(255,255,255,.75);
+    font-weight: 600;
+  }
+
+  .numero {
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #fff;
+  }
+}
+
+// ---- Seção meta ----
+
+.ordem-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+  }
+}
+
+.meta-label {
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.meta-valor {
+  font-weight: 600;
+  font-size: .95rem;
+  color: #1e293b;
+}
+
+// ---- Itens de corte ----
+
+.ordem-itens {
+  padding: 1.25rem 2rem 1.75rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.item-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: .75rem;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  background: #fff;
+}
+
+.item-card-hdr {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+}
+
+.item-corte {
+  font-size: .92rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.item-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .3rem;
+}
+
+.chip {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: .1rem .4rem;
+  font-size: .72rem;
+  color: #374151;
+}
+
+.chip--total {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+.item-svg {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 280 / 150;
+}
+
+.item-obs {
+  margin: 0;
+  font-size: .8rem;
+  color: #374151;
+  line-height: 1.5;
+}
+
+// ---- Rodapé ----
+
+.ordem-footer {
+  padding: .9rem 2rem;
+  background: #f0f4f8;
+  border-top: 1px solid #e2e8f0;
+  font-size: .78rem;
+  color: #64748b;
+  text-align: center;
+
+  p { margin: .15rem 0; }
+}
+
+// ---- Responsivo ----
+
+@media (max-width: 600px) {
+  .ordem-header {
+    padding: 1.25rem;
+    flex-direction: column;
+    gap: 1rem;
+
+    h1 { font-size: 1.2rem; }
+  }
+
+  .pedido-id { align-items: flex-start; text-align: left; }
+  .ordem-meta { padding: 1rem; gap: 1rem; }
+  .ordem-itens { padding: 1rem; grid-template-columns: 1fr; }
+  .ordem-footer { padding: .75rem 1rem; }
+  .empresa-logo { max-width: 110px; max-height: 44px; }
+  .watermark span { font-size: 1.4rem; margin: 1rem 1.5rem; }
+}

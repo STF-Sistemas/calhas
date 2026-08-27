@@ -48,6 +48,9 @@ router.get('/', async (req: Request, res: Response) => {
     }),
   ]);
 
+  // Remove a assinatura (base64, pesada) da listagem — só é necessária na busca por ID.
+  const pedidosRecentesSemAssinatura = pedidosRecentes.map(({ aprovacao_assinatura, ...resto }) => resto);
+
   res.status(StatusCodes.OK).json({
     success: true,
     data: {
@@ -58,7 +61,7 @@ router.get('/', async (req: Request, res: Response) => {
       pedidosEmProducao,
       pedidosConcluidos,
       pedidosCancelados,
-      pedidosRecentes,
+      pedidosRecentes: pedidosRecentesSemAssinatura,
     },
   });
 });

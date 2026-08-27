@@ -34,19 +34,34 @@
   @if (estado === 'ok' && pedido) {
     <div class="orcamento-card">
 
+      @if (watermarkTexto()) {
+        <div class="watermark" aria-hidden="true">
+          @for (i of watermarkRepeticoes; track i) {
+            <span>{{ watermarkTexto() }}</span>
+          }
+        </div>
+      }
+
       <!-- Cabeçalho empresa -->
       <header class="orcamento-header">
         <div class="empresa-info">
-          <h1>{{ pedido.empresa.nome_fantasia || pedido.empresa.razao_social }}</h1>
-          @if (pedido.empresa.nome_fantasia) {
-            <p class="razao-social">{{ pedido.empresa.razao_social }}</p>
+          @if (pedido.empresa.logo_url) {
+            <img class="empresa-logo" [src]="pedido.empresa.logo_url"
+              [alt]="'Logo de ' + (pedido.empresa.nome_fantasia || pedido.empresa.razao_social)"
+              width="140" height="56">
           }
-          @if (pedido.empresa.telefone) {
-            <p><i class="pi pi-phone"></i> {{ pedido.empresa.telefone }}</p>
-          }
-          @if (pedido.empresa.email) {
-            <p><i class="pi pi-envelope"></i> {{ pedido.empresa.email }}</p>
-          }
+          <div class="empresa-textos">
+            <h1>{{ pedido.empresa.nome_fantasia || pedido.empresa.razao_social }}</h1>
+            @if (pedido.empresa.nome_fantasia) {
+              <p class="razao-social">{{ pedido.empresa.razao_social }}</p>
+            }
+            @if (pedido.empresa.telefone) {
+              <p><i class="pi pi-phone"></i> {{ pedido.empresa.telefone }}</p>
+            }
+            @if (pedido.empresa.email) {
+              <p><i class="pi pi-envelope"></i> {{ pedido.empresa.email }}</p>
+            }
+          </div>
         </div>
         <div class="pedido-id">
           <span class="label">Orçamento</span>
@@ -95,10 +110,27 @@
             }
           </tbody>
           <tfoot>
-            <tr class="total-row">
-              <td colspan="3" class="total-label">Total do Orçamento</td>
-              <td class="total-valor">{{ pedido.valor_total | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
-            </tr>
+            @if (pedido.valor_desconto > 0) {
+              <tr class="subtotal-row">
+                <td colspan="3" class="subtotal-label">Total do Orçamento</td>
+                <td class="subtotal-valor">{{ pedido.valor_total | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+              </tr>
+              <tr class="subtotal-row">
+                <td colspan="3" class="subtotal-label">
+                  Desconto ({{ pedido.desconto_tipo === EDescontoTipo.Percentual ? (pedido.desconto_valor | number:'1.0-2':'pt-BR') + '%' : 'R$' }})
+                </td>
+                <td class="subtotal-valor">- {{ pedido.valor_desconto | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+              </tr>
+              <tr class="total-row">
+                <td colspan="3" class="total-label">Total Líquido</td>
+                <td class="total-valor">{{ pedido.valor_liquido | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+              </tr>
+            } @else {
+              <tr class="total-row">
+                <td colspan="3" class="total-label">Total do Orçamento</td>
+                <td class="total-valor">{{ pedido.valor_total | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+              </tr>
+            }
           </tfoot>
         </table>
       </section>
@@ -107,6 +139,139 @@
         <section class="orcamento-obs">
           <span class="meta-label">Observações</span>
           <p>{{ pedido.observacoes }}</p>
+        </section>
+      }
+
+      @if (pedido.status !== EStatusPedido.Cancelado) {
+        <section class="orcamento-acoes">
+
+          @if (pedido.aprovacao_status === EAprovacaoPedido.Pendente) {
+
+            @if (erroDecisao) {
+              <p class="acao-erro" role="alert">{{ erroDecisao }}</p>
+            }
+
+            @if (!mostrandoAssinatura && !mostrandoMotivoRecusa) {
+              <div class="acao-botoes">
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-check-circle"
+                  label="Autorizar Produção"
+                  severity="success"
+                  aria-label="Autorizar a produção deste orçamento"
+                  (click)="onAutorizar()"
+                ></button>
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-times-circle"
+                  label="Recusar"
+                  severity="secondary"
+                  [outlined]="true"
+                  aria-label="Recusar este orçamento"
+                  (click)="onRecusar()"
+                ></button>
+              </div>
+            }
+
+            @if (mostrandoAssinatura) {
+              <div class="assinatura-area">
+                <h2>Assine para autorizar a produção</h2>
+                <app-assinatura-canvas (alterado)="onAssinaturaAlterada($event)"></app-assinatura-canvas>
+                <div class="acao-botoes">
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-eraser"
+                    label="Limpar"
+                    severity="secondary"
+                    [outlined]="true"
+                    aria-label="Limpar assinatura"
+                    [disabled]="enviando"
+                    (click)="onLimparAssinatura()"
+                  ></button>
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-check"
+                    label="Confirmar Assinatura"
+                    severity="success"
+                    aria-label="Confirmar assinatura e autorizar a produção"
+                    [disabled]="!assinaturaPreenchida || enviando"
+                    [loading]="enviando"
+                    (click)="onConfirmarAssinatura()"
+                  ></button>
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-arrow-left"
+                    label="Cancelar"
+                    severity="secondary"
+                    [text]="true"
+                    aria-label="Cancelar assinatura"
+                    [disabled]="enviando"
+                    (click)="onCancelarAssinatura()"
+                  ></button>
+                </div>
+              </div>
+            }
+
+            @if (mostrandoMotivoRecusa) {
+              <div class="motivo-recusa-area">
+                <h2 id="motivoRecusaLabel">Motivo da recusa (opcional)</h2>
+                <label for="motivoRecusa" class="sr-only">Motivo da recusa (opcional)</label>
+                <textarea
+                  pTextarea
+                  id="motivoRecusa"
+                  rows="3"
+                  maxlength="1000"
+                  placeholder="Conte-nos o motivo, se desejar..."
+                  [(ngModel)]="motivoRecusa"
+                  [disabled]="enviando"
+                ></textarea>
+                <div class="acao-botoes">
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-times"
+                    label="Confirmar Recusa"
+                    severity="danger"
+                    aria-label="Confirmar recusa do orçamento"
+                    [disabled]="enviando"
+                    [loading]="enviando"
+                    (click)="onConfirmarRecusa()"
+                  ></button>
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-arrow-left"
+                    label="Cancelar"
+                    severity="secondary"
+                    [text]="true"
+                    aria-label="Cancelar recusa"
+                    [disabled]="enviando"
+                    (click)="onCancelarRecusa()"
+                  ></button>
+                </div>
+              </div>
+            }
+
+          } @else if (pedido.aprovacao_status === EAprovacaoPedido.Autorizado) {
+            <div class="resultado-decisao resultado-decisao--sucesso">
+              <i class="pi pi-check-circle"></i>
+              <p>Produção autorizada em {{ pedido.aprovacao_data | date:'dd/MM/yyyy \'às\' HH:mm' }}.</p>
+            </div>
+          } @else if (pedido.aprovacao_status === EAprovacaoPedido.Recusado) {
+            <div class="resultado-decisao resultado-decisao--recusado">
+              <i class="pi pi-times-circle"></i>
+              <p>Você recusou este orçamento em {{ pedido.aprovacao_data | date:'dd/MM/yyyy \'às\' HH:mm' }}.</p>
+              @if (pedido.recusa_motivo) {
+                <p class="resultado-motivo"><strong>Motivo:</strong> {{ pedido.recusa_motivo }}</p>
+              }
+            </div>
+          }
+
         </section>
       }
 

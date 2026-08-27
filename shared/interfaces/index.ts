@@ -24,3 +24,4 @@ export * from './ICepResponse';
 export * from './IRelatorioPedidosLucros';
 export * from './IPagamentoPix';
 export * from './IDanfeData';
+export * from './INotificacao';

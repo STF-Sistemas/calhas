@@ -1,0 +1,72 @@
+<app-dialog-wrapper
+  [(visible)]="visible"
+  [title]="'Ordem de Corte — Pedido Nº ' + (pedido?.id ?? '')"
+  [hasFooter]="false"
+  width="440px">
+
+  @if (passo === 'opcoes') {
+    <div class="opcoes-grid">
+      <button type="button" class="opcao-card opcao-card--imprimir" (click)="onImprimir()"
+        aria-label="Imprimir ordem de corte">
+        <i class="pi pi-print" aria-hidden="true"></i>
+        <span class="opcao-titulo">Imprimir</span>
+        <span class="opcao-desc">Abrir a ordem de corte para impressão</span>
+      </button>
+      <button type="button" class="opcao-card opcao-card--whatsapp" (click)="onEscolherWhatsApp()"
+        aria-label="Enviar ordem de corte pelo WhatsApp">
+        <i class="pi pi-whatsapp" aria-hidden="true"></i>
+        <span class="opcao-titulo">Enviar pelo WhatsApp</span>
+        <span class="opcao-desc">Escolher um fornecedor e enviar o link</span>
+      </button>
+    </div>
+  }
+
+  @if (passo === 'fornecedor') {
+    <div class="fornecedor-passo">
+      <p class="fornecedor-intro">Selecione o fornecedor que deve receber a ordem de corte:</p>
+
+      @if (carregandoFornecedores) {
+        <div class="fornecedor-loading">
+          <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+          <span>Carregando fornecedores...</span>
+        </div>
+      } @else {
+        <label for="fornecedor-select">Fornecedor</label>
+        <p-select
+          inputId="fornecedor-select"
+          [(ngModel)]="fornecedorSelecionado"
+          [options]="fornecedores"
+          optionLabel="razao_social"
+          placeholder="Selecione um fornecedor"
+          [filter]="true"
+          filterBy="razao_social,cnpj"
+          styleClass="w-full"
+          aria-label="Selecionar fornecedor para envio">
+          <ng-template let-fornecedor pTemplate="item">
+            <div class="fornecedor-item">
+              <span>{{ fornecedor.razao_social }}</span>
+              <small>{{ fornecedor.fone || 'Sem telefone' }}</small>
+            </div>
+          </ng-template>
+        </p-select>
+
+        @if (fornecedorSelecionado && !fornecedorSelecionado.fone) {
+          <small class="p-error">Este fornecedor não possui telefone cadastrado.</small>
+        }
+      }
+
+      <div class="fornecedor-acoes">
+        <p-button label="Voltar" icon="pi pi-arrow-left" severity="secondary" [outlined]="true"
+          (onClick)="voltar()" aria-label="Voltar para as opções">
+        </p-button>
+        <p-button label="Enviar" icon="pi pi-send"
+          [loading]="enviando"
+          [disabled]="!fornecedorSelecionado || !fornecedorSelecionado.fone"
+          (onClick)="onEnviarWhatsApp()"
+          aria-label="Enviar ordem de corte pelo WhatsApp para o fornecedor selecionado">
+        </p-button>
+      </div>
+    </div>
+  }
+
+</app-dialog-wrapper>

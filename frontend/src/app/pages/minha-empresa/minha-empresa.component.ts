@@ -19,6 +19,7 @@ import { ClienteService } from '#core/services/cliente.service';
 import { environment } from 'src/environments/environment';
 import { IEmpresa } from '#shared/interfaces';
 import { TApiResponse } from '#shared/types';
+import { LogoUploaderComponent } from '#shared-frontend/components/logo-uploader/logo-uploader.component';
 
 @Component({
   selector: 'app-minha-empresa',
@@ -37,6 +38,7 @@ import { TApiResponse } from '#shared/types';
     CardModule,
     ToastModule,
     NgxMaskDirective,
+    LogoUploaderComponent,
   ],
   providers: [provideNgxMask()],
   templateUrl: './minha-empresa.component.html',
@@ -71,6 +73,7 @@ export class MinhaEmpresaComponent implements OnInit {
       cod_cidade:      [null as number | null],
       cidade_nome:     [{ value: '', disabled: true }],
       marca_dagua:     ['', [Validators.maxLength(250)]],
+      logo_url:        [null as string | null],
       validar_estoque: [false],
       whatsapp_mensagem_padrao: [''],
       link_validade_dias: [7, [Validators.min(1), Validators.max(365)]],

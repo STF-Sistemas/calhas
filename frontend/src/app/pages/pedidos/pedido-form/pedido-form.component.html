@@ -277,6 +277,59 @@
           </div>
         </div>
 
+        <!-- ===================== DESCONTO ======================== -->
+        <div class="row" style="padding-top: 0.5rem;">
+          <div class="col-12" style="padding: 0.5rem 0.75rem;">
+            <label for="desconto_valor" style="display:block; margin-bottom: 0.4rem;">Desconto</label>
+            <div style="display:flex; gap: 0.5rem; align-items:center;">
+              <p-selectButton
+                formControlName="desconto_tipo"
+                [options]="descontoTipoOpcoes"
+                optionLabel="label"
+                optionValue="value"
+                [allowEmpty]="false"
+                (onChange)="onDescontoTipoChange()"
+                aria-label="Tipo de desconto: reais ou percentual">
+              </p-selectButton>
+
+              @if (form.get('desconto_tipo')?.value === EDescontoTipo.Percentual) {
+                <p-inputNumber
+                  inputId="desconto_valor"
+                  formControlName="desconto_valor"
+                  suffix="%"
+                  [min]="0" [max]="100" [maxFractionDigits]="2"
+                  styleClass="w-full"
+                  aria-label="Valor do desconto em percentual">
+                </p-inputNumber>
+              } @else {
+                <input pInputText appCurrencyMask id="desconto_valor" formControlName="desconto_valor"
+                  class="w-full" aria-label="Valor do desconto em reais" />
+              }
+            </div>
+            @if (form.get('desconto_valor')?.invalid && form.get('desconto_valor')?.touched) {
+              <small class="p-error">Desconto percentual não pode ser maior que 100%.</small>
+            }
+          </div>
+        </div>
+
+        @if (form.get('valor_desconto')?.value > 0) {
+          <div class="row">
+            <div class="col-12" style="display:flex; justify-content:space-between; align-items:center; padding: 0.5rem 0.75rem;">
+              <span class="text-600">Desconto aplicado:</span>
+              <span class="font-bold" style="color: var(--p-red-500, #ef4444);">
+                - {{ form.get('valor_desconto')?.value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              </span>
+            </div>
+          </div>
+        }
+
+        <div class="row" style="border-top: 2px solid var(--p-primary); padding-top: 0.75rem; margin-top: 0.5rem;">
+          <div class="col-12" style="display:flex; justify-content:space-between; align-items:center; padding: 0.5rem 0.75rem;">
+            <span class="font-bold" style="font-size: 1rem;">Total Líquido:</span>
+            <span style="font-size: 1.6rem; font-weight: 800; color: var(--p-green-600, #16a34a);">{{ form.get('valor_liquido')?.value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+          </div>
+        </div>
+
         <div style="margin-top: 1rem; padding: 0.75rem; background: var(--surface-100); border-radius: 8px; border-left: 3px solid var(--p-primary);">
           <p style="margin: 0; font-size: 0.75rem; color: var(--text-secondary); font-style: italic; line-height: 1.5;">
             * O valor de serviço é calculado automaticamente sobre o valor dos itens de material (Produtos e Cortes).

@@ -60,6 +60,24 @@
         </div>
       </form>
     </p-card>
+
+    @if (pushService.suportado) {
+      <p-card styleClass="mt-4">
+        <h2 class="text-lg font-semibold mb-2">Notificações Push</h2>
+        <div class="flex align-items-center justify-content-between gap-3">
+          <label for="pushToggle" class="text-600 text-sm" style="max-width: 70%;">
+            Receba um aviso neste dispositivo sempre que um cliente autorizar ou recusar um orçamento.
+          </label>
+          <p-toggleswitch
+            inputId="pushToggle"
+            [ngModel]="pushService.inscrito()"
+            [disabled]="alterandoPush"
+            (ngModelChange)="onTogglePush($event)"
+            aria-label="Ativar notificações push neste dispositivo">
+          </p-toggleswitch>
+        </div>
+      </p-card>
+    }
   }
 
 </main>

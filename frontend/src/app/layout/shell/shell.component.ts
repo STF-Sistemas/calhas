@@ -1,4 +1,4 @@
-import { Component, signal, computed, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, signal, computed, DestroyRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { DrawerModule } from 'primeng/drawer';
@@ -14,6 +14,8 @@ import { ToastModule } from 'primeng/toast';
 import { MenuItem, MessageService } from 'primeng/api';
 import { AuthService } from '#core/services/auth.service';
 import { ThemeService } from '#core/services/theme.service';
+import { NotificacaoService } from '#core/services/notificacao.service';
+import { INotificacao } from '#shared/interfaces';
 import { EmpresaFormComponent } from '../../pages/empresas/empresa-form/empresa-form.component';
 
 @Component({
@@ -61,6 +63,14 @@ export class ShellComponent implements OnInit, OnDestroy {
     if (dias < 0) return { texto: 'Sua licença está vencida.', urgente: true };
     return { texto: `Sua licença vence em ${dias} dia${dias === 1 ? '' : 's'}.`, urgente: dias <= 3 };
   });
+
+  // ── Notificações reais (backend) ──────────────────────────────────────────────
+  notificacoes = signal<INotificacao[]>([]);
+  carregandoNotificacoes = signal(false);
+
+  readonly temNotificacaoPendente = computed(() =>
+    !!this.notificacaoLicenca() || this.notificacaoService.naoLidasCount() > 0
+  );
 
   // Menu de perfil: "Minha Empresa" só aparece para admin/super_admin
   get profileMenuItems(): MenuItem[] {
@@ -141,7 +151,9 @@ export class ShellComponent implements OnInit, OnDestroy {
   constructor(
     public authService: AuthService,
     public themeService: ThemeService,
-    private router: Router
+    public notificacaoService: NotificacaoService,
+    private router: Router,
+    private destroyRef: DestroyRef,
   ) {}
 
   onSidebarItemClick(item: { action?: (() => void) | null; [key: string]: unknown }) {
@@ -163,6 +175,33 @@ export class ShellComponent implements OnInit, OnDestroy {
     this.themeService.applyTheme();
     this.checkBreakpoint();
     window.addEventListener('resize', this.resizeListener);
+    this.notificacaoService.iniciarPolling(this.destroyRef);
+  }
+
+  abrirNotificacoes(): void {
+    this.carregandoNotificacoes.set(true);
+    this.notificacaoService.listar().subscribe({
+      next: (res) => {
+        this.notificacoes.set(res.data);
+        this.carregandoNotificacoes.set(false);
+      },
+      error: () => this.carregandoNotificacoes.set(false),
+    });
+  }
+
+  marcarNotificacaoComoLida(notificacao: INotificacao): void {
+    if (notificacao.lida) return;
+    this.notificacaoService.marcarComoLida(notificacao.id).subscribe(() => {
+      notificacao.lida = true;
+      this.notificacaoService.decrementarContagem();
+    });
+  }
+
+  marcarTodasNotificacoesComoLidas(): void {
+    this.notificacaoService.marcarTodasComoLidas().subscribe(() => {
+      this.notificacoes.update((lista) => lista.map((n) => ({ ...n, lida: true })));
+      this.notificacaoService.zerarContagem();
+    });
   }
 
   ngOnDestroy() {

@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { prisma } from '../../config/prisma';
 import { authMiddleware, adminMiddleware, superAdminMiddleware } from '../../middlewares/auth.middleware';
+import { isLogoDataUriValido } from '#shared/functions/logo.functions';
 
 const router = Router();
 router.use(authMiddleware);
@@ -41,6 +42,12 @@ router.get('/:id', adminMiddleware, async (req: Request, res: Response) => {
 router.post('/', superAdminMiddleware, async (req: Request, res: Response) => {
   try {
     const { cidade_nome, cidade, usuarios, clientes, produtos, chapas, servicos, pedidos, excluido, ...data } = req.body;
+
+    if (data.logo_url != null && !isLogoDataUriValido(data.logo_url)) {
+      res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: 'Logo inválido. Envie um arquivo PNG ou JPG de até 1MB.' });
+      return;
+    }
+
     const empresa = await prisma.empresa.create({ data });
     res.status(StatusCodes.CREATED).json({ success: true, data: empresa });
   } catch { res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Erro ao criar empresa.' }); }
@@ -66,6 +73,11 @@ router.put('/:id', adminMiddleware, async (req: Request, res: Response) => {
       delete data.data_expiracao;
       delete data.valor_mensalidade;
       delete data.ativo;
+    }
+
+    if (data.logo_url != null && !isLogoDataUriValido(data.logo_url)) {
+      res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: 'Logo inválido. Envie um arquivo PNG ou JPG de até 1MB.' });
+      return;
     }
 
     const empresa = await prisma.empresa.update({ where: { id }, data: { ...data, updated_at: new Date() } });

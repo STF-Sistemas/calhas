@@ -9,9 +9,12 @@ import { CardModule } from 'primeng/card';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { AvatarModule } from 'primeng/avatar';
+import { ToggleSwitch } from 'primeng/toggleswitch';
+import { FormsModule } from '@angular/forms';
 import { environment } from 'src/environments/environment';
 import { TApiResponse } from '#shared/types';
 import { IUsuario } from '#shared/interfaces';
+import { PushNotificacaoService } from '#core/services/push-notificacao.service';
 
 @Component({
   selector: 'app-perfil',
@@ -19,11 +22,13 @@ import { IUsuario } from '#shared/interfaces';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     InputTextModule,
     ButtonModule,
     CardModule,
     ToastModule,
     AvatarModule,
+    ToggleSwitch,
   ],
   templateUrl: './perfil.component.html',
 })
@@ -32,12 +37,14 @@ export class PerfilComponent implements OnInit {
   isLoading = false;
   isSaving = false;
   usuario: IUsuario | null = null;
+  alterandoPush = false;
 
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
     private messageService: MessageService,
-    private title: Title
+    private title: Title,
+    public pushService: PushNotificacaoService,
   ) {}
 
   ngOnInit(): void {
@@ -49,6 +56,24 @@ export class PerfilComponent implements OnInit {
     });
 
     this.carregar();
+    this.pushService.carregarStatus();
+  }
+
+  async onTogglePush(ativar: boolean): Promise<void> {
+    this.alterandoPush = true;
+    try {
+      if (ativar) {
+        await this.pushService.ativar();
+        this.messageService.add({ severity: 'success', summary: 'Notificações ativadas', detail: 'Você receberá notificações push neste dispositivo.' });
+      } else {
+        await this.pushService.desativar();
+        this.messageService.add({ severity: 'info', summary: 'Notificações desativadas', detail: 'Você não receberá mais notificações push neste dispositivo.' });
+      }
+    } catch {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível alterar as notificações push. Verifique a permissão do navegador.' });
+    } finally {
+      this.alterandoPush = false;
+    }
   }
 
   carregar(): void {

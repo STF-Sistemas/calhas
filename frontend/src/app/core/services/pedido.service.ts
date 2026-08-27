@@ -52,7 +52,29 @@ export class PedidoService {
     return this.http.post<TApiResponse<{ token: string; expiracao: string; mensagem_padrao: string }>>(`${this.apiUrl}/${id}/gerar-link`, {});
   }
 
+  gerarLinkOrdemCorte(id: number) {
+    return this.http.post<TApiResponse<{ token: string; expiracao: string }>>(`${this.apiUrl}/${id}/gerar-link-corte`, {});
+  }
+
   buscarPublico(token: string) {
     return this.http.get<TApiResponse<any>>(`${environment.apiUrl}/pedidos-publico/${token}`);
+  }
+
+  buscarOrdemCortePublico(token: string) {
+    return this.http.get<TApiResponse<any>>(`${environment.apiUrl}/ordem-corte-publico/${token}`);
+  }
+
+  autorizarPublico(token: string, assinatura: string) {
+    return this.http.post<TApiResponse<{ aprovacao_status: number; aprovacao_data: string }>>(
+      `${environment.apiUrl}/pedidos-publico/${token}/autorizar`,
+      { assinatura }
+    );
+  }
+
+  recusarPublico(token: string, motivo?: string) {
+    return this.http.post<TApiResponse<{ aprovacao_status: number; aprovacao_data: string }>>(
+      `${environment.apiUrl}/pedidos-publico/${token}/recusar`,
+      { motivo }
+    );
   }
 }

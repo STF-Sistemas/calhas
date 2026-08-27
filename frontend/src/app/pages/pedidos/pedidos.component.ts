@@ -12,12 +12,14 @@ import { PaginatorModule } from 'primeng/paginator';
 import { ButtonModule } from 'primeng/button';
 import { DataTableComponent, IRowAction } from '#shared-frontend/components/data-table/data-table.component';
 import { PedidoFormComponent } from './pedido-form/pedido-form.component';
+import { OrdemCorteEnvioDialogComponent } from './dialogs/ordem-corte-envio-dialog/ordem-corte-envio-dialog.component';
+import { AutorizacaoDialogComponent } from './dialogs/autorizacao-dialog/autorizacao-dialog.component';
 import { PedidoService } from '#core/services/pedido.service';
 import { ClienteService } from '#core/services/cliente.service';
 import { PedidoImpressaoService } from '#core/services/pedido-impressao.service';
-import { PedidoImpressaoDesenhoService } from '#core/services/pedido-impressao-desenho.service';
 import { IPedido, ICliente } from '#shared/interfaces';
-import { EStatusPedido } from '#shared/enums';
+import { EStatusPedido, ETipoItemPedido, EAprovacaoPedido } from '#shared/enums';
+import { obterAprovacaoTag } from '#shared/functions/aprovacao.functions';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -28,6 +30,8 @@ import { environment } from 'src/environments/environment';
     FormsModule,
     DataTableComponent,
     PedidoFormComponent,
+    OrdemCorteEnvioDialogComponent,
+    AutorizacaoDialogComponent,
     ConfirmDialogModule,
     ToastModule,
     TagModule,
@@ -43,6 +47,8 @@ import { environment } from 'src/environments/environment';
 })
 export class PedidosComponent implements OnInit {
   @ViewChild('form') form!: PedidoFormComponent;
+  @ViewChild('ordemCorteDialog') ordemCorteDialog!: OrdemCorteEnvioDialogComponent;
+  @ViewChild('autorizacaoDialog') autorizacaoDialog!: AutorizacaoDialogComponent;
 
   pedidos: IPedido[] = [];
   loading = false;
@@ -100,6 +106,14 @@ export class PedidosComponent implements OnInit {
       severity: 'secondary',
       visible: (row) => row.status === EStatusPedido.Concluido,
     },
+    {
+      key: 'ver-autorizacao',
+      icon: 'pi pi-file-check',
+      tooltip: 'Ver Autorização/Recusa',
+      ariaLabel: 'Ver detalhes da autorização ou recusa do cliente',
+      severity: 'info',
+      visible: (row) => row.aprovacao_status !== EAprovacaoPedido.Pendente,
+    },
   ];
 
   cols = [
@@ -107,14 +121,16 @@ export class PedidosComponent implements OnInit {
     { field: 'cliente_nome', header: 'Cliente' },
     { field: 'data_pedido', header: 'Data', type: 'date' },
     { field: 'valor_total', header: 'Total', type: 'currency' },
-    { field: 'status_label', header: 'Status' }
+    { field: 'valor_desconto', header: 'Desconto', type: 'currency' },
+    { field: 'valor_liquido', header: 'Total Líquido', type: 'currency' },
+    { field: 'status_label', header: 'Status' },
+    { field: 'aprovacao', header: 'Aprovação', type: 'tag' }
   ];
 
   constructor(
     private pedidoService: PedidoService,
     private clienteService: ClienteService,
     private impressaoService: PedidoImpressaoService,
-    private impressaoDesenhoService: PedidoImpressaoDesenhoService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
   ) {}
@@ -157,7 +173,7 @@ export class PedidosComponent implements OnInit {
           else if (p.status === EStatusPedido.EmProducao) statusLabel = 'Em Produção';
           else if (p.status === EStatusPedido.Concluido) statusLabel = 'Finalizado';
           else if (p.status === EStatusPedido.Cancelado) statusLabel = 'Cancelado';
-          return { ...p, cliente_nome: p.cliente?.razao_social, status_label: statusLabel };
+          return { ...p, cliente_nome: p.cliente?.razao_social, status_label: statusLabel, aprovacao: obterAprovacaoTag(p.aprovacao_status) };
         });
         this.loading = false;
       },
@@ -191,7 +207,16 @@ export class PedidosComponent implements OnInit {
 
   onPrintDesenho(pedido: IPedido) {
     this.pedidoService.buscarPorId(pedido.id).subscribe({
-      next: (res) => this.impressaoDesenhoService.imprimir(res.data),
+      next: (res) => {
+        const temItensCorte = (res.data.itens ?? []).some(
+          i => i.tipo === ETipoItemPedido.Corte && i.cod_desenho
+        );
+        if (!temItensCorte) {
+          this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Este pedido não possui itens de corte com desenho.' });
+          return;
+        }
+        this.ordemCorteDialog.abrir(res.data);
+      },
       error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar dados do pedido' })
     });
   }
@@ -199,6 +224,10 @@ export class PedidosComponent implements OnInit {
   onRowAction(event: { key: string; row: IPedido }) {
     if (event.key === 'whatsapp') {
       this.onEnviarWhatsApp(event.row);
+      return;
+    }
+    if (event.key === 'ver-autorizacao') {
+      this.autorizacaoDialog.abrir(event.row);
       return;
     }
 

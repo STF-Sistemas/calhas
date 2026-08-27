@@ -5,3 +5,5 @@ export * from './ETipoItemPedido';
 export * from './EPerfilUsuario';
 export * from './EStatusCompra';
 export * from './ECrt';
+export * from './EDescontoTipo';
+export * from './EAprovacaoPedido';

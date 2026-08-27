@@ -1,0 +1,45 @@
+<app-dialog-wrapper
+  [(visible)]="visible"
+  title="Autorização do Cliente"
+  [isLoadingData]="isLoadingData"
+  [hasFooter]="false"
+  width="480px"
+  (cancel)="fechar()">
+
+  @if (pedido) {
+    <div class="autorizacao-conteudo">
+      <p-tag [value]="label()" [severity]="severity()" styleClass="autorizacao-tag"></p-tag>
+
+      @if (pedido.aprovacao_status !== EAprovacaoPedido.Pendente) {
+        <dl class="autorizacao-info">
+          <div>
+            <dt>Data/hora</dt>
+            <dd>{{ pedido.aprovacao_data | date:'dd/MM/yyyy \'às\' HH:mm' }}</dd>
+          </div>
+          @if (pedido.aprovacao_ip) {
+            <div>
+              <dt>IP de origem</dt>
+              <dd>{{ pedido.aprovacao_ip }}</dd>
+            </div>
+          }
+          @if (pedido.aprovacao_status === EAprovacaoPedido.Recusado && pedido.recusa_motivo) {
+            <div>
+              <dt>Motivo da recusa</dt>
+              <dd>{{ pedido.recusa_motivo }}</dd>
+            </div>
+          }
+        </dl>
+
+        @if (pedido.aprovacao_status === EAprovacaoPedido.Autorizado && pedido.aprovacao_assinatura) {
+          <div class="assinatura-visualizacao">
+            <span class="assinatura-label">Assinatura do cliente</span>
+            <img [src]="pedido.aprovacao_assinatura" alt="Assinatura do cliente registrada na autorização" width="440" height="180">
+          </div>
+        }
+      } @else {
+        <p class="autorizacao-vazia">O cliente ainda não respondeu ao orçamento enviado.</p>
+      }
+    </div>
+  }
+
+</app-dialog-wrapper>

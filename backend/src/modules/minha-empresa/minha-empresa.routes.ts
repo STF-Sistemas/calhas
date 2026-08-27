@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 import { prisma } from '#config/prisma';
 import { authMiddleware, adminMiddleware } from '#middlewares/auth.middleware';
+import { isLogoDataUriValido } from '#shared/functions/logo.functions';
 
 const router = Router();
 router.use(authMiddleware, adminMiddleware);
@@ -48,6 +49,10 @@ const minhaEmpresaSchema = z.object({
   complemento:    z.string().max(100).nullable().optional(),
   cod_cidade:     z.number().int().positive().nullable().optional(),
   marca_dagua:                  z.string().max(250).nullable().optional(),
+  logo_url: z.union([
+    z.string().refine(isLogoDataUriValido, { message: 'Logo inválido. Envie um arquivo PNG ou JPG de até 1MB.' }),
+    z.null(),
+  ]).optional(),
   validar_estoque:              z.boolean().optional(),
   quantidade_desenho_por_folha: z.number().int().min(1).max(20).optional(),
   whatsapp_mensagem_padrao:     z.string().nullable().optional(),

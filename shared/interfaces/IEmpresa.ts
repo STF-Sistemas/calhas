@@ -21,6 +21,7 @@ export interface IEmpresa {
   bairro: string | null;
   complemento: string | null;
   marca_dagua: string | null;
+  logo_url: string | null;
   whatsapp_mensagem_padrao: string | null;
   link_validade_dias: number;
   cod_cidade: number | null;

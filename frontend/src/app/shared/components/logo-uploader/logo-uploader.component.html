@@ -1,0 +1,47 @@
+<div class="logo-uploader">
+  <div class="logo-preview" [class.vazio]="!preview">
+    @if (preview) {
+      <img [src]="preview" alt="Pré-visualização do logo da empresa" width="160" height="90">
+    } @else {
+      <i class="pi pi-image" aria-hidden="true"></i>
+      <span>Sem logo</span>
+    }
+  </div>
+
+  <div class="logo-acoes">
+    <input #inputArquivo type="file" accept="image/png,image/jpeg" hidden class="input-arquivo-oculto"
+      (change)="aoSelecionarArquivo($event)" aria-label="Selecionar arquivo de logo da empresa">
+
+    <div class="logo-botoes">
+      <p-button
+        type="button"
+        [label]="preview ? 'Trocar Logo' : 'Selecionar Logo'"
+        icon="pi pi-upload"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [disabled]="disabled"
+        (onClick)="abrirSeletor()"
+        aria-label="Selecionar arquivo de logo da empresa">
+      </p-button>
+      @if (preview) {
+        <p-button
+          type="button"
+          label="Remover"
+          icon="pi pi-trash"
+          severity="danger"
+          [outlined]="true"
+          size="small"
+          [disabled]="disabled"
+          (onClick)="remover()"
+          aria-label="Remover logo da empresa">
+        </p-button>
+      }
+    </div>
+
+    <small class="field-hint">PNG ou JPG, máx. 1MB. Aparece no orçamento enviado ao cliente e na impressão.</small>
+    @if (erro) {
+      <small class="p-error">{{ erro }}</small>
+    }
+  </div>
+</div>

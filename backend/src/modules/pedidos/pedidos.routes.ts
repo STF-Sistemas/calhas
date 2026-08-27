@@ -6,7 +6,8 @@ import { z } from 'zod';
 import { randomUUID } from 'crypto';
 import { prisma } from '#config/prisma';
 import { authMiddleware } from '#middlewares/auth.middleware';
-import { EStatusPedido } from '#shared/enums';
+import { EStatusPedido, EDescontoTipo } from '#shared/enums';
+import { calcularValorDesconto, calcularValorLiquido } from '#shared/functions/desconto.functions';
 
 /** Converte medidas para o tipo JSON aceito pelo Prisma (null → DbNull) */
 function toJsonMedidas(medidas: number[] | null | undefined): Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue {
@@ -42,18 +43,30 @@ const itemSchema = z.object({
   { message: 'Item deve ter produto, serviço ou corte.' }
 );
 
-const pedidoSchema = z.object({
+const pedidoBaseSchema = z.object({
   cod_cliente: z.number().int().positive(),
   cod_meio_pagamento: z.number().int().positive().nullable().optional(),
   data_pedido: z.string().min(1),
   observacoes: z.string().max(2000).nullable().optional(),
+  desconto_tipo: z.coerce.number().int().min(1).max(2).default(EDescontoTipo.Reais),
+  desconto_valor: z.coerce.number().min(0).default(0),
   itens: z.array(itemSchema).min(1),
 });
 
-const pedidoUpdateSchema = pedidoSchema.extend({
+function validarDescontoPercentual(d: { desconto_tipo: number; desconto_valor: number }): boolean {
+  return d.desconto_tipo !== EDescontoTipo.Percentual || d.desconto_valor <= 100;
+}
+const REFINE_DESCONTO = {
+  message: 'O desconto percentual não pode ser maior que 100%.',
+  path: ['desconto_valor'],
+};
+
+const pedidoSchema = pedidoBaseSchema.refine(validarDescontoPercentual, REFINE_DESCONTO);
+
+const pedidoUpdateSchema = pedidoBaseSchema.extend({
   status: z.number().int().min(1),
   itens: z.array(itemSchema).min(1),
-});
+}).refine(validarDescontoPercentual, REFINE_DESCONTO);
 
 // ── Busca o custo diretamente do banco (não confia no cliente) ────────────────
 async function buscarCustoDoItem(item: z.infer<typeof itemSchema>): Promise<Decimal> {
@@ -67,7 +80,10 @@ async function buscarCustoDoItem(item: z.infer<typeof itemSchema>): Promise<Deci
 }
 
 async function recalcularPedido(pedidoId: number) {
-  const itens = await prisma.pedidoItem.findMany({ where: { cod_pedido: pedidoId } });
+  const [itens, pedido] = await Promise.all([
+    prisma.pedidoItem.findMany({ where: { cod_pedido: pedidoId } }),
+    prisma.pedido.findUniqueOrThrow({ where: { id: pedidoId }, select: { desconto_tipo: true, desconto_valor: true } }),
+  ]);
 
   let valorMaterial = new Decimal(0);
   let valorServico = new Decimal(0);
@@ -83,9 +99,18 @@ async function recalcularPedido(pedidoId: number) {
   const servicoCalculado = valorMaterial;
   const valorTotal = valorMaterial.add(servicoCalculado).add(valorServico);
 
+  const valorDesconto = calcularValorDesconto(valorTotal.toNumber(), pedido.desconto_tipo, pedido.desconto_valor.toNumber());
+  const valorLiquido = calcularValorLiquido(valorTotal.toNumber(), valorDesconto);
+
   await prisma.pedido.update({
     where: { id: pedidoId },
-    data: { valor_material: valorMaterial, valor_servico: servicoCalculado, valor_total: valorTotal },
+    data: {
+      valor_material: valorMaterial,
+      valor_servico: servicoCalculado,
+      valor_total: valorTotal,
+      valor_desconto: new Decimal(valorDesconto),
+      valor_liquido: new Decimal(valorLiquido),
+    },
   });
 }
 
@@ -163,7 +188,10 @@ router.get('/', async (req: Request, res: Response) => {
       prisma.pedido.findMany({ where, include, orderBy: { data_pedido: 'desc' }, skip, take: limiteNum }),
     ]);
 
-    res.json({ success: true, data: pedidos, total, pagina: paginaNum, totalPaginas: Math.ceil(total / limiteNum) });
+    // Remove a assinatura (base64, pesada) da listagem — só é necessária na busca por ID.
+    const pedidosSemAssinatura = pedidos.map(({ aprovacao_assinatura, ...resto }) => resto);
+
+    res.json({ success: true, data: pedidosSemAssinatura, total, pagina: paginaNum, totalPaginas: Math.ceil(total / limiteNum) });
   } catch (err) {
     console.error('[PEDIDOS_GET]', err);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Erro ao listar pedidos.' });
@@ -192,7 +220,7 @@ router.post('/', async (req: Request, res: Response) => {
       res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: parse.error.issues[0].message }); return;
     }
 
-    const { itens, cod_cliente, cod_meio_pagamento, data_pedido, observacoes } = parse.data;
+    const { itens, cod_cliente, cod_meio_pagamento, data_pedido, observacoes, desconto_tipo, desconto_valor } = parse.data;
 
     // Busca custo real do banco para cada item
     const itensComCusto = await Promise.all(itens.map(async item => ({
@@ -216,6 +244,8 @@ router.post('/', async (req: Request, res: Response) => {
         cod_meio_pagamento: cod_meio_pagamento ?? null,
         data_pedido: new Date(data_pedido),
         observacoes: observacoes ?? null,
+        desconto_tipo,
+        desconto_valor,
         status: EStatusPedido.Aberto,
         itens: { create: itensComCusto },
       },
@@ -245,7 +275,7 @@ router.put('/:id', async (req: Request, res: Response) => {
       res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: parse.error.issues[0].message }); return;
     }
 
-    const { itens, status, cod_cliente, cod_meio_pagamento, data_pedido, observacoes } = parse.data;
+    const { itens, status, cod_cliente, cod_meio_pagamento, data_pedido, observacoes, desconto_tipo, desconto_valor } = parse.data;
     const novoStatus = Number(status);
     const STATUS_PRODUTIVOS = [EStatusPedido.EmProducao, EStatusPedido.Concluido];
     const novoEhProdutivo = STATUS_PRODUTIVOS.includes(novoStatus);
@@ -299,6 +329,8 @@ router.put('/:id', async (req: Request, res: Response) => {
           cod_meio_pagamento: cod_meio_pagamento ?? null,
           data_pedido: new Date(data_pedido),
           observacoes: observacoes ?? null,
+          desconto_tipo,
+          desconto_valor,
           updated_at: new Date(),
         },
       });
@@ -590,6 +622,41 @@ router.post('/:id/gerar-link', async (req: Request, res: Response) => {
   } catch (err) {
     console.error('[PEDIDOS_GERAR_LINK]', err);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Erro ao gerar link.' });
+  }
+});
+
+// ── POST /:id/gerar-link-corte — gera (ou regenera) token de acesso da ordem de corte ──
+// Usa um campo de token dedicado (token_acesso_corte), separado do token do orçamento
+// (token_acesso), para que gerar um link não invalide o outro.
+router.post('/:id/gerar-link-corte', async (req: Request, res: Response) => {
+  try {
+    const pedidoId = Number(req.params['id']);
+    const codEmpresa = req.user!.cod_empresa!;
+
+    const pedido = await prisma.pedido.findFirst({
+      where: { id: pedidoId, cod_empresa: codEmpresa, excluido: false },
+    });
+    if (!pedido) {
+      res.status(StatusCodes.NOT_FOUND).json({ success: false, message: 'Pedido não encontrado.' });
+      return;
+    }
+
+    const empresa = await prisma.empresa.findUnique({ where: { id: codEmpresa } });
+    const diasValidade = empresa?.link_validade_dias ?? 7;
+    const expiracao = new Date();
+    expiracao.setDate(expiracao.getDate() + diasValidade);
+
+    const token = randomUUID();
+
+    await prisma.pedido.update({
+      where: { id: pedidoId },
+      data: { token_acesso_corte: token, token_expiracao_corte: expiracao },
+    });
+
+    res.json({ success: true, data: { token, expiracao } });
+  } catch (err) {
+    console.error('[PEDIDOS_GERAR_LINK_CORTE]', err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Erro ao gerar link da ordem de corte.' });
   }
 });
 

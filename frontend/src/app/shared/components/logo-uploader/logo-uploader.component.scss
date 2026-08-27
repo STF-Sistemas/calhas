@@ -1,0 +1,65 @@
+.logo-uploader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+// Especificidade reforçada para sobrepor a regra global `.field input { display: block }`
+// (styles.scss), já que este input fica dentro de um wrapper `.field` no formulário pai.
+.logo-uploader .input-arquivo-oculto {
+  display: none;
+}
+
+.logo-preview {
+  width: 160px;
+  height: 90px;
+  border: 1px dashed var(--surface-300);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--surface-100);
+  flex-shrink: 0;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  &.vazio {
+    flex-direction: column;
+    gap: .3rem;
+    color: var(--text-color-secondary);
+    font-size: .78rem;
+
+    i { font-size: 1.4rem; }
+  }
+}
+
+.logo-acoes {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  align-items: flex-start;
+  min-width: 220px;
+}
+
+.logo-botoes {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+
+small.field-hint {
+  color: var(--text-color-secondary);
+  font-size: .75rem;
+  line-height: 1.4;
+}
+
+small.p-error {
+  color: var(--red-500, #ef4444);
+  font-size: .75rem;
+}
