@@ -183,10 +183,58 @@
   color: #1e293b;
 }
 
-// ---- Itens de corte ----
+// ---- Títulos de seção ----
+
+.secao-titulo {
+  margin: 0 0 .75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+// ---- Tabela de produtos ----
+
+.ordem-produtos {
+  padding: 1.25rem 2rem 0;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+  }
+
+  th {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #64748b;
+    font-weight: 700;
+    padding: .5rem .6rem;
+    border-bottom: 2px solid #e2e8f0;
+    text-align: left;
+  }
+
+  td {
+    padding: .65rem .6rem;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: left;
+    color: #1e293b;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  .col-num { text-align: right; white-space: nowrap; }
+  .col-desc { width: 55%; }
+}
+
+// ---- Cortes ----
+
+.ordem-cortes {
+  padding: 1.5rem 2rem 0;
+}
 
 .ordem-itens {
-  padding: 1.25rem 2rem 1.75rem;
+  padding: 0 0 1.75rem;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1rem;
@@ -275,7 +323,9 @@
 
   .pedido-id { align-items: flex-start; text-align: left; }
   .ordem-meta { padding: 1rem; gap: 1rem; }
-  .ordem-itens { padding: 1rem; grid-template-columns: 1fr; }
+  .ordem-produtos { padding: 1rem 1rem 0; }
+  .ordem-cortes { padding: 1.25rem 1rem 0; }
+  .ordem-itens { padding: 0 0 1rem; grid-template-columns: 1fr; }
   .ordem-footer { padding: .75rem 1rem; }
   .empresa-logo { max-width: 110px; max-height: 44px; }
   .watermark span { font-size: 1.4rem; margin: 1rem 1.5rem; }

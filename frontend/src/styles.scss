@@ -572,9 +572,12 @@ body {
    ::ng-deep no componente não alcança estes elementos.
    ========================================================== */
 
-/* Toast sempre acima de tudo */
+/* Toast sempre acima de tudo.
+   max-width evita que a largura fixa (25rem) do PrimeNG estoure a tela
+   e corte o texto em viewports estreitos (celular/PWA). */
 .p-toast {
   z-index: 99999 !important;
+  max-width: calc(100vw - 40px);
 }
 
 /* Modal cobre tudo do topo ao rodapé */

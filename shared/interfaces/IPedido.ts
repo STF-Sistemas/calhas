@@ -24,6 +24,7 @@ export interface IPedido {
   token_expiracao?: Date | string | null;
   token_acesso_corte?: string | null;
   token_expiracao_corte?: Date | string | null;
+  itens_corte_selecionados?: number[] | null;
   aprovacao_status?: number;
   aprovacao_data?: Date | string | null;
   aprovacao_assinatura?: string | null;

@@ -17,6 +17,7 @@ router.get('/:token', async (req: Request, res: Response) => {
         cliente: true,
         itens: {
           include: {
+            produto: true,
             corte: { include: { chapa: true } },
             desenho: true,
           },
@@ -39,13 +40,25 @@ router.get('/:token', async (req: Request, res: Response) => {
       return;
     }
 
-    const itensCorte = pedido.itens
-      .filter((item: any) => item.tipo === ETipoItemPedido.Corte && item.cod_desenho)
+    const idsSelecionados: number[] | null = Array.isArray(pedido.itens_corte_selecionados)
+      ? pedido.itens_corte_selecionados
+      : null;
+
+    const itensEnvio = pedido.itens
+      .filter((item: any) => item.tipo === ETipoItemPedido.Corte || item.tipo === ETipoItemPedido.Produto)
+      .filter((item: any) => !idsSelecionados || idsSelecionados.includes(item.id))
+      // Produtos primeiro, depois cortes (Produto=10 < Corte=11)
+      .sort((a: any, b: any) => a.tipo - b.tipo)
       .map((item: any) => ({
         id: item.id,
+        tipo: item.tipo,
         quantidade: Number(item.quantidade),
         observacoes: item.observacoes,
         medidas: item.medidas ?? [],
+        produto: item.produto ? {
+          descricao: item.produto.descricao,
+          unidade_medida: item.produto.unidade_medida,
+        } : null,
         corte: item.corte ? {
           descricao: item.corte.descricao,
           corte: Number(item.corte.corte),
@@ -58,8 +71,8 @@ router.get('/:token', async (req: Request, res: Response) => {
         } : null,
       }));
 
-    if (itensCorte.length === 0) {
-      res.status(StatusCodes.NOT_FOUND).json({ success: false, code: 'NOT_FOUND', message: 'Este pedido não possui itens de corte com desenho.' });
+    if (itensEnvio.length === 0) {
+      res.status(StatusCodes.NOT_FOUND).json({ success: false, code: 'NOT_FOUND', message: 'Este pedido não possui itens disponíveis para envio.' });
       return;
     }
 
@@ -80,7 +93,7 @@ router.get('/:token', async (req: Request, res: Response) => {
         cliente: {
           razao_social: pedido.cliente.razao_social,
         },
-        itens: itensCorte,
+        itens: itensEnvio,
       },
     });
   } catch (err) {

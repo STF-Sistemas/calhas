@@ -48,8 +48,8 @@ const pedidoBaseSchema = z.object({
   cod_meio_pagamento: z.number().int().positive().nullable().optional(),
   data_pedido: z.string().min(1),
   observacoes: z.string().max(2000).nullable().optional(),
-  desconto_tipo: z.coerce.number().int().min(1).max(2).default(EDescontoTipo.Reais),
-  desconto_valor: z.coerce.number().min(0).default(0),
+  desconto_tipo: z.coerce.number().int().min(1, 'Tipo de desconto inválido.').max(2, 'Tipo de desconto inválido.').default(EDescontoTipo.Reais),
+  desconto_valor: z.coerce.number().min(0, 'Desconto não pode ser negativo.').default(0),
   itens: z.array(itemSchema).min(1),
 });
 
@@ -628,10 +628,20 @@ router.post('/:id/gerar-link', async (req: Request, res: Response) => {
 // ── POST /:id/gerar-link-corte — gera (ou regenera) token de acesso da ordem de corte ──
 // Usa um campo de token dedicado (token_acesso_corte), separado do token do orçamento
 // (token_acesso), para que gerar um link não invalide o outro.
+const gerarLinkCorteSchema = z.object({
+  itens: z.array(z.number().int().positive()).nullish(),
+});
+
 router.post('/:id/gerar-link-corte', async (req: Request, res: Response) => {
   try {
     const pedidoId = Number(req.params['id']);
     const codEmpresa = req.user!.cod_empresa!;
+
+    const parse = gerarLinkCorteSchema.safeParse(req.body);
+    if (!parse.success) {
+      res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: parse.error.issues[0]!.message });
+      return;
+    }
 
     const pedido = await prisma.pedido.findFirst({
       where: { id: pedidoId, cod_empresa: codEmpresa, excluido: false },
@@ -650,7 +660,11 @@ router.post('/:id/gerar-link-corte', async (req: Request, res: Response) => {
 
     await prisma.pedido.update({
       where: { id: pedidoId },
-      data: { token_acesso_corte: token, token_expiracao_corte: expiracao },
+      data: {
+        token_acesso_corte: token,
+        token_expiracao_corte: expiracao,
+        itens_corte_selecionados: parse.data.itens && parse.data.itens.length > 0 ? parse.data.itens : Prisma.DbNull,
+      },
     });
 
     res.json({ success: true, data: { token, expiracao } });

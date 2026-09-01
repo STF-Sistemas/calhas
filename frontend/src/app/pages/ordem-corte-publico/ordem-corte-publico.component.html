@@ -27,7 +27,7 @@
     <div class="estado-mensagem estado-erro">
       <i class="pi pi-ban" style="font-size:2.5rem; color:var(--red-500)"></i>
       <h2>Link inválido</h2>
-      <p>O link acessado não existe ou não possui itens de corte com desenho.</p>
+      <p>O link acessado não existe ou não possui itens disponíveis para envio.</p>
     </div>
   }
 
@@ -56,7 +56,7 @@
               <p class="razao-social">{{ pedido.empresa.razao_social }}</p>
             }
             @if (pedido.empresa.telefone) {
-              <p><i class="pi pi-phone"></i> {{ pedido.empresa.telefone }}</p>
+              <p><i class="pi pi-phone"></i> {{ formatTelefone(pedido.empresa.telefone) }}</p>
             }
             @if (pedido.empresa.email) {
               <p><i class="pi pi-envelope"></i> {{ pedido.empresa.email }}</p>
@@ -79,34 +79,77 @@
           <span class="meta-valor">{{ pedido.data_pedido | date:'dd/MM/yyyy' }}</span>
         </div>
         <div>
-          <span class="meta-label">Itens de Corte</span>
-          <span class="meta-valor">{{ itens.length }}</span>
+          <span class="meta-label">Produtos</span>
+          <span class="meta-valor">{{ produtos.length }}</span>
+        </div>
+        <div>
+          <span class="meta-label">Cortes</span>
+          <span class="meta-valor">{{ cortes.length }}</span>
         </div>
       </section>
 
-      <!-- Itens de corte -->
-      <section class="ordem-itens">
-        @for (item of itens; track item.id) {
-          <article class="item-card">
-            <header class="item-card-hdr">
-              <span class="item-corte">{{ item.corteDescricao }}</span>
-              <span class="item-chips">
-                <span class="chip">Chapa: {{ item.chapaDescricao }}</span>
-                <span class="chip">Ref: {{ item.corteRef }}</span>
-                <span class="chip">Desenho: {{ item.desenhoDescricao }}</span>
-                <span class="chip">Qtd: {{ item.quantidade }}</span>
-                @if (item.total > 0) {
-                  <span class="chip chip--total">Total: {{ item.total }} cm</span>
+      <!-- Produtos -->
+      @if (produtos.length > 0) {
+        <section class="ordem-produtos">
+          <h2 class="secao-titulo">Produtos</h2>
+          <table>
+            <thead>
+              <tr>
+                <th class="col-desc">Produto</th>
+                <th class="col-num">Qtd</th>
+                <th>Observações</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (produto of produtos; track produto.id) {
+                <tr>
+                  <td>{{ produto.descricao }}</td>
+                  <td class="col-num">{{ produto.quantidade }}{{ produto.unidadeMedida ? ' ' + produto.unidadeMedida : '' }}</td>
+                  <td>{{ produto.observacoes || '-' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </section>
+      }
+
+      <!-- Cortes -->
+      @if (cortes.length > 0) {
+        <section class="ordem-cortes">
+          <h2 class="secao-titulo">Cortes</h2>
+          <div class="ordem-itens">
+            @for (item of cortes; track item.id) {
+              <article class="item-card">
+                @if (item.temDesenho) {
+                  <header class="item-card-hdr">
+                    <span class="item-corte">{{ item.corteDescricao }}</span>
+                    <span class="item-chips">
+                      <span class="chip">Chapa: {{ item.chapaDescricao }}</span>
+                      <span class="chip">Ref: {{ item.corteRef }}</span>
+                      <span class="chip">Desenho: {{ item.desenhoDescricao }}</span>
+                      <span class="chip">Qtd: {{ item.quantidade }}</span>
+                      @if (item.total > 0) {
+                        <span class="chip chip--total">Total: {{ item.total }} cm</span>
+                      }
+                    </span>
+                  </header>
+                  <div class="item-svg" [innerHTML]="item.svg"></div>
+                } @else {
+                  <header class="item-card-hdr">
+                    <span class="item-corte">{{ item.corteDescricao }}</span>
+                    <span class="item-chips">
+                      <span class="chip">Qtd: {{ item.quantidade }}</span>
+                    </span>
+                  </header>
                 }
-              </span>
-            </header>
-            <div class="item-svg" [innerHTML]="item.svg"></div>
-            @if (item.observacoes) {
-              <p class="item-obs"><strong>Obs:</strong> {{ item.observacoes }}</p>
+                @if (item.observacoes) {
+                  <p class="item-obs"><strong>Obs:</strong> {{ item.observacoes }}</p>
+                }
+              </article>
             }
-          </article>
-        }
-      </section>
+          </div>
+        </section>
+      }
 
       <footer class="ordem-footer">
         <p>Esta ordem de corte é gerada automaticamente a partir do pedido.</p>

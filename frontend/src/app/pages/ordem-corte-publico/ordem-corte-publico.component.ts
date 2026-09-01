@@ -4,10 +4,21 @@ import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PedidoService } from '#core/services/pedido.service';
 import { calcularTotalCorte, gerarSvgCorte } from '#shared/functions/desenho-corte.functions';
+import { formatPhone } from '#shared/functions/format.functions';
+import { ETipoItemPedido } from '#shared/enums';
 import { IDiagonal, IPonto } from '#shared/interfaces';
+
+interface IItemProdutoExibicao {
+  id: number;
+  descricao: string;
+  quantidade: number;
+  unidadeMedida?: string;
+  observacoes: string | null;
+}
 
 interface IItemCorteExibicao {
   id: number;
+  temDesenho: boolean;
   quantidade: number;
   observacoes: string | null;
   chapaDescricao: string;
@@ -15,7 +26,7 @@ interface IItemCorteExibicao {
   corteRef: string;
   desenhoDescricao: string;
   total: number;
-  svg: SafeHtml;
+  svg: SafeHtml | null;
 }
 
 @Component({
@@ -28,7 +39,8 @@ interface IItemCorteExibicao {
 export class OrdemCortePublicoComponent implements OnInit {
   estado: 'carregando' | 'ok' | 'expirado' | 'cancelado' | 'invalido' = 'carregando';
   pedido: any = null;
-  itens: IItemCorteExibicao[] = [];
+  produtos: IItemProdutoExibicao[] = [];
+  cortes: IItemCorteExibicao[] = [];
   readonly watermarkRepeticoes = Array.from({ length: 14 });
 
   constructor(
@@ -42,7 +54,13 @@ export class OrdemCortePublicoComponent implements OnInit {
     this.pedidoService.buscarOrdemCortePublico(token).subscribe({
       next: (res) => {
         this.pedido = res.data;
-        this.itens = (res.data.itens ?? []).map((item: any) => this.montarItem(item));
+        const todos = res.data.itens ?? [];
+        this.produtos = todos
+          .filter((item: any) => item.tipo === ETipoItemPedido.Produto)
+          .map((item: any) => this.montarProduto(item));
+        this.cortes = todos
+          .filter((item: any) => item.tipo === ETipoItemPedido.Corte)
+          .map((item: any) => this.montarCorte(item));
         this.estado = 'ok';
       },
       error: (err) => {
@@ -54,19 +72,35 @@ export class OrdemCortePublicoComponent implements OnInit {
     });
   }
 
+  formatTelefone(valor: string | null | undefined): string {
+    return formatPhone(valor);
+  }
+
   watermarkTexto(): string {
     const empresa = this.pedido?.empresa;
     if (!empresa) return '';
     return empresa.marca_dagua || empresa.nome_fantasia || empresa.razao_social || '';
   }
 
-  private montarItem(item: any): IItemCorteExibicao {
+  private montarProduto(item: any): IItemProdutoExibicao {
+    return {
+      id: item.id,
+      descricao: item.produto?.descricao || `Item Nº ${item.id}`,
+      quantidade: item.quantidade,
+      unidadeMedida: item.produto?.unidade_medida,
+      observacoes: item.observacoes,
+    };
+  }
+
+  private montarCorte(item: any): IItemCorteExibicao {
+    const temDesenho = !!item.desenho;
     const pontos: IPonto[] = item.desenho?.pontos ?? [];
     const diagonais: IDiagonal[] = item.desenho?.diagonais ?? [];
     const medidas: number[] = item.medidas ?? [];
-    const total = calcularTotalCorte(pontos, diagonais, medidas);
+    const total = temDesenho ? calcularTotalCorte(pontos, diagonais, medidas) : 0;
     return {
       id: item.id,
+      temDesenho,
       quantidade: item.quantidade,
       observacoes: item.observacoes,
       chapaDescricao: item.corte?.chapa?.descricao ?? '-',
@@ -74,7 +108,7 @@ export class OrdemCortePublicoComponent implements OnInit {
       corteRef: item.corte?.corte != null ? `${item.corte.corte} cm` : '-',
       desenhoDescricao: item.desenho?.descricao ?? '-',
       total,
-      svg: this.sanitizer.bypassSecurityTrustHtml(gerarSvgCorte(pontos, diagonais, medidas)),
+      svg: temDesenho ? this.sanitizer.bypassSecurityTrustHtml(gerarSvgCorte(pontos, diagonais, medidas)) : null,
     };
   }
 }

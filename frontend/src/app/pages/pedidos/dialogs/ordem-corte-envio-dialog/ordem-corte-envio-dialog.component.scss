@@ -96,3 +96,46 @@ small.p-error {
   color: var(--red-500, #ef4444);
   font-size: .78rem;
 }
+
+// ---- Passo: seleção de itens ----
+
+.itens-passo {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.itens-todos {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .35rem 0;
+  border-bottom: 1px solid var(--surface-200);
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.itens-lista {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.item-linha {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .5rem .25rem;
+  border-bottom: 1px solid var(--surface-100);
+}
+
+.item-label {
+  display: flex;
+  flex-direction: column;
+  gap: .1rem;
+  cursor: pointer;
+
+  small { color: var(--text-color-secondary); }
+}

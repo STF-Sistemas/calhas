@@ -12,6 +12,8 @@ export interface IFornecedor {
   crt: number;
   email?: string;
   fone?: string;
+  nome_vendedor?: string;
+  fone_vendedor?: string;
   cep?: string;
   logradouro?: string;
   numero?: string;

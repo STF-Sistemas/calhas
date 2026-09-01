@@ -49,6 +49,11 @@ if ((process.env['JWT_SECRET'] as string).length < 32) {
 const app = express();
 const PORT = process.env['PORT'] || 3004;
 
+// ── Confia no proxy reverso (1 hop) para X-Forwarded-For ser lido corretamente
+// pelo express-rate-limit. Sem isso, em produção (atrás de nginx/Docker), o
+// header X-Forwarded-For é rejeitado com ERR_ERL_UNEXPECTED_X_FORWARDED_FOR.
+app.set('trust proxy', 1);
+
 // ── Headers de segurança HTTP ─────────────────────────────────────────────────
 // CSP desabilitado: o Angular serve arquivos estáticos com hashes/nonces
 // que o helmet não conhece em tempo de build. Outros headers (HSTS, XFO, etc.) permanecem.

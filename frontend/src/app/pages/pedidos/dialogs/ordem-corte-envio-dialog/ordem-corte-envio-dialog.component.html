@@ -39,19 +39,20 @@
           optionLabel="razao_social"
           placeholder="Selecione um fornecedor"
           [filter]="true"
-          filterBy="razao_social,cnpj"
+          filterBy="razao_social,cnpj,nome_vendedor"
           styleClass="w-full"
+          appendTo="body"
           aria-label="Selecionar fornecedor para envio">
           <ng-template let-fornecedor pTemplate="item">
             <div class="fornecedor-item">
-              <span>{{ fornecedor.razao_social }}</span>
-              <small>{{ fornecedor.fone || 'Sem telefone' }}</small>
+              <span>{{ nomeExibicaoFornecedor(fornecedor) }}</span>
+              <small>{{ foneVendedorFormatado(fornecedor) || 'Sem telefone de vendedor' }}</small>
             </div>
           </ng-template>
         </p-select>
 
-        @if (fornecedorSelecionado && !fornecedorSelecionado.fone) {
-          <small class="p-error">Este fornecedor não possui telefone cadastrado.</small>
+        @if (fornecedorSelecionado && !fornecedorSelecionado.fone_vendedor) {
+          <small class="p-error">Este fornecedor não possui telefone do vendedor cadastrado.</small>
         }
       }
 
@@ -59,9 +60,60 @@
         <p-button label="Voltar" icon="pi pi-arrow-left" severity="secondary" [outlined]="true"
           (onClick)="voltar()" aria-label="Voltar para as opções">
         </p-button>
+        <p-button label="Avançar" icon="pi pi-arrow-right"
+          [disabled]="!fornecedorSelecionado || !fornecedorSelecionado.fone_vendedor"
+          (onClick)="onAvancarItens()"
+          aria-label="Avançar para a seleção de itens">
+        </p-button>
+      </div>
+    </div>
+  }
+
+  @if (passo === 'itens') {
+    <div class="itens-passo">
+      <p class="fornecedor-intro">
+        Selecione os itens que serão enviados para
+        <strong>{{ nomeExibicaoFornecedor(fornecedorSelecionado!) }}</strong>:
+      </p>
+
+      <div class="itens-todos">
+        <p-checkbox
+          [binary]="true"
+          [ngModel]="todosSelecionados()"
+          (ngModelChange)="toggleTodos($event)"
+          inputId="todos-itens"
+          aria-label="Selecionar todos os itens">
+        </p-checkbox>
+        <label for="todos-itens">Selecionar todos</label>
+      </div>
+
+      <div class="itens-lista">
+        @for (i of itensSelecionaveis; track trackByItemId($index, i)) {
+          <div class="item-linha">
+            <p-checkbox
+              [binary]="true"
+              [(ngModel)]="i.selecionado"
+              [inputId]="'item-' + i.item.id"
+              [attr.aria-label]="'Selecionar ' + i.descricao">
+            </p-checkbox>
+            <label [for]="'item-' + i.item.id" class="item-label">
+              <span>{{ i.descricao }}</span>
+              <small>Qtd: {{ i.item.quantidade }}</small>
+            </label>
+          </div>
+        }
+        @if (itensSelecionaveis.length === 0) {
+          <p class="fornecedor-intro">Nenhum produto ou corte disponível para envio.</p>
+        }
+      </div>
+
+      <div class="fornecedor-acoes">
+        <p-button label="Voltar" icon="pi pi-arrow-left" severity="secondary" [outlined]="true"
+          (onClick)="voltar()" aria-label="Voltar para a seleção de fornecedor">
+        </p-button>
         <p-button label="Enviar" icon="pi pi-send"
           [loading]="enviando"
-          [disabled]="!fornecedorSelecionado || !fornecedorSelecionado.fone"
+          [disabled]="itensSelecionaveis.length === 0"
           (onClick)="onEnviarWhatsApp()"
           aria-label="Enviar ordem de corte pelo WhatsApp para o fornecedor selecionado">
         </p-button>

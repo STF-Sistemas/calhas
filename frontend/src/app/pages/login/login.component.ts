@@ -74,7 +74,8 @@ export class LoginComponent {
         this.isLoading = false;
       },
       error: (err) => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao conectar ao servidor' });
+        const detail = err?.error?.message || 'Erro ao conectar ao servidor';
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail });
         this.isLoading = false;
       }
     });

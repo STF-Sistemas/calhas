@@ -19,6 +19,8 @@ const fornecedorSchema = z.object({
   crt: z.number().int().min(1).max(3).default(1),
   email: z.string().email().max(200).nullish().or(z.literal('')),
   fone: z.string().max(20).nullish().or(z.literal('')),
+  nome_vendedor: z.string().max(200).nullish().or(z.literal('')),
+  fone_vendedor: z.string().max(20).nullish().or(z.literal('')),
   cep: z.string().max(8).nullish().or(z.literal('')),
   logradouro: z.string().max(200).nullish().or(z.literal('')),
   numero: z.string().max(20).nullish().or(z.literal('')),

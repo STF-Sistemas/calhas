@@ -79,6 +79,8 @@ export class FornecedorFormComponent implements OnInit {
       crt: [ECrt.SimplesNacional, [Validators.required]],
       email: ['', [Validators.email, Validators.maxLength(200)]],
       fone: ['', [Validators.maxLength(20)]],
+      nome_vendedor: ['', [Validators.maxLength(200)]],
+      fone_vendedor: ['', [Validators.maxLength(20)]],
       cep: [''],
       logradouro: ['', [Validators.maxLength(200)]],
       numero: ['', [Validators.maxLength(20)]],
@@ -211,6 +213,7 @@ export class FornecedorFormComponent implements OnInit {
     const dados: Partial<IFornecedor> = {
       ...raw,
       cnpj: raw['cnpj'].replace(/\D/g, ''),
+      cep: raw['cep'] ? String(raw['cep']).replace(/\D/g, '') : raw['cep'],
       id: this.fornecedorId,
     };
     delete (dados as Record<string, unknown>)['cidade_nome'];

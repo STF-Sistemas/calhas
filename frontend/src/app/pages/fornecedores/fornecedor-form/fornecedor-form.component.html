@@ -92,6 +92,19 @@
       </div>
     </div>
 
+    <div class="row">
+      <div class="field col-12 col-md-6">
+        <label for="nome_vendedor">Nome do Vendedor</label>
+        <input pInputText id="nome_vendedor" formControlName="nome_vendedor" placeholder="Nome do vendedor responsável" />
+      </div>
+      <div class="field col-12 col-md-6">
+        <label for="fone_vendedor">Telefone (WhatsApp) do Vendedor</label>
+        <input pInputText id="fone_vendedor" formControlName="fone_vendedor" type="tel"
+          placeholder="(00) 0000-0000 ou (00) 00000-0000"
+          mask="(00) 0000-0000||(00) 00000-0000" />
+      </div>
+    </div>
+
     <!-- ============ ENDEREÇO ============ -->
     <h3 class="section-title mt-2">
       <i class="pi pi-map-marker"></i>

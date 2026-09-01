@@ -277,6 +277,7 @@ model Pedido {
   token_expiracao    DateTime?
   token_acesso_corte    String?   @unique @db.VarChar(100)
   token_expiracao_corte DateTime?
+  itens_corte_selecionados Json?
   aprovacao_status     Int       @default(0)
   aprovacao_data       DateTime?
   aprovacao_assinatura String?   @db.Text
@@ -358,6 +359,8 @@ model Fornecedor {
   crt           Int      @default(1)
   email         String?  @db.VarChar(200)
   fone          String?  @db.VarChar(20)
+  nome_vendedor String?  @db.VarChar(200)
+  fone_vendedor String?  @db.VarChar(20)
   cep           String?  @db.VarChar(8)
   logradouro    String?  @db.VarChar(200)
   numero        String?  @db.VarChar(20)

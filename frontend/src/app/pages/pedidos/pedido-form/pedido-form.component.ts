@@ -152,7 +152,13 @@ export class PedidoFormComponent implements OnInit {
   abrir(id?: number) {
     this.pedidoId = id;
     this.visible = true;
-    this.form.reset({ data_pedido: new Date(), status: EStatusPedido.Aberto, cod_meio_pagamento: null });
+    this.form.reset({
+      data_pedido: new Date(),
+      status: EStatusPedido.Aberto,
+      cod_meio_pagamento: null,
+      desconto_tipo: EDescontoTipo.Reais,
+      desconto_valor: 0,
+    });
     this.itens.clear();
 
     if (id) {

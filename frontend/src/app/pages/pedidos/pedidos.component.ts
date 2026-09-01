@@ -208,11 +208,11 @@ export class PedidosComponent implements OnInit {
   onPrintDesenho(pedido: IPedido) {
     this.pedidoService.buscarPorId(pedido.id).subscribe({
       next: (res) => {
-        const temItensCorte = (res.data.itens ?? []).some(
-          i => i.tipo === ETipoItemPedido.Corte && i.cod_desenho
+        const temItensEnviaveis = (res.data.itens ?? []).some(
+          i => i.tipo === ETipoItemPedido.Corte || i.tipo === ETipoItemPedido.Produto
         );
-        if (!temItensCorte) {
-          this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Este pedido não possui itens de corte com desenho.' });
+        if (!temItensEnviaveis) {
+          this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Este pedido não possui produtos ou cortes para envio.' });
           return;
         }
         this.ordemCorteDialog.abrir(res.data);
