@@ -13,7 +13,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./dialog-wrapper.component.css'],
 })
-export class DialogWrapperComponent {
+export class DialogWrapper {
   @Input() visible = false;
   @Input() title = '';
   @Input() isLoadingData = false;

@@ -33,7 +33,7 @@ import { PushNotificacaoService } from '#core/services/push-notificacao.service'
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './perfil.component.html',
 })
-export class PerfilComponent implements OnInit {
+export class Perfil implements OnInit {
   form!: FormGroup;
   isLoading = false;
   isSaving = false;

@@ -17,11 +17,11 @@ import { TableModule } from 'primeng/table';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
-import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
-import { DesenhoMedidaComponent } from '../desenho-medida/desenho-medida.component';
+import { DesenhoMedida } from '../desenho-medida/desenho-medida.component';
 import {
-  DesenhoLivreComponent,
+  DesenhoLivre,
   IDesenhoLivreResultado,
 } from '../desenho-livre/desenho-livre.component';
 import { PedidoService } from '#core/services/pedido.service';
@@ -63,17 +63,17 @@ import { calcularValorDesconto, calcularValorLiquido } from '#shared/functions/d
     TooltipModule,
     CurrencyMaskDirective,
     EnterFocusNextDirective,
-    DialogWrapperComponent,
-    DesenhoMedidaComponent,
-    DesenhoLivreComponent,
+    DialogWrapper,
+    DesenhoMedida,
+    DesenhoLivre,
   ],
   templateUrl: './pedido-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./pedido-form.component.css'],
 })
-export class PedidoFormComponent implements OnInit {
-  @ViewChild('medidasDialog') medidasDialog!: DesenhoMedidaComponent;
-  @ViewChild('desenhoLivreDialog') desenhoLivreDialog!: DesenhoLivreComponent;
+export class PedidoForm implements OnInit {
+  @ViewChild('medidasDialog') medidasDialog!: DesenhoMedida;
+  @ViewChild('desenhoLivreDialog') desenhoLivreDialog!: DesenhoLivre;
   @Output() saved = new EventEmitter<void>();
 
   form: FormGroup;

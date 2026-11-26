@@ -14,7 +14,7 @@ import { IEmpresa } from '#shared/interfaces';
   changeDetection: ChangeDetectionStrategy.Eager,
   encapsulation: ViewEncapsulation.None,
 })
-export class RelatorioWrapperComponent {
+export class RelatorioWrapper {
   @Input() titulo = '';
   @Input() empresa: IEmpresa | null = null;
   @Input() isLoading = false;

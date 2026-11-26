@@ -35,7 +35,7 @@ import { CheckboxModule } from 'primeng/checkbox';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./login.component.css'],
 })
-export class LoginComponent {
+export class Login {
   loginForm: FormGroup;
   isLoading = false;
   currentYear = new Date().getFullYear();

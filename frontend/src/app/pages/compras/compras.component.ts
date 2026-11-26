@@ -8,10 +8,10 @@ import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import {
-  DataTableComponent,
+  DataTable,
   IRowAction,
 } from '#shared-frontend/components/data-table/data-table.component';
-import { CompraFormComponent } from './compra-form/compra-form.component';
+import { CompraForm } from './compra-form/compra-form.component';
 import { CompraService } from '#core/services/compra.service';
 import { DanfePrintService } from '#core/services/danfe-print.service';
 import { ICompra } from '#shared/interfaces';
@@ -23,8 +23,8 @@ import { EStatusCompra } from '#shared/enums';
   imports: [
     CommonModule,
     FormsModule,
-    DataTableComponent,
-    CompraFormComponent,
+    DataTable,
+    CompraForm,
     ConfirmDialogModule,
     ToastModule,
     DialogModule,
@@ -35,8 +35,8 @@ import { EStatusCompra } from '#shared/enums';
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })
-export class ComprasComponent implements OnInit {
-  @ViewChild('form') form!: CompraFormComponent;
+export class Compras implements OnInit {
+  @ViewChild('form') form!: CompraForm;
 
   compras: ICompra[] = [];
   loading = false;

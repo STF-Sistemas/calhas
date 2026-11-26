@@ -26,7 +26,7 @@ import { TApiResponse } from '#shared/types';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./esqueci-senha.component.css'],
 })
-export class EsqueciSenhaComponent {
+export class EsqueciSenha {
   form: FormGroup;
   isLoading = false;
   enviado = false;

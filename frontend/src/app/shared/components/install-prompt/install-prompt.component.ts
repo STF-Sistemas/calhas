@@ -10,7 +10,7 @@ import { ButtonModule } from 'primeng/button';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./install-prompt.component.css'],
 })
-export class InstallPromptComponent implements OnInit, OnDestroy {
+export class InstallPrompt implements OnInit, OnDestroy {
   visible = false;
 
   private deferredPrompt: any = null;

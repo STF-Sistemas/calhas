@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessageService } from 'primeng/api';
-import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { PedidoService } from '#core/services/pedido.service';
 import { FornecedorService } from '#core/services/fornecedor.service';
 import { PedidoImpressaoDesenhoService } from '#core/services/pedido-impressao-desenho.service';
@@ -28,13 +28,13 @@ interface IItemSelecionavel {
     ButtonModule,
     SelectModule,
     CheckboxModule,
-    DialogWrapperComponent,
+    DialogWrapper,
   ],
   templateUrl: './ordem-corte-envio-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./ordem-corte-envio-dialog.component.css'],
 })
-export class OrdemCorteEnvioDialogComponent {
+export class OrdemCorteEnvioDialog {
   visible = false;
   passo: 'opcoes' | 'fornecedor' | 'itens' = 'opcoes';
   pedido: IPedido | null = null;

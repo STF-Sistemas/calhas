@@ -4,8 +4,8 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { TagModule } from 'primeng/tag';
-import { DataTableComponent } from '#shared-frontend/components/data-table/data-table.component';
-import { UsuarioFormComponent } from './usuario-form/usuario-form.component';
+import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
+import { UsuarioForm } from './usuario-form/usuario-form.component';
 import { UsuarioService } from '#core/services/usuario.service';
 import { IUsuario } from '#shared/interfaces';
 
@@ -14,8 +14,8 @@ import { IUsuario } from '#shared/interfaces';
   standalone: true,
   imports: [
     CommonModule,
-    DataTableComponent,
-    UsuarioFormComponent,
+    DataTable,
+    UsuarioForm,
     ConfirmDialogModule,
     ToastModule,
     TagModule,
@@ -25,8 +25,8 @@ import { IUsuario } from '#shared/interfaces';
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })
-export class UsuariosComponent implements OnInit {
-  @ViewChild('form') form!: UsuarioFormComponent;
+export class Usuarios implements OnInit {
+  @ViewChild('form') form!: UsuarioForm;
 
   usuarios: IUsuario[] = [];
   loading = false;

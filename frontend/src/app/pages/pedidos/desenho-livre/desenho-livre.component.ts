@@ -13,7 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
-import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { IDiagonal, IPonto } from '#shared/interfaces';
@@ -58,7 +58,7 @@ interface ISnapshot {
     InputTextModule,
     TooltipModule,
     SelectButtonModule,
-    DialogWrapperComponent,
+    DialogWrapper,
     CurrencyMaskDirective,
     EnterFocusNextDirective,
   ],
@@ -66,7 +66,7 @@ interface ISnapshot {
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./desenho-livre.component.css'],
 })
-export class DesenhoLivreComponent implements OnDestroy {
+export class DesenhoLivre implements OnDestroy {
   @ViewChild('canvas') canvasRef?: ElementRef<HTMLCanvasElement>;
   @Output() confirmed = new EventEmitter<IDesenhoLivreResultado>();
 

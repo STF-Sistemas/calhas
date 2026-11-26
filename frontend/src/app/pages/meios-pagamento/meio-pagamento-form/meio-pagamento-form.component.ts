@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
-import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { MeioPagamentoService } from '#core/services/meio-pagamento.service';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 
@@ -15,13 +15,13 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
     ReactiveFormsModule,
     InputTextModule,
     EnterFocusNextDirective,
-    DialogWrapperComponent,
+    DialogWrapper,
   ],
   templateUrl: './meio-pagamento-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./meio-pagamento-form.component.css'],
 })
-export class MeioPagamentoFormComponent {
+export class MeioPagamentoForm {
   @Output() saved = new EventEmitter<void>();
 
   form: FormGroup;

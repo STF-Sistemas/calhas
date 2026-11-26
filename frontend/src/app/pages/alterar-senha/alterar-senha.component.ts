@@ -37,7 +37,7 @@ function senhasIguaisValidator(g: AbstractControl) {
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './alterar-senha.component.html',
 })
-export class AlterarSenhaComponent implements OnInit {
+export class AlterarSenha implements OnInit {
   form!: FormGroup;
   isSaving = false;
 

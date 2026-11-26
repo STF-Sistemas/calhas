@@ -10,7 +10,7 @@ import SignaturePad from 'signature_pad';
   styleUrls: ['./assinatura-canvas.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AssinaturaCanvasComponent implements AfterViewInit, OnDestroy {
+export class AssinaturaCanvas implements AfterViewInit, OnDestroy {
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
   @Output() alterado = new EventEmitter<boolean>();
 

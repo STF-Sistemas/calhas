@@ -12,7 +12,7 @@ import { TableModule } from 'primeng/table';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
-import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { ChapaService } from '#core/services/chapa.service';
 import { ICorte } from '#shared/interfaces';
 import { forkJoin, of, switchMap, Observable } from 'rxjs';
@@ -30,13 +30,13 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
     ButtonModule,
     CurrencyMaskDirective,
     EnterFocusNextDirective,
-    DialogWrapperComponent,
+    DialogWrapper,
   ],
   templateUrl: './chapa-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./chapa-form.component.css'],
 })
-export class ChapaFormComponent {
+export class ChapaForm {
   @Output() saved = new EventEmitter<void>();
 
   form: FormGroup;

@@ -8,7 +8,7 @@ import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageModule } from 'primeng/message';
 import { PanelModule } from 'primeng/panel';
-import { RelatorioWrapperComponent } from 'src/app/shared/components/relatorio-wrapper/relatorio-wrapper.component';
+import { RelatorioWrapper } from 'src/app/shared/components/relatorio-wrapper/relatorio-wrapper.component';
 import { RelatorioService } from 'src/app/core/services/relatorio.service';
 import { ClienteService } from 'src/app/core/services/cliente.service';
 import { ProdutoService } from 'src/app/core/services/produto.service';
@@ -29,13 +29,13 @@ import { IRelatorioPedidosLucros, IEmpresa } from '#shared/interfaces';
     TooltipModule,
     MessageModule,
     PanelModule,
-    RelatorioWrapperComponent,
+    RelatorioWrapper,
   ],
   templateUrl: './pedidos-lucros.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./pedidos-lucros.component.css'],
 })
-export class PedidosLucrosComponent implements OnInit {
+export class PedidosLucros implements OnInit {
   form: FormGroup;
   empresa: IEmpresa | null = null;
   relatorio: IRelatorioPedidosLucros | null = null;

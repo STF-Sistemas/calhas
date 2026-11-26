@@ -19,13 +19,13 @@ import { SelectModule } from 'primeng/select';
 import { DialogModule } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
-import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CompraService } from '#core/services/compra.service';
 import { FornecedorService } from '#core/services/fornecedor.service';
 import { ProdutoService } from '#core/services/produto.service';
-import { FornecedorLookupDialogComponent } from '../dialogs/fornecedor-lookup-dialog/fornecedor-lookup-dialog.component';
-import { ProdutoLookupDialogComponent } from '../dialogs/produto-lookup-dialog/produto-lookup-dialog.component';
-import { ProdutoFormComponent } from '../../produtos/produto-form/produto-form.component';
+import { FornecedorLookupDialog } from '../dialogs/fornecedor-lookup-dialog/fornecedor-lookup-dialog.component';
+import { ProdutoLookupDialog } from '../dialogs/produto-lookup-dialog/produto-lookup-dialog.component';
+import { ProdutoForm } from '../../produtos/produto-form/produto-form.component';
 import { ICompra, IFornecedor, IProduto } from '#shared/interfaces';
 import { EStatusCompra } from '#shared/enums';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
@@ -48,20 +48,20 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
     DialogModule,
     NgxMaskDirective,
     EnterFocusNextDirective,
-    DialogWrapperComponent,
-    FornecedorLookupDialogComponent,
-    ProdutoLookupDialogComponent,
-    ProdutoFormComponent,
+    DialogWrapper,
+    FornecedorLookupDialog,
+    ProdutoLookupDialog,
+    ProdutoForm,
   ],
   providers: [provideNgxMask()],
   templateUrl: './compra-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./compra-form.component.css'],
 })
-export class CompraFormComponent implements OnInit {
-  @ViewChild('fornecedorLookup') fornecedorLookup!: FornecedorLookupDialogComponent;
-  @ViewChild('produtoLookup') produtoLookup!: ProdutoLookupDialogComponent;
-  @ViewChild('produtoForm') produtoFormRef!: ProdutoFormComponent;
+export class CompraForm implements OnInit {
+  @ViewChild('fornecedorLookup') fornecedorLookup!: FornecedorLookupDialog;
+  @ViewChild('produtoLookup') produtoLookup!: ProdutoLookupDialog;
+  @ViewChild('produtoForm') produtoFormRef!: ProdutoForm;
   @Output() saved = new EventEmitter<void>();
 
   form!: FormGroup;

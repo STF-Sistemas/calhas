@@ -14,8 +14,8 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MessageService } from 'primeng/api';
 import { NgxMaskDirective } from 'ngx-mask';
-import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
-import { LogoUploaderComponent } from '#shared-frontend/components/logo-uploader/logo-uploader.component';
+import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { LogoUploader } from '#shared-frontend/components/logo-uploader/logo-uploader.component';
 import { EmpresaService } from '#core/services/empresa.service';
 import { ClienteService } from '#core/services/cliente.service';
 import { AuthService } from '#core/services/auth.service';
@@ -48,14 +48,14 @@ import { environment } from 'src/environments/environment';
     NgxMaskDirective,
     CurrencyMaskDirective,
     EnterFocusNextDirective,
-    DialogWrapperComponent,
-    LogoUploaderComponent,
+    DialogWrapper,
+    LogoUploader,
   ],
   templateUrl: './empresa-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./empresa-form.component.css'],
 })
-export class EmpresaFormComponent {
+export class EmpresaForm {
   @Output() saved = new EventEmitter<void>();
 
   form: FormGroup;

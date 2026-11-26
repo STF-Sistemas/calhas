@@ -6,7 +6,7 @@ import { PasswordModule } from 'primeng/password';
 import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessageService } from 'primeng/api';
-import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { UsuarioService } from '#core/services/usuario.service';
 import { EmpresaService } from '#core/services/empresa.service';
 import { AuthService } from '#core/services/auth.service';
@@ -25,13 +25,13 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
     SelectModule,
     CheckboxModule,
     EnterFocusNextDirective,
-    DialogWrapperComponent,
+    DialogWrapper,
   ],
   templateUrl: './usuario-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./usuario-form.component.css'],
 })
-export class UsuarioFormComponent implements OnInit {
+export class UsuarioForm implements OnInit {
   @Output() saved = new EventEmitter<void>();
 
   form: FormGroup;

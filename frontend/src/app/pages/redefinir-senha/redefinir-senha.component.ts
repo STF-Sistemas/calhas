@@ -38,7 +38,7 @@ function senhasIguaisValidator(g: AbstractControl) {
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./redefinir-senha.component.css'],
 })
-export class RedefinirSenhaComponent implements OnInit {
+export class RedefinirSenha implements OnInit {
   form!: FormGroup;
   isLoading = false;
   concluido = false;

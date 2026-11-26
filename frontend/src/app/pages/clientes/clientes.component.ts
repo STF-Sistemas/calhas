@@ -13,8 +13,8 @@ import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TagModule } from 'primeng/tag';
-import { DataTableComponent } from '#shared-frontend/components/data-table/data-table.component';
-import { ClienteFormComponent } from './cliente-form/cliente-form.component';
+import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
+import { ClienteForm } from './cliente-form/cliente-form.component';
 import { ClienteService } from '#core/services/cliente.service';
 import { PedidoService } from '#core/services/pedido.service';
 import { ICliente, IPedido } from '#shared/interfaces';
@@ -26,8 +26,8 @@ import { EStatusPedido } from '#shared/enums';
   imports: [
     CommonModule,
     FormsModule,
-    DataTableComponent,
-    ClienteFormComponent,
+    DataTable,
+    ClienteForm,
     ConfirmDialogModule,
     ToastModule,
     PanelModule,
@@ -45,8 +45,8 @@ import { EStatusPedido } from '#shared/enums';
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })
-export class ClientesComponent implements OnInit {
-  @ViewChild('form') form!: ClienteFormComponent;
+export class Clientes implements OnInit {
+  @ViewChild('form') form!: ClienteForm;
 
   clientes: ICliente[] = [];
   loading = false;

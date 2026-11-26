@@ -18,7 +18,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
-import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { FornecedorService } from '#core/services/fornecedor.service';
 import { ClienteService } from '#core/services/cliente.service';
 import { IFornecedor } from '#shared/interfaces';
@@ -41,14 +41,14 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
     TooltipModule,
     NgxMaskDirective,
     EnterFocusNextDirective,
-    DialogWrapperComponent,
+    DialogWrapper,
   ],
   providers: [provideNgxMask()],
   templateUrl: './fornecedor-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./fornecedor-form.component.css'],
 })
-export class FornecedorFormComponent implements OnInit {
+export class FornecedorForm implements OnInit {
   /** Quando usado como sub-componente de lookup, pré-preenche o CNPJ */
   @Input() cnpjInicial?: string;
   @Output() saved = new EventEmitter<IFornecedor>();

@@ -14,8 +14,8 @@ import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TagModule } from 'primeng/tag';
-import { DataTableComponent } from '#shared-frontend/components/data-table/data-table.component';
-import { FornecedorFormComponent } from './fornecedor-form/fornecedor-form.component';
+import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
+import { FornecedorForm } from './fornecedor-form/fornecedor-form.component';
 import { FornecedorService } from '#core/services/fornecedor.service';
 import { CompraService } from '#core/services/compra.service';
 import { IFornecedor, ICompra } from '#shared/interfaces';
@@ -27,8 +27,8 @@ import { EStatusCompra } from '#shared/enums';
   imports: [
     CommonModule,
     FormsModule,
-    DataTableComponent,
-    FornecedorFormComponent,
+    DataTable,
+    FornecedorForm,
     ConfirmDialogModule,
     ToastModule,
     PanelModule,
@@ -46,8 +46,8 @@ import { EStatusCompra } from '#shared/enums';
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })
-export class FornecedoresComponent implements OnInit {
-  @ViewChild('form') form!: FornecedorFormComponent;
+export class Fornecedores implements OnInit {
+  @ViewChild('form') form!: FornecedorForm;
 
   fornecedores: IFornecedor[] = [];
   loading = false;

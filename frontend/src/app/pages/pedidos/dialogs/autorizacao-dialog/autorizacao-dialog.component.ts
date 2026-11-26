@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TagModule } from 'primeng/tag';
 import { MessageService } from 'primeng/api';
-import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { PedidoService } from '#core/services/pedido.service';
 import { IPedido } from '#shared/interfaces';
 import { EAprovacaoPedido } from '#shared/enums';
@@ -10,12 +10,12 @@ import { EAprovacaoPedido } from '#shared/enums';
 @Component({
   selector: 'app-autorizacao-dialog',
   standalone: true,
-  imports: [CommonModule, TagModule, DialogWrapperComponent],
+  imports: [CommonModule, TagModule, DialogWrapper],
   templateUrl: './autorizacao-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./autorizacao-dialog.component.css'],
 })
-export class AutorizacaoDialogComponent {
+export class AutorizacaoDialog {
   visible = false;
   isLoadingData = false;
   pedido: IPedido | null = null;

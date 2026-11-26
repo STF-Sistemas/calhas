@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
-import { DataTableComponent } from '#shared-frontend/components/data-table/data-table.component';
-import { ServicoFormComponent } from './servico-form/servico-form.component';
+import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
+import { ServicoForm } from './servico-form/servico-form.component';
 import { ServicoService } from '#core/services/servico.service';
 import { IServico } from '#shared/interfaces';
 import { EStatusGeral } from '#shared/enums';
@@ -14,8 +14,8 @@ import { EStatusGeral } from '#shared/enums';
   standalone: true,
   imports: [
     CommonModule,
-    DataTableComponent,
-    ServicoFormComponent,
+    DataTable,
+    ServicoForm,
     ConfirmDialogModule,
     ToastModule,
   ],
@@ -24,8 +24,8 @@ import { EStatusGeral } from '#shared/enums';
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })
-export class ServicosComponent implements OnInit {
-  @ViewChild('form') form!: ServicoFormComponent;
+export class Servicos implements OnInit {
+  @ViewChild('form') form!: ServicoForm;
 
   servicos: IServico[] = [];
   loading = false;

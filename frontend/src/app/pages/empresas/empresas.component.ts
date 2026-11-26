@@ -4,8 +4,8 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { TagModule } from 'primeng/tag';
-import { DataTableComponent } from '#shared-frontend/components/data-table/data-table.component';
-import { EmpresaFormComponent } from './empresa-form/empresa-form.component';
+import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
+import { EmpresaForm } from './empresa-form/empresa-form.component';
 import { EmpresaService } from '#core/services/empresa.service';
 import { IEmpresa } from '#shared/interfaces';
 
@@ -14,8 +14,8 @@ import { IEmpresa } from '#shared/interfaces';
   standalone: true,
   imports: [
     CommonModule,
-    DataTableComponent,
-    EmpresaFormComponent,
+    DataTable,
+    EmpresaForm,
     ConfirmDialogModule,
     ToastModule,
     TagModule,
@@ -25,8 +25,8 @@ import { IEmpresa } from '#shared/interfaces';
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })
-export class EmpresasComponent implements OnInit {
-  @ViewChild('form') form!: EmpresaFormComponent;
+export class Empresas implements OnInit {
+  @ViewChild('form') form!: EmpresaForm;
 
   empresas: IEmpresa[] = [];
   loading = false;

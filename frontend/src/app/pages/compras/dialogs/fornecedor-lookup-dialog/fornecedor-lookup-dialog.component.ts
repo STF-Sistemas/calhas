@@ -7,7 +7,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
 import { FornecedorService } from '#core/services/fornecedor.service';
-import { FornecedorFormComponent } from '../../../fornecedores/fornecedor-form/fornecedor-form.component';
+import { FornecedorForm } from '../../../fornecedores/fornecedor-form/fornecedor-form.component';
 import { IFornecedor } from '#shared/interfaces';
 
 @Component({
@@ -20,14 +20,14 @@ import { IFornecedor } from '#shared/interfaces';
     TableModule,
     DialogModule,
     InputTextModule,
-    FornecedorFormComponent,
+    FornecedorForm,
   ],
   templateUrl: './fornecedor-lookup-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./fornecedor-lookup-dialog.component.css'],
 })
-export class FornecedorLookupDialogComponent {
-  @ViewChild('fornecedorForm') fornecedorFormRef?: FornecedorFormComponent;
+export class FornecedorLookupDialog {
+  @ViewChild('fornecedorForm') fornecedorFormRef?: FornecedorForm;
   @Output() selecionado = new EventEmitter<IFornecedor>();
   @Output() cancelado = new EventEmitter<void>();
 

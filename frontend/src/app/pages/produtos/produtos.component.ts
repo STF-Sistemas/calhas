@@ -6,8 +6,8 @@ import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { DataTableComponent } from '#shared-frontend/components/data-table/data-table.component';
-import { ProdutoFormComponent } from './produto-form/produto-form.component';
+import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
+import { ProdutoForm } from './produto-form/produto-form.component';
 import { ProdutoService, IHistoricoCompraProduto } from '#core/services/produto.service';
 import { IProduto } from '#shared/interfaces';
 import { EStatusGeral } from '#shared/enums';
@@ -17,8 +17,8 @@ import { EStatusGeral } from '#shared/enums';
   standalone: true,
   imports: [
     CommonModule,
-    DataTableComponent,
-    ProdutoFormComponent,
+    DataTable,
+    ProdutoForm,
     ConfirmDialogModule,
     ToastModule,
     DialogModule,
@@ -30,8 +30,8 @@ import { EStatusGeral } from '#shared/enums';
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })
-export class ProdutosComponent implements OnInit {
-  @ViewChild('form') form!: ProdutoFormComponent;
+export class Produtos implements OnInit {
+  @ViewChild('form') form!: ProdutoForm;
 
   produtos: IProduto[] = [];
   loading = false;

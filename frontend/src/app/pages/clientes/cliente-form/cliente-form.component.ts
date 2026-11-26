@@ -10,7 +10,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
-import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { ClienteService } from '#core/services/cliente.service';
 
@@ -29,14 +29,14 @@ import { ClienteService } from '#core/services/cliente.service';
     TooltipModule,
     NgxMaskDirective,
     EnterFocusNextDirective,
-    DialogWrapperComponent,
+    DialogWrapper,
   ],
   providers: [provideNgxMask()],
   templateUrl: './cliente-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./cliente-form.component.css'],
 })
-export class ClienteFormComponent {
+export class ClienteForm {
   @Output() saved = new EventEmitter<void>();
 
   form: FormGroup;

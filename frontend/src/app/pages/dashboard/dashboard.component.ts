@@ -6,12 +6,12 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import {
-  DataTableComponent,
+  DataTable,
   IRowAction,
 } from '#shared-frontend/components/data-table/data-table.component';
-import { PedidoFormComponent } from '../pedidos/pedido-form/pedido-form.component';
-import { OrdemCorteEnvioDialogComponent } from '../pedidos/dialogs/ordem-corte-envio-dialog/ordem-corte-envio-dialog.component';
-import { AutorizacaoDialogComponent } from '../pedidos/dialogs/autorizacao-dialog/autorizacao-dialog.component';
+import { PedidoForm } from '../pedidos/pedido-form/pedido-form.component';
+import { OrdemCorteEnvioDialog } from '../pedidos/dialogs/ordem-corte-envio-dialog/ordem-corte-envio-dialog.component';
+import { AutorizacaoDialog } from '../pedidos/dialogs/autorizacao-dialog/autorizacao-dialog.component';
 import { AuthService } from '#core/services/auth.service';
 import { DashboardService, IDashboardStats } from '#core/services/dashboard.service';
 import { PedidoService } from '#core/services/pedido.service';
@@ -30,20 +30,20 @@ import { IPedido } from '#shared/interfaces';
     ButtonModule,
     ToastModule,
     ConfirmDialogModule,
-    DataTableComponent,
-    PedidoFormComponent,
-    OrdemCorteEnvioDialogComponent,
-    AutorizacaoDialogComponent,
+    DataTable,
+    PedidoForm,
+    OrdemCorteEnvioDialog,
+    AutorizacaoDialog,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })
-export class DashboardComponent implements OnInit {
-  @ViewChild('form') form!: PedidoFormComponent;
-  @ViewChild('ordemCorteDialog') ordemCorteDialog!: OrdemCorteEnvioDialogComponent;
-  @ViewChild('autorizacaoDialog') autorizacaoDialog!: AutorizacaoDialogComponent;
+export class Dashboard implements OnInit {
+  @ViewChild('form') form!: PedidoForm;
+  @ViewChild('ordemCorteDialog') ordemCorteDialog!: OrdemCorteEnvioDialog;
+  @ViewChild('autorizacaoDialog') autorizacaoDialog!: AutorizacaoDialog;
 
   loading = true;
   stats: IDashboardStats | null = null;

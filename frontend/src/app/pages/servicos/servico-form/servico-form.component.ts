@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
-import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { ServicoService } from '#core/services/servico.service';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
@@ -17,13 +17,13 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
     InputTextModule,
     CurrencyMaskDirective,
     EnterFocusNextDirective,
-    DialogWrapperComponent,
+    DialogWrapper,
   ],
   templateUrl: './servico-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./servico-form.component.css'],
 })
-export class ServicoFormComponent {
+export class ServicoForm {
   @Output() saved = new EventEmitter<void>();
 
   form: FormGroup;

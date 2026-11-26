@@ -34,7 +34,7 @@ import { IPagamentoPix } from '#shared/interfaces';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./pagamento.component.css'],
 })
-export class PagamentoComponent implements OnInit, OnDestroy {
+export class Pagamento implements OnInit, OnDestroy {
   carregando = signal(true);
   erro = signal<string | null>(null);
   pagamento = signal<IPagamentoPix | null>(null);

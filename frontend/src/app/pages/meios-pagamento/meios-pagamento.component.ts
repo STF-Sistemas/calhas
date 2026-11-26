@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
-import { DataTableComponent } from '#shared-frontend/components/data-table/data-table.component';
-import { MeioPagamentoFormComponent } from './meio-pagamento-form/meio-pagamento-form.component';
+import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
+import { MeioPagamentoForm } from './meio-pagamento-form/meio-pagamento-form.component';
 import { MeioPagamentoService } from '#core/services/meio-pagamento.service';
 import { IMeioPagamento } from '#shared/interfaces';
 import { EStatusGeral } from '#shared/enums';
@@ -14,8 +14,8 @@ import { EStatusGeral } from '#shared/enums';
   standalone: true,
   imports: [
     CommonModule,
-    DataTableComponent,
-    MeioPagamentoFormComponent,
+    DataTable,
+    MeioPagamentoForm,
     ConfirmDialogModule,
     ToastModule,
   ],
@@ -24,8 +24,8 @@ import { EStatusGeral } from '#shared/enums';
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })
-export class MeiosPagamentoComponent implements OnInit {
-  @ViewChild('form') form!: MeioPagamentoFormComponent;
+export class MeiosPagamento implements OnInit {
+  @ViewChild('form') form!: MeioPagamentoForm;
 
   meios: IMeioPagamento[] = [];
   loading = false;

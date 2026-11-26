@@ -16,12 +16,12 @@ import { LOGO_EMPRESA_TIPOS_ACEITOS, LOGO_EMPRESA_TAMANHO_MAXIMO_BYTES } from '#
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => LogoUploaderComponent),
+      useExisting: forwardRef(() => LogoUploader),
       multi: true,
     },
   ],
 })
-export class LogoUploaderComponent implements ControlValueAccessor {
+export class LogoUploader implements ControlValueAccessor {
   @ViewChild('inputArquivo') inputArquivo!: ElementRef<HTMLInputElement>;
 
   preview: string | null = null;

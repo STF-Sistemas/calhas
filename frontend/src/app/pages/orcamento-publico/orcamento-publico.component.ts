@@ -7,7 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { Textarea } from 'primeng/textarea';
 import { PedidoService } from '#core/services/pedido.service';
 import { EDescontoTipo, EAprovacaoPedido, EStatusPedido } from '#shared/enums';
-import { AssinaturaCanvasComponent } from '#shared-frontend/components/assinatura-canvas/assinatura-canvas.component';
+import { AssinaturaCanvas } from '#shared-frontend/components/assinatura-canvas/assinatura-canvas.component';
 
 @Component({
   selector: 'app-orcamento-publico',
@@ -18,14 +18,14 @@ import { AssinaturaCanvasComponent } from '#shared-frontend/components/assinatur
     TagModule,
     ButtonModule,
     Textarea,
-    AssinaturaCanvasComponent,
+    AssinaturaCanvas,
   ],
   templateUrl: './orcamento-publico.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./orcamento-publico.component.css'],
 })
-export class OrcamentoPublicoComponent implements OnInit {
-  @ViewChild(AssinaturaCanvasComponent) assinaturaCanvas?: AssinaturaCanvasComponent;
+export class OrcamentoPublico implements OnInit {
+  @ViewChild(AssinaturaCanvas) assinaturaCanvas?: AssinaturaCanvas;
 
   estado: 'carregando' | 'ok' | 'expirado' | 'cancelado' | 'invalido' = 'carregando';
   pedido: any = null;

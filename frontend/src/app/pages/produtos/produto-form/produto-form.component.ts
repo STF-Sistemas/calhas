@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
-import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { ProdutoService } from '#core/services/produto.service';
 import { IProduto } from '#shared/interfaces';
@@ -19,13 +19,13 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
     InputTextModule,
     CurrencyMaskDirective,
     EnterFocusNextDirective,
-    DialogWrapperComponent,
+    DialogWrapper,
   ],
   templateUrl: './produto-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./produto-form.component.css'],
 })
-export class ProdutoFormComponent implements OnDestroy {
+export class ProdutoForm implements OnDestroy {
   @Output() saved = new EventEmitter<IProduto>();
 
   form: FormGroup;

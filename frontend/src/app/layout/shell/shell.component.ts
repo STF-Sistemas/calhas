@@ -25,8 +25,8 @@ import { AuthService } from '#core/services/auth.service';
 import { ThemeService } from '#core/services/theme.service';
 import { NotificacaoService } from '#core/services/notificacao.service';
 import { INotificacao } from '#shared/interfaces';
-import { EmpresaFormComponent } from '../../pages/empresas/empresa-form/empresa-form.component';
-import { NovidadesDialogComponent } from '#shared-frontend/components/novidades-dialog/novidades-dialog.component';
+import { EmpresaForm } from '../../pages/empresas/empresa-form/empresa-form.component';
+import { NovidadesDialog } from '#shared-frontend/components/novidades-dialog/novidades-dialog.component';
 
 @Component({
   selector: 'app-shell',
@@ -44,15 +44,15 @@ import { NovidadesDialogComponent } from '#shared-frontend/components/novidades-
     PopoverModule,
     BadgeModule,
     ToastModule,
-    EmpresaFormComponent,
-    NovidadesDialogComponent,
+    EmpresaForm,
+    NovidadesDialog,
   ],
   templateUrl: './shell.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./shell.component.css'],
 })
-export class ShellComponent implements OnInit, OnDestroy {
-  @ViewChild('empresaForm') empresaFormRef?: EmpresaFormComponent;
+export class Shell implements OnInit, OnDestroy {
+  @ViewChild('empresaForm') empresaFormRef?: EmpresaForm;
 
   sidebarVisible = signal(false);
   isMobile = signal(false);

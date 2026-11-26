@@ -16,7 +16,7 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { DialogModule } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
-import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { DesenhoService } from '#core/services/desenho.service';
 import { ThemeService } from '#core/services/theme.service';
 import { IDiagonal, IPonto } from '#shared/interfaces';
@@ -31,13 +31,13 @@ import { IDiagonal, IPonto } from '#shared/interfaces';
     ButtonModule,
     TooltipModule,
     DialogModule,
-    DialogWrapperComponent,
+    DialogWrapper,
   ],
   templateUrl: './desenho-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./desenho-form.component.css'],
 })
-export class DesenhoFormComponent implements OnInit, AfterViewInit {
+export class DesenhoForm implements OnInit, AfterViewInit {
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('canvasMobile') canvasMobileRef?: ElementRef<HTMLCanvasElement>;
   @Output() saved = new EventEmitter<void>();

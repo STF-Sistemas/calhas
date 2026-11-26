@@ -11,12 +11,12 @@ import { SelectModule } from 'primeng/select';
 import { PaginatorModule } from 'primeng/paginator';
 import { ButtonModule } from 'primeng/button';
 import {
-  DataTableComponent,
+  DataTable,
   IRowAction,
 } from '#shared-frontend/components/data-table/data-table.component';
-import { PedidoFormComponent } from './pedido-form/pedido-form.component';
-import { OrdemCorteEnvioDialogComponent } from './dialogs/ordem-corte-envio-dialog/ordem-corte-envio-dialog.component';
-import { AutorizacaoDialogComponent } from './dialogs/autorizacao-dialog/autorizacao-dialog.component';
+import { PedidoForm } from './pedido-form/pedido-form.component';
+import { OrdemCorteEnvioDialog } from './dialogs/ordem-corte-envio-dialog/ordem-corte-envio-dialog.component';
+import { AutorizacaoDialog } from './dialogs/autorizacao-dialog/autorizacao-dialog.component';
 import { PedidoService } from '#core/services/pedido.service';
 import { ClienteService } from '#core/services/cliente.service';
 import { PedidoImpressaoService } from '#core/services/pedido-impressao.service';
@@ -31,10 +31,10 @@ import { environment } from 'src/environments/environment';
   imports: [
     CommonModule,
     FormsModule,
-    DataTableComponent,
-    PedidoFormComponent,
-    OrdemCorteEnvioDialogComponent,
-    AutorizacaoDialogComponent,
+    DataTable,
+    PedidoForm,
+    OrdemCorteEnvioDialog,
+    AutorizacaoDialog,
     ConfirmDialogModule,
     ToastModule,
     TagModule,
@@ -49,10 +49,10 @@ import { environment } from 'src/environments/environment';
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })
-export class PedidosComponent implements OnInit {
-  @ViewChild('form') form!: PedidoFormComponent;
-  @ViewChild('ordemCorteDialog') ordemCorteDialog!: OrdemCorteEnvioDialogComponent;
-  @ViewChild('autorizacaoDialog') autorizacaoDialog!: AutorizacaoDialogComponent;
+export class Pedidos implements OnInit {
+  @ViewChild('form') form!: PedidoForm;
+  @ViewChild('ordemCorteDialog') ordemCorteDialog!: OrdemCorteEnvioDialog;
+  @ViewChild('autorizacaoDialog') autorizacaoDialog!: AutorizacaoDialog;
 
   pedidos: IPedido[] = [];
   loading = false;

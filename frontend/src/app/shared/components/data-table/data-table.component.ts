@@ -38,7 +38,7 @@ import { NgxMaskPipe, provideNgxMask } from 'ngx-mask';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./data-table.component.css'],
 })
-export class DataTableComponent {
+export class DataTable {
   constructor(public themeService: ThemeService) {}
 
   get drawingLineColor(): string {

@@ -17,7 +17,7 @@ import { IProduto } from '#shared/interfaces';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./produto-lookup-dialog.component.css'],
 })
-export class ProdutoLookupDialogComponent {
+export class ProdutoLookupDialog {
   @Output() selecionado = new EventEmitter<{ produto: IProduto; itemIndex: number }>();
   @Output() cancelado = new EventEmitter<void>();
 

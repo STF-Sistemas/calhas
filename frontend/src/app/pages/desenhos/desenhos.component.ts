@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
-import { DataTableComponent } from '#shared-frontend/components/data-table/data-table.component';
-import { DesenhoFormComponent } from './desenho-form/desenho-form.component';
+import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
+import { DesenhoForm } from './desenho-form/desenho-form.component';
 import { DesenhoService } from '#core/services/desenho.service';
 import { IDesenho } from '#shared/interfaces';
 
@@ -13,8 +13,8 @@ import { IDesenho } from '#shared/interfaces';
   standalone: true,
   imports: [
     CommonModule,
-    DataTableComponent,
-    DesenhoFormComponent,
+    DataTable,
+    DesenhoForm,
     ConfirmDialogModule,
     ToastModule,
   ],
@@ -23,8 +23,8 @@ import { IDesenho } from '#shared/interfaces';
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })
-export class DesenhosComponent implements OnInit {
-  @ViewChild('form') form!: DesenhoFormComponent;
+export class Desenhos implements OnInit {
+  @ViewChild('form') form!: DesenhoForm;
 
   desenhos: IDesenho[] = [];
   loading = false;

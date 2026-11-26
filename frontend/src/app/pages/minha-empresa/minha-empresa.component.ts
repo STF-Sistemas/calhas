@@ -20,7 +20,7 @@ import { ClienteService } from '#core/services/cliente.service';
 import { environment } from 'src/environments/environment';
 import { IEmpresa } from '#shared/interfaces';
 import { TApiResponse } from '#shared/types';
-import { LogoUploaderComponent } from '#shared-frontend/components/logo-uploader/logo-uploader.component';
+import { LogoUploader } from '#shared-frontend/components/logo-uploader/logo-uploader.component';
 
 @Component({
   selector: 'app-minha-empresa',
@@ -44,13 +44,13 @@ import { LogoUploaderComponent } from '#shared-frontend/components/logo-uploader
     CardModule,
     ToastModule,
     NgxMaskDirective,
-    LogoUploaderComponent,
+    LogoUploader,
   ],
   providers: [provideNgxMask()],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './minha-empresa.component.html',
 })
-export class MinhaEmpresaComponent implements OnInit {
+export class MinhaEmpresa implements OnInit {
   form!: FormGroup;
   isLoading = false;
   isSaving = false;

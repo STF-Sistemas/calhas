@@ -33,7 +33,7 @@ import { ThemeService } from '#core/services/theme.service';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./desenho-medida.component.css'],
 })
-export class DesenhoMedidaComponent implements AfterViewInit {
+export class DesenhoMedida implements AfterViewInit {
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
   @Output() confirmed = new EventEmitter<{ index: number; medidas: number[] }>();
 

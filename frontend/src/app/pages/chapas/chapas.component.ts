@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
-import { DataTableComponent } from '#shared-frontend/components/data-table/data-table.component';
-import { ChapaFormComponent } from './chapa-form/chapa-form.component';
+import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
+import { ChapaForm } from './chapa-form/chapa-form.component';
 import { ChapaService } from '#core/services/chapa.service';
 import { IChapa } from '#shared/interfaces';
 import { EStatusGeral } from '#shared/enums';
@@ -12,14 +12,14 @@ import { EStatusGeral } from '#shared/enums';
 @Component({
   selector: 'app-chapas',
   standalone: true,
-  imports: [CommonModule, DataTableComponent, ChapaFormComponent, ConfirmDialogModule, ToastModule],
+  imports: [CommonModule, DataTable, ChapaForm, ConfirmDialogModule, ToastModule],
   templateUrl: './chapas.component.html',
   styleUrls: ['./chapas.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })
-export class ChapasComponent implements OnInit {
-  @ViewChild('form') form!: ChapaFormComponent;
+export class Chapas implements OnInit {
+  @ViewChild('form') form!: ChapaForm;
 
   chapas: IChapa[] = [];
   loading = false;
