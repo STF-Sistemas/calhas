@@ -1,12 +1,16 @@
 <div class="layout-wrapper" [ngClass]="{
     'layout-static-inactive': !sidebarVisible() && !isMobile(),
-    'layout-mobile-active': sidebarVisible() && isMobile(),
-    'app-dark': themeService.isDarkMode()
+    'layout-mobile-active': sidebarVisible() && isMobile()
 }">
   <header class="layout-topbar">
-    <a class="layout-topbar-logo" routerLink="/" aria-label="Página Inicial">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" style="width: 36px; height: 36px; flex-shrink: 0; border-radius: 8px;">
-        <rect width="32" height="32" rx="7" style="fill: var(--p-primary)"/>
+    <button type="button" class="layout-topbar-button layout-menu-button" (click)="toggleSidebar()"
+      [attr.aria-expanded]="sidebarVisible()" aria-label="Abrir ou fechar o menu">
+      <i class="pi pi-bars" aria-hidden="true"></i>
+    </button>
+
+    <a class="layout-topbar-logo" routerLink="/dashboard" aria-label="Calhas Pro, ir para o início">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" class="logo-svg" aria-hidden="true">
+        <rect width="32" height="32" rx="7" class="logo-fundo"/>
         <path d="M5 12 L5 18 Q5 27 16 27 Q27 27 27 18 L27 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         <line x1="5" y1="12" x2="5" y2="10" stroke="white" stroke-width="3" stroke-linecap="round"/>
         <line x1="27" y1="12" x2="27" y2="10" stroke="white" stroke-width="3" stroke-linecap="round"/>
@@ -14,44 +18,39 @@
         <circle cx="16" cy="4" r="1.4" fill="white"/>
         <circle cx="20" cy="5.5" r="1.3" fill="white" opacity="0.75"/>
       </svg>
-      <span class="text-xl font-bold text-900">Calhas Pro</span>
+      <span>Calhas Pro</span>
     </a>
 
-    <button class="p-link layout-topbar-button layout-menu-button ml-3" (click)="toggleSidebar()" aria-label="Abrir/Fechar Menu">
-      <i class="pi pi-bars text-xl"></i>
-    </button>
-
     <div class="layout-topbar-menu">
-      <button class="p-link layout-topbar-button" (click)="themeService.toggleTheme()"
-        [pTooltip]="themeService.isDarkMode() ? 'Modo Claro' : 'Modo Escuro'"
-        [attr.aria-label]="themeService.isDarkMode() ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'">
-        <i [class]="themeService.isDarkMode() ? 'pi pi-sun' : 'pi pi-moon'"></i>
+      <button type="button" class="layout-topbar-button so-desktop" (click)="themeService.toggleTheme()"
+        [pTooltip]="themeService.isDarkMode() ? 'Modo claro' : 'Modo escuro'" tooltipPosition="bottom"
+        [attr.aria-label]="themeService.isDarkMode() ? 'Mudar para o modo claro' : 'Mudar para o modo escuro'">
+        <i [class]="themeService.isDarkMode() ? 'pi pi-sun' : 'pi pi-moon'" aria-hidden="true"></i>
       </button>
 
-      <button class="p-link layout-topbar-button" (click)="colorMenu.toggle($event)"
-        pTooltip="Cor do Sistema" aria-label="Selecionar Cor do Sistema">
-        <i class="pi pi-palette"></i>
+      <button type="button" class="layout-topbar-button so-desktop" (click)="colorMenu.toggle($event)"
+        pTooltip="Cor do sistema" tooltipPosition="bottom" aria-label="Escolher a cor do sistema">
+        <i class="pi pi-palette" aria-hidden="true"></i>
       </button>
-      <p-menu #colorMenu [model]="colorMenuItems" [popup]="true"></p-menu>
+      <p-menu #colorMenu [model]="colorMenuItems" [popup]="true" appendTo="body"></p-menu>
 
-      <button class="p-link layout-topbar-button notif-btn" (click)="novidades.abrir()"
-        pTooltip="Novidades" aria-label="Novidades do sistema">
-        <i class="pi pi-gift"></i>
+      <button type="button" class="layout-topbar-button notif-btn" (click)="novidades.abrir()"
+        pTooltip="Novidades" tooltipPosition="bottom" aria-label="Novidades do sistema">
+        <i class="pi pi-gift" aria-hidden="true"></i>
         @if (novidades.temNaoVistas()) {
           <span class="notif-badge"></span>
         }
       </button>
 
-      <button class="p-link layout-topbar-button notif-btn" (click)="notifPanel.toggle($event); abrirNotificacoes()"
-        pTooltip="Notificações" aria-label="Notificações">
-        <i class="pi pi-bell"></i>
+      <button type="button" class="layout-topbar-button notif-btn" (click)="notifPanel.toggle($event); abrirNotificacoes()"
+        pTooltip="Notificações" tooltipPosition="bottom" aria-label="Notificações">
+        <i class="pi pi-bell" aria-hidden="true"></i>
         @if (temNotificacaoPendente()) {
           <span class="notif-badge" [class.notif-badge--urgente]="notificacaoLicenca()?.urgente"></span>
         }
       </button>
-      <p-popover #notifPanel styleClass="notif-popover">
+      <p-popover #notifPanel styleClass="notif-popover" appendTo="body">
         <div class="notif-panel">
-
           @if (notificacaoService.naoLidasCount() > 0) {
             <button pButton class="p-button-sm p-button-text w-full mb-2"
               label="Marcar todas como lidas" icon="pi pi-check"
@@ -63,7 +62,7 @@
             @if (notificacaoLicenca(); as notif) {
               <div class="notif-item" [class.notif-item--urgente]="notif.urgente">
                 <div class="notif-item-header">
-                  <i class="pi" [class]="notif.urgente ? 'pi-exclamation-circle' : 'pi-clock'"></i>
+                  <i class="pi" [class]="notif.urgente ? 'pi-exclamation-circle' : 'pi-clock'" aria-hidden="true"></i>
                   <span class="notif-item-title">Licença</span>
                 </div>
                 <p class="notif-item-texto">{{ notif.texto }}</p>
@@ -78,7 +77,7 @@
 
             @if (carregandoNotificacoes()) {
               <div class="notif-vazia">
-                <i class="pi pi-spin pi-spinner"></i>
+                <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
                 <span>Carregando...</span>
               </div>
             } @else {
@@ -89,7 +88,7 @@
                   [attr.aria-label]="'Notificação: ' + notificacao.titulo"
                   (keydown.enter)="marcarNotificacaoComoLida(notificacao)">
                   <div class="notif-item-header">
-                    <i class="pi" [class]="notificacao.tipo === 'pedido_recusado' ? 'pi-times-circle' : 'pi-check-circle'"></i>
+                    <i class="pi" [class]="notificacao.tipo === 'pedido_recusado' ? 'pi-times-circle' : 'pi-check-circle'" aria-hidden="true"></i>
                     <span class="notif-item-title">{{ notificacao.titulo }}</span>
                   </div>
                   <p class="notif-item-texto">{{ notificacao.mensagem }}</p>
@@ -97,38 +96,37 @@
               }
               @if (!notificacaoLicenca() && notificacoes().length === 0) {
                 <div class="notif-vazia">
-                  <i class="pi pi-check-circle"></i>
+                  <i class="pi pi-check-circle" aria-hidden="true"></i>
                   <span>Nenhuma notificação</span>
                 </div>
               }
             }
           </div>
-
         </div>
       </p-popover>
-      <button class="p-link layout-topbar-button" (click)="profileMenu.toggle($event)"
-        pTooltip="Meu Perfil" aria-label="Meu Perfil">
-        <i class="pi pi-user"></i>
+
+      <button type="button" class="layout-topbar-button perfil-btn" (click)="profileMenu.toggle($event)"
+        pTooltip="Minha conta" tooltipPosition="bottom" aria-label="Minha conta">
+        <span class="perfil-iniciais" aria-hidden="true">{{ iniciais() }}</span>
       </button>
-      <p-menu #profileMenu [model]="profileMenuItems" [popup]="true"></p-menu>
+      <p-menu #profileMenu [model]="profileMenuItems" [popup]="true" appendTo="body"></p-menu>
     </div>
   </header>
 
-  @if (alertaLicenca()) {
-    <div class="licenca-banner licenca-banner--{{ alertaLicenca()!.severity }} no-print">
-      <i class="pi pi-exclamation-triangle"></i>
-      <span>
-        <strong>Licença:</strong> {{ alertaLicenca()!.label }}.
-        @if (authService.isAdmin() && !authService.isSuperAdmin()) {
-          <a routerLink="/pagamento" class="licenca-link">Renovar agora</a>
-        }
-      </span>
+  <aside class="layout-sidebar" [attr.aria-hidden]="isMobile() && !sidebarVisible()">
+    <div class="sidebar-usuario">
+      <span class="perfil-iniciais perfil-iniciais--grande" aria-hidden="true">{{ iniciais() }}</span>
+      <div class="sidebar-usuario__texto">
+        <strong>{{ authService.currentUser()?.nome }}</strong>
+        <span>{{ authService.currentUser()?.email }}</span>
+      </div>
+      <button type="button" class="layout-topbar-button sidebar-fechar" (click)="sidebarVisible.set(false)" aria-label="Fechar o menu">
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
     </div>
-  }
 
-  <aside class="layout-sidebar">
-    <nav class="layout-menu mt-2" aria-label="Menu Principal">
-      <ul class="list-none p-0 m-0">
+    <nav class="layout-menu" aria-label="Menu principal">
+      <ul>
         @for (group of getFilteredGroups(); track group.label) {
           <li class="layout-menuitem-root-text">{{ group.label }}</li>
           @for (item of group.items; track item.label) {
@@ -137,9 +135,8 @@
                 [routerLink]="item.routerLink"
                 [routerLinkActive]="item.routerLink ? 'active-route' : ''"
                 (click)="onSidebarItemClick(item)"
-                [attr.aria-label]="item.label"
                 [class.cursor-pointer]="!item.routerLink">
-                <i [class]="item.icon"></i>
+                <i [class]="item.icon" aria-hidden="true"></i>
                 <span>{{ item.label }}</span>
               </a>
             </li>
@@ -147,27 +144,74 @@
         }
       </ul>
     </nav>
+
+    <div class="sidebar-aparencia so-mobile">
+      <span class="layout-menuitem-root-text">Aparência</span>
+      <div class="sidebar-aparencia__linha">
+        <button type="button" class="aparencia-tema" (click)="themeService.toggleTheme()">
+          <i [class]="themeService.isDarkMode() ? 'pi pi-sun' : 'pi pi-moon'" aria-hidden="true"></i>
+          {{ themeService.isDarkMode() ? 'Modo claro' : 'Modo escuro' }}
+        </button>
+        <div class="aparencia-cores" role="group" aria-label="Cor do sistema">
+          @for (cor of cores; track cor.id) {
+            <button type="button" class="aparencia-cor" [style.background]="cor.hex"
+              [class.aparencia-cor--ativa]="themeService.activeColor() === cor.id"
+              [attr.aria-label]="'Cor ' + cor.nome" [attr.aria-pressed]="themeService.activeColor() === cor.id"
+              (click)="themeService.setColor(cor.id)"></button>
+          }
+        </div>
+      </div>
+    </div>
   </aside>
 
   <div class="layout-main-container">
+    @if (alertaLicenca()) {
+      <div class="licenca-banner licenca-banner--{{ alertaLicenca()!.severity }} no-print" role="alert">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+        <span>
+          <strong>Licença:</strong> {{ alertaLicenca()!.label }}
+          @if (authService.isAdmin() && !authService.isSuperAdmin()) {
+            <a routerLink="/pagamento" class="licenca-link">Renovar agora</a>
+          }
+        </span>
+      </div>
+    }
+
     <main class="layout-main fade-in">
       <router-outlet></router-outlet>
     </main>
 
-    <footer class="layout-footer py-4 border-top-1 border-surface-200 mt-6">
-      <div class="flex flex-column md:flex-row align-items-center justify-content-between gap-3">
-        <span class="text-600 text-sm">
-          © {{ currentYear }} <a href="https://www.sistemastecnologiafuturo.com.br" target="_blank"
-            rel="noopener noreferrer" class="font-bold text-primary no-underline hover:underline">Sistemas de Tecnologia do Futuro</a>
-        </span>
-        <div class="flex align-items-center gap-3">
-          <i class="pi pi-facebook text-600 cursor-pointer hover:text-primary transition-colors" aria-hidden="true"></i>
-          <i class="pi pi-instagram text-600 cursor-pointer hover:text-primary transition-colors" aria-hidden="true"></i>
-          <i class="pi pi-github text-600 cursor-pointer hover:text-primary transition-colors" aria-hidden="true"></i>
-        </div>
-      </div>
+    <footer class="layout-footer">
+      <span>© {{ currentYear }} {{ siteConfig.nome }}. Todos os direitos reservados.</span>
+      <span>
+        Desenvolvido por
+        <a [href]="siteConfig.developerUrl" target="_blank" rel="noopener noreferrer">{{ siteConfig.developerName }}</a>
+      </span>
     </footer>
   </div>
+
+  <nav class="bottom-nav" aria-label="Acesso rápido">
+    @for (atalho of atalhos; track atalho.label) {
+      <a class="bottom-nav__item" [routerLink]="atalho.rota" routerLinkActive="bottom-nav__item--ativo"
+        [routerLinkActiveOptions]="{ paths: 'subset', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored' }"
+        (click)="sidebarVisible.set(false)">
+        <i [class]="atalho.icone" aria-hidden="true"></i>
+        <span>{{ atalho.label }}</span>
+      </a>
+      @if ($index === 1) {
+        <a class="bottom-nav__item bottom-nav__novo" routerLink="/pedidos" [queryParams]="{ novo: 1 }"
+          (click)="sidebarVisible.set(false)" aria-label="Novo pedido">
+          <span class="bottom-nav__novo-circulo"><i class="pi pi-plus" aria-hidden="true"></i></span>
+          <span>Novo pedido</span>
+        </a>
+      }
+    }
+    <button type="button" class="bottom-nav__item" [class.bottom-nav__item--ativo]="sidebarVisible()"
+      (click)="toggleSidebar()" [attr.aria-expanded]="sidebarVisible()" aria-label="Abrir o menu completo">
+      <i class="pi pi-th-large" aria-hidden="true"></i>
+      <span>Menu</span>
+    </button>
+  </nav>
 
   <div class="layout-mask" (click)="sidebarVisible.set(false)" aria-hidden="true"></div>
 </div>
@@ -175,3 +219,5 @@
 <app-empresa-form #empresaForm></app-empresa-form>
 
 <app-novidades-dialog #novidades></app-novidades-dialog>
+
+<app-install-prompt></app-install-prompt>

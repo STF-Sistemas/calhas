@@ -15,6 +15,7 @@
         label="Novo Pedido"
         icon="pi pi-plus"
         routerLink="/pedidos"
+        [queryParams]="{ novo: 1 }"
         aria-label="Criar novo pedido"
         styleClass="p-button-primary dashboard-new-btn">
       </p-button>

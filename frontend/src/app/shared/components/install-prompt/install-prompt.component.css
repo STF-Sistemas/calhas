@@ -1,9 +1,9 @@
 .install-prompt {
   position: fixed;
-  bottom: 1.25rem;
+  bottom: calc(var(--bottom-nav-altura) + env(safe-area-inset-bottom, 0px) + 0.75rem);
   left: 50%;
   transform: translateX(-50%);
-  z-index: 99998;
+  z-index: 1000;
   display: flex;
   align-items: center;
   gap: 0.75rem;

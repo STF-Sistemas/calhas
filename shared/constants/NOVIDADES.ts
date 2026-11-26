@@ -2,6 +2,20 @@ import { INovidade } from '../interfaces/INovidade';
 
 export const NOVIDADES: INovidade[] = [
   {
+    versao: '2.0.0',
+    data: '26/11/2026',
+    itens: [
+      'Celular: novo menu fixo na parte de baixo da tela com Início, Pedidos, Clientes e Menu. No meio fica o botão grande "Novo pedido", que já abre o formulário.',
+      'Celular: o botão Menu abre todas as telas do sistema com seu nome no topo, e lá embaixo dá para trocar entre modo claro e escuro e escolher a cor.',
+      'Celular: as listas (clientes, pedidos, produtos e outras) agora aparecem em cartões, um embaixo do outro, com o nome do campo ao lado de cada informação. Não precisa mais arrastar a tabela para o lado.',
+      'Celular: os formulários abrem em tela cheia, com os botões Salvar e Cancelar grandes no rodapé. Os campos ficaram maiores e o iPhone não dá mais zoom ao tocar num campo.',
+      'Computador: menu lateral mais limpo, fixo à esquerda, e o botão de menu no topo esconde ou mostra o menu.',
+      'Painel inicial mais enxuto no celular: os indicadores aparecem lado a lado. O botão "Novo Pedido" do painel agora já abre o formulário.',
+      'App instalado: o ícone ficou certinho no Android, e ao segurar o ícone aparecem atalhos para Novo pedido, Pedidos e Clientes. O convite para instalar o app aparece no celular.',
+      'Segurança: os dados de clientes e pedidos não ficam mais guardados no aparelho depois de sair do sistema.',
+    ],
+  },
+  {
     versao: '1.9.2',
     data: '26/11/2026',
     itens: [

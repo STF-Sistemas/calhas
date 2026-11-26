@@ -35,7 +35,7 @@ export class DialogWrapper {
   @Input() saveLabel = 'Salvar';
   @Input() cancelLabel = 'Cancelar';
   @Input() saveDisabled = false;
-  @Input() fullscreenMobile = false;
+  @Input() fullscreenMobile = true;
 
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() save = new EventEmitter<void>();

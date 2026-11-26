@@ -1,4 +1,6 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, OnInit, ViewChild, ChangeDetectionStrategy, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TagModule } from 'primeng/tag';
@@ -45,7 +47,11 @@ import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.s
   styleUrls: ['./pedidos.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
 })
-export class Pedidos implements OnInit {
+export class Pedidos implements OnInit, AfterViewInit {
+  private readonly rota = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild('form') form!: PedidoForm;
   @ViewChild('ordemCorteDialog') ordemCorteDialog!: OrdemCorteEnvioDialog;
   @ViewChild('autorizacaoDialog') autorizacaoDialog!: AutorizacaoDialog;
@@ -196,6 +202,16 @@ export class Pedidos implements OnInit {
     this.limite = event.rows ?? this.limite;
     this.pagina = Math.floor((event.first ?? 0) / this.limite) + 1;
     this.carregarPedidos();
+  }
+
+  ngAfterViewInit(): void {
+    this.rota.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      if (params.get('novo') !== '1') return;
+      setTimeout(() => {
+        this.form.abrir();
+        this.router.navigate([], { relativeTo: this.rota, queryParams: { novo: null }, queryParamsHandling: 'merge', replaceUrl: true });
+      });
+    });
   }
 
   onAdd() {

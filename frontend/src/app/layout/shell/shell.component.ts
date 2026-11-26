@@ -9,7 +9,9 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs';
 import { DrawerModule } from 'primeng/drawer';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
@@ -24,8 +26,10 @@ import { AuthService } from '#core/services/auth.service';
 import { ThemeService } from '#core/services/theme.service';
 import { NotificacaoService } from '#core/services/notificacao.service';
 import { INotificacao } from '#shared/interfaces';
+import { SITE_CONFIG } from '#core/config/site-config';
 import { EmpresaForm } from '../../pages/empresas/empresa-form/empresa-form.component';
 import { NovidadesDialog } from '#shared-frontend/components/novidades-dialog/novidades-dialog.component';
+import { InstallPrompt } from '#shared-frontend/components/install-prompt/install-prompt.component';
 
 @Component({
   selector: 'app-shell',
@@ -44,17 +48,43 @@ import { NovidadesDialog } from '#shared-frontend/components/novidades-dialog/no
     BadgeModule,
     EmpresaForm,
     NovidadesDialog,
+    InstallPrompt,
   ],
   templateUrl: './shell.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./shell.component.css'],
+  host: { '(document:keydown.escape)': 'fecharMenuNoCelular()' },
 })
 export class Shell implements OnInit, OnDestroy {
   @ViewChild('empresaForm') empresaFormRef?: EmpresaForm;
 
   sidebarVisible = signal(false);
   isMobile = signal(false);
+  private breakpointIniciado = false;
   currentYear = new Date().getFullYear();
+  readonly siteConfig = SITE_CONFIG;
+
+  readonly iniciais = computed(() => {
+    const nome = this.authService.currentUser()?.nome?.trim() ?? '';
+    const partes = nome.split(/\s+/).filter(Boolean);
+    if (!partes.length) return '?';
+    const primeira = partes[0][0];
+    const ultima = partes.length > 1 ? partes[partes.length - 1][0] : '';
+    return (primeira + ultima).toUpperCase();
+  });
+
+  readonly atalhos = [
+    { label: 'Início', icone: 'pi pi-home', rota: '/dashboard' },
+    { label: 'Pedidos', icone: 'pi pi-shopping-cart', rota: '/pedidos' },
+    { label: 'Clientes', icone: 'pi pi-users', rota: '/clientes' },
+  ];
+
+  readonly cores = [
+    { id: 'orange', nome: 'laranja', hex: '#f97316' },
+    { id: 'blue', nome: 'azul', hex: '#3b82f6' },
+    { id: 'emerald', nome: 'esmeralda', hex: '#10b981' },
+    { id: 'indigo', nome: 'índigo', hex: '#6366f1' },
+  ];
   private resizeListener = () => this.checkBreakpoint();
 
   readonly diasParaVencer = computed(() => this.authService.diasParaVencer());
@@ -95,6 +125,11 @@ export class Shell implements OnInit, OnDestroy {
     }
 
     items.push(
+      {
+        label: this.themeService.isDarkMode() ? 'Modo claro' : 'Modo escuro',
+        icon: this.themeService.isDarkMode() ? 'pi pi-sun' : 'pi pi-moon',
+        command: () => this.themeService.toggleTheme(),
+      },
       { label: 'Meu Perfil', icon: 'pi pi-user', command: () => this.router.navigate(['/perfil']) },
       {
         label: 'Alterar Senha',
@@ -283,6 +318,9 @@ export class Shell implements OnInit, OnDestroy {
     this.checkBreakpoint();
     window.addEventListener('resize', this.resizeListener);
     this.notificacaoService.iniciarPolling(this.destroyRef);
+    this.router.events
+      .pipe(filter((e) => e instanceof NavigationEnd), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.fecharMenuNoCelular());
   }
 
   abrirNotificacoes(): void {
@@ -315,13 +353,16 @@ export class Shell implements OnInit, OnDestroy {
     window.removeEventListener('resize', this.resizeListener);
   }
 
+  fecharMenuNoCelular(): void {
+    if (this.isMobile()) this.sidebarVisible.set(false);
+  }
+
   private checkBreakpoint() {
-    this.isMobile.set(window.innerWidth <= 991);
-    if (!this.isMobile()) {
-      this.sidebarVisible.set(true);
-    } else {
-      this.sidebarVisible.set(false);
-    }
+    const mobile = window.innerWidth <= 991;
+    if (this.breakpointIniciado && mobile === this.isMobile()) return;
+    this.breakpointIniciado = true;
+    this.isMobile.set(mobile);
+    this.sidebarVisible.set(!mobile);
   }
 
   toggleSidebar() {

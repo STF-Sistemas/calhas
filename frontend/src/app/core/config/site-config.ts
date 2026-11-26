@@ -1,8 +1,7 @@
 export const SITE_CONFIG = {
   nome: 'Calhas Pro',
-  creditoDesenvolvimento: {
-    texto: 'Desenvolvido por Pingo Sistemas',
-  },
+  developerName: 'Sistemas Tecnologia Futuro',
+  developerUrl: 'https://www.sistemastecnologiafuturo.com.br/',
 } as const;
 
 export function siteUrl(): string {

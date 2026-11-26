@@ -32,16 +32,10 @@
       }
     }
   ],
-  "dataGroups": [
-    {
-      "name": "api-cache",
-      "urls": ["/api/**"],
-      "cacheConfig": {
-        "strategy": "freshness",
-        "maxSize": 100,
-        "maxAge": "1d",
-        "timeout": "10s"
-      }
-    }
+  "navigationUrls": [
+    "/**",
+    "!/api/**",
+    "!/health",
+    "!/**/*.*"
   ]
 }
