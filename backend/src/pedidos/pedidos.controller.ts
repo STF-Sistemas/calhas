@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { EmpresaAtual } from '../common/decorators';
 import { IdPipe } from '../common/validadores';
-import { GerarLinkCorteDto, PedidoDto, PedidoItemDto, PedidoUpdateDto, StatusPedidoDto } from './pedido.dto';
+import { GerarLinkCorteDto, PedidoDto, PedidoItemDto, PedidoUpdateDto, StatusPedidoDto } from './dto/pedido.dto';
 import { PedidosService } from './pedidos.service';
 
 @Controller('pedidos')
@@ -14,9 +14,8 @@ export class PedidosController {
   }
 
   @Get(':id')
-  async buscar(@Param('id', IdPipe) id: number, @EmpresaAtual() codEmpresa: number) {
-    await this.pedidos.obter(id, codEmpresa);
-    return { success: true, data: await this.pedidos.completo(id) };
+  buscar(@Param('id', IdPipe) id: number, @EmpresaAtual() codEmpresa: number) {
+    return this.pedidos.buscar(id, codEmpresa);
   }
 
   @Post()

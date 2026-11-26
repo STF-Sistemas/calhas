@@ -92,6 +92,16 @@ export class AuthService {
     return this.currentUser()?.super_admin || false;
   }
 
+  atualizarToken(token: string): void {
+    const data = this.armazenamento?.getItem(this.STORAGE_KEY);
+    if (!data) return;
+    try {
+      const auth = JSON.parse(data) as ILoginResponse;
+      auth.token = token;
+      this.armazenamento?.setItem(this.STORAGE_KEY, JSON.stringify(auth));
+    } catch { }
+  }
+
   atualizarEmpresaExpiracao(novaExpiracao: Date): void {
     const data = this.armazenamento?.getItem(this.STORAGE_KEY);
     if (data) {

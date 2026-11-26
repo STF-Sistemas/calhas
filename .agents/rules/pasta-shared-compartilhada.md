@@ -4,7 +4,7 @@ trigger: always_on
 
 # Pasta Shared Compartilhada: Padrões Obrigatórios
 
-Esta rule define a estrutura, localização e padrões de importação da pasta `shared/`, que é compartilhada entre os projetos **frontend** (Angular) e **backend** (Node/Express/Prisma). Toda regra aqui descrita deve ser seguida rigorosamente em qualquer implementação.
+Esta rule define a estrutura, localização e padrões de importação da pasta `shared/`, que é compartilhada entre os projetos **frontend** (Angular) e **backend** (NestJS/Prisma). Toda regra aqui descrita deve ser seguida rigorosamente em qualquer implementação.
 
 ---
 

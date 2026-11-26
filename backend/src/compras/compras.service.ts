@@ -2,8 +2,8 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { falha } from '../common/falha';
 import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { CompraDto, CompraItemDto } from './compra.dto';
-import { buildDanfeFromDb, lerNfeParaImportacao, parseDanfeXml } from './nfe-xml';
+import { CompraDto, CompraItemDto } from './dto/compra.dto';
+import { buildDanfeFromDb, lerNfeParaImportacao, parseDanfeXml } from './nfe-xml.parser';
 
 const RASCUNHO = 1;
 const CONFIRMADA = 2;

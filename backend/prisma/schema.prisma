@@ -38,6 +38,7 @@ model Usuario {
   excluido              Boolean   @default(false)
   reset_token           String?   @db.VarChar(255)
   reset_token_expiracao DateTime?
+  token_versao          Int       @default(0)
 
   empresa Empresa? @relation(fields: [cod_empresa], references: [id])
   push_subscriptions PushSubscription[]

@@ -3,13 +3,14 @@ import { ToastService } from '#shared-frontend/services/toast.service';
 import { IPedido, IPedidoItem } from '#shared/interfaces';
 import { ETipoItemPedido, EStatusPedido, EDescontoTipo } from '#shared/enums';
 import { formatCurrency, formatNumber, formatCpfCnpj, formatPhone, formatDate } from '#shared/functions/format.functions';
+import { escaparProfundo } from '#shared-frontend/utils/escapar-html';
 
 @Injectable({ providedIn: 'root' })
 export class PedidoImpressaoService {
   private readonly toast = inject(ToastService);
 
-  imprimir(pedido: IPedido): void {
-    const html = this.gerarHtml(pedido);
+  imprimir(pedidoOriginal: IPedido): void {
+    const html = this.gerarHtml(escaparProfundo(pedidoOriginal));
     const win = window.open('', '_blank');
     if (!win) {
       this.toast.warn('Permita as janelas pop-up deste site para imprimir o pedido.');
@@ -120,6 +121,7 @@ export class PedidoImpressaoService {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; font-src data:">
   <title>Pedido Nº ${pedido.id}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }

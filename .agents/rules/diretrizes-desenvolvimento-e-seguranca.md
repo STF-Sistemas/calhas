@@ -8,7 +8,7 @@ Esta regra deve ser aplicada obrigatoriamente antes de qualquer resposta ou exec
 
 ## 1. Fase de Reconhecimento e Contexto Operacional
 Sempre que uma nova tarefa for iniciada ou uma conversa for retomada:
-- **Análise Holística**: Analise o projeto como um todo. Entenda a arquitetura (Angular/Node/Prisma), as dependências instaladas e o propósito de negócio (Calhas: monorepo com frontend Angular, backend Node/Express/Prisma e pasta shared compartilhada).
+- **Análise Holística**: Analise o projeto como um todo. Entenda a arquitetura (Angular/NestJS/Prisma), as dependências instaladas e o propósito de negócio (Calhas: monorepo com frontend Angular, backend NestJS/Prisma e pasta shared compartilhada).
 - **Idioma Mandatório**: Todas as respostas, explicações, comentários de código, descrições de tarefas e planos de implementação DEVEM ser realizados exclusivamente em **Português (pt-br)**.
 
 ## 2. Auditoria Contínua de Segurança (Persona: Pentester)

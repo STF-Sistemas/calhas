@@ -28,7 +28,9 @@
           <div class="empresa-header">
             <div class="empresa-info-bloco">
               <div class="empresa-nome">{{ empresa.nome_fantasia || empresa.razao_social }}</div>
-              <div class="empresa-razao" *ngIf="empresa.nome_fantasia">{{ empresa.razao_social }}</div>
+              @if (empresa.nome_fantasia) {
+                <div class="empresa-razao">{{ empresa.razao_social }}</div>
+              }
               <div class="empresa-detalhe">CNPJ: {{ empresa.cnpj }}</div>
               @if (empresa.telefone) {
                 <div class="empresa-detalhe">Tel: {{ empresa.telefone }}</div>

@@ -50,10 +50,10 @@
           <div class="row">
             <div class="field col-12 col-md-6">
               <label for="cnpj">CNPJ *</label>
-              <p-inputMask appTecladoNumerico id="cnpj" mask="99.999.999/9999-99" formControlName="cnpj" placeholder="00.000.000/0000-00"
+              <p-inputmask appTecladoNumerico id="cnpj" mask="99.999.999/9999-99" formControlName="cnpj" placeholder="00.000.000/0000-00"
                 [class.ng-invalid]="form.get('cnpj')?.invalid && form.get('cnpj')?.touched"
                 [class.ng-dirty]="form.get('cnpj')?.touched">
-              </p-inputMask>
+              </p-inputmask>
               @if (form.get('cnpj')?.invalid && form.get('cnpj')?.touched) {
                 <small class="p-error">CNPJ é obrigatório.</small>
               }
@@ -92,11 +92,11 @@
           <div class="row">
             <div class="field col-12 col-sm-4 col-md-3">
               <label for="cep">CEP *</label>
-              <p-inputMask appTecladoNumerico id="cep" mask="99999-999" formControlName="cep" placeholder="00000-000"
+              <p-inputmask appTecladoNumerico id="cep" mask="99999-999" formControlName="cep" placeholder="00000-000"
                 (onComplete)="onCepChange()"
                 [class.ng-invalid]="form.get('cep')?.invalid && form.get('cep')?.touched"
                 [class.ng-dirty]="form.get('cep')?.touched">
-              </p-inputMask>
+              </p-inputmask>
               @if (form.get('cep')?.invalid && form.get('cep')?.touched) {
                 <small class="p-error">CEP é obrigatório.</small>
               }

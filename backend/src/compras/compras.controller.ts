@@ -17,7 +17,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { EmpresaAtual } from '../common/decorators';
 import { falha } from '../common/falha';
 import { IdPipe } from '../common/validadores';
-import { CompraDto, StatusCompraDto } from './compra.dto';
+import { CompraDto, StatusCompraDto } from './dto/compra.dto';
 import { ComprasService } from './compras.service';
 
 @Controller('compras')

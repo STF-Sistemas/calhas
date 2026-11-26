@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { CompraService } from './compra.service';
 import { IDanfeData } from '#shared/interfaces';
+import { escaparProfundo } from '#shared-frontend/utils/escapar-html';
 
 @Injectable({ providedIn: 'root' })
 export class DanfePrintService {
@@ -16,12 +17,14 @@ export class DanfePrintService {
   }
 
   private abrirJanelaDanfe(data: IDanfeData): void {
-    const html = this.gerarHtml(data);
+    const html = this.gerarHtml(escaparProfundo(data));
     const win = window.open('', '_blank', 'width=900,height=700');
     if (!win) { this.toast.warn('Permita as janelas pop-up deste site para imprimir.'); return; }
     win.document.open();
     win.document.write(html);
     win.document.close();
+    win.document.querySelector('.print-btn')?.addEventListener('click', () => win.print());
+    setTimeout(() => win.print(), 400);
   }
 
   private gerarHtml(d: IDanfeData): string {
@@ -102,6 +105,7 @@ export class DanfePrintService {
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; font-src data:">
 <title>DANFE | NF-e ${fmtNfe(d.numero_nfe)}</title>
 <style>
   @page { size: A4 portrait; margin: 5mm; }
@@ -151,7 +155,7 @@ export class DanfePrintService {
 </style>
 </head>
 <body>
-<button class="print-btn no-print" onclick="window.print()">Imprimir</button>
+<button type="button" class="print-btn no-print">Imprimir</button>
 <div class="danfe">
 
 <div class="flex">
@@ -309,7 +313,6 @@ ${d.faturas && d.faturas.length > 0 ? `
 </div>
 
 </div>
-<script>window.onload = function(){ setTimeout(function(){ window.print(); }, 400); }</script>
 </body>
 </html>`;
   }

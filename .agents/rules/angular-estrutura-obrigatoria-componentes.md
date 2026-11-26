@@ -19,8 +19,9 @@ Todos os componentes devem ser criados com separação total de responsabilidade
 Para garantir uma experiência premium e consistente (Design System):
 - **Componentes de UI:** É OBRIGATÓRIO o uso de componentes do **PrimeNG** para todos os elementos de interface, a menos que o PrimeNG não forneça uma solução nativa.
     - **Botões:** Usar `p-button`, `p-splitbutton`, `p-speeddial`, etc.
-    - **Formulários:** Usar `p-inputtext`, `p-dropdown`, `p-checkbox`, `p-calendar`, `p-inputnumber`.
-    - **Containers:** Usar `p-card`, `p-toolbar`, `p-tabview`, `p-panel`.
+    - **Formulários:** Usar `pInputText`, `p-select`, `p-checkbox`, `p-datepicker`, `p-inputnumber`, `p-inputmask`.
+    - **Containers:** Usar `p-card`, `p-toolbar`, `p-tabs`, `p-panel`.
+    - **Seletores em minúsculas:** o PrimeNG 22 só reconhece as tags em minúsculas ou com hífen (`p-inputmask`, `p-toggleswitch`, `p-progress-spinner`). Tag em camelCase (`p-inputMask`) não é reconhecida e o campo do formulário quebra com `NG01203: No value accessor`.
     - **Feedback:** Usar `p-progressspinner`, `p-progressbar`.
 - **Toast e confirmação (PROIBIDO `alert()`, `confirm()`, `MessageService`, `ConfirmationService`, `<p-toast>`, `<p-confirmdialog>`):**
     - Resultado de ação: `ToastService` (`#shared-frontend/services/toast.service`) com `success`, `error`, `info`, `warn`.

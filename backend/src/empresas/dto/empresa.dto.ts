@@ -1,6 +1,6 @@
 import { IsEmail, IsOptional, MaxLength, ValidateBy, ValidateIf } from 'class-validator';
 import { isLogoDataUriValido } from '#shared/functions/logo.functions';
-import { Booleano, Data, Id, Inteiro, Numero, Texto, TextoOpcional } from '../common/validadores';
+import { Booleano, Data, Id, Inteiro, Numero, Texto, TextoOpcional } from '../../common/validadores';
 
 const LogoValido = () =>
   ValidateBy({

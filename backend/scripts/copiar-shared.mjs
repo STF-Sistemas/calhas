@@ -1,6 +1,3 @@
-// Copia ../shared (fonte única do monorepo) para src/shared antes do build e do dev.
-// Assim o tsc compila tudo dentro de src/ e a saída fica em dist/main.js (rootDir = src).
-// src/shared é gerado: está no .gitignore e nunca deve ser editado à mão.
 import { cpSync, existsSync, rmSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 

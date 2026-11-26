@@ -9,6 +9,7 @@ import { FornecedorService } from '#core/services/fornecedor.service';
 import { FornecedorForm } from '../../../fornecedores/fornecedor-form/fornecedor-form.component';
 import { IFornecedor } from '#shared/interfaces';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { normalizarBusca } from '#shared-frontend/busca/normalizar-busca';
 
 @Component({
   selector: 'app-fornecedor-lookup-dialog',
@@ -90,9 +91,9 @@ export class FornecedorLookupDialog {
   }
 
   filtrar() {
-    const termo = this.filtro.toLowerCase();
+    const termo = normalizarBusca(this.filtro);
     this.fornecedoresFiltrados = this.fornecedores.filter(
-      (f) => f.razao_social.toLowerCase().includes(termo) || f.cnpj.includes(termo),
+      (f) => normalizarBusca(f.razao_social).includes(termo) || f.cnpj.includes(termo),
     );
   }
 

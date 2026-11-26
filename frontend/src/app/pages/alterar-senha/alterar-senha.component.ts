@@ -15,6 +15,7 @@ import { PasswordModule } from 'primeng/password';
 import { environment } from '#environments/environment';
 import { TApiResponse } from '#shared/types';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { AuthService } from '#core/services/auth.service';
 
 function senhasIguaisValidator(g: AbstractControl) {
   const nova = g.get('nova_senha')?.value;
@@ -43,6 +44,7 @@ export class AlterarSenha implements OnInit {
     private fb: FormBuilder,
     private http: HttpClient,
     private readonly toast: ToastService,
+    private readonly auth: AuthService,
     private title: Title,
   ) {}
 
@@ -69,9 +71,10 @@ export class AlterarSenha implements OnInit {
     const { senha_atual, nova_senha } = this.form.value;
 
     this.http
-      .put<TApiResponse<null>>(`${environment.apiUrl}/perfil/senha`, { senha_atual, nova_senha })
+      .put<TApiResponse<{ token: string } | null>>(`${environment.apiUrl}/perfil/senha`, { senha_atual, nova_senha })
       .subscribe({
         next: (res) => {
+          if (res.data?.token) this.auth.atualizarToken(res.data.token);
           this.toast.success(res.message ?? 'Senha alterada com sucesso.');
           this.form.reset();
           this.isSaving = false;

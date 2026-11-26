@@ -8,6 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ProdutoService } from '#core/services/produto.service';
 import { IProduto } from '#shared/interfaces';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { normalizarBusca } from '#shared-frontend/busca/normalizar-busca';
 
 @Component({
   selector: 'app-produto-lookup-dialog',
@@ -64,9 +65,9 @@ export class ProdutoLookupDialog {
   }
 
   filtrar() {
-    const termo = this.filtro.toLowerCase();
+    const termo = normalizarBusca(this.filtro);
     this.produtosFiltrados = this.produtos.filter(
-      (p) => p.descricao.toLowerCase().includes(termo) || String(p.id).includes(termo),
+      (p) => normalizarBusca(p.descricao).includes(termo) || String(p.id).includes(termo),
     );
   }
 

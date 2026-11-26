@@ -2,6 +2,20 @@ import { INovidade } from '../interfaces/INovidade';
 
 export const NOVIDADES: INovidade[] = [
   {
+    versao: '2.0.1',
+    data: '26/11/2026',
+    itens: [
+      'Cadastro de Clientes, Fornecedores, Empresas e Minha Empresa: os campos de CNPJ e CEP voltaram a funcionar. Antes a tela dava erro e esses campos não aceitavam digitação.',
+      'Compras › busca de fornecedor e de produto: a pesquisa agora ignora acentos e maiúsculas. Quem digita "joao" encontra "João".',
+      'Pesquisa de clientes e fornecedores por telefone: encontra o número mesmo que ele tenha sido cadastrado com parênteses, espaços ou traços.',
+      'Impressão da DANFE: o botão Imprimir e a impressão automática voltaram a funcionar.',
+      'Segurança: ao trocar a senha, desativar ou excluir um usuário, ou mudar o perfil dele, as sessões abertas em outros aparelhos são encerradas na hora. Quem troca a própria senha continua conectado no aparelho atual.',
+      'Segurança: o administrador de uma empresa não vê nem altera mais o usuário do suporte do sistema.',
+      'Segurança: textos digitados em pedidos, clientes e notas fiscais não conseguem mais executar nada nas telas de impressão.',
+      'Segurança: o link de "esqueci minha senha" enviado por e-mail antigo deixou de valer. Se precisar, peça um novo.',
+    ],
+  },
+  {
     versao: '2.0.0',
     data: '26/11/2026',
     itens: [

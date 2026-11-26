@@ -109,7 +109,7 @@ export function gerarSvgCorte(pontos: IPonto[], diagonais: IDiagonal[], medidas:
     const len = Math.sqrt(dx * dx + dy * dy) || 1;
     const medida = medidas[i];
     const hasVal = medida != null && Number(medida) > 0;
-    const text = hasVal ? `${medida}cm` : `${i + 1}`;
+    const text = hasVal ? `${Number(medida)}cm` : `${i + 1}`;
     const w = Math.max(18, text.length * 5.8 + 6);
     lblData.push({
       x: mx + (-dy / len) * 14, y: my + (dx / len) * 14,

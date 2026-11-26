@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { ArrayMaxSize, ArrayMinSize, IsArray, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
-import { Id, Numero, Texto, TextoOpcional, UmDe } from '../common/validadores';
+import { Id, Numero, Texto, TextoOpcional, UmDe } from '../../common/validadores';
 
 const valorOpcional = (mensagem = 'Valor inválido.') => Numero({ opcional: true, min: 0, mensagem });
 

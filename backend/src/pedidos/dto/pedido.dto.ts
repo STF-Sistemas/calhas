@@ -10,7 +10,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { Id, Inteiro, Numero, Texto, TextoOpcional } from '../common/validadores';
+import { Id, Inteiro, Numero, Texto, TextoOpcional } from '../../common/validadores';
 
 export class PontoDto {
   @IsNumber({ allowNaN: false, allowInfinity: false }, { message: 'Ponto do desenho inválido.' })

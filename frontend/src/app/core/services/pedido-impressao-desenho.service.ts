@@ -5,12 +5,14 @@ import { ETipoItemPedido } from '#shared/enums';
 import { formatDate, formatCpfCnpj, formatPhone } from '#shared/functions/format.functions';
 import { calcularTotalCorte, gerarSvgCorte } from '#shared/functions/desenho-corte.functions';
 import { resolverDesenhoItem } from '#shared/functions/desenho-livre.functions';
+import { escaparProfundo } from '#shared-frontend/utils/escapar-html';
 
 @Injectable({ providedIn: 'root' })
 export class PedidoImpressaoDesenhoService {
   private readonly toast = inject(ToastService);
 
-  imprimir(pedido: IPedido): void {
+  imprimir(pedidoOriginal: IPedido): void {
+    const pedido = escaparProfundo(pedidoOriginal);
     const itensCorte = (pedido.itens ?? []).filter(
       i => i.tipo === ETipoItemPedido.Corte && !!resolverDesenhoItem(i)
     );
@@ -156,6 +158,7 @@ export class PedidoImpressaoDesenhoService {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; font-src data:">
   <title>Ordem de Corte | Pedido Nº ${pedido.id}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }

@@ -1,16 +1,27 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
-import { randomBytes } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import { EStatusGeral } from '#shared/enums';
 import { falha } from '../common/falha';
+import { siteUrl } from '../common/site-url.util';
 import { MailService } from '../mail/mail.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { EsqueciSenhaDto } from './dto/esqueci-senha.dto';
 import { LoginDto } from './dto/login.dto';
 import { RedefinirSenhaDto } from './dto/redefinir-senha.dto';
 
-const BCRYPT_ROUNDS = parseInt(process.env['BCRYPT_ROUNDS'] || '12', 10);
+export const BCRYPT_ROUNDS = parseInt(process.env['BCRYPT_ROUNDS'] || '12', 10);
+const HASH_FALSO = bcrypt.hashSync('senha-inexistente', 10);
+const hashDoToken = (token: string) => createHash('sha256').update(token).digest('hex');
+
+interface IUsuarioToken {
+  id: number;
+  cod_empresa: number | null;
+  admin: boolean;
+  super_admin: boolean;
+  token_versao: number;
+}
 
 @Injectable()
 export class AuthService {
@@ -19,20 +30,37 @@ export class AuthService {
     private readonly mail: MailService,
   ) {}
 
+  gerarToken(usuario: IUsuarioToken): string {
+    return jwt.sign(
+      {
+        id: usuario.id,
+        cod_empresa: usuario.cod_empresa,
+        admin: usuario.admin,
+        super_admin: usuario.super_admin,
+        tv: usuario.token_versao,
+      },
+      process.env['JWT_SECRET'] as string,
+      { algorithm: 'HS256', expiresIn: (process.env['JWT_EXPIRES_IN'] || '8h') as jwt.SignOptions['expiresIn'] },
+    );
+  }
+
   async login(dto: LoginDto) {
     const email = dto.email.toLowerCase().trim();
     const usuario = await this.prisma.usuario.findFirst({ where: { email, excluido: false } });
-    if (!usuario || usuario.status !== EStatusGeral.Ativo || !(await bcrypt.compare(dto.senha, usuario.senha))) {
+    const senhaConfere = await bcrypt.compare(dto.senha, usuario?.senha ?? HASH_FALSO);
+    if (!usuario || usuario.status !== EStatusGeral.Ativo || !senhaConfere) {
       throw falha(HttpStatus.UNAUTHORIZED, 'Credenciais inválidas.');
     }
 
-    const token = jwt.sign(
-      { id: usuario.id, cod_empresa: usuario.cod_empresa, admin: usuario.admin, super_admin: usuario.super_admin },
-      process.env['JWT_SECRET'] as string,
-      { expiresIn: (process.env['JWT_EXPIRES_IN'] || '8h') as jwt.SignOptions['expiresIn'] },
-    );
+    const token = this.gerarToken(usuario);
 
-    const { senha: _senha, reset_token: _token, reset_token_expiracao: _exp, ...usuarioPublico } = usuario;
+    const {
+      senha: _senha,
+      reset_token: _token,
+      reset_token_expiracao: _exp,
+      token_versao: _versao,
+      ...usuarioPublico
+    } = usuario;
 
     let empresa_expiracao: string | null = null;
     if (usuario.cod_empresa) {
@@ -54,10 +82,11 @@ export class AuthService {
       const token = randomBytes(32).toString('hex');
       await this.prisma.usuario.update({
         where: { id: usuario.id },
-        data: { reset_token: token, reset_token_expiracao: new Date(Date.now() + 60 * 60 * 1000) },
+        data: { reset_token: hashDoToken(token), reset_token_expiracao: new Date(Date.now() + 60 * 60 * 1000) },
       });
 
-      const link = `${process.env['FRONTEND_URL'] || 'http://localhost:4204'}/redefinir-senha?token=${token}`;
+      const base = process.env['FRONTEND_URL']?.trim().replace(/\/+$/, '') || siteUrl();
+      const link = `${base}/redefinir-senha?token=${token}`;
       await this.mail.enviar(email, 'Recuperação de Senha: Calhas Pro', this.htmlRecuperacao(usuario.nome, link));
     }
 
@@ -66,13 +95,18 @@ export class AuthService {
 
   async redefinirSenha(dto: RedefinirSenhaDto) {
     const usuario = await this.prisma.usuario.findFirst({
-      where: { reset_token: dto.token, reset_token_expiracao: { gt: new Date() }, excluido: false },
+      where: { reset_token: hashDoToken(dto.token), reset_token_expiracao: { gt: new Date() }, excluido: false },
     });
     if (!usuario) throw falha(HttpStatus.BAD_REQUEST, 'Token inválido ou expirado.');
 
     await this.prisma.usuario.update({
       where: { id: usuario.id },
-      data: { senha: await bcrypt.hash(dto.nova_senha, BCRYPT_ROUNDS), reset_token: null, reset_token_expiracao: null },
+      data: {
+        senha: await bcrypt.hash(dto.nova_senha, BCRYPT_ROUNDS),
+        reset_token: null,
+        reset_token_expiracao: null,
+        token_versao: { increment: 1 },
+      },
     });
     return { success: true, message: 'Senha redefinida com sucesso. Você já pode fazer login.' };
   }

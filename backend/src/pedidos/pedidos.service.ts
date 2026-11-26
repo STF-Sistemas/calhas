@@ -5,7 +5,7 @@ import { calcularValorDesconto, calcularValorLiquido } from '#shared/functions/d
 import { falha } from '../common/falha';
 import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { DiagonalDto, PedidoDto, PedidoItemDto, PedidoUpdateDto, PontoDto } from './pedido.dto';
+import { DiagonalDto, PedidoDto, PedidoItemDto, PedidoUpdateDto, PontoDto } from './dto/pedido.dto';
 
 const Decimal = Prisma.Decimal;
 type TJson = Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue;
@@ -81,6 +81,11 @@ export class PedidosService {
     const pedido = await this.prisma.pedido.findFirst({ where: { id, cod_empresa: codEmpresa, excluido: false } });
     if (!pedido) throw falha(HttpStatus.NOT_FOUND, 'Pedido não encontrado.');
     return pedido;
+  }
+
+  async buscar(id: number, codEmpresa: number) {
+    await this.obter(id, codEmpresa);
+    return { success: true, data: await this.completo(id) };
   }
 
   async completo(id: number) {
