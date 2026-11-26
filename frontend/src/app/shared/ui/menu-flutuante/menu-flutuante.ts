@@ -11,6 +11,7 @@ import { IMenuItem } from '../tipos';
 })
 export class MenuFlutuante implements OnDestroy {
   readonly model = input<IMenuItem[]>([]);
+  readonly alinhar = input<'inicio' | 'fim'>('fim');
   private readonly painel = viewChild.required<ElementRef<HTMLElement>>('painel');
   protected readonly aberto = signal(false);
   private flutuante?: Flutuante;
@@ -35,7 +36,7 @@ export class MenuFlutuante implements OnDestroy {
   }
 
   private obter(): Flutuante {
-    this.flutuante ??= new Flutuante(this.painel().nativeElement, { alinhar: 'fim', aoFechar: () => this.aberto.set(false) });
+    this.flutuante ??= new Flutuante(this.painel().nativeElement, { alinhar: this.alinhar(), aoFechar: () => this.aberto.set(false) });
     return this.flutuante;
   }
 }

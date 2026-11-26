@@ -37,6 +37,7 @@ const icones = {
   dollar: 'attach_money',
   envelope: 'mail',
   'envelope-open': 'drafts',
+  'ellipsis-v': 'more_vert',
   eraser: 'ink_eraser',
   'exclamation-circle': 'error',
   'exclamation-triangle': 'warning',

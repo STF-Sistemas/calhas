@@ -8,6 +8,7 @@
           type="button"
           role="menuitem"
           class="ui-menu__item"
+          [class.ui-menu__item--perigo]="item.perigo"
           [style]="item.style"
           [disabled]="item.disabled"
           (click)="executar(item)">

@@ -22,17 +22,24 @@
 
         <ng-template #header let-columns>
             <tr>
+                @if (temAcoes()) {
+                    <th class="dt-acoes-th">Ações</th>
+                }
                 @for (col of columns; track col.field) {
                     <th [uiSortableColumn]="col.field" class="white-space-nowrap">
                         {{ col.header }} <ui-sorticon [field]="col.field"></ui-sorticon>
                     </th>
                 }
-                <th class="dt-acoes-th">Ações</th>
             </tr>
         </ng-template>
 
         <ng-template #body let-rowData let-columns="columns">
             <tr>
+                @if (temAcoes()) {
+                    <td class="dt-acoes">
+                        <ui-button icon="ic ic-ellipsis-v" [rounded]="true" [text]="true" severity="secondary" dica="Ações" aria-label="Abrir ações do registro" (onClick)="abrirAcoes($event, rowData)"></ui-button>
+                    </td>
+                }
                 @for (col of columns; track col.field; let primeira = $first) {
                     <td [attr.data-label]="col.header" [class.dt-titulo]="primeira">
                         @if (col.type === 'status') {
@@ -71,41 +78,17 @@
                         }
                     </td>
                 }
-                <td class="dt-acoes">
-                    <div class="dt-acoes__lista">
-                        <ui-button [style.display]="showToggleStatus ? 'inline-flex' : 'none'" icon="ic ic-power-off" [rounded]="true" [text]="true" [severity]="toggleSeverity(rowData[statusField])" (onClick)="toggleStatus.emit(rowData)" [dica]="toggleTooltip(rowData[statusField])" [aria-label]="toggleTooltip(rowData[statusField])"></ui-button>
-                        @if (showPrintButton) {
-                            <ui-button icon="ic ic-print" [rounded]="true" [text]="true" severity="info" (onClick)="print.emit(rowData)" dica="Imprimir pedido" aria-label="Imprimir pedido"></ui-button>
-                        }
-                        @if (showPrintDesenhoButton) {
-                            <ui-button icon="ic ic-print" [rounded]="true" [text]="true" severity="warn" (onClick)="printDesenho.emit(rowData)" dica="Imprimir ordem de corte" aria-label="Imprimir ordem de corte"></ui-button>
-                        }
-                        @if (showExtraButton) {
-                            <ui-button [icon]="extraButtonIcon" [rounded]="true" [text]="true" [severity]="extraButtonSeverity" (onClick)="extraAction.emit(rowData)" [dica]="extraButtonTooltip"></ui-button>
-                        }
-                        @for (action of rowActions; track action.key) {
-                            @if (!action.visible || action.visible(rowData)) {
-                                <ui-button [icon]="action.icon" [rounded]="true" [text]="true" [severity]="action.severity" [dica]="action.tooltip" [aria-label]="action.ariaLabel" (onClick)="rowActionClick.emit({ key: action.key, row: rowData })"></ui-button>
-                            }
-                        }
-                        @if (showEditButton) {
-                            <ui-button icon="ic ic-pencil" [rounded]="true" [text]="true" severity="secondary" (onClick)="edit.emit(rowData)" dica="Editar"></ui-button>
-                        }
-                        @if (showDeleteButton) {
-                            <ui-button icon="ic ic-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="delete.emit(rowData)" dica="Excluir"></ui-button>
-                        }
-                    </div>
-                </td>
             </tr>
         </ng-template>
 
         <ng-template #emptymessage>
             <tr>
-                <td [attr.colspan]="columns.length + 1" class="dt-vazio">
+                <td [attr.colspan]="columns.length + (temAcoes() ? 1 : 0)" class="dt-vazio">
                     Nenhum registro encontrado.
                 </td>
             </tr>
         </ng-template>
     </ui-table>
+    <ui-menu #menuAcoes [model]="acoesLinha" alinhar="inicio" />
   </div>
 </div>

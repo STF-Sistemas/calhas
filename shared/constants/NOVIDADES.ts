@@ -2,6 +2,14 @@ import { INovidade } from '../interfaces/INovidade';
 
 export const NOVIDADES: INovidade[] = [
   {
+    versao: '2.1.1',
+    data: '26/11/2026',
+    itens: [
+      'Listas (clientes, pedidos, produtos e as demais): os vários botões de cada linha viraram um só, o de três pontinhos, logo no começo da linha. Ao tocar nele aparecem todas as opções, como Editar, Imprimir, Ativar/Inativar e Excluir.',
+      'No celular, o botão de opções fica no canto esquerdo de cada cartão, ao lado do nome.',
+    ],
+  },
+  {
     versao: '2.1.0',
     data: '26/11/2026',
     itens: [

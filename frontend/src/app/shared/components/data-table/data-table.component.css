@@ -101,12 +101,10 @@
   white-space: nowrap;
 }
 
-.dt-acoes__lista {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: center;
-  gap: 0.25rem;
+.dt-acoes {
+  width: 1%;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .dt-vazio {
@@ -171,21 +169,24 @@
     display: none;
   }
 
+  :host ::ng-deep .ui-table__tabela tbody tr:has(> td.dt-acoes) {
+    position: relative;
+  }
+
   :host ::ng-deep .ui-table__tabela tbody tr > td.dt-acoes {
-    justify-content: flex-end;
-    border-bottom: none;
-    background: var(--surface-section);
-    padding: 0.35rem 0.5rem;
+    position: absolute;
+    top: 0.3rem;
+    left: 0.3rem;
+    width: auto;
+    min-height: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
   }
 
-  .dt-acoes__lista {
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-
-  :host ::ng-deep .dt-acoes .ui-button {
-    width: 2.75rem;
-    height: 2.75rem;
+  :host ::ng-deep .ui-table__tabela tbody tr:has(> td.dt-acoes) > td.dt-titulo {
+    padding-left: 3.4rem;
+    min-height: 3.4rem;
   }
 
   :host ::ng-deep .ui-table__tabela tbody tr > td.dt-vazio {

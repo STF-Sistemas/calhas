@@ -6,6 +6,7 @@ export interface IMenuItem {
   style?: Record<string, string>;
   command?: () => void;
   separator?: boolean;
+  perigo?: boolean;
   disabled?: boolean;
 }
 

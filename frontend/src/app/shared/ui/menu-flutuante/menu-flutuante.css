@@ -43,3 +43,8 @@
   border: 0;
   border-top: 1px solid var(--border-color);
 }
+
+.ui-menu__item--perigo,
+.ui-menu__item--perigo .ui-menu__rotulo {
+  color: var(--cor-perigo);
+}

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { ThemeService } from '#core/services/theme.service';
 
 export interface IRowAction {
@@ -11,7 +11,15 @@ export interface IRowAction {
 }
 import { CommonModule } from '@angular/common';
 import { NgxMaskPipe, provideNgxMask } from 'ngx-mask';
-import { Botao, Dica, Tag, Tabela, ColunaOrdenavel, IconeOrdem } from '#ui';
+import { Botao, Dica, Tag, Tabela, ColunaOrdenavel, IconeOrdem, MenuFlutuante, IMenuItem } from '#ui';
+
+const COR_SEVERIDADE: Record<string, string> = {
+  success: 'var(--cor-sucesso)',
+  info: 'var(--cor-info)',
+  warn: 'var(--cor-alerta)',
+  danger: 'var(--cor-perigo)',
+  secondary: 'var(--text-secondary)',
+};
 
 @Component({
   selector: 'app-data-table',
@@ -25,6 +33,7 @@ import { Botao, Dica, Tag, Tabela, ColunaOrdenavel, IconeOrdem } from '#ui';
     Tabela,
     ColunaOrdenavel,
     IconeOrdem,
+    MenuFlutuante,
   ],
   providers: [provideNgxMask()],
   templateUrl: './data-table.component.html',
@@ -33,6 +42,9 @@ import { Botao, Dica, Tag, Tabela, ColunaOrdenavel, IconeOrdem } from '#ui';
 })
 export class DataTable {
   constructor(public themeService: ThemeService) {}
+
+  @ViewChild('menuAcoes') menuAcoes?: MenuFlutuante;
+  acoesLinha: IMenuItem[] = [];
 
   get drawingLineColor(): string {
     return this.themeService.isDarkMode() ? '#ef4444' : '#1a1a1a';
@@ -67,6 +79,73 @@ export class DataTable {
   @Output() printDesenho = new EventEmitter<any>();
   @Output() extraAction = new EventEmitter<any>();
   @Output() rowActionClick = new EventEmitter<{ key: string; row: any }>();
+
+  abrirAcoes(evento: Event, row: any): void {
+    this.acoesLinha = this.montarAcoes(row);
+    this.menuAcoes?.toggle(evento);
+  }
+
+  private montarAcoes(row: any): IMenuItem[] {
+    const cor = (severidade: string) => ({ color: COR_SEVERIDADE[severidade] ?? 'var(--text-secondary)' });
+    const itens: IMenuItem[] = [];
+    if (this.showEditButton) {
+      itens.push({ label: 'Editar', icon: 'ic ic-pencil', style: cor('secondary'), command: () => this.edit.emit(row) });
+    }
+    if (this.showExtraButton) {
+      itens.push({
+        label: this.extraButtonTooltip,
+        icon: this.extraButtonIcon,
+        style: cor(this.extraButtonSeverity),
+        command: () => this.extraAction.emit(row),
+      });
+    }
+    for (const acao of this.rowActions) {
+      if (acao.visible && !acao.visible(row)) continue;
+      itens.push({
+        label: acao.tooltip,
+        icon: acao.icon,
+        style: cor(acao.severity),
+        command: () => this.rowActionClick.emit({ key: acao.key, row }),
+      });
+    }
+    if (this.showPrintButton) {
+      itens.push({ label: 'Imprimir pedido', icon: 'ic ic-print', style: cor('info'), command: () => this.print.emit(row) });
+    }
+    if (this.showPrintDesenhoButton) {
+      itens.push({
+        label: 'Imprimir ordem de corte',
+        icon: 'ic ic-print',
+        style: cor('warn'),
+        command: () => this.printDesenho.emit(row),
+      });
+    }
+    if (this.showToggleStatus) {
+      const valor = row[this.statusField];
+      itens.push({
+        label: this.toggleTooltip(valor),
+        icon: this.toggleIcon(valor),
+        style: cor(this.toggleSeverity(valor)),
+        command: () => this.toggleStatus.emit(row),
+      });
+    }
+    if (this.showDeleteButton) {
+      if (itens.length) itens.push({ separator: true });
+      itens.push({ label: 'Excluir', icon: 'ic ic-trash', perigo: true, command: () => this.delete.emit(row) });
+    }
+    return itens;
+  }
+
+  temAcoes(): boolean {
+    return (
+      this.showEditButton ||
+      this.showDeleteButton ||
+      this.showExtraButton ||
+      this.showToggleStatus ||
+      this.showPrintButton ||
+      this.showPrintDesenhoButton ||
+      this.rowActions.length > 0
+    );
+  }
 
   trackById(index: number, item: any): any {
     return item.id || index;
