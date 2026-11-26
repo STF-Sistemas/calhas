@@ -1,3 +1,4 @@
+import { TecladoNumericoDirective } from '#shared-frontend/directives/teclado-numerico.directive';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -27,6 +28,7 @@ import { environment } from 'src/environments/environment';
   selector: 'app-empresa-form',
   standalone: true,
   imports: [
+    TecladoNumericoDirective,
     CommonModule,
     ReactiveFormsModule,
     InputTextModule,

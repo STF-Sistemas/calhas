@@ -44,7 +44,7 @@
                (click)="onBuscarCpfCnpj()">
             </i>
           </p-inputIcon>
-          <input pInputText id="cpf_cnpj" formControlName="cpf_cnpj"
+          <input appTecladoNumerico pInputText id="cpf_cnpj" formControlName="cpf_cnpj"
             placeholder="000.000.000-00 ou 00.000.000/0000-00"
             mask="000.000.000-00||00.000.000/0000-00" />
         </p-iconField>
@@ -63,7 +63,7 @@
 
       <div class="field col-12 col-md-4">
         <label for="telefone">Telefone</label>
-        <input pInputText id="telefone" formControlName="telefone" type="tel"
+        <input appTecladoNumerico pInputText id="telefone" formControlName="telefone" type="tel"
           placeholder="(00) 0000-0000 ou (00) 00000-0000"
           mask="(00) 0000-0000||(00) 00000-0000" />
       </div>
@@ -79,7 +79,7 @@
     <div class="row">
       <div class="field col-12 col-sm-4 col-md-3">
         <label for="cep">CEP *</label>
-        <p-inputMask id="cep" mask="99999-999" formControlName="cep" placeholder="00000-000"
+        <p-inputMask appTecladoNumerico id="cep" mask="99999-999" formControlName="cep" placeholder="00000-000"
           (onComplete)="onCepChange()">
         </p-inputMask>
         @if (form.get('cep')?.invalid && form.get('cep')?.touched) {

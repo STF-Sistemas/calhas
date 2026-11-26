@@ -1,3 +1,4 @@
+import { TecladoNumericoDirective } from '#shared-frontend/directives/teclado-numerico.directive';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -17,6 +18,7 @@ import { ClienteService } from '#core/services/cliente.service';
   selector: 'app-cliente-form',
   standalone: true,
   imports: [
+    TecladoNumericoDirective,
     CommonModule,
     ReactiveFormsModule,
     InputTextModule,

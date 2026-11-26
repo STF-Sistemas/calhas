@@ -1,3 +1,4 @@
+import { TecladoNumericoDirective } from '#shared-frontend/directives/teclado-numerico.directive';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -25,6 +26,7 @@ import { LogoUploaderComponent } from '#shared-frontend/components/logo-uploader
   selector: 'app-minha-empresa',
   standalone: true,
   imports: [
+    TecladoNumericoDirective,
     CommonModule,
     ReactiveFormsModule,
     InputTextModule,

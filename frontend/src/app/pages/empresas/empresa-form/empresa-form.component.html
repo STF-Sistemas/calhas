@@ -53,7 +53,7 @@
           <div class="row">
             <div class="field col-12 col-md-6">
               <label for="cnpj">CNPJ *</label>
-              <p-inputMask id="cnpj" mask="99.999.999/9999-99" formControlName="cnpj" placeholder="00.000.000/0000-00"
+              <p-inputMask appTecladoNumerico id="cnpj" mask="99.999.999/9999-99" formControlName="cnpj" placeholder="00.000.000/0000-00"
                 [class.ng-invalid]="form.get('cnpj')?.invalid && form.get('cnpj')?.touched"
                 [class.ng-dirty]="form.get('cnpj')?.touched">
               </p-inputMask>
@@ -72,7 +72,7 @@
           <div class="row">
             <div class="field col-12 col-md-6">
               <label for="telefone">Telefone</label>
-              <input pInputText id="telefone" formControlName="telefone" type="tel"
+              <input appTecladoNumerico pInputText id="telefone" formControlName="telefone" type="tel"
                 placeholder="(00) 0000-0000 ou (00) 00000-0000" mask="(00) 0000-0000 || (00) 00000-0000" />
             </div>
           </div>
@@ -99,7 +99,7 @@
           <div class="row">
             <div class="field col-12 col-sm-4 col-md-3">
               <label for="cep">CEP *</label>
-              <p-inputMask id="cep" mask="99999-999" formControlName="cep" placeholder="00000-000"
+              <p-inputMask appTecladoNumerico id="cep" mask="99999-999" formControlName="cep" placeholder="00000-000"
                 (onComplete)="onCepChange()"
                 [class.ng-invalid]="form.get('cep')?.invalid && form.get('cep')?.touched"
                 [class.ng-dirty]="form.get('cep')?.touched">

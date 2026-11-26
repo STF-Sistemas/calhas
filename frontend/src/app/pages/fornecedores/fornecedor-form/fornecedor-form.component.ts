@@ -1,3 +1,4 @@
+import { TecladoNumericoDirective } from '#shared-frontend/directives/teclado-numerico.directive';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -21,6 +22,7 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
   selector: 'app-fornecedor-form',
   standalone: true,
   imports: [
+    TecladoNumericoDirective,
     CommonModule,
     ReactiveFormsModule,
     InputTextModule,

@@ -13,6 +13,14 @@ import { INovidade } from '../interfaces/INovidade';
  */
 export const NOVIDADES: INovidade[] = [
   {
+    versao: '1.8.0',
+    data: '26/11/2026',
+    itens: [
+      'Celular: os campos de número agora abrem o teclado numérico. Valores, medidas e quantidades mostram o teclado com vírgula; CPF, CNPJ, CEP e telefone mostram só os números.',
+      'Campos de valor e medida aceitam vírgula ou ponto: digite 1,33 direto. Continua valendo digitar só os números (133 vira 1,33). Antes, em alguns celulares Android, os números digitados não entravam no campo.',
+    ],
+  },
+  {
     versao: '1.7.0',
     data: '26/11/2026',
     itens: [

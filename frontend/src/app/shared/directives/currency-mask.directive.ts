@@ -10,6 +10,12 @@ export class CurrencyMaskDirective implements OnInit, OnDestroy {
   @Input() decimals = 2;
 
   private units = 0; // valor interno × 10^decimals (inteiro)
+  /**
+   * Depois de digitar vírgula/ponto, os próximos dígitos vão para as casas decimais
+   * (ex.: "1,33"). Sem separador, os dígitos entram da direita como no caixa (133 → 1,33).
+   */
+  private modoDecimal = false;
+  private casasDigitadas = 0;
   private _internalChange = false;
   private _subscription?: Subscription;
 
@@ -24,7 +30,8 @@ export class CurrencyMaskDirective implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.el.nativeElement.style.textAlign = 'right';
     this.el.nativeElement.setAttribute('autocomplete', 'off');
-    this.el.nativeElement.setAttribute('inputmode', 'numeric');
+    // Teclado numérico no celular, com vírgula/ponto quando o campo aceita decimais.
+    this.el.nativeElement.setAttribute('inputmode', this.decimals > 0 ? 'decimal' : 'numeric');
 
     if (this.ngControl?.control) {
       this._subscription = this.ngControl.control.valueChanges.subscribe((val) => {
@@ -52,39 +59,99 @@ export class CurrencyMaskDirective implements OnInit, OnDestroy {
     this._subscription?.unsubscribe();
   }
 
-  @HostListener('keydown', ['$event'])
-  onKeyDown(event: KeyboardEvent): void {
-    const key = event.key;
-
-    if (key >= '0' && key <= '9') {
+  /**
+   * `beforeinput` em vez de `keydown`: teclados virtuais (Android/Gboard) mandam
+   * `key = "Unidentified"` no keydown, mas o beforeinput traz o caractere digitado.
+   */
+  @HostListener('beforeinput', ['$event'])
+  onBeforeInput(event: InputEvent): void {
+    const tipo = event.inputType;
+    if (tipo.startsWith('insert')) {
       event.preventDefault();
-      const novoValor = this.units * 10 + parseInt(key, 10);
-      if (novoValor <= this.maxUnits) {
-        this.units = novoValor;
-      }
+      for (const ch of event.data ?? '') this.processarCaractere(ch);
       this.emitir();
-    } else if (key === 'Backspace') {
+    } else if (tipo === 'deleteContentBackward') {
       event.preventDefault();
-      this.units = Math.floor(this.units / 10);
+      this.apagarUltimo();
       this.emitir();
-    } else if (key === 'Delete') {
+    } else if (tipo.startsWith('delete')) {
       event.preventDefault();
-      this.units = 0;
+      this.zerar();
       this.emitir();
     }
+  }
+
+  /** Garante que nada digitado por fora do beforeinput (ex.: IME) fique na tela. */
+  @HostListener('input')
+  onInput(): void {
+    this.exibir();
+  }
+
+  @HostListener('focus')
+  @HostListener('blur')
+  onFocoAlterado(): void {
+    this.modoDecimal = false;
+    this.casasDigitadas = 0;
+    this.exibir();
+  }
+
+  private processarCaractere(ch: string): void {
+    if (ch >= '0' && ch <= '9') {
+      const d = parseInt(ch, 10);
+      if (this.modoDecimal) {
+        if (this.casasDigitadas >= this.decimals) return;
+        this.units += d * Math.pow(10, this.decimals - 1 - this.casasDigitadas);
+        this.casasDigitadas++;
+      } else {
+        const novoValor = this.units * 10 + d;
+        if (novoValor <= this.maxUnits) this.units = novoValor;
+      }
+    } else if ((ch === ',' || ch === '.') && this.decimals > 0 && !this.modoDecimal) {
+      // O que foi digitado até aqui passa a ser a parte inteira.
+      const inteiro = this.units * this.multiplier;
+      if (inteiro <= this.maxUnits) this.units = inteiro;
+      this.modoDecimal = true;
+      this.casasDigitadas = 0;
+    }
+  }
+
+  private apagarUltimo(): void {
+    if (!this.modoDecimal) {
+      this.units = Math.floor(this.units / 10);
+      return;
+    }
+    if (this.casasDigitadas > 0) {
+      this.casasDigitadas--;
+      const casa = Math.pow(10, this.decimals - 1 - this.casasDigitadas);
+      this.units -= Math.floor(this.units / casa) % 10 * casa;
+    } else {
+      // Apagou a vírgula: volta à digitação da direita com a parte inteira.
+      this.units = Math.floor(this.units / this.multiplier);
+      this.modoDecimal = false;
+    }
+  }
+
+  private zerar(): void {
+    this.units = 0;
+    this.modoDecimal = false;
+    this.casasDigitadas = 0;
   }
 
   @HostListener('paste', ['$event'])
   onPaste(event: ClipboardEvent): void {
     event.preventDefault();
-    const texto = event.clipboardData?.getData('text') ?? '';
-    const apenasNumeros = texto.replace(/\D/g, '');
-    if (apenasNumeros) {
-      const novoValor = parseInt(apenasNumeros, 10);
-      if (novoValor <= this.maxUnits) {
-        this.units = novoValor;
-        this.emitir();
-      }
+    const texto = (event.clipboardData?.getData('text') ?? '').trim();
+    // Colar "1.234,56", "1234.56" ou "133": a última vírgula/ponto é o separador decimal.
+    const m = texto.match(/^(.*?)[.,](\d{1,})$/);
+    const num = m
+      ? Number(`${m[1].replace(/\D/g, '') || '0'}.${m[2]}`)
+      : Number(texto.replace(/\D/g, '')) / this.multiplier;
+    if (!Number.isFinite(num)) return;
+    const novoValor = Math.round(num * this.multiplier);
+    if (novoValor <= this.maxUnits) {
+      this.zerar();
+      this.units = novoValor;
+      this.emitir();
     }
   }
 
@@ -100,6 +167,13 @@ export class CurrencyMaskDirective implements OnInit, OnDestroy {
 
   private exibir(): void {
     const valor = this.units / this.multiplier;
+    if (this.modoDecimal) {
+      // Durante a digitação após a vírgula mostra só as casas já digitadas (ex.: "1," / "1,3").
+      const inteiro = Math.floor(this.units / this.multiplier).toLocaleString('pt-BR');
+      const frac = String(this.units % this.multiplier).padStart(this.decimals, '0').slice(0, this.casasDigitadas);
+      this.el.nativeElement.value = `${inteiro},${frac}`;
+      return;
+    }
     this.el.nativeElement.value = valor.toLocaleString('pt-BR', {
       minimumFractionDigits: this.decimals,
       maximumFractionDigits: this.decimals,

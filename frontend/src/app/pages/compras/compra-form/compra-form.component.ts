@@ -1,3 +1,4 @@
+import { TecladoNumericoDirective } from '#shared-frontend/directives/teclado-numerico.directive';
 import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
@@ -26,6 +27,7 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
   selector: 'app-compra-form',
   standalone: true,
   imports: [
+    TecladoNumericoDirective,
     CommonModule,
     DecimalPipe,
     ReactiveFormsModule,
