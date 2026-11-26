@@ -14,7 +14,6 @@
     (onHide)="onClose()"
     (onShow)="show.emit()">
 
-    <!-- State: Loading -->
     @if (isLoadingData) {
         <div class="flex justify-content-center align-items-center p-5 min-h-10rem">
             <p-progress-spinner ariaLabel="Carregando dados"></p-progress-spinner>
@@ -23,7 +22,6 @@
         <ng-content></ng-content>
     }
 
-    <!-- Footer -->
     @if (hasFooter) {
         <ng-template pTemplate="footer">
             <div class="flex justify-content-end gap-2">

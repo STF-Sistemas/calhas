@@ -48,7 +48,6 @@ export class Fornecedores implements OnInit {
   fornecedores: IFornecedor[] = [];
   loading = false;
 
-  // ── Histórico de compras do fornecedor ────────────────────────────────────────
   showHistorico = false;
   historicoLoading = false;
   historicoCompras: ICompra[] = [];

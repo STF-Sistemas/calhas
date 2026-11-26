@@ -16,7 +16,6 @@ export class MailService {
     return this.transporter;
   }
 
-  /** Envia e-mail; falha de envio só vai para o log (nunca expõe erro ao cliente). */
   async enviar(para: string, assunto: string, html: string): Promise<boolean> {
     try {
       await this.obterTransporter().sendMail({

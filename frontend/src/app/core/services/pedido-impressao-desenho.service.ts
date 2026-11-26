@@ -26,14 +26,12 @@ export class PedidoImpressaoDesenhoService {
     win.onload = () => win.print();
   }
 
-  // ── Marca d'água por página ──────────────────────────────────────────────
   private gerarWatermarkHtml(texto: string): string {
     if (!texto) return '';
     const spans = Array.from({ length: 10 }).map(() => `<span>${texto}</span>`).join('');
     return `<div class="watermark" aria-hidden="true">${spans}</div>`;
   }
 
-  // ── Slot preenchido ───────────────────────────────────────────────────────
   private gerarSlotItem(item: IPedidoItem, seq: number): string {
     const chapa    = item.corte?.chapa?.descricao ?? '-';
     const corte    = item.corte?.descricao ?? '-';
@@ -70,12 +68,10 @@ export class PedidoImpressaoDesenhoService {
     </div>`;
   }
 
-  // ── Slot vazio ────────────────────────────────────────────────────────────
   private gerarSlotVazio(): string {
     return `<div class="item-slot item-slot--vazio"></div>`;
   }
 
-  // ── Cabeçalho da empresa ──────────────────────────────────────────────────
   private gerarEmpresaHeader(pedido: IPedido): string {
     const emp = pedido.empresa;
     if (!emp) return '';
@@ -103,7 +99,6 @@ export class PedidoImpressaoDesenhoService {
     </div>`;
   }
 
-  // ── Páginas com 2 desenhos por linha ─────────────────────────────────────
   private gerarPaginas(pedido: IPedido, itens: IPedidoItem[], qtdPorFolha: number): string {
     const cliente     = pedido.cliente?.razao_social ?? '-';
     const agora       = new Date();
@@ -153,7 +148,6 @@ export class PedidoImpressaoDesenhoService {
     }).join('\n');
   }
 
-  // ── HTML completo ─────────────────────────────────────────────────────────
   private gerarHtml(pedido: IPedido, itens: IPedidoItem[]): string {
     const qtdPorFolha = Math.max(2, Math.min(20, pedido.empresa?.quantidade_desenho_por_folha ?? 4));
     const paginas = this.gerarPaginas(pedido, itens, qtdPorFolha);

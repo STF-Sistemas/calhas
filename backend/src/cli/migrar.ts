@@ -4,22 +4,8 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { Client } from 'pg';
 
-/**
- * Aplica as migrations do Prisma sem a CLI do Prisma (que não vai para produção:
- * REGRAS-DESENVOLVIMENTO, "Orçamento de memória", regra 12).
- *
- * Grava a tabela `_prisma_migrations` igual ao Prisma (mesmas colunas, checksum sha256
- * do migration.sql e o mesmo advisory lock), então `prisma migrate status/dev/resolve`
- * continuam funcionando sobre o mesmo banco. Migration com falha fica com
- * `finished_at` nulo e bloqueia as próximas.
- *
- * Baseline: um banco criado antes das migrations (com `prisma db push`) já tem as
- * tabelas do `0_init`; nesse caso o `0_init` é só registrado como aplicado.
- */
-
 const ADVISORY_LOCK = 72707369;
 const BASELINE = '0_init';
-/** Tabela que existe em todo banco do Calhas criado antes das migrations. */
 const TABELA_EXISTENTE = 'calhas.pedidos';
 
 function pastaMigrations(): string {
@@ -80,7 +66,6 @@ async function main(): Promise<void> {
     }
     const aplicadas = new Set(registradas.filter((m) => m.finished_at).map((m) => m.migration_name));
 
-    // Baseline do banco que já existia antes das migrations.
     if (tabelaNova && migrations.includes(BASELINE)) {
       const { rows } = await cliente.query(`SELECT to_regclass($1) AS t`, [TABELA_EXISTENTE]);
       if (rows[0].t) {

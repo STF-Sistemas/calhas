@@ -12,9 +12,6 @@
     transform: translateY(0);
   }
 }
-/* ===========================
-   Header
-=========================== */
 .dashboard-header {
   display: flex;
   flex-direction: row;
@@ -55,9 +52,6 @@
   transform: translateY(-1px);
 }
 
-/* ===========================
-   Stats Cards
-=========================== */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -170,9 +164,6 @@
   color: #10b981;
 }
 
-/* ===========================
-   Content Grid
-=========================== */
 .content-grid {
   display: grid;
   grid-template-columns: 1fr 340px;
@@ -195,9 +186,6 @@
   gap: 1.25rem;
 }
 
-/* ===========================
-   Panels
-=========================== */
 .panel {
   background: var(--surface-0);
   border-radius: 16px;
@@ -220,9 +208,6 @@
   font-size: 0.95rem;
 }
 
-/* ===========================
-   Quick Actions
-=========================== */
 .quick-actions {
   display: flex;
   flex-direction: column;
@@ -287,9 +272,6 @@
   flex-shrink: 0;
 }
 
-/* ===========================
-   Status List
-=========================== */
 .status-list {
   display: flex;
   flex-direction: column;
@@ -330,9 +312,6 @@
   color: var(--text-color);
 }
 
-/* ===========================
-   Dark mode overrides
-=========================== */
 :host-context(.app-dark) .stat-card,
 :host-context(.app-dark) .panel {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);

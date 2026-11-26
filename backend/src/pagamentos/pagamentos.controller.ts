@@ -4,7 +4,6 @@ import { JwtPayload } from '../common/jwt-payload';
 import { IdPipe } from '../common/validadores';
 import { PagamentosService } from './pagamentos.service';
 
-/** Pagamento da licença: funciona mesmo com a licença vencida. */
 @SemLicenca()
 @Controller('pagamentos')
 export class PagamentosController {
@@ -23,7 +22,6 @@ export class PagamentosController {
     return this.pagamentos.status(id, usuario.cod_empresa);
   }
 
-  /** Mercado Pago: responde sempre 200 (retries agressivos em 4xx/5xx). */
   @Publico()
   @Post('webhook')
   @HttpCode(200)

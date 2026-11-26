@@ -13,7 +13,6 @@ export class PagamentosService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  /** Cria ou reaproveita a cobrança Pix pendente da empresa. */
   async criarPix(codEmpresa: number | null) {
     if (!codEmpresa) throw falha(HttpStatus.BAD_REQUEST, 'Empresa não identificada.');
     const empresa = await this.prisma.empresa.findFirst({
@@ -32,7 +31,6 @@ export class PagamentosService {
       return { success: true, data: { pagamento: pendente, manual, pix_chave: manual ? this.pixChaveManual : null, valor } };
     }
 
-    // Modo manual: Mercado Pago não configurado.
     if (!this.mpToken) {
       const pagamento = await this.prisma.pagamentoPix.create({
         data: { cod_empresa: codEmpresa, valor, status: 'pendente', qr_code: this.pixChaveManual },
@@ -99,7 +97,6 @@ export class PagamentosService {
     return { success: true, data: { pagamento } };
   }
 
-  /** Webhook do Mercado Pago: sempre confere o status direto na API (o corpo não é confiável). */
   async webhook(corpo: { type?: string; data?: { id?: unknown } }): Promise<void> {
     const idMp = corpo?.data?.id;
     if (corpo?.type !== 'payment' || !idMp || !/^\d{1,30}$/.test(String(idMp))) return;
@@ -138,10 +135,6 @@ export class PagamentosService {
     }
   }
 
-  /**
-   * Aprova o pagamento e prorroga a licença em 30 dias (a partir da validade vigente ou de hoje).
-   * Idempotente: um pagamento já aprovado não prorroga de novo.
-   */
   private async confirmar(pagamentoId: number, codEmpresa: number): Promise<Date | null> {
     return this.prisma.$transaction(async (tx) => {
       const marcado = await tx.pagamentoPix.updateMany({

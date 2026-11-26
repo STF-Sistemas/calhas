@@ -1,6 +1,3 @@
-// Start em um único processo Node: apaga sobras de deploys antigos, confere as dependências
-// que vieram prontas (npm ci só no plano B), migrations e seed em processos curtos e depois o
-// servidor carregado neste mesmo processo. Nada é compilado nem instalado no caminho normal.
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -12,14 +9,12 @@ const RAIZ = resolve(import.meta.dirname, '..');
 const BACKEND = join(RAIZ, 'backend');
 const MAIN = join(BACKEND, 'dist', 'main.js');
 const SEED = join(BACKEND, 'dist', 'cli', 'seed.js');
-const MIGRAR = join(BACKEND, 'dist', 'cli', 'migrar.js'); // sem CLI do Prisma em produção
+const MIGRAR = join(BACKEND, 'dist', 'cli', 'migrar.js');
 const DEPLOY_INFO = join(RAIZ, 'deploy-info.json');
-const MANIFESTO = join(RAIZ, 'arquivos-deploy.txt'); // gravado pelo montar-deploy.mjs
+const MANIFESTO = join(RAIZ, 'arquivos-deploy.txt');
 const PACOTE_CLIENTE = join(BACKEND, 'node_modules', '@prisma', 'client', 'package.json');
 const MARCA_LOCK = join(BACKEND, 'node_modules', '.lock-hash');
-// Gravada pelo montar-deploy.mjs --com-dependencias: node_modules veio pronto na branch deploy.
 const MARCA_PRONTAS = join(BACKEND, 'node_modules', '.deploy-lock-hash');
-// Pacotes com binário nativo do projeto: precisam carregar para aceitar o node_modules pronto.
 const NATIVOS = ['bcrypt'];
 const NODE_OPTIONS_AUXILIARES = '--max-old-space-size=192 --max-semi-space-size=8';
 const ehWindows = process.platform === 'win32';
@@ -32,7 +27,6 @@ function encerrar(mensagem) {
 
 function rodar(comando, args) {
   log(`> ${[comando, ...args].join(' ')}`);
-  // No Windows (só uso local) o comando passa pelo shell: caminhos precisam de aspas.
   const citar = (texto) => (ehWindows && /[\\/]/.test(texto) ? `"${texto}"` : texto);
   const resultado = spawnSync(citar(comando), args.map(citar), {
     cwd: BACKEND,
@@ -67,8 +61,6 @@ const hashDoLock = (comNode) => {
   return hash.digest('hex');
 };
 
-// Os nativos foram instalados no Linux do GitHub Actions: confere num processo curto se
-// carregam neste servidor (não carregam se, por exemplo, a Discloud usar musl).
 function nativosCarregam() {
   const codigo = NATIVOS.map((nome) => `require('${nome}');`).join(' ');
   const resultado = spawnSync(process.execPath, ['--input-type=commonjs', '-e', codigo], {
@@ -86,15 +78,12 @@ function instalarDependenciasProducao() {
     const marca = readFileSync(MARCA_PRONTAS, 'utf8').trim();
     if (marca === hashDoLock(false) && existsSync(PACOTE_CLIENTE) && nativosCarregam()) {
       log('Dependências vieram prontas da branch deploy; npm ci dispensado.');
-      // Só aqui o node_modules corresponde ao manifesto (no plano B ele vem do npm ci).
       removerSobrasDoDeploy(['backend/node_modules']);
       rmSync(join(homedir(), '.npm', '_cacache'), { recursive: true, force: true });
       return;
     }
-    // Plano B, sem olhar a MARCA_LOCK: ela pode ter sobrado de uma instalação anterior.
     log('Dependências prontas inválidas para este servidor; instalando com npm ci.');
   } else {
-    // O hash inclui a versão do Node: foi este servidor que instalou.
     const instalado = existsSync(MARCA_LOCK) ? readFileSync(MARCA_LOCK, 'utf8').trim() : '';
     if (instalado === hashDoLock(true) && existsSync(PACOTE_CLIENTE)) return;
   }
@@ -102,8 +91,6 @@ function instalarDependenciasProducao() {
   writeFileSync(MARCA_LOCK, hashDoLock(true) + '\n');
 }
 
-// A Discloud não apaga do disco o que saiu da branch deploy. Dentro das pastas geradas pelo
-// deploy, apaga tudo que não está no manifesto (e as pastas que ficarem vazias).
 function removerSobrasDoDeploy(pastas) {
   if (!existsSync(MANIFESTO)) return;
   const validos = new Set(readFileSync(MANIFESTO, 'utf8').split('\n').filter(Boolean));

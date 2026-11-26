@@ -1,6 +1,5 @@
 import { IPonto, IDiagonal } from '../interfaces/IDesenho';
 
-// ── Total de material (mesma lógica usada no editor de desenho e nas impressões) ──
 export function calcularTotalCorte(pontos: IPonto[], diagonais: IDiagonal[], medidas: number[]): number {
   const baseSeg = Math.max(0, pontos.length - 1);
   const cobertos = segmentosCobertosCorte(pontos, diagonais);
@@ -16,7 +15,6 @@ export function calcularTotalCorte(pontos: IPonto[], diagonais: IDiagonal[], med
   return Math.round(total * 100) / 100;
 }
 
-/** Índices dos segmentos base cobertos por alguma diagonal (não entram na soma). */
 export function segmentosCobertosCorte(pontos: IPonto[], diagonais: IDiagonal[]): Set<number> {
   const set = new Set<number>();
   diagonais.forEach(d => {
@@ -39,7 +37,6 @@ function segmentoCobertoCorte(pontos: IPonto[], d: IDiagonal): number {
   return idx;
 }
 
-// ── Resolução de sobreposição de labels (AABB) ──────────────────────────────
 interface ILabelCorte {
   x: number; y: number; w: number; h: number;
   mx: number; my: number;
@@ -77,8 +74,6 @@ function resolverSobreposicoesCorte(labels: ILabelCorte[], vw: number, vh: numbe
   }
 }
 
-// ── SVG do desenho com diagonais e medidas ──────────────────────────────────
-// Usado na impressão da Ordem de Corte e na página pública enviada ao fornecedor.
 export function gerarSvgCorte(pontos: IPonto[], diagonais: IDiagonal[], medidas: number[]): string {
   if (!pontos || pontos.length < 2) {
     return '<span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:9px;color:#9ca3af">Sem desenho</span>';
@@ -106,7 +101,6 @@ export function gerarSvgCorte(pontos: IPonto[], diagonais: IDiagonal[], medidas:
 
   const lblData: ILabelCorte[] = [];
 
-  // Labels dos segmentos base (pula cobertos)
   for (let i = 0; i < baseSeg; i++) {
     if (cobertos.has(i)) continue;
     const a = pts[i], b = pts[i + 1];
@@ -126,7 +120,6 @@ export function gerarSvgCorte(pontos: IPonto[], diagonais: IDiagonal[], medidas:
     });
   }
 
-  // Labels das diagonais: uma label por ponta
   const diagLines: string[] = [];
   for (let i = 0; i < diagonais.length; i++) {
     const d = diagonais[i];

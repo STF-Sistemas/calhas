@@ -11,7 +11,6 @@ const LogoValido = () =>
     },
   });
 
-/** Campos que o admin pode alterar na própria empresa. */
 export class MinhaEmpresaDto {
   @Texto(200, 'Razão social é obrigatória.')
   razao_social: string;
@@ -58,7 +57,6 @@ export class MinhaEmpresaDto {
   link_validade_dias?: number;
 }
 
-/** Super admin: inclui os campos de licença. */
 export class EmpresaDto extends MinhaEmpresaDto {
   @Data()
   data_expiracao?: string | null;

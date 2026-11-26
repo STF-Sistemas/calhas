@@ -110,7 +110,6 @@ export class ProdutosController {
     return { success: true, data };
   }
 
-  /** Estoque não muda pelo PUT: é controlado por compras e pedidos. */
   @Put(':id')
   async atualizar(@Param('id', IdPipe) id: number, @Body() dto: ProdutoDto, @EmpresaAtual() codEmpresa: number) {
     await this.obter(id, codEmpresa);
@@ -151,7 +150,6 @@ export class ProdutosController {
       create: { cod_produto: id, cod_fornecedor: dto.cod_fornecedor, codigo_produto_fornecedor: dto.codigo },
       update: { cod_produto: id },
     });
-    // Status 200 como antes (upsert).
     return { success: true, data };
   }
 

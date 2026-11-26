@@ -29,7 +29,6 @@ export interface IDesenhoLivreResultado {
   index: number;
   pontos: IPonto[];
   diagonais: IDiagonal[];
-  /** Mesma ordem do desenho da biblioteca: linhas base, depois [P1, P2] de cada transversal. */
   medidas: number[];
 }
 
@@ -40,14 +39,6 @@ interface ISnapshot {
   medidasDiag: [number, number][];
 }
 
-/**
- * Desenho à mão livre para itens de corte do pedido.
- * - O traço é endireitado ao soltar o dedo/mouse.
- * - Traço começando na ponta do desenho continua o desenho (novas linhas).
- * - Traço feito em qualquer outro lugar vira uma linha TRANSVERSAL, com duas
- *   medidas (P1 e P2); na soma vale a maior, e a linha base que ela cobre sai da soma.
- * - As medidas ficam no painel lateral, em ordem: 1ª medida = 1ª linha, etc.
- */
 @Component({
   selector: 'app-desenho-livre',
   standalone: true,
@@ -70,11 +61,9 @@ export class DesenhoLivre implements OnDestroy {
   @ViewChild('canvas') canvasRef?: ElementRef<HTMLCanvasElement>;
   @Output() confirmed = new EventEmitter<IDesenhoLivreResultado>();
 
-  /** Sistema de coordenadas lógico. Paisagem (4:3) no computador; retrato (3:4) no celular. */
   LARGURA = 800;
   ALTURA = 600;
   retrato = false;
-  /** Distância (lógica) para um novo traço continuar a partir da ponta do desenho. */
   private readonly RAIO_CONTINUAR = 40;
   private readonly MAX_PONTOS = 200;
   private readonly MAX_DIAGONAIS = 50;
@@ -86,27 +75,20 @@ export class DesenhoLivre implements OnDestroy {
   medidasBase: number[] = [];
   medidasDiag: [number, number][] = [];
   cobertos = new Set<number>();
-  /** Campo em foco: 's<i>' (linha) ou 'd<i>-1' / 'd<i>-2' (ponta da transversal). */
   foco: string | null = null;
 
-  /** Modo da tela: desenhar linhas ou escrever as medidas à mão sobre o desenho. */
   modo: 'desenhar' | 'escrever' = 'desenhar';
   readonly modoOpcoes = [
     { label: 'Desenhar', value: 'desenhar', icon: 'pi pi-pencil' },
     { label: 'Escrever medida', value: 'escrever', icon: 'pi pi-pen-to-square' },
   ];
-  /** Medida que vai receber o próximo número escrito. */
   alvoAtual: string | null = null;
-  /** Último número reconhecido (para conferência). */
   ultimoReconhecido: { rotulo: string; texto: string } | null = null;
   naoEntendi = false;
 
-  /** Traços da escrita à mão ainda não reconhecidos. */
   private tinta: IPonto[][] = [];
   private timerEscrita?: ReturnType<typeof setTimeout>;
-  /** Pausa (ms) sem escrever para reconhecer o número. */
   private readonly PAUSA_ESCRITA = 1100;
-  /** Posições dos números/pontas no desenho — tocar neles escolhe qual medida escrever. */
   private alvosClicaveis: { chave: string; x: number; y: number; r: number }[] = [];
 
   private historico: ISnapshot[] = [];
@@ -130,7 +112,6 @@ export class DesenhoLivre implements OnDestroy {
     return this.historico.length > 0;
   }
 
-  /** Ordem de preenchimento: linhas (exceto cobertas) e depois P1/P2 de cada transversal. */
   get sequenciaAlvos(): string[] {
     const linhas = this.segmentos.filter((i) => !this.cobertos.has(i)).map((i) => `s${i}`);
     const transv = this.diagonais.flatMap((_, i) => [`d${i}-1`, `d${i}-2`]);
@@ -180,12 +161,10 @@ export class DesenhoLivre implements OnDestroy {
     this.ultimoReconhecido = null;
     this.naoEntendi = false;
     this.alvoAtual = this.primeiroAlvoVazio();
-    // Reabrindo com desenho e medidas faltando: já começa no modo de escrever.
     this.modo = this.pontos.length >= 2 && this.alvoAtual ? 'escrever' : 'desenhar';
     this.visible = true;
   }
 
-  /** Chamado quando o diálogo termina de abrir (canvas já existe no DOM). */
   onShow() {
     this.prepararCanvas();
   }
@@ -195,7 +174,6 @@ export class DesenhoLivre implements OnDestroy {
     if (this.timerEscrita) clearTimeout(this.timerEscrita);
   }
 
-  /** Se o desenho salvo não couber no quadro atual (outro aparelho), reduz e centraliza. */
   private criarEncaixe(todos: IPonto[]): (p: IPonto) => IPonto {
     const ident = (p: IPonto) => ({ x: p.x, y: p.y });
     if (todos.length < 2) return ident;
@@ -214,8 +192,6 @@ export class DesenhoLivre implements OnDestroy {
       oy = (this.ALTURA - h * esc) / 2;
     return (p: IPonto) => ({ x: ox + (p.x - minX) * esc, y: oy + (p.y - minY) * esc });
   }
-
-  // ── Ações ────────────────────────────────────────────────────────────────
 
   desfazer() {
     const anterior = this.historico.pop();
@@ -263,8 +239,6 @@ export class DesenhoLivre implements OnDestroy {
     this.redesenhar();
   }
 
-  // ── Escrita das medidas à mão ───────────────────────────────────────────
-
   onModoChange() {
     this.cancelarEscrita();
     this.naoEntendi = false;
@@ -277,7 +251,6 @@ export class DesenhoLivre implements OnDestroy {
     this.redesenhar();
   }
 
-  /** Escolhe qual medida recebe o próximo número escrito (permite corrigir uma medida). */
   selecionarAlvo(chave: string, irParaEscrita = false) {
     this.alvoAtual = chave;
     this.naoEntendi = false;
@@ -288,7 +261,6 @@ export class DesenhoLivre implements OnDestroy {
     this.redesenhar();
   }
 
-  /** Reconhece já, sem esperar a pausa. */
   reconhecerAgora() {
     if (this.timerEscrita) clearTimeout(this.timerEscrita);
     this.reconhecerTinta();
@@ -300,7 +272,6 @@ export class DesenhoLivre implements OnDestroy {
     this.redesenhar();
   }
 
-  /** Pula a medida atual sem preencher. */
   pularAlvo() {
     this.cancelarEscrita();
     this.alvoAtual = this.proximoAlvo(this.alvoAtual, false);
@@ -359,7 +330,6 @@ export class DesenhoLivre implements OnDestroy {
     }
   }
 
-  /** Próxima medida depois da atual (opcionalmente só as vazias); se acabar, a primeira vazia. */
   private proximoAlvo(atual: string | null, soVazias: boolean): string | null {
     const seq = this.sequenciaAlvos;
     const idx = atual ? seq.indexOf(atual) : -1;
@@ -377,7 +347,6 @@ export class DesenhoLivre implements OnDestroy {
     return Number(this.medidasDiag[d]?.[ponta === 1 ? 0 : 1]) || 0;
   }
 
-  /** Após mudar o desenho, a escrita aponta para a primeira medida vazia. */
   private reapontarAlvo() {
     this.alvoAtual = this.primeiroAlvoVazio();
   }
@@ -392,7 +361,6 @@ export class DesenhoLivre implements OnDestroy {
     this.visible = false;
   }
 
-  /** Linhas base (cobertas = 0) seguidas de [P1, P2] de cada transversal. */
   private medidasCompostas(): number[] {
     const base = this.segmentos.map((i) =>
       this.cobertos.has(i) ? 0 : Number(this.medidasBase[i]) || 0,
@@ -409,8 +377,6 @@ export class DesenhoLivre implements OnDestroy {
     if (this.visible) this.reapontarAlvo();
   }
 
-  // ── Canvas / ponteiro ───────────────────────────────────────────────────
-
   private prepararCanvas() {
     const canvas = this.canvasRef?.nativeElement;
     if (!canvas) return;
@@ -421,7 +387,6 @@ export class DesenhoLivre implements OnDestroy {
     this.resizeObs = new ResizeObserver(() => this.ajustarResolucao());
     this.resizeObs.observe(canvas);
 
-    // Eventos de ponteiro fora da zona do Angular: evita change detection a cada movimento.
     this.zone.runOutsideAngular(() => {
       canvas.onpointerdown = (e) => this.onPointerDown(e);
       canvas.onpointermove = (e) => this.onPointerMove(e);
@@ -478,13 +443,11 @@ export class DesenhoLivre implements OnDestroy {
     this.pointerId = null;
     const traco = this.traco;
     this.traco = [];
-    // Volta para a zona do Angular: altera estado exibido no template.
     this.zone.run(() =>
       this.modo === 'escrever' ? this.finalizarEscrita(traco) : this.finalizarTraco(traco),
     );
   }
 
-  /** Modo escrever: toque num número escolhe a medida; traços viram tinta para reconhecer. */
   private finalizarEscrita(traco: IPonto[]) {
     const xs = traco.map((p) => p.x),
       ys = traco.map((p) => p.y);
@@ -497,7 +460,6 @@ export class DesenhoLivre implements OnDestroy {
         return;
       }
     }
-    // Um toque isolado (ponto/vírgula) vira um traço mínimo
     this.tinta.push(
       traco.length === 1 ? [traco[0], { x: traco[0].x + 1, y: traco[0].y + 1 }] : traco,
     );
@@ -506,7 +468,6 @@ export class DesenhoLivre implements OnDestroy {
     this.agendarReconhecimento();
   }
 
-  /** Decide o que o traço é: início do desenho, continuação nas pontas ou transversal. */
   private finalizarTraco(traco: IPonto[]) {
     if (traco.length < 2) {
       this.redesenhar();
@@ -519,7 +480,6 @@ export class DesenhoLivre implements OnDestroy {
     const ultimo = this.pontos[this.pontos.length - 1];
     const primeiro = this.pontos[0];
 
-    // 1) Sem desenho ainda: o traço vira o desenho base.
     if (this.pontos.length < 2) {
       const reto = endireitarTraco(traco);
       if (reto.length < 2) {
@@ -536,7 +496,6 @@ export class DesenhoLivre implements OnDestroy {
       return;
     }
 
-    // 2) Começou na ponta final ou inicial: continua o desenho.
     if (perto(ultimo) || perto(primeiro)) {
       const reto = endireitarTraco(traco);
       if (reto.length < 2) {
@@ -550,10 +509,8 @@ export class DesenhoLivre implements OnDestroy {
       const extra = reto.slice(1).map((p) => ({ x: p.x + dx, y: p.y + dy }));
       this.salvarHistorico();
       if (noFim) {
-        // As linhas existentes mantêm a numeração.
         this.pontos = [...this.pontos, ...extra].slice(0, this.MAX_PONTOS);
       } else {
-        // O novo trecho vira as primeiras linhas.
         this.pontos = [...extra.reverse(), ...this.pontos].slice(0, this.MAX_PONTOS);
         this.medidasBase = [...new Array<number>(extra.length).fill(0), ...this.medidasBase];
       }
@@ -563,7 +520,6 @@ export class DesenhoLivre implements OnDestroy {
       return;
     }
 
-    // 3) Em qualquer outro lugar: linha transversal sobre o desenho.
     if (this.diagonais.length >= this.MAX_DIAGONAIS) {
       this.redesenhar();
       return;
@@ -589,8 +545,6 @@ export class DesenhoLivre implements OnDestroy {
     });
     if (this.historico.length > 30) this.historico.shift();
   }
-
-  // ── Renderização ────────────────────────────────────────────────────────
 
   private cor(nome: string, fallback: string): string {
     const v = getComputedStyle(document.documentElement).getPropertyValue(nome).trim();
@@ -643,7 +597,6 @@ export class DesenhoLivre implements OnDestroy {
       ctx.fillText('Desenhe aqui com o dedo ou o mouse', this.LARGURA / 2, this.ALTURA / 2);
     }
 
-    // Linhas base
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
     for (let i = 0; i < this.pontos.length - 1; i++) {
@@ -662,7 +615,6 @@ export class DesenhoLivre implements OnDestroy {
     }
     ctx.setLineDash([]);
 
-    // Transversais (por cima)
     this.diagonais.forEach((d, i) => {
       const focoDiag = destaque?.startsWith(`d${i}-`);
       ctx.strokeStyle = focoDiag ? ambar : this.maiorDiag(i) > 0 ? verde : transv;
@@ -673,7 +625,6 @@ export class DesenhoLivre implements OnDestroy {
       ctx.stroke();
     });
 
-    // Vértices
     ctx.fillStyle = neutro;
     for (const p of this.pontos) {
       ctx.beginPath();
@@ -681,7 +632,6 @@ export class DesenhoLivre implements OnDestroy {
       ctx.fill();
     }
 
-    // Ponta final (onde o próximo traço continua)
     const fim = this.pontos[this.pontos.length - 1];
     if (fim && !this.desenhando) {
       ctx.strokeStyle = primaria;
@@ -693,7 +643,6 @@ export class DesenhoLivre implements OnDestroy {
       ctx.setLineDash([]);
     }
 
-    // Número + medida das linhas base
     for (let i = 0; i < this.pontos.length - 1; i++) {
       if (this.cobertos.has(i)) continue;
       const a = this.pontos[i],
@@ -704,7 +653,6 @@ export class DesenhoLivre implements OnDestroy {
       this.alvosClicaveis.push({ chave: `s${i}`, x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, r: 15 });
     }
 
-    // Rótulo + pontas das transversais
     this.diagonais.forEach((d, i) => {
       const cor = destaque?.startsWith(`d${i}-`) ? ambar : this.maiorDiag(i) > 0 ? verde : transv;
       this.badgeComMedida(ctx, d.p1, d.p2, `T${i + 1}`, cor, 0, fundo, texto);
@@ -730,7 +678,6 @@ export class DesenhoLivre implements OnDestroy {
       );
     });
 
-    // Tinta da escrita (números à mão) ainda não reconhecida
     ctx.strokeStyle = ambar;
     ctx.lineWidth = 6;
     for (const t of this.tinta) {
@@ -740,7 +687,6 @@ export class DesenhoLivre implements OnDestroy {
       ctx.stroke();
     }
 
-    // Traço em andamento
     if (this.traco.length > 1) {
       ctx.strokeStyle = this.modo === 'escrever' ? ambar : primaria;
       ctx.lineWidth = this.modo === 'escrever' ? 6 : 4;
@@ -780,7 +726,6 @@ export class DesenhoLivre implements OnDestroy {
     }
   }
 
-  /** Etiqueta P1/P2 (com a medida, se houver) um pouco para fora da ponta. */
   private rotuloPonta(
     ctx: CanvasRenderingContext2D,
     ponta: IPonto,

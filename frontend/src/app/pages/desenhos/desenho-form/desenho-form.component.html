@@ -20,7 +20,6 @@
     </div>
   </form>
 
-  <!-- Mobile: botão Desenhar -->
   <div class="mobile-canvas-btn">
     <p-button
       label="Desenhar"
@@ -36,7 +35,6 @@
     }
   </div>
 
-  <!-- Desktop: toolbar do canvas -->
   <div class="desktop-canvas">
     <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; flex-wrap:wrap;">
       <span class="text-600 text-sm">
@@ -83,7 +81,6 @@
       </div>
     </div>
 
-    <!-- Canvas desktop -->
     <div style="position:relative; width:100%; border-radius:6px; overflow:hidden; border: 1px solid var(--p-content-border-color);">
       <canvas
         #canvas
@@ -108,7 +105,6 @@
 
 </app-dialog-wrapper>
 
-<!-- Mobile: canvas em tela cheia (appendTo body para escapar do overflow do layout) -->
 <p-dialog
   [(visible)]="canvasMobileAberto"
   [modal]="true"

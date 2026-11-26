@@ -4,13 +4,8 @@ import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog
 import { NOVIDADES, VERSAO_ATUAL } from '#shared/constants';
 import { INovidade } from '#shared/interfaces';
 
-/** Chave do localStorage com a última versão cujas novidades o usuário já viu. */
 const CHAVE_VERSAO_VISTA = 'calhas.novidades.versaoVista';
 
-/**
- * Tela "Novidades do Calhas Pro": abre sozinha quando o sistema foi atualizado
- * desde a última vez que o usuário viu, e pode ser reaberta pelo topo.
- */
 @Component({
   selector: 'app-novidades-dialog',
   standalone: true,
@@ -24,7 +19,6 @@ export class NovidadesDialog implements OnInit {
   readonly versaoAtual = VERSAO_ATUAL;
 
   visible = false;
-  /** Há novidades que o usuário ainda não viu (para o indicador no topo). */
   readonly temNaoVistas = signal(false);
 
   ngOnInit() {
@@ -52,7 +46,6 @@ export class NovidadesDialog implements OnInit {
     try {
       localStorage.setItem(CHAVE_VERSAO_VISTA, this.versaoAtual);
     } catch {
-      // localStorage indisponível (modo privado): apenas não persiste.
     }
   }
 

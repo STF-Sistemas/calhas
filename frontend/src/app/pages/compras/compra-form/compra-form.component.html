@@ -10,7 +10,6 @@
 
   <form [formGroup]="form" class="p-fluid compra-form" appEnterNext>
 
-    <!-- ============ TOOLBAR DE AÇÕES ============ -->
     <div class="form-toolbar">
       <label class="xml-btn" aria-label="Importar XML NF-e">
         <i class="pi pi-file-import"></i> Importar XML NF-e
@@ -31,13 +30,11 @@
       }
     </div>
 
-    <!-- ============ CABEÇALHO NF-e ============ -->
     <h3 class="section-title">
       <i class="pi pi-file"></i>
       Cabeçalho da NF-e
     </h3>
 
-    <!-- Fornecedor -->
     <div class="row">
       <div class="field col-12 col-md-6">
         <label for="cnpj_lookup">CNPJ do Fornecedor</label>
@@ -65,7 +62,6 @@
       </div>
     </div>
 
-    <!-- Dados NF-e: Número + Série + Emissão + Entrada -->
     <div class="row">
       <div class="field col-12 col-md-2">
         <label for="numero_nfe">N° NF-e</label>
@@ -91,7 +87,6 @@
       </div>
     </div>
 
-    <!-- Chave de Acesso -->
     <div class="row">
       <div class="field col-12">
         <label for="chave_acesso">Chave de Acesso (44 dígitos)</label>
@@ -99,7 +94,6 @@
       </div>
     </div>
 
-    <!-- Totais de cabeçalho -->
     <div class="row">
       <div class="field col-12 col-md-3 col-lg-3">
         <label for="valor_frete">Frete (R$)</label>
@@ -123,7 +117,6 @@
       </div>
     </div>
 
-    <!-- ============ ITENS ============ -->
     <h3 class="section-title mt-2">
       <i class="pi pi-list"></i>
       Itens da NF-e
@@ -246,7 +239,6 @@
       </p-table>
     </div>
 
-    <!-- Observação -->
     <div class="row mt-2">
       <div class="field col-12">
         <label for="observacao">Observação</label>
@@ -258,7 +250,6 @@
 
   </form>
 
-  <!-- Dialog de confirmação de produto não encontrado -->
   <p-dialog
     [(visible)]="showProdutoConfirma"
     [modal]="true"
@@ -324,7 +315,6 @@
     </ng-template>
   </p-dialog>
 
-  <!-- Lookup Dialogs -->
   <app-fornecedor-lookup-dialog #fornecedorLookup
     (selecionado)="onFornecedorSelecionado($event)"
     (cancelado)="onFornecedorCancelado()">
@@ -339,7 +329,6 @@
     (saved)="onProdutoSalvoDoXml($event)">
   </app-produto-form>
 
-  <!-- ── Diálogo: Atualizar custo dos produtos ───────────────────────────────── -->
   <p-dialog
     [(visible)]="showConfirmaAtualizacaoCusto"
     [modal]="true"
@@ -366,7 +355,6 @@
     </ng-template>
   </p-dialog>
 
-  <!-- ── Diálogo: Help do cálculo de custo ──────────────────────────────────── -->
   <p-dialog
     [(visible)]="showHelp"
     [modal]="true"

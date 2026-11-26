@@ -49,7 +49,6 @@ import { ToastService } from '#shared-frontend/services/toast.service';
   styleUrls: ['./fornecedor-form.component.css'],
 })
 export class FornecedorForm implements OnInit {
-  /** Quando usado como sub-componente de lookup, pré-preenche o CNPJ */
   @Input() cnpjInicial?: string;
   @Output() saved = new EventEmitter<IFornecedor>();
 
@@ -151,7 +150,6 @@ export class FornecedorForm implements OnInit {
       return;
     }
 
-    // Pré-preenche com dados do emitente da NF-e se disponíveis
     if (emitente) {
       this.form.patchValue({
         cnpj: String(emitente['cnpj'] ?? '').replace(/\D/g, ''),
@@ -246,7 +244,6 @@ export class FornecedorForm implements OnInit {
 
     this.isSaving = true;
     const raw = this.form.getRawValue();
-    // Envia apenas dígitos do CNPJ
     const dados: Partial<IFornecedor> = {
       ...raw,
       cnpj: raw['cnpj'].replace(/\D/g, ''),

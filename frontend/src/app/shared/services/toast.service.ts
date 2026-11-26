@@ -12,10 +12,6 @@ export interface IToast {
 const DURACAO_MS: Record<TToastTipo, number> = { success: 3500, info: 4000, warn: 5500, error: 6500 };
 const MAXIMO = 4;
 
-/**
- * Mensagens de resultado de ação (salvou, excluiu, falhou). Montado uma vez no app.html.
- * Erro de campo de formulário continua inline, perto do campo.
- */
 @Injectable({ providedIn: 'root' })
 export class ToastService {
   private proximoId = 1;

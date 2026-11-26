@@ -79,13 +79,11 @@ export class CompraForm implements OnInit {
     { label: 'Cancelada', value: EStatusCompra.Cancelada },
   ];
 
-  // ── Fila de confirmação de produtos não encontrados via GTIN ─────────────────
   filaProdutosPendentes: Record<string, unknown>[] = [];
   filaProdutoIndex = 0;
   showProdutoConfirma = false;
   produtoConfirmaAtual: Record<string, unknown> | null = null;
 
-  // ── Diálogos pós-save ────────────────────────────────────────────────────────
   showHelp = false;
   showConfirmaAtualizacaoCusto = false;
   isAtualizandoCusto = false;
@@ -118,7 +116,6 @@ export class CompraForm implements OnInit {
       itens: this.fb.array([]),
     });
 
-    // Recalcular custos ao alterar valores do cabeçalho
     ['valor_frete', 'valor_seguro', 'valor_desconto', 'valor_outros'].forEach((campo) => {
       this.form.get(campo)?.valueChanges.subscribe(() => {
         for (let i = 0; i < this.itens.length; i++) {
@@ -175,8 +172,6 @@ export class CompraForm implements OnInit {
     }
   }
 
-  // ── Fornecedor lookup ────────────────────────────────────────────────────────
-
   onCnpjBlur() {
     const cnpj = (this.form.get('cnpj_lookup')?.value ?? '').replace(/\D/g, '');
     if (cnpj.length !== 14) return;
@@ -219,8 +214,6 @@ export class CompraForm implements OnInit {
     this.produtoLookup.abrirListagem(index);
   }
 
-  // ── Itens ────────────────────────────────────────────────────────────────────
-
   adicionarItem(data?: Partial<Record<string, unknown>>) {
     const itemGroup = this.fb.group({
       cod_produto: [data?.['cod_produto'] as number | null, [Validators.required]],
@@ -251,7 +244,6 @@ export class CompraForm implements OnInit {
 
     const idx = this.itens.length;
 
-    // Recalcular valor_total automaticamente (qtd × vlr_unit) e depois custo
     const recalcTotal = () => {
       const qty = Number(itemGroup.get('quantidade')?.value || 0);
       const vu = Number(itemGroup.get('valor_unitario')?.value || 0);
@@ -262,7 +254,6 @@ export class CompraForm implements OnInit {
       itemGroup.get(c)?.valueChanges.subscribe(() => recalcTotal());
     });
 
-    // Recalcular custo ao alterar impostos/desconto
     ['desconto', 'valor_ipi', 'valor_icms_st'].forEach((c) => {
       itemGroup.get(c)?.valueChanges.subscribe(() => this.calcularCustoItem(idx));
     });
@@ -272,7 +263,6 @@ export class CompraForm implements OnInit {
 
   removerItem(index: number) {
     this.itens.removeAt(index);
-    // Recalcular todos os custos após remoção
     for (let i = 0; i < this.itens.length; i++) {
       this.calcularCustoItem(i);
     }
@@ -294,7 +284,6 @@ export class CompraForm implements OnInit {
 
   onProdutoSelecionado(event: { produto: IProduto; itemIndex: number }) {
     if (event.itemIndex === -1) {
-      // Contexto de fila: relaciona o item pendente ao produto selecionado
       const item = this.produtoConfirmaAtual!;
       this.adicionarItem({
         ...item,
@@ -309,8 +298,6 @@ export class CompraForm implements OnInit {
       this.preencherProdutoNoItem(event.itemIndex, event.produto);
     }
   }
-
-  // ── Cálculo de custo ─────────────────────────────────────────────────────────
 
   calcularCustoItem(itemIndex: number) {
     const item = (this.itens.at(itemIndex) as FormGroup).getRawValue() as Record<string, number>;
@@ -361,8 +348,6 @@ export class CompraForm implements OnInit {
     );
   }
 
-  // ── Import XML ───────────────────────────────────────────────────────────────
-
   onImportarXml(event: Event) {
     const input = event.target as HTMLInputElement;
     const arquivo = input.files?.[0];
@@ -384,7 +369,6 @@ export class CompraForm implements OnInit {
         const dados = res.data as Record<string, unknown>;
         this.itens.clear();
 
-        // Preenche cabeçalho
         this.form.patchValue({
           chave_acesso: dados['chave_acesso'] ?? '',
           numero_nfe: dados['numero_nfe'] ?? '',
@@ -396,7 +380,6 @@ export class CompraForm implements OnInit {
           valor_outros: Number(dados['valor_outros'] ?? 0),
         });
 
-        // Preenche fornecedor se já existir
         const fornecedor = dados['fornecedor'] as IFornecedor | null;
         if (fornecedor) {
           this.preencherFornecedor(fornecedor);
@@ -412,7 +395,6 @@ export class CompraForm implements OnInit {
           }
         }
 
-        // Processa itens: busca por GTIN, fila de confirmação para não encontrados
         const itens = dados['itens'] as Record<string, unknown>[];
         this.processarItensXml(itens);
         input.value = '';
@@ -426,14 +408,12 @@ export class CompraForm implements OnInit {
     });
   }
 
-  // Processa cada item do XML: tenta casar por GTIN, empilha os não encontrados
   private processarItensXml(itens: Record<string, unknown>[]) {
     this.filaProdutosPendentes = [];
     this.filaProdutoIndex = 0;
 
     const buscarProximo = (idx: number) => {
       if (idx >= itens.length) {
-        // Todos consultados — agora processa a fila de não encontrados
         this.processarProximoPendente();
         return;
       }
@@ -442,7 +422,6 @@ export class CompraForm implements OnInit {
       const gtin = String(item['gtin'] ?? '').trim();
 
       if (!gtin) {
-        // Sem GTIN: tenta casar pelo código do produto no fornecedor (cProd)
         const cProd = String(item['cProd'] ?? '').trim();
         const codFornecedor = this.form.get('cod_fornecedor')?.value as number | null;
         if (cProd && codFornecedor) {
@@ -472,8 +451,6 @@ export class CompraForm implements OnInit {
 
       this.produtoService.buscarPorGtin(gtin).subscribe({
         next: (res) => {
-          // Produto encontrado pelo GTIN → relaciona automaticamente
-          // descricao_xml = original do NF-e; descricao = nome no sistema
           this.adicionarItem({
             ...item,
             cod_produto: res.data.id,
@@ -485,7 +462,6 @@ export class CompraForm implements OnInit {
         },
         error: (err) => {
           if ((err as { status: number }).status === 404) {
-            // Não encontrado → entra na fila de confirmação
             this.filaProdutosPendentes.push(item);
           } else {
             this.filaProdutosPendentes.push(item);
@@ -498,7 +474,6 @@ export class CompraForm implements OnInit {
     buscarProximo(0);
   }
 
-  // Exibe a confirmação para o próximo item pendente na fila
   private processarProximoPendente() {
     if (this.filaProdutoIndex >= this.filaProdutosPendentes.length) {
       const total = this.itens.length;
@@ -513,19 +488,16 @@ export class CompraForm implements OnInit {
     this.showProdutoConfirma = true;
   }
 
-  // Usuário confirmou: abre o form de produto com dados pré-preenchidos do XML
   onConfirmarCadastrarProduto() {
     this.showProdutoConfirma = false;
     setTimeout(() => this.produtoFormRef?.abrir(undefined, this.produtoConfirmaAtual!), 0);
   }
 
-  // Usuário optou por relacionar a produto já existente
   onRelacionarProdutoExistente() {
     this.showProdutoConfirma = false;
     setTimeout(() => this.produtoLookup.abrirListagem(-1), 0);
   }
 
-  // Produto salvo pelo form: adiciona o item à compra e continua a fila
   onProdutoSalvoDoXml(produto: IProduto) {
     const item = this.produtoConfirmaAtual!;
     this.adicionarItem({ ...item, cod_produto: produto.id });
@@ -547,14 +519,11 @@ export class CompraForm implements OnInit {
     }
   }
 
-  // Usuário pulou: não adiciona o item, vai para o próximo
   onPularProduto() {
     this.showProdutoConfirma = false;
     this.filaProdutoIndex++;
     setTimeout(() => this.processarProximoPendente(), 100);
   }
-
-  // ── Save ─────────────────────────────────────────────────────────────────────
 
   onSave() {
     this.form.markAllAsTouched();
@@ -614,7 +583,6 @@ export class CompraForm implements OnInit {
           this.compraId = res.data.id;
           this.compraIdSalva = res.data.id;
           this.toast.success(`Compra ${dados.id ? 'atualizada' : 'criada'} com sucesso`);
-          // Pergunta se deseja atualizar custo dos produtos
           this.showConfirmaAtualizacaoCusto = true;
         }
         this.isSaving = false;
@@ -626,8 +594,6 @@ export class CompraForm implements OnInit {
       },
     });
   }
-
-  // ── Atualização de custo pós-save ────────────────────────────────────────────
 
   onConfirmarAtualizacaoCusto() {
     this.isAtualizandoCusto = true;

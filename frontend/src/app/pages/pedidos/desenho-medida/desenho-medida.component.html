@@ -8,12 +8,10 @@
   appendTo="body">
 
   @if (desenho) {
-    <!-- Canvas -->
     <div style="border-radius:6px; overflow:hidden; border:1px solid #2a2a2a; margin-bottom:1rem;">
       <canvas #canvas style="display:block; width:100%;"></canvas>
     </div>
 
-    <!-- Legenda -->
     <div style="display:flex; gap:1.2rem; margin-bottom:1rem; font-size:0.8rem; flex-wrap:wrap;">
       <span style="display:flex; align-items:center; gap:0.3rem;">
         <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:#ef4444;"></span>
@@ -31,7 +29,6 @@
       }
     </div>
 
-    <!-- Segmentos base -->
     <div appEnterNext style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:0.75rem; margin-bottom:1rem;">
       @for (seg of segmentosBase; track seg) {
         @let coberto = segmentosCobertos.has(seg);
@@ -54,7 +51,6 @@
       }
     </div>
 
-    <!-- Diagonais -->
     @if (segmentosDiagonaisInfo.length > 0) {
       <div style="border-top:1px solid var(--surface-200); padding-top:0.75rem; margin-bottom:1rem;">
         <p style="font-size:0.8rem; font-weight:600; margin:0 0 0.75rem; color: var(--text-color);">
@@ -101,7 +97,6 @@
       </div>
     }
 
-    <!-- Rodapé -->
     <div style="display:flex; justify-content:flex-end; gap:0.5rem; border-top:1px solid var(--surface-200); padding-top:1rem;">
       <p-button label="Cancelar" icon="pi pi-times" severity="secondary" [text]="true" (onClick)="visible = false"></p-button>
       <p-button label="Confirmar Medidas" icon="pi pi-check" severity="primary" (onClick)="confirmar()"></p-button>

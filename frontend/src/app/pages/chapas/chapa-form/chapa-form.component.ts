@@ -92,11 +92,9 @@ export class ChapaForm {
 
   removerCorte(corte: ICorte) {
     if (corte.id) {
-      // Existente: marca como excluído em memória
       corte.excluido = true;
       this.cortes = [...this.cortes];
     } else {
-      // Novo (sem id): remove direto da lista
       this.cortes = this.cortes.filter((c) => c !== corte);
     }
   }
@@ -132,21 +130,18 @@ export class ChapaForm {
 
           const ops: Observable<unknown>[] = [];
 
-          // Novos cortes (sem id)
           this.cortes
             .filter((c) => !c.id && !c.excluido)
             .forEach((c) => {
               ops.push(this.chapaService.adicionarCorte(this.chapaId!, c));
             });
 
-          // Cortes existentes excluídos
           this.cortes
             .filter((c) => c.id && c.excluido)
             .forEach((c) => {
               ops.push(this.chapaService.removerCorte(this.chapaId!, c.id));
             });
 
-          // Cortes existentes atualizados
           this.cortes
             .filter((c) => c.id && !c.excluido)
             .forEach((c) => {

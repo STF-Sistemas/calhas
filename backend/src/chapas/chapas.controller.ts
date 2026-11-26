@@ -36,7 +36,6 @@ export class ChapasController {
     return chapa;
   }
 
-  /** O corte precisa pertencer à chapa da empresa (prevenção de IDOR). */
   private async obterCorte(id: number, corteId: number, codEmpresa: number) {
     const chapa = await this.obter(id, codEmpresa);
     const corte = await this.prisma.corte.findFirst({ where: { id: corteId, cod_chapa: chapa.id, excluido: false } });

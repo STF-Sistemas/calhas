@@ -1,11 +1,5 @@
 import { AfterViewInit, Directive, ElementRef, Input } from '@angular/core';
 
-/**
- * Abre o teclado numérico no celular. Funciona no próprio `<input>` ou em
- * componentes que embrulham um input (ex.: `p-inputMask`).
- * - `appTecladoNumerico` → só dígitos (CEP, CPF, CNPJ, quantidades inteiras)
- * - `appTecladoNumerico="decimal"` → dígitos com vírgula/ponto
- */
 @Directive({
   selector: '[appTecladoNumerico]',
   standalone: true,

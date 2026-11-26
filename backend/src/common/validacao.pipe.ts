@@ -11,7 +11,6 @@ function primeiraMensagem(erros: ValidationError[]): string | undefined {
   return undefined;
 }
 
-/** DTOs com class-validator: remove campos não declarados e responde só a primeira mensagem. */
 export const validacaoPipe = new ValidationPipe({
   whitelist: true,
   transform: true,

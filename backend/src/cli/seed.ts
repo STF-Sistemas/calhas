@@ -4,11 +4,6 @@ import bcrypt from 'bcrypt';
 import { EPerfilUsuario, EStatusGeral, EStatusPedido, ETipoItemPedido } from '#shared/enums';
 import { criarPrismaClient } from '../prisma/criar-prisma-client';
 
-/**
- * Seed idempotente: roda a cada início do app (discloud-start.mjs).
- * Cria os tipos de referência, a empresa do sistema e o super administrador,
- * sem nunca sobrescrever a senha de um usuário que já existe.
- */
 const prisma = criarPrismaClient();
 
 async function main(): Promise<void> {

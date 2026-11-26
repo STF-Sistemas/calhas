@@ -30,7 +30,6 @@ import { UsuariosModule } from './usuarios/usuarios.module';
 
 @Module({
   imports: [
-    // 300 requisições a cada 15 minutos por IP (limites menores em login e links públicos).
     ThrottlerModule.forRoot([{ name: 'default', ttl: 15 * 60 * 1000, limit: 300 }]),
     PrismaModule,
     MailModule,
@@ -56,7 +55,6 @@ import { UsuariosModule } from './usuarios/usuarios.module';
     NotificacoesModule,
   ],
   providers: [
-    // Ordem importa: limite de taxa, login, licença da empresa, perfil.
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: LicencaGuard },

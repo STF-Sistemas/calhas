@@ -12,10 +12,6 @@ const FORNECEDOR_RESUMO = { select: { id: true, razao_social: true, cnpj: true }
 
 const n = (v: number | null | undefined) => v ?? 0;
 
-/**
- * Custo de aquisição por unidade:
- * valor do produto + IPI + ICMS ST - desconto do item + rateio (frete + seguro + outros - desconto da nota).
- */
 function custoUnitario(
   item: { quantidade: number; valor_total: number; desconto: number; valor_ipi: number; valor_icms_st: number },
   rateio: { frete: number; seguro: number; outros: number; desconto: number },
@@ -100,7 +96,6 @@ export class ComprasService {
     await this.validar(dto, codEmpresa, id);
 
     const compra = await this.prisma.$transaction(async (tx) => {
-      // Itens anteriores ficam marcados como excluídos e a lista é recriada.
       await tx.compraItem.updateMany({ where: { cod_compra: id }, data: { excluido: true } });
       return tx.compra.update({
         where: { id },
@@ -122,7 +117,6 @@ export class ComprasService {
       where: { id },
       data: { status, ...(status === CANCELADA ? { motivo_cancelamento: motivo?.trim() } : {}) },
     });
-    // Ao confirmar: atualiza custo e preço de venda (o estoque é do trigger do banco).
     if (status === CONFIRMADA) await this.atualizarCustoProdutos(id, codEmpresa);
     return { success: true, data };
   }
@@ -135,7 +129,6 @@ export class ComprasService {
 
   async excluir(id: number, codEmpresa: number) {
     await this.obter(id, codEmpresa);
-    // O trigger do banco reverte o estoque se a compra estava confirmada.
     await this.prisma.compra.update({ where: { id }, data: { excluido: true } });
     return { success: true, message: 'Compra excluída.' };
   }
@@ -166,9 +159,6 @@ export class ComprasService {
     return { success: true, data: { ...resto, fornecedor, itens } };
   }
 
-  // ── Apoio ────────────────────────────────────────────────────────────────
-
-  /** Fornecedor e produtos da própria empresa; chave de acesso sem duplicidade. */
   private async validar(dto: CompraDto, codEmpresa: number, ignorarId?: number): Promise<void> {
     if (dto.chave_acesso && dto.chave_acesso.length === 44) {
       const dup = await this.prisma.compra.findFirst({
@@ -268,7 +258,6 @@ export class ComprasService {
     });
   }
 
-  /** Recalcula o rateio com o cabeçalho atual e aplica custo (e preço, se houver markup) nos produtos. */
   private async atualizarCustoProdutos(compraId: number, codEmpresa: number): Promise<void> {
     const compra = await this.prisma.compra.findFirst({
       where: { id: compraId, excluido: false },

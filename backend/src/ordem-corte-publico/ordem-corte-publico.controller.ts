@@ -4,7 +4,6 @@ import { Publico } from '../common/decorators';
 import { falha } from '../common/falha';
 import { PrismaService } from '../prisma/prisma.service';
 
-/** Ordem de Corte enviada a um fornecedor por link (WhatsApp). Sem login. */
 @Publico()
 @Controller('ordem-corte-publico')
 export class OrdemCortePublicoController {
@@ -39,7 +38,6 @@ export class OrdemCortePublicoController {
     const itens = pedido.itens
       .filter((item) => item.tipo === ETipoItemPedido.Corte || item.tipo === ETipoItemPedido.Produto)
       .filter((item) => !selecionados || selecionados.includes(item.id))
-      // Produtos primeiro, depois cortes (Produto=10 < Corte=11).
       .sort((a, b) => a.tipo - b.tipo)
       .map((item) => ({
         id: item.id,

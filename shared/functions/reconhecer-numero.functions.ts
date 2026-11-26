@@ -1,19 +1,10 @@
 import { IPonto } from '../interfaces/IDesenho';
 
-/**
- * Reconhecimento local (offline) de números escritos à mão, ex.: "1,33".
- *
- * 1. Agrupa os traços em caracteres pela sobreposição horizontal.
- * 2. Caracteres pequenos e baixos viram vírgula/ponto decimal.
- * 3. Cada caractere é comparado com modelos de dígitos usando o algoritmo $P
- *    (nuvem de pontos — independe da ordem e do sentido dos traços).
- */
-
 export type ITraco = IPonto[];
 
 export interface IResultadoNumero {
-  texto: string;       // ex.: "1,33"
-  valor: number;       // ex.: 1.33
+  texto: string;
+  valor: number;
   caracteres: { char: string; minX: number; maxX: number; minY: number; maxY: number }[];
 }
 
@@ -40,7 +31,6 @@ export function reconhecerNumero(tracos: ITraco[]): IResultadoNumero | null {
     caracteres.push({ char, minX: g.minX, maxX: g.maxX, minY: g.minY, maxY: g.maxY });
   }
 
-  // Monta o texto: só a primeira vírgula vale; vírgula no início/fim é descartada.
   let texto = '';
   for (const c of caracteres) {
     if (c.char === ',') {
@@ -55,8 +45,6 @@ export function reconhecerNumero(tracos: ITraco[]): IResultadoNumero | null {
   if (!Number.isFinite(valor)) return null;
   return { texto, valor, caracteres };
 }
-
-// ── Agrupamento ─────────────────────────────────────────────────────────────
 
 interface IGrupo { tracos: ITraco[]; minX: number; maxX: number; minY: number; maxY: number; }
 
@@ -73,7 +61,6 @@ function agruparCaracteres(tracos: ITraco[]): IGrupo[] {
     if (ult) {
       const sobreposicao = Math.min(ult.maxX, it.maxX) - Math.max(ult.minX, it.minX);
       const menor = Math.max(1, Math.min(ult.maxX - ult.minX, it.maxX - it.minX));
-      // Traços que se sobrepõem bastante na horizontal pertencem ao mesmo caractere (ex.: 4, 5, 7 cortado)
       if (sobreposicao > menor * 0.4) {
         ult.tracos.push(it.t);
         ult.minX = Math.min(ult.minX, it.minX); ult.maxX = Math.max(ult.maxX, it.maxX);
@@ -86,15 +73,12 @@ function agruparCaracteres(tracos: ITraco[]): IGrupo[] {
   return grupos;
 }
 
-// ── $P point-cloud recognizer ───────────────────────────────────────────────
-
 const N = 32;
 
 interface IPt { x: number; y: number; id: number; }
 
 function normalizar(tracos: ITraco[]): IPt[] {
   let pts: IPt[] = [];
-  // Espaçamento mínimo proporcional ao tamanho: o tremor não infla o comprimento das curvas
   const todos = tracos.flat();
   const tamCaixa = Math.max(
     Math.max(...todos.map(p => p.x)) - Math.min(...todos.map(p => p.x)),
@@ -102,7 +86,6 @@ function normalizar(tracos: ITraco[]): IPt[] {
   ) || 1;
   tracos.forEach((t, id) => suavizar(preencher(espacar(t, tamCaixa * 0.04), tamCaixa * 0.04)).forEach(p => pts.push({ x: p.x, y: p.y, id })));
   pts = reamostrar(pts, N);
-  // Escala uniforme (mantém proporção) + translada para o centróide
   const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
   const minX = Math.min(...xs), minY = Math.min(...ys);
   const tam = Math.max(Math.max(...xs) - minX, Math.max(...ys) - minY) || 1;
@@ -122,7 +105,6 @@ function espacar(t: ITraco, min: number): ITraco {
   return out;
 }
 
-/** Interpola pontos em trechos longos para que todo o traço tenha densidade parecida. */
 function preencher(t: ITraco, passo: number): ITraco {
   const out: ITraco = [t[0]];
   for (let i = 1; i < t.length; i++) {
@@ -134,7 +116,6 @@ function preencher(t: ITraco, passo: number): ITraco {
   return out;
 }
 
-/** Média móvel curta: remove o tremor do dedo sem deformar o caractere. */
 function suavizar(t: ITraco): ITraco {
   if (t.length < 4) return t;
   return t.map((_, i) => {
@@ -214,8 +195,6 @@ function classificarDigito(tracos: ITraco[]): string {
   }
   return melhor;
 }
-
-// ── Modelos de dígitos (caixa ~0.6 x 1, y para baixo) ────────────────────────
 
 function arco(cx: number, cy: number, rx: number, ry: number, a0: number, a1: number, passos = 16): IPonto[] {
   const pts: IPonto[] = [];

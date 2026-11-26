@@ -1,4 +1,3 @@
-// Barrel file — re-exporta todas as interfaces compartilhadas
 export * from './ICidade';
 export * from './IEmpresa';
 export * from './IUsuario';
@@ -14,7 +13,6 @@ export * from './IMeioPagamento';
 export * from './IFornecedor';
 export * from './ICompra';
 export * from './ICompraItem';
-// DTOs
 export * from './ILoginDto';
 export * from './ILoginResponse';
 export * from './ICreatePedidoDto';

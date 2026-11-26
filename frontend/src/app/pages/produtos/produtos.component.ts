@@ -32,7 +32,6 @@ export class Produtos implements OnInit {
   produtos: IProduto[] = [];
   loading = false;
 
-  // ── Histórico de compras ──────────────────────────────────────────────────────
   showHistorico = false;
   historicoLoading = false;
   historico: IHistoricoCompraProduto[] = [];

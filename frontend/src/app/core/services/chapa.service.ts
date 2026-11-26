@@ -35,7 +35,6 @@ export class ChapaService {
     return this.http.delete<TApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
 
-  // Cortes subordinados
   adicionarCorte(chapaId: number, corte: Partial<ICorte>) {
     return this.http.post<TApiResponse<ICorte>>(`${this.apiUrl}/${chapaId}/cortes`, corte);
   }

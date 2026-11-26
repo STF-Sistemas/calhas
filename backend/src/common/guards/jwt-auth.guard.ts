@@ -6,7 +6,6 @@ import { ROTA_PUBLICA } from '../decorators';
 import { falha } from '../falha';
 import { JwtPayload } from '../jwt-payload';
 
-/** Guard global: toda rota exige `Authorization: Bearer <token>`, exceto as marcadas com @Publico(). */
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}

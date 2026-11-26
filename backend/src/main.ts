@@ -6,7 +6,8 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import compression from 'compression';
 import express, { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
-import { existsSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { AppModule } from './app.module';
 import { siteUrl } from './common/site-url.util';
@@ -18,17 +19,43 @@ function validarAmbiente(): void {
   if (!process.env['DATABASE_URL']) throw new Error('DATABASE_URL ausente.');
   const segredo = process.env['JWT_SECRET'] ?? '';
   if (segredo.length < 32) throw new Error('JWT_SECRET ausente ou com menos de 32 caracteres.');
-  siteUrl(); // falha em produção sem SITE_URL
+  siteUrl();
 }
 
-/** Build do frontend: layout do `ng build` e layout achatado da branch deploy. */
+const SHELLS = ['index.csr.html', 'index.html'];
+
 function pastaDoFrontend(): string | undefined {
   const relativos = ['frontend/dist/frontend/browser', 'frontend/browser'];
   const bases = [resolve(process.cwd(), '..'), process.cwd(), resolve(__dirname, '..', '..'), resolve(__dirname, '..')];
   const candidatos = bases.flatMap((base) => relativos.map((r) => join(base, r)));
-  const pasta = candidatos.find((p) => existsSync(join(p, 'index.html')));
+  const pasta = candidatos.find((p) => SHELLS.some((s) => existsSync(join(p, s))));
   if (!pasta) logger.warn('Build do frontend não encontrado: modo desenvolvimento (só API).');
   return pasta;
+}
+
+interface IFrontend {
+  pasta: string;
+  shell: string;
+  paginas: Map<string, string>;
+  hashesScripts: string[];
+}
+
+function carregarFrontend(pasta: string): IFrontend {
+  const ler = (arquivo: string) => readFileSync(arquivo, 'utf8').replaceAll('%SITE_URL%', siteUrl());
+  const shell = ler(join(pasta, SHELLS.find((s) => existsSync(join(pasta, s)))!));
+  const paginas = new Map<string, string>();
+  for (const item of readdirSync(pasta, { withFileTypes: true })) {
+    const arquivo = join(pasta, item.name, 'index.html');
+    if (item.isDirectory() && existsSync(arquivo)) paginas.set(`/${item.name}`, ler(arquivo));
+  }
+  const hashes = new Set<string>();
+  for (const html of [shell, ...paginas.values()]) {
+    for (const m of html.matchAll(/<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/g)) {
+      if (/type="application\/json"/.test(m[1]) || !m[2].trim()) continue;
+      hashes.add(`'sha256-${createHash('sha256').update(m[2], 'utf8').digest('base64')}'`);
+    }
+  }
+  return { pasta, shell, paginas, hashesScripts: [...hashes] };
 }
 
 function origensPermitidas(): string[] {
@@ -46,14 +73,16 @@ async function bootstrap(): Promise<void> {
     bodyParser: false,
   });
 
+  const pasta = pastaDoFrontend();
+  const frontend = pasta ? carregarFrontend(pasta) : undefined;
+
   app.set('trust proxy', 1);
   app.use(
     helmet({
-      // Fonte única da CSP (o index.html não tem meta CSP).
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'"],
+          scriptSrc: ["'self'", ...(frontend?.hashesScripts ?? [])],
           scriptSrcAttr: ["'none'"],
           styleSrc: ["'self'", "'unsafe-inline'"],
           imgSrc: ["'self'", 'data:', 'blob:'],
@@ -83,30 +112,29 @@ async function bootstrap(): Promise<void> {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
-  const pasta = pastaDoFrontend();
-  if (pasta) {
-    logger.log(`Servindo o frontend de ${pasta}`);
-    // Template lido uma vez e mantido em memória, com o %SITE_URL% já trocado.
-    const indexHtml = readFileSync(join(pasta, 'index.html'), 'utf8').replaceAll('%SITE_URL%', siteUrl());
-    const enviarIndex = (_req: Request, res: Response) => {
+  if (frontend) {
+    logger.log(`Servindo o frontend de ${frontend.pasta} (${frontend.paginas.size} páginas pré-renderizadas)`);
+    const enviarHtml = (res: Response, html: string) => {
       res.setHeader('Cache-Control', 'no-cache');
-      res.type('html').send(indexHtml);
+      res.type('html').send(html);
     };
-    http.get('/', enviarIndex);
+    http.get('/', (_req, res) => enviarHtml(res, frontend.shell));
+    for (const [rota, html] of frontend.paginas) {
+      http.get([rota, `${rota}/`], (_req, res) => enviarHtml(res, html));
+    }
     http.use(
-      express.static(pasta, {
+      express.static(frontend.pasta, {
         index: false,
+        redirect: false,
         setHeaders: (res, caminho) => {
-          // Arquivos com hash no nome podem ficar em cache por 1 ano; o resto revalida.
           const imutavel = /\.[0-9a-f]{8,}\.(js|css|woff2?)$/i.test(caminho) || /[-.][A-Z0-9]{8,}\.(js|css)$/.test(caminho);
           res.setHeader('Cache-Control', imutavel ? 'public, max-age=31536000, immutable' : 'no-cache');
         },
       }),
     );
-    // Fallback da SPA (Express 5 exige `/{*splat}`); a API e o /health ficam de fora.
     http.get('/{*splat}', (req: Request, res: Response, next: NextFunction) => {
       if (req.path.startsWith('/api/') || req.path === '/api' || req.path === '/health') return next();
-      enviarIndex(req, res);
+      enviarHtml(res, frontend.shell);
     });
   }
 

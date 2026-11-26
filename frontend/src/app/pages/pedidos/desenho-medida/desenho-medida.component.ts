@@ -48,8 +48,6 @@ export class DesenhoMedida implements AfterViewInit {
   readonly CANVAS_W = 800;
   readonly CANVAS_H = 320;
 
-  // ── Getters ───────────────────────────────────────────────────────────────
-
   get segmentosBase(): number[] {
     const n = this.desenho ? Math.max(0, this.desenho.pontos.length - 1) : 0;
     return Array.from({ length: n }, (_, i) => i);
@@ -64,7 +62,6 @@ export class DesenhoMedida implements AfterViewInit {
     return set;
   }
 
-  /** Cada diagonal gera 2 entradas: p1 e p2. */
   get segmentosDiagonaisInfo(): {
     diagIdx: number;
     p1Idx: number;
@@ -80,7 +77,6 @@ export class DesenhoMedida implements AfterViewInit {
     }));
   }
 
-  /** Retorna o índice do segmento base mais próximo do ponto médio da diagonal. */
   segmentoCoberto(diagIdx: number): number {
     const pontos = this.desenho?.pontos ?? [];
     const d = this.desenho?.diagonais?.[diagIdx];
@@ -107,8 +103,6 @@ export class DesenhoMedida implements AfterViewInit {
     return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
   }
 
-  // ── Lifecycle ─────────────────────────────────────────────────────────────
-
   ngAfterViewInit() {
     this.initCanvas();
   }
@@ -118,7 +112,6 @@ export class DesenhoMedida implements AfterViewInit {
     this.desenho = desenho;
     const baseSeg = Math.max(0, desenho.pontos.length - 1);
     const diagCount = (desenho.diagonais ?? []).length;
-    // 2 medidas por diagonal (ponta 1 e ponta 2)
     const total = baseSeg + diagCount * 2;
     this.medidas = Array.from({ length: total }, (_, i) => medidasAtuais[i] ?? 0);
     this.ctx = undefined;
@@ -144,8 +137,6 @@ export class DesenhoMedida implements AfterViewInit {
     this.confirmed.emit({ index: this.itemIndex, medidas: [...this.medidas] });
     this.visible = false;
   }
-
-  // ── Canvas ────────────────────────────────────────────────────────────────
 
   redraw() {
     if (!this.ctx || !this.desenho) return;
@@ -181,7 +172,6 @@ export class DesenhoMedida implements AfterViewInit {
 
     const base = pontos.length - 1;
 
-    // Segmentos base
     for (let i = 0; i < base; i++) {
       const p1 = pontos[i],
         p2 = pontos[i + 1];
@@ -207,7 +197,6 @@ export class DesenhoMedida implements AfterViewInit {
       }
     }
 
-    // Diagonais (por cima)
     for (let i = 0; i < diagonais.length; i++) {
       const d = diagonais[i];
       const p1Idx = base + i * 2;
@@ -226,17 +215,14 @@ export class DesenhoMedida implements AfterViewInit {
       ctx.lineTo(d.p2.x, d.p2.y);
       ctx.stroke();
 
-      // Badge no meio com número sequencial
       const mx = (d.p1.x + d.p2.x) / 2,
         my = (d.p1.y + d.p2.y) / 2;
       this.desenharBadge(ctx, mx, my, base + i + 1, cor);
 
-      // Labels nas pontas
       if (m1 > 0) this.desenharMedidaLabel(ctx, d.p1.x, d.p1.y - 18, m1, '#22c55e');
       if (m2 > 0) this.desenharMedidaLabel(ctx, d.p2.x, d.p2.y - 18, m2, '#22c55e');
     }
 
-    // Pontos
     ctx.fillStyle = dark ? '#888' : '#555';
     pontos.forEach((p) => {
       ctx.beginPath();

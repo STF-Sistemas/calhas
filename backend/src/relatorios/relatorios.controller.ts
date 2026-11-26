@@ -14,7 +14,6 @@ const idOpcional = (valor: unknown): number | null => {
 export class RelatoriosController {
   constructor(private readonly prisma: PrismaService) {}
 
-  /** Query: data_inicio e data_fim (YYYY-MM-DD), cod_cliente, cod_produto. */
   @Get('pedidos-lucros')
   async pedidosLucros(@EmpresaAtual() codEmpresa: number, @Query() q: Record<string, string>) {
     const dataInicio = DATA.test(q['data_inicio'] ?? '') ? q['data_inicio'] : null;
@@ -93,7 +92,6 @@ export class RelatoriosController {
       };
     });
 
-    // Nomes dos filtros aplicados (somente da própria empresa).
     const [cliente, produto] = await Promise.all([
       codCliente
         ? this.prisma.cliente.findFirst({ where: { id: codCliente, cod_empresa: codEmpresa }, select: { razao_social: true } })

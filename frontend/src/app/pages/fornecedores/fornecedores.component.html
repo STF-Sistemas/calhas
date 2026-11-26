@@ -14,7 +14,6 @@
     </div>
   </div>
 
-  <!-- Painel de Filtros -->
   <p-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:1rem; align-items:flex-end;">
 
@@ -84,7 +83,6 @@
 
   <app-fornecedor-form #form (saved)="carregar()"></app-fornecedor-form>
 
-  <!-- ── Dialog: Histórico de compras do fornecedor ──────────────────────────── -->
   <p-dialog
     [(visible)]="showHistorico"
     [modal]="true"
@@ -97,7 +95,6 @@
     [breakpoints]="{ '960px': '95vw', '640px': '95vw' }"
     [header]="'Histórico de Compras — ' + fornecedorHistoricoNome">
 
-    <!-- Filtros de período -->
     <p-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
       <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:1rem; align-items:flex-end;">
 
@@ -131,7 +128,6 @@
       </div>
     </p-panel>
 
-    <!-- Tabela de compras -->
     <p-table
       [value]="historicoCompras"
       [loading]="historicoLoading"

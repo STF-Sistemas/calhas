@@ -3,7 +3,6 @@
     'layout-mobile-active': sidebarVisible() && isMobile(),
     'app-dark': themeService.isDarkMode()
 }">
-  <!-- Topbar -->
   <header class="layout-topbar">
     <a class="layout-topbar-logo" routerLink="/" aria-label="Página Inicial">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" style="width: 36px; height: 36px; flex-shrink: 0; border-radius: 8px;">
@@ -115,7 +114,6 @@
     </div>
   </header>
 
-  <!-- Banner de vencimento de licença (somente no dia do vencimento) -->
   @if (alertaLicenca()) {
     <div class="licenca-banner licenca-banner--{{ alertaLicenca()!.severity }} no-print">
       <i class="pi pi-exclamation-triangle"></i>
@@ -128,7 +126,6 @@
     </div>
   }
 
-  <!-- Sidebar -->
   <aside class="layout-sidebar">
     <nav class="layout-menu mt-2" aria-label="Menu Principal">
       <ul class="list-none p-0 m-0">
@@ -152,7 +149,6 @@
     </nav>
   </aside>
 
-  <!-- Main Container -->
   <div class="layout-main-container">
     <main class="layout-main fade-in">
       <router-outlet></router-outlet>
@@ -173,11 +169,9 @@
     </footer>
   </div>
 
-  <!-- Mask mobile -->
   <div class="layout-mask" (click)="sidebarVisible.set(false)" aria-hidden="true"></div>
 </div>
 
-<!-- Dialog: Minha Empresa (admin/super_admin) -->
 <app-empresa-form #empresaForm></app-empresa-form>
 
 <app-novidades-dialog #novidades></app-novidades-dialog>

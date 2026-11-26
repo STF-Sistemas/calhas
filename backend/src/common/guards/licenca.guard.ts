@@ -5,10 +5,6 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ROTA_PUBLICA, SEM_LICENCA } from '../decorators';
 import { falha } from '../falha';
 
-/**
- * Bloqueia empresa inativa (403) ou com licença vencida (402).
- * Super admin e usuário sem empresa sempre passam.
- */
 @Injectable()
 export class LicencaGuard implements CanActivate {
   constructor(

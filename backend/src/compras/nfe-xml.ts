@@ -9,9 +9,6 @@ import {
   IDanfeTransporte,
 } from '#shared/interfaces';
 
-/* eslint-disable @typescript-eslint/no-explicit-any -- estrutura dinâmica do XML da NF-e */
-
-
 export async function parseDanfeXml(xmlContent: string): Promise<IDanfeData> {
   const parsed = await parseStringPromise(xmlContent, { explicitArray: false, ignoreAttrs: false });
   const nfeRoot = parsed['nfeProc'] ?? parsed['NFe'];
@@ -32,7 +29,6 @@ export async function parseDanfeXml(xmlContent: string): Promise<IDanfeData> {
 
   const chave = (infNFe?.['$']?.['Id'] ?? '').replace('NFe', '').trim();
 
-  // Emitente
   const emitente: IDanfeEmitente = {
     razao_social: emit['xNome'] ?? '',
     nome_fantasia: emit['xFant'],
@@ -50,7 +46,6 @@ export async function parseDanfeXml(xmlContent: string): Promise<IDanfeData> {
     fone: emit['enderEmit']?.['fone'],
   };
 
-  // Destinatário
   const destinatario: IDanfeDestinatario = {
     razao_social: dest['xNome'] ?? '',
     cnpj: dest['CNPJ'],
@@ -67,7 +62,6 @@ export async function parseDanfeXml(xmlContent: string): Promise<IDanfeData> {
     email: dest['email'],
   };
 
-  // Itens
   const itens: IDanfeItem[] = dets.map((det: Record<string, unknown>, i: number) => {
     const prod = det['prod'] as Record<string, unknown> ?? {};
     const imposto = det['imposto'] as Record<string, unknown> ?? {};
@@ -98,7 +92,6 @@ export async function parseDanfeXml(xmlContent: string): Promise<IDanfeData> {
     };
   });
 
-  // Totais
   const totais: IDanfeTotais = {
     base_icms: Number(total['vBC'] ?? 0),
     valor_icms: Number(total['vICMS'] ?? 0),
@@ -113,7 +106,6 @@ export async function parseDanfeXml(xmlContent: string): Promise<IDanfeData> {
     valor_total: Number(total['vNF'] ?? 0),
   };
 
-  // Transporte
   const transpVol = Array.isArray(transp['vol']) ? transp['vol'][0] : transp['vol'];
   const transporte: IDanfeTransporte = {
     modalidade_frete: String(transp['modFrete'] ?? '9'),
@@ -134,7 +126,6 @@ export async function parseDanfeXml(xmlContent: string): Promise<IDanfeData> {
     peso_bruto: transpVol ? Number(transpVol['pesoB'] ?? 0) : undefined,
   };
 
-  // Faturas
   let faturas: IDanfeFatura[] | undefined;
   if (cobr?.['dup']) {
     const dups = Array.isArray(cobr['dup']) ? cobr['dup'] : [cobr['dup']];
@@ -244,7 +235,6 @@ export function buildDanfeFromDb(compra: any, empresa: any): IDanfeData {
   };
 }
 
-/** Lê o XML da NF-e para pré-preencher a compra (sem gravar nada). */
 export async function lerNfeParaImportacao(xmlContent: string) {
   const parsed = await parseStringPromise(xmlContent, { explicitArray: false, ignoreAttrs: false });
   const nfeRoot = parsed?.['nfeProc'] ?? parsed?.['NFe'];
@@ -270,7 +260,6 @@ export async function lerNfeParaImportacao(xmlContent: string) {
     const pisAliq = pis['PISAliq'] ?? pis['PISNT'] ?? {};
     const cofins = imposto['COFINS'] ?? {};
     const cofinsAliq = cofins['COFINSAliq'] ?? cofins['COFINSNT'] ?? {};
-    // cEAN = GTIN; 'SEM GTIN' é o padrão quando não há código de barras.
     const gtin = String(prod['cEAN'] ?? '').trim();
     return {
       cod_produto: null as number | null,

@@ -36,7 +36,6 @@ export class ProdutoForm implements OnDestroy {
 
   private subs = new Subscription();
   private dadosExtras: Record<string, unknown> = {};
-  // Flags para evitar loop de recalculo entre os campos
   private recalculando = false;
 
   constructor(
@@ -61,14 +60,12 @@ export class ProdutoForm implements OnDestroy {
   }
 
   private registrarCalculos() {
-    // Custo ou markup mudou → recalcula valor_unitario
     this.subs.add(
       this.form.get('custo')!.valueChanges.subscribe(() => this.recalcularValorUnitario()),
     );
     this.subs.add(
       this.form.get('markup')!.valueChanges.subscribe(() => this.recalcularValorUnitario()),
     );
-    // valor_unitario editado manualmente → back-calcula markup
     this.subs.add(
       this.form.get('valor_unitario')!.valueChanges.subscribe(() => this.recalcularMarkup()),
     );

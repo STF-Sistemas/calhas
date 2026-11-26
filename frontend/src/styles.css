@@ -1,6 +1,4 @@
-/* primeicons entra pelo angular.json (styles) */
 :root {
-  /* Default Theme (Orange) */
   --p-primary: #f97316;
   --p-primary-hover: #ea580c;
   --surface-0: #ffffff;
@@ -21,15 +19,12 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 56px;
-  /* Sakai Special */
   --transition-speed: 0.3s;
-  /* PrimeNG & Sakai Compatibility */
   --primary-color: var(--p-primary);
   --primary-color-text: #ffffff;
   --p-primary-color: var(--p-primary);
 }
 
-/* Primary Color Overrides */
 .theme-orange {
   --p-primary: #f97316;
   --p-primary-hover: #ea580c;
@@ -75,14 +70,13 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family: "Inter Variable", "Inter", system-ui, -apple-system, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
   transition: background-color var(--transition-speed), color var(--transition-speed);
   -webkit-font-smoothing: antialiased;
 }
 
-/* Sakai Layout Structure */
 .layout-wrapper {
   min-height: 100vh;
   overflow-x: hidden;
@@ -148,7 +142,6 @@ body {
   transition: padding var(--transition-speed);
 }
 
-/* Sidebar oculta — desktop */
 .layout-wrapper.layout-static-inactive .layout-sidebar {
   left: calc(-300px - 2rem);
 }
@@ -157,7 +150,6 @@ body {
   padding-left: 2.5rem;
 }
 
-/* Mobile */
 @media (max-width: 991px) {
   .layout-sidebar {
     top: 0;
@@ -175,7 +167,6 @@ body {
     padding: 6.5rem 1.25rem 2rem 1.25rem;
   }
 }
-/* Sakai Menu Elements */
 .layout-menu-category {
   font-size: 0.7rem;
   font-weight: 700;
@@ -255,7 +246,6 @@ body {
   display: block;
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -278,7 +268,6 @@ body {
   background: var(--surface-100);
 }
 
-/* Utility Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -293,7 +282,6 @@ body {
   animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-/* Global Form Helpers */
 .field {
   display: flex;
   flex-direction: column;
@@ -308,7 +296,6 @@ body {
   color: var(--text-color);
 }
 .field {
-  /* Garante que inputs e masks preencham 100% do campo */
 }
 .field input,
 .field input.p-inputtext,
@@ -320,11 +307,6 @@ body {
   display: block;
 }
 
-/* ==========================================================
-   Grid Bootstrap-compatível (12 colunas)
-   Mesmas classes e breakpoints do Bootstrap 5:
-   row, col-{n}, col-sm-{n}, col-md-{n}, col-lg-{n}, col-xl-{n}
-   ========================================================== */
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -332,7 +314,6 @@ body {
   margin-left: -0.75rem;
 }
 
-/* Padding lateral padrão em todas as colunas */
 [class^=col],
 [class*=" col"] {
   padding-right: 0.75rem;
@@ -341,7 +322,6 @@ body {
   min-width: 0;
 }
 
-/* col sem breakpoint (sempre aplica) */
 .col-1 {
   flex: 0 0 auto;
   width: 8.3333333333%;
@@ -406,7 +386,6 @@ body {
   flex: 1 0 0%;
 }
 
-/* sm ≥ 576px */
 @media (min-width: 576px) {
   .col-sm-1 {
     flex: 0 0 auto;
@@ -460,7 +439,6 @@ body {
     flex: 1 0 0%;
   }
 }
-/* md ≥ 768px */
 @media (min-width: 768px) {
   .col-md-1 {
     flex: 0 0 auto;
@@ -514,7 +492,6 @@ body {
     flex: 1 0 0%;
   }
 }
-/* lg ≥ 992px */
 @media (min-width: 992px) {
   .col-lg-1 {
     flex: 0 0 auto;
@@ -568,7 +545,6 @@ body {
     flex: 1 0 0%;
   }
 }
-/* xl ≥ 1200px */
 @media (min-width: 1200px) {
   .col-xl-1 {
     flex: 0 0 auto;
@@ -622,25 +598,18 @@ body {
     flex: 1 0 0%;
   }
 }
-/* Garante que o grid do PrimeFlex tenha espaçamento padrão */
 .grid {
   margin-right: -0.5rem;
   margin-left: -0.5rem;
   margin-top: -0.5rem;
 }
 
-/* ==========================================================
-   Global PrimeNG Color Sync
-   Sincroniza TODOS os componentes com o tema ativo via --p-primary
-   ========================================================== */
-/* --- Checkbox --- */
 .p-checkbox.p-highlight > .p-checkbox-box,
 .p-checkbox .p-checkbox-box.p-highlight {
   background-color: var(--p-primary) !important;
   border-color: var(--p-primary) !important;
 }
 
-/* --- Radio Button --- */
 .p-radiobutton.p-highlight .p-radiobutton-box {
   border-color: var(--p-primary) !important;
 }
@@ -648,12 +617,10 @@ body {
   background-color: var(--p-primary) !important;
 }
 
-/* --- Toggle Switch --- */
 .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
   background: var(--p-primary) !important;
 }
 
-/* --- Input Focus --- */
 .p-inputtext:focus,
 .p-password input:focus,
 .p-inputnumber .p-inputtext:focus,
@@ -662,7 +629,6 @@ body {
   box-shadow: 0 0 0 1px var(--p-primary) !important;
 }
 
-/* --- Dropdown / MultiSelect / Select foco --- */
 .p-dropdown:not(.p-disabled).p-focus,
 .p-multiselect:not(.p-disabled).p-focus,
 .p-select:not(.p-disabled).p-focus {
@@ -670,7 +636,6 @@ body {
   box-shadow: 0 0 0 1px var(--p-primary) !important;
 }
 
-/* --- Dropdown item selecionado --- */
 .p-dropdown-item.p-highlight,
 .p-multiselect-item.p-highlight,
 .p-select-option.p-select-option-selected {
@@ -678,28 +643,23 @@ body {
   color: var(--p-primary) !important;
 }
 
-/* --- Chips / Tags --- */
 .p-chip {
   background-color: color-mix(in srgb, var(--p-primary) 12%, transparent);
   color: var(--p-primary);
 }
 
-/* --- Progress Bar --- */
 .p-progressbar .p-progressbar-value {
   background: var(--p-primary) !important;
 }
 
-/* --- Spinner --- */
 .p-progressspinner-circle {
   stroke: var(--p-primary) !important;
 }
 
-/* --- Texto primário --- */
 .text-primary {
   color: var(--p-primary) !important;
 }
 
-/* --- Menu / Sidebar ativo --- */
 .layout-menu li a.active-route,
 .layout-menu li a.active-route i {
   color: var(--p-primary) !important;
@@ -709,20 +669,14 @@ body {
   background-color: color-mix(in srgb, var(--p-primary) 10%, transparent) !important;
 }
 
-/* --- Background primário (logo, badge, botão) --- */
 .bg-primary {
   background-color: var(--p-primary) !important;
 }
 
-/* --- Borda primária --- */
 .border-primary {
   border-color: var(--p-primary) !important;
 }
 
-/* ==========================================================
-   Botões p-button — garante a cor do tema ativo
-   ========================================================== */
-/* Botão primário (filled) */
 .p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-link):not(.p-button-secondary):not(.p-button-info):not(.p-button-success):not(.p-button-warning):not(.p-button-danger):not(.p-button-help),
 .p-button[severity=primary] {
   background-color: var(--p-primary) !important;
@@ -739,7 +693,6 @@ body {
   opacity: 0.55;
 }
 
-/* Botão texto (text=true) com severity primary */
 .p-button.p-button-text[severity=primary],
 .p-button.p-button-text:not([severity]):not(.p-button-secondary):not(.p-button-info):not(.p-button-success):not(.p-button-warning):not(.p-button-danger):not(.p-button-help) {
   color: var(--p-primary) !important;
@@ -750,12 +703,6 @@ body {
   color: var(--p-primary) !important;
 }
 
-/* ==========================================================
-   Dialog Global — layout flex + suporte a altura fixa
-   PrimeNG renderiza o dialog em portal (body), portanto
-   ::ng-deep no componente não alcança estes elementos.
-   ========================================================== */
-/* Modal cobre tudo do topo ao rodapé */
 .p-dialog-mask {
   top: 0 !important;
   height: 100% !important;
@@ -798,9 +745,6 @@ body {
   flex-shrink: 0;
 }
 
-/* ==========================================================
-   Page layout global
-   ========================================================== */
 .page-section {
   display: block;
 }
@@ -847,9 +791,6 @@ body {
   margin: 0;
 }
 
-/* ==========================================================
-   Form helpers globais
-   ========================================================== */
 .section-title {
   display: flex;
   align-items: center;
@@ -874,22 +815,14 @@ body {
   margin-left: 0.25rem;
 }
 
-/* ==========================================================
-   Dialog fullscreen mobile
-   ========================================================== */
-/* ==========================================================
-   Mobile canvas dialog — tela cheia para desenho no celular
-   ========================================================== */
-/* Máscara do dialog mobile-canvas: sem padding, z-index elevado */
 .p-dialog-mask:has(.mobile-canvas-dialog) {
   padding: 0 !important;
   align-items: flex-start !important;
   justify-content: flex-start !important;
   z-index: 10000 !important;
-  overflow: visible !important; /* permite que o painel rotacionado ultrapasse os limites antes da rotação */
+  overflow: visible !important;
 }
 
-/* O dialog em si — landscape nativo (device já rotacionado pelo OS) */
 .mobile-canvas-dialog {
   position: fixed !important;
   top: 0 !important;
@@ -915,27 +848,18 @@ body {
   background: var(--surface-0) !important;
 }
 
-/* Fallback portrait: rotaciona -90° para simular landscape.
-   Aplicado quando o OS não girou (iOS Safari / lock não suportado). */
 @media (orientation: portrait) {
   .mobile-canvas-dialog {
-    /* Dimensões trocadas: largura = altura da tela, altura = largura da tela */
     width: 100dvh !important;
     max-width: 100dvh !important;
     height: 100vw !important;
     max-height: 100vw !important;
-    /* Centraliza o painel antes de rotacionar */
     top: calc((100dvh - 100vw) / 2) !important;
     left: calc((100vw - 100dvh) / 2) !important;
-    /* Rotação CCW: home button fica à direita, orientação mais natural */
     transform: rotate(-90deg) !important;
   }
 }
-/* ==========================================================
-   Dialog fullscreen mobile (form dialogs)
-   ========================================================== */
 @media screen and (max-width: 640px) {
-  /* Remove padding/centering da mask para dialog fullscreen */
   .p-dialog-mask:has(.dialog-fullscreen-mobile) {
     padding: 0 !important;
     align-items: flex-start !important;
@@ -967,7 +891,6 @@ body {
     border-radius: 0 !important;
     padding: 0.5rem 0.75rem !important;
     flex-shrink: 0;
-    /* Botões compactos: apenas ícone no mobile */
   }
   .dialog-fullscreen-mobile > .p-dialog-footer .dialog-footer-btn .p-button-label {
     display: none !important;

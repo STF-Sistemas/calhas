@@ -26,7 +26,6 @@ function jsonMedidas(medidas: number[] | null | undefined): TJson {
   return medidas == null ? Prisma.DbNull : medidas;
 }
 
-/** Desenho livre só existe sem cod_desenho e com pelo menos 2 pontos. */
 function usaDesenhoLivre(item: PedidoItemDto): boolean {
   return !item.cod_desenho && Array.isArray(item.desenho_pontos) && item.desenho_pontos.length >= 2;
 }
@@ -40,7 +39,6 @@ function jsonDiagonais(diagonais: DiagonalDto[] | null | undefined): TJson {
   return diagonais.map((d) => ({ p1: { x: arred(d.p1.x), y: arred(d.p1.y) }, p2: { x: arred(d.p2.x), y: arred(d.p2.y) } }));
 }
 
-/** Campos do item comuns a create/update (sem custo e sem cod_pedido). */
 function dadosItem(item: PedidoItemDto) {
   const livre = usaDesenhoLivre(item);
   return {
@@ -114,7 +112,6 @@ export class PedidosService {
       this.prisma.pedido.count({ where }),
       this.prisma.pedido.findMany({
         where,
-        // A assinatura (base64, pesada) só vai na busca por id.
         omit: { aprovacao_assinatura: true },
         include: INCLUDE_PEDIDO,
         orderBy: { data_pedido: 'desc' },
@@ -154,11 +151,8 @@ export class PedidosService {
     const dataPedido = validarCabecalho(dto);
     await this.validarReferencias(codEmpresa, dto.cod_cliente, dto.cod_meio_pagamento, dto.itens);
 
-    // Valida estoque antes de alterar (o trigger do banco faz o débito/crédito real).
     if (STATUS_PRODUTIVOS.includes(dto.status)) await this.exigirEstoque(id, codEmpresa, dto.itens, existente.estoque_baixado);
 
-    // Para editar com estoque já baixado: volta para Aberto (trigger devolve o estoque com os
-    // itens antigos), atualiza os itens e define o status final (trigger debita com os novos).
     await this.prisma.$transaction(async (tx) => {
       if (existente.estoque_baixado) {
         await tx.$executeRaw`
@@ -198,7 +192,6 @@ export class PedidosService {
 
   async excluir(id: number, codEmpresa: number) {
     await this.obter(id, codEmpresa);
-    // O trigger devolve o estoque quando excluido passa a TRUE (se a empresa valida estoque).
     await this.prisma.pedido.update({ where: { id }, data: { excluido: true } });
     return { success: true, message: 'Pedido excluído.' };
   }
@@ -266,7 +259,6 @@ export class PedidosService {
     return { success: true, data: { token, expiracao, mensagem_padrao } };
   }
 
-  /** Token próprio da ordem de corte: gerar um link não invalida o do orçamento. */
   async gerarLinkCorte(id: number, itens: number[] | null | undefined, codEmpresa: number) {
     await this.obter(id, codEmpresa);
     const empresa = await this.prisma.empresa.findUnique({ where: { id: codEmpresa } });
@@ -283,8 +275,6 @@ export class PedidosService {
     return { success: true, data: { token, expiracao } };
   }
 
-  // ── Apoio ────────────────────────────────────────────────────────────────
-
   private expiracaoLink(dias: number | null | undefined): Date {
     const expiracao = new Date();
     expiracao.setDate(expiracao.getDate() + (dias ?? 7));
@@ -296,14 +286,12 @@ export class PedidosService {
     if (!item) throw falha(HttpStatus.FORBIDDEN, 'Item não pertence a este pedido.');
   }
 
-  /** Custo vem sempre do banco (nunca do cliente). */
   private async custoDoItem(item: PedidoItemDto): Promise<Prisma.Decimal> {
     if (!item.cod_produto) return new Decimal(0);
     const produto = await this.prisma.produto.findUnique({ where: { id: item.cod_produto }, select: { custo: true } });
     return produto ? new Decimal(produto.custo) : new Decimal(0);
   }
 
-  /** Cliente, meio de pagamento e itens referenciados precisam ser da própria empresa (IDOR). */
   private async validarReferencias(
     codEmpresa: number,
     codCliente: number | null,
@@ -332,10 +320,6 @@ export class PedidosService {
     }
   }
 
-  /**
-   * Com estoque já baixado, o saldo atual já descontou as quantidades antigas:
-   * somamos de volta para comparar com o que será debitado.
-   */
   private async exigirEstoque(
     pedidoId: number,
     codEmpresa: number,
@@ -370,7 +354,6 @@ export class PedidosService {
     }
   }
 
-  /** Material = produtos + cortes; serviço calculado = material + serviços avulsos. */
   private async recalcular(pedidoId: number): Promise<void> {
     const [itens, pedido] = await Promise.all([
       this.prisma.pedidoItem.findMany({ where: { cod_pedido: pedidoId } }),

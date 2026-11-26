@@ -57,7 +57,6 @@ export class Shell implements OnInit, OnDestroy {
   currentYear = new Date().getFullYear();
   private resizeListener = () => this.checkBreakpoint();
 
-  // ── Alerta de vencimento de licença ──────────────────────────────────────────
   readonly diasParaVencer = computed(() => this.authService.diasParaVencer());
 
   readonly alertaLicenca = computed(() => {
@@ -77,7 +76,6 @@ export class Shell implements OnInit, OnDestroy {
     };
   });
 
-  // ── Notificações reais (backend) ──────────────────────────────────────────────
   notificacoes = signal<INotificacao[]>([]);
   carregandoNotificacoes = signal(false);
 
@@ -85,7 +83,6 @@ export class Shell implements OnInit, OnDestroy {
     () => !!this.notificacaoLicenca() || this.notificacaoService.naoLidasCount() > 0,
   );
 
-  // Menu de perfil: "Minha Empresa" só aparece para admin/super_admin
   get profileMenuItems(): MenuItem[] {
     const items: MenuItem[] = [];
 

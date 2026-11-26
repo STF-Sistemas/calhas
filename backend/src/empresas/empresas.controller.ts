@@ -8,7 +8,6 @@ import { EmpresaDto, ValidadeDto } from './empresa.dto';
 
 function dadosEmpresa(dto: EmpresaDto, superAdmin: boolean) {
   const { data_expiracao, valor_mensalidade, ativo, ...resto } = dto;
-  // Admin não altera campos de licença.
   if (!superAdmin) return resto;
   return {
     ...resto,

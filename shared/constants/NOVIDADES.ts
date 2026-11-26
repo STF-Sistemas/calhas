@@ -1,17 +1,14 @@
 import { INovidade } from '../interfaces/INovidade';
 
-/**
- * Histórico de novidades exibido na tela "Novidades do Calhas Pro".
- *
- * ⚠️ ATUALIZAR ANTES DE CADA COMMIT (rule `.agents/rules/novidades-antes-do-commit.md`):
- * - Adicione uma nova entrada NO TOPO da lista.
- * - Nova funcionalidade → sobe o número do meio (1.7.0 → 1.8.0).
- *   Correção/ajuste pequeno → sobe o último número (1.7.0 → 1.7.1).
- * - Escreva para o usuário final: o que mudou, onde fica e por que ajuda.
- *
- * A primeira entrada é a versão atual do sistema.
- */
 export const NOVIDADES: INovidade[] = [
+  {
+    versao: '1.9.2',
+    data: '26/11/2026',
+    itens: [
+      'A tela de entrada abre mais rápido: ela já chega pronta do servidor, sem esperar o sistema carregar inteiro.',
+      'A fonte das letras agora vem junto com o sistema, sem depender de serviços de fora: as telas aparecem com a letra certa desde o primeiro instante.',
+    ],
+  },
   {
     versao: '1.9.1',
     data: '26/11/2026',
@@ -112,5 +109,4 @@ export const NOVIDADES: INovidade[] = [
   },
 ];
 
-/** Versão atual do sistema (a mais recente das novidades). */
 export const VERSAO_ATUAL: string = NOVIDADES[0].versao;

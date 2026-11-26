@@ -58,7 +58,6 @@ export class CompraDto {
 
   @TextoOpcional(500) observacao?: string | null;
 
-  /** XML original da NF-e importada (guardado para o DANFE). */
   @IsOptional()
   @IsString()
   @MaxLength(1_500_000, { message: 'XML muito grande.' })

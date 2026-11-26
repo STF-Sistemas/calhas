@@ -22,7 +22,6 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
       if (error.status === 401) {
         authService.logout();
       } else if (error.status === 402) {
-        // Licença expirada — redireciona para página de pagamento
         if (!authService.isSuperAdmin()) {
           router.navigate(['/pagamento']);
         }

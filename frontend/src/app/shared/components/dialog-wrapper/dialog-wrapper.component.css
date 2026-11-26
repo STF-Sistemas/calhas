@@ -1,8 +1,3 @@
-/*
-  Estilos de layout do dialog (flex, altura, scrollbar, etc.) estão em styles.css global,
-  pois o PrimeNG renderiza o dialog em portal (body) e ::ng-deep não alcança elementos fora do host.
-*/
-/* Scrollbar elegante no conteúdo do dialog */
 .p-dialog > .p-dialog-content::-webkit-scrollbar {
   width: 5px;
 }
@@ -14,7 +9,6 @@
   border-radius: 4px;
 }
 
-/* Padding padrão no header e footer do dialog-wrapper */
 :host ::ng-deep .p-dialog-header {
   padding: 1.25rem 1.5rem;
 }
@@ -34,7 +28,6 @@
   padding: 1rem 1.5rem;
 }
 :host ::ng-deep {
-  /* Botão Salvar */
 }
 :host ::ng-deep .p-button:not(.p-button-text) {
   border-radius: 10px;
@@ -50,7 +43,6 @@
   cursor: not-allowed;
 }
 :host ::ng-deep {
-  /* Botão Cancelar */
 }
 :host ::ng-deep .p-button.p-button-text {
   border-radius: 10px;

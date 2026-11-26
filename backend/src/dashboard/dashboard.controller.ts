@@ -26,7 +26,6 @@ export class DashboardController {
         this.prisma.pedido.count({ where: { ...base, status: EStatusPedido.Cancelado } }),
         this.prisma.pedido.findMany({
           where: base,
-          // A assinatura (base64, pesada) só é necessária na busca por id.
           omit: { aprovacao_assinatura: true },
           include: { cliente: true },
           orderBy: { id: 'desc' },

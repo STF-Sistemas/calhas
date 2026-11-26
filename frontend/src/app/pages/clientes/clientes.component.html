@@ -14,7 +14,6 @@
     </div>
   </div>
 
-  <!-- Painel de Filtros -->
   <p-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:1rem; align-items:flex-end;">
 
@@ -81,7 +80,6 @@
 
   <app-cliente-form #form (saved)="carregarClientes()"></app-cliente-form>
 
-  <!-- ── Dialog: Histórico de pedidos do cliente ─────────────────────────────── -->
   <p-dialog
     [(visible)]="showHistorico"
     [modal]="true"
@@ -94,7 +92,6 @@
     [breakpoints]="{ '960px': '95vw', '640px': '95vw' }"
     [header]="'Histórico de Pedidos — ' + clienteHistoricoNome">
 
-    <!-- Filtros de período -->
     <p-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
       <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:1rem; align-items:flex-end;">
 
@@ -128,7 +125,6 @@
       </div>
     </p-panel>
 
-    <!-- Tabela de pedidos -->
     <p-table
       [value]="historicoPedidos"
       [loading]="historicoLoading"

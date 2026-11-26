@@ -3,7 +3,6 @@
   [empresa]="relatorio?.empresa ?? empresa"
   [isLoading]="isLoading">
 
-  <!-- ===== FILTROS (tela) ===== -->
   <div filtros>
     <p-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
       <form [formGroup]="form" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:1rem; align-items:flex-end;">
@@ -69,7 +68,6 @@
     </p-panel>
   </div>
 
-  <!-- ===== FILTROS APLICADOS (impresso junto) ===== -->
   @if (relatorio) {
     <div filtros-aplicados class="filtros-aplicados">
       @if (relatorio.filtros.data_inicio || relatorio.filtros.data_fim) {
@@ -87,16 +85,13 @@
     </div>
   }
 
-  <!-- ===== ERRO ===== -->
   @if (erro) {
     <p-message severity="error" styleClass="w-full mt-2">{{ erro }}</p-message>
   }
 
-  <!-- ===== RESULTADO ===== -->
   @if (relatorio) {
     <div class="resultado">
 
-      <!-- Totais gerais -->
       <div class="totais-gerais">
         <div class="total-card">
           <span class="total-label">Pedidos</span>
@@ -120,11 +115,9 @@
         </div>
       </div>
 
-      <!-- Tabela de pedidos com itens -->
       @for (pedido of relatorio.pedidos; track pedido.id) {
         <div class="pedido-bloco">
 
-          <!-- Cabeçalho do pedido -->
           <div class="pedido-header">
             <div class="pedido-id">Pedido #{{ pedido.id }}</div>
             <div class="pedido-info">
@@ -139,7 +132,6 @@
             </div>
           </div>
 
-          <!-- Itens do pedido -->
           <div class="tabela-scroll">
           <p-table [value]="pedido.itens" styleClass="p-datatable-sm p-datatable-gridlines">
             <ng-template pTemplate="header">
@@ -188,7 +180,6 @@
         </div>
       }
 
-      <!-- Rodapé geral -->
       @if (relatorio.pedidos.length === 0) {
         <div class="sem-dados">Nenhum pedido encontrado para os filtros selecionados.</div>
       } @else {

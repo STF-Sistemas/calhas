@@ -23,7 +23,6 @@ class RecusarDto {
 
 const QUINZE_MIN = 15 * 60 * 1000;
 
-/** Orçamento aberto pelo cliente por link (sem login): visualizar, autorizar ou recusar. */
 @Publico()
 @Controller('pedidos-publico')
 export class PedidosPublicoController {
@@ -49,7 +48,6 @@ export class PedidosPublicoController {
     return pedido;
   }
 
-  /** Grava a decisão só se ainda estiver pendente (evita corrida entre duas respostas). */
   private async decidir(id: number, dados: Record<string, unknown>): Promise<void> {
     const r = await this.prisma.pedido.updateMany({
       where: { id, aprovacao_status: EAprovacaoPedido.Pendente },

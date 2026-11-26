@@ -52,7 +52,6 @@ export class DesenhoForm implements OnInit, AfterViewInit {
   diagonais: IDiagonal[] = [];
 
   modoInserir = false;
-  /** 0 = aguardando P1 | 1 = P1 definido, aguardando P2 */
   diagonalStep: 0 | 1 = 0;
   private diagonalP1?: IPonto;
 
@@ -91,7 +90,6 @@ export class DesenhoForm implements OnInit, AfterViewInit {
   @HostListener('window:orientationchange')
   onOrientationChange() {
     if (this.canvasMobileAberto) {
-      // Aguarda a animação de rotação do OS antes de redesenhar
       setTimeout(() => {
         this.redraw();
       }, 350);
@@ -155,8 +153,6 @@ export class DesenhoForm implements OnInit, AfterViewInit {
     }
   }
 
-  // ── Canvas mobile ─────────────────────────────────────────────────────────
-
   async abrirCanvasMobile() {
     this.pontosSnapshot = [...this.pontos];
     this.diagonaisSnapshot = [...this.diagonais];
@@ -165,7 +161,6 @@ export class DesenhoForm implements OnInit, AfterViewInit {
     try {
       await (screen as any).orientation?.lock?.('landscape');
     } catch {
-      /* não suportado; prossegue normalmente */
     }
   }
 
@@ -201,8 +196,6 @@ export class DesenhoForm implements OnInit, AfterViewInit {
     } catch {}
   }
 
-  // ── Helpers de canvas ativo ───────────────────────────────────────────────
-
   private get activeCanvas(): HTMLCanvasElement {
     return this.canvasMobileAberto && this.canvasMobileRef?.nativeElement
       ? this.canvasMobileRef.nativeElement
@@ -220,8 +213,6 @@ export class DesenhoForm implements OnInit, AfterViewInit {
     this.mousePos = undefined;
     this.redraw();
   }
-
-  // ── Clique / Touch ────────────────────────────────────────────────────────
 
   onCanvasClick(event: MouseEvent) {
     const p = this.toCanvasPoint(event);
@@ -289,8 +280,6 @@ export class DesenhoForm implements OnInit, AfterViewInit {
     return this.mapToCanvas(touch.clientX, touch.clientY, rect);
   }
 
-  // ── Edição ────────────────────────────────────────────────────────────────
-
   undo() {
     if (this.modoInserir) {
       if (this.diagonalStep === 1) {
@@ -317,27 +306,15 @@ export class DesenhoForm implements OnInit, AfterViewInit {
     this.redraw();
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
-
   private toCanvasPoint(event: MouseEvent): IPonto {
     const canvas = this.activeCanvas;
     const rect = canvas.getBoundingClientRect();
     return this.mapToCanvas(event.clientX, event.clientY, rect);
   }
 
-  /**
-   * Mapeia coordenadas de viewport para coordenadas internas do canvas.
-   * Quando o canvas está rotacionado -90° via CSS (fallback portrait),
-   * o bounding rect está em espaço portrait mas os pontos precisam ser
-   * mapeados para o espaço landscape do canvas.
-   *
-   * Rotação -90° CCW: elemento (ex, ey) → viewport (ey, 812 - ex)
-   * Inverso:          viewport (vx, vy) → elemento (rect.bottom - vy, vx - rect.left)
-   */
   private mapToCanvas(clientX: number, clientY: number, rect: DOMRect): IPonto {
     const rotated = this.canvasMobileAberto && window.innerHeight > window.innerWidth;
     if (rotated) {
-      // Rect está em portrait: width = canvas_css_height, height = canvas_css_width
       return {
         x: Math.round(((rect.bottom - clientY) / rect.height) * this.CANVAS_W),
         y: Math.round(((clientX - rect.left) / rect.width) * this.CANVAS_H),
@@ -348,8 +325,6 @@ export class DesenhoForm implements OnInit, AfterViewInit {
       y: Math.round((clientY - rect.top) * (this.CANVAS_H / rect.height)),
     };
   }
-
-  // ── Renderização ──────────────────────────────────────────────────────────
 
   private redraw() {
     const ctx = this.canvasMobileAberto && this.mobileCtx ? this.mobileCtx : this.ctx;
@@ -448,8 +423,6 @@ export class DesenhoForm implements OnInit, AfterViewInit {
     ctx.fillRect(-5, -5, 10, 10);
     ctx.restore();
   }
-
-  // ── Salvar ────────────────────────────────────────────────────────────────
 
   onSave() {
     this.form.markAllAsTouched();

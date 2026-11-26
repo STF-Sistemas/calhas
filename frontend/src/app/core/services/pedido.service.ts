@@ -43,7 +43,6 @@ export class PedidoService {
     return this.http.delete<TApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
 
-  // Itens do Pedido
   removerItem(pedidoId: number, itemId: number) {
     return this.http.delete<TApiResponse<void>>(`${this.apiUrl}/${pedidoId}/itens/${itemId}`);
   }

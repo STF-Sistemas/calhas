@@ -47,7 +47,6 @@ export class Clientes implements OnInit {
   clientes: ICliente[] = [];
   loading = false;
 
-  // ── Histórico de pedidos do cliente ──────────────────────────────────────────
   showHistorico = false;
   historicoLoading = false;
   historicoPedidos: IPedido[] = [];

@@ -74,7 +74,6 @@ export class ClientesController {
     const where: Prisma.ClienteWhereInput = { cod_empresa: codEmpresa, excluido: false };
     const condicoes: Prisma.ClienteWhereInput[] = [];
 
-    // Nome e endereço: pesquisa sem acento via SQL.
     const textos: Prisma.Sql[] = [];
     if (nome) textos.push(algumaContem([Prisma.sql`c.razao_social`, Prisma.sql`c.nome_fantasia`], nome));
     if (endereco) {

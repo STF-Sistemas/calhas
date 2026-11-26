@@ -12,14 +12,12 @@ interface IConfirmAberto extends Required<Omit<IConfirmOpcoes, 'danger'>> {
   danger: boolean;
 }
 
-/** Confirmação estilizada no lugar do confirm() nativo. Montado uma vez no app.html. */
 @Injectable({ providedIn: 'root' })
 export class ConfirmDialogService {
   readonly aberto = signal<IConfirmAberto | null>(null);
   private resolver?: (resposta: boolean) => void;
 
   confirm(opcoes: IConfirmOpcoes): Promise<boolean> {
-    // Uma confirmação pendente é respondida como "não" antes de abrir outra.
     this.resolver?.(false);
     this.aberto.set({
       title: opcoes.title ?? 'Confirmar',

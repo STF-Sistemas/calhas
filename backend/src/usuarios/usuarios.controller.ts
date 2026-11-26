@@ -65,7 +65,6 @@ class AtualizarUsuarioDto {
 export class UsuariosController {
   constructor(private readonly prisma: PrismaService) {}
 
-  /** Admin só enxerga usuários da própria empresa. */
   private async obter(id: number, usuario: JwtPayload) {
     const existente = await this.prisma.usuario.findFirst({ where: { id, excluido: false }, select: campos });
     if (!existente || (!usuario.super_admin && existente.cod_empresa !== usuario.cod_empresa)) {

@@ -236,13 +236,11 @@ export class PedidoForm implements OnInit {
       id: [data?.id ?? null],
       tipo: [data?.tipo || ETipoItemPedido.Produto, [Validators.required]],
       cod_produto: [data?.cod_produto ?? null],
-      // cod_chapa é apenas UI — não é salvo no backend diretamente
       cod_chapa: [codChapa],
       cod_corte: [data?.cod_corte ?? null],
       cod_servico: [data?.cod_servico ?? null],
       cod_desenho: [data?.cod_desenho ?? null],
       medidas: [data?.medidas ?? []],
-      // desenho_livre é apenas UI — true quando o corte usa desenho feito à mão
       desenho_livre: [!data?.cod_desenho && (data?.desenho_pontos?.length ?? 0) >= 2],
       desenho_pontos: [data?.desenho_pontos ?? null],
       desenho_diagonais: [data?.desenho_diagonais ?? null],
@@ -287,7 +285,6 @@ export class PedidoForm implements OnInit {
   onChapaChange(index: number) {
     const control = this.itens.at(index);
     if (control.get('desenho_livre')?.value) {
-      // Desenho livre independe da chapa: mantém o desenho e recalcula o corte.
       control.patchValue({ cod_corte: null, valor_unitario: 0 }, { emitEvent: false });
       if ((control.get('desenho_pontos')?.value?.length ?? 0) >= 2)
         this.calcularCorteAutomatico(index);
@@ -360,7 +357,6 @@ export class PedidoForm implements OnInit {
     this.calcularCorteAutomatico(event.index);
   }
 
-  /** Desenho do item: o da biblioteca ou o desenho livre (com suas transversais). */
   getDesenhoDoItem(control: any): IDesenho | undefined {
     if (control.get('desenho_livre')?.value) {
       const pontos: IPonto[] = control.get('desenho_pontos')?.value ?? [];
@@ -395,17 +391,11 @@ export class PedidoForm implements OnInit {
     this.calcularCorteAutomatico(event.index);
   }
 
-  /**
-   * Soma correta das medidas:
-   * - Segmentos base não cobertos por diagonal somam normalmente.
-   * - Para cada diagonal: soma apenas o MAIOR valor entre Ponta 1 e Ponta 2.
-   */
   private calcularTotalMedidas(desenho: IDesenho | undefined, medidas: number[]): number {
     if (!desenho) return medidas.reduce((s, m) => s + (Number(m) || 0), 0);
     const baseSeg = Math.max(0, desenho.pontos.length - 1);
     const diagonais: IDiagonal[] = (desenho.diagonais as IDiagonal[]) ?? [];
 
-    // Detecta quais segmentos base estão cobertos por alguma diagonal
     const cobertos = new Set<number>();
     diagonais.forEach((d) => {
       const idx = this.segmentoCobertoPorDiagonal(desenho, d);
@@ -466,7 +456,6 @@ export class PedidoForm implements OnInit {
     const chapa = this.chapas.find((ch) => ch.id === codChapa);
     if (!chapa?.cortes?.length) return;
 
-    // Próximo corte maior ou igual à soma das medidas
     const candidatos = chapa.cortes
       .filter((c) => Number(c.corte) >= totalMedida)
       .sort((a, b) => Number(a.corte) - Number(b.corte));
@@ -567,8 +556,6 @@ export class PedidoForm implements OnInit {
   }
 
   onDescontoTipoChange(): void {
-    // Zera o valor ao trocar o tipo (interação do usuário) — evita reaproveitar
-    // um número em reais como se fosse percentual (ou vice-versa).
     this.form.get('desconto_valor')?.setValue(0);
   }
 
@@ -610,7 +597,6 @@ export class PedidoForm implements OnInit {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    // Valida itens antes de enviar
     const itemInvalido = this.itens.controls.findIndex((c) => {
       const tipo = c.get('tipo')?.value;
       if (tipo === ETipoItemPedido.Produto) return !c.get('cod_produto')?.value;
@@ -635,7 +621,6 @@ export class PedidoForm implements OnInit {
       id: this.pedidoId,
       itens: this.itens.getRawValue().map((item: any) => {
         const { desenho_livre, ...resto } = item;
-        // Mantém apenas uma origem de desenho por item
         return desenho_livre
           ? { ...resto, cod_desenho: null }
           : { ...resto, desenho_pontos: null, desenho_diagonais: null };

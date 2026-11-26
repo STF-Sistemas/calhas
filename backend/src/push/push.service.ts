@@ -28,7 +28,6 @@ export class PushService {
     }
   }
 
-  /** Envia push para todos os dispositivos dos usuários. Inscrições expiradas são removidas. */
   async enviarParaUsuarios(usuarioIds: number[], payload: IPushPayload): Promise<void> {
     if (!this.configurado || usuarioIds.length === 0) return;
     try {

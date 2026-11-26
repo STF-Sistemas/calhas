@@ -112,7 +112,6 @@ export class OrdemCorteEnvioDialog {
       .filter(
         (item) => item.tipo === ETipoItemPedido.Corte || item.tipo === ETipoItemPedido.Produto,
       )
-      // Produtos primeiro, depois cortes (Produto=10 < Corte=11)
       .sort((a, b) => a.tipo - b.tipo)
       .map((item) => ({
         item,

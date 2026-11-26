@@ -8,9 +8,7 @@
   (save)="onSave()"
 >
   <form [formGroup]="form" class="grid p-fluid" appEnterNext>
-    <!-- ===================== LADO ESQUERDO ======================== -->
     <div class="col-12 xl:col-9">
-      <!-- Cabeçalho do Pedido -->
       <div class="mb-4">
         <h3 class="section-title">
           <i class="pi pi-file-edit"></i>
@@ -96,7 +94,6 @@
         </div>
       </div>
 
-      <!-- Itens do Pedido -->
       <h3 class="section-title">
         <i class="pi pi-list"></i>
         Itens do Pedido
@@ -148,7 +145,6 @@
                 </p-select>
               } @else if (control.get('tipo')?.value === ETipoItemPedido.Corte) {
                 <div style="display: flex; flex-direction: column; gap: 0.35rem">
-                  <!-- 1. Chapa -->
                   <p-select
                     formControlName="cod_chapa"
                     [options]="chapas"
@@ -160,7 +156,6 @@
                   >
                   </p-select>
 
-                  <!-- 2. Origem do desenho: biblioteca ou desenho livre -->
                   @if (control.get('cod_chapa')?.value) {
                     <p-selectbutton
                       formControlName="desenho_livre"
@@ -175,7 +170,6 @@
                     </p-selectbutton>
                   }
 
-                  <!-- 2b. Desenho livre -->
                   @if (control.get('cod_chapa')?.value && control.get('desenho_livre')?.value) {
                     <div class="desenho-livre-acao">
                       @if (control.get('desenho_pontos')?.value?.length >= 2) {
@@ -242,7 +236,6 @@
                     }
                   }
 
-                  <!-- 2c. Desenho da biblioteca -->
                   @if (control.get('cod_chapa')?.value && !control.get('desenho_livre')?.value) {
                     <p-select
                       formControlName="cod_desenho"
@@ -331,7 +324,6 @@
                     </p-select>
                   }
 
-                  <!-- 3. Medidas + Corte (após desenho) -->
                   @if (control.get('cod_desenho')?.value && !control.get('desenho_livre')?.value) {
                     <p-button
                       [label]="getMedidasLabel(control)"
@@ -400,7 +392,6 @@
       </p-table>
     </div>
 
-    <!-- ===================== RESUMO (sidebar) ======================== -->
     <div class="col-12 xl:col-3">
       <div style="position: sticky; top: 0">
         <h3 class="section-title">
@@ -475,7 +466,6 @@
           </div>
         </div>
 
-        <!-- ===================== DESCONTO ======================== -->
         <div class="row" style="padding-top: 0.5rem">
           <div class="col-12" style="padding: 0.5rem 0.75rem">
             <label for="desconto_valor" style="display: block; margin-bottom: 0.4rem"

@@ -55,7 +55,6 @@ export class EsqueciSenha {
           this.isLoading = false;
         },
         error: () => {
-          // Mesmo em erro mostra mensagem genérica (não revelamos se email existe)
           this.enviado = true;
           this.isLoading = false;
         },

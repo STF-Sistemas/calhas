@@ -37,7 +37,6 @@
   font-size: 1.5rem;
 }
 
-/* Sakai Card with Gradient Border */
 .login-card-wrapper {
   padding: 1px;
   border-radius: var(--radius-xl);
@@ -122,7 +121,6 @@
   color: var(--surface-600);
 }
 :host ::ng-deep {
-  /* Dark Mode Overrides for Sakai inputs appearance */
 }
 :host ::ng-deep .app-dark .p-inputtext {
   background-color: var(--surface-50);

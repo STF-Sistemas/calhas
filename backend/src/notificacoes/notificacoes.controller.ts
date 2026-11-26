@@ -25,7 +25,6 @@ export class NotificacoesController {
     return { success: true, data: { count } };
   }
 
-  // Declarada antes de ':id/lida' por clareza (caminhos diferentes, sem conflito).
   @Patch('marcar-todas-lidas')
   async marcarTodas(@EmpresaAtual() codEmpresa: number) {
     if (codEmpresa) {

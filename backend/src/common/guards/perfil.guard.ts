@@ -4,7 +4,6 @@ import { Request } from 'express';
 import { PERFIL_EXIGIDO, TPerfilExigido } from '../decorators';
 import { falha } from '../falha';
 
-/** Aplica @ApenasAdmin() / @ApenasSuperAdmin(). */
 @Injectable()
 export class PerfilGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}

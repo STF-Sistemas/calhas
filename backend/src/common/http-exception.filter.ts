@@ -2,10 +2,6 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logge
 import { ThrottlerException } from '@nestjs/throttler';
 import { Response } from 'express';
 
-/**
- * Mantém o formato de erro da API: `{ success: false, message, ... }`.
- * Erro inesperado vira 500 genérico (o detalhe fica só no log).
- */
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger('Erro');

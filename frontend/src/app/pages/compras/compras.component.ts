@@ -38,7 +38,6 @@ export class Compras implements OnInit {
   loading = false;
   isSavingStatus = false;
 
-  // Dialog de cancelamento
   showCancelDialog = false;
   motivoCancelamento = '';
   compraCancelando: ICompra | null = null;

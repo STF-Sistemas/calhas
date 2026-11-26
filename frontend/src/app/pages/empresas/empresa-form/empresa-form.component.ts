@@ -68,7 +68,7 @@ export class EmpresaForm {
   constructor(
     private fb: FormBuilder,
     private empresaService: EmpresaService,
-    private clienteService: ClienteService, // Usado para buscar CEP (rota compartilhada no backend /cep)
+    private clienteService: ClienteService,
     private readonly toast: ToastService,
     private http: HttpClient,
     public authService: AuthService,

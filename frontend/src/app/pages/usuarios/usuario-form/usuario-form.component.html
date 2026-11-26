@@ -9,7 +9,6 @@
 
   <form [formGroup]="form" class="p-fluid" appEnterNext>
 
-    <!-- ===================== EMPRESA (somente superAdmin) ======================== -->
     @if (authService.isSuperAdmin()) {
       <h3 class="section-title">
         <i class="pi pi-building"></i>
@@ -36,7 +35,6 @@
       </div>
     }
 
-    <!-- ===================== DADOS DE ACESSO ======================== -->
     <h3 class="section-title mt-2">
       <i class="pi pi-user"></i>
       Dados de Acesso
@@ -89,7 +87,6 @@
       </div>
     </div>
 
-    <!-- ===================== PERMISSÕES ======================== -->
     <h3 class="section-title mt-2">
       <i class="pi pi-shield"></i>
       Permissões

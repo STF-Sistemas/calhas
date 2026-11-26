@@ -126,7 +126,6 @@ export class PedidoImpressaoService {
     body { font-family: Arial, sans-serif; font-size: 11px; color: #1a1a1a; background: #fff; }
     .page { max-width: 800px; margin: 0 auto; padding: 24px 28px; }
 
-    /* Cabeçalho da empresa — idêntico ao relatorio-wrapper */
     .empresa-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding-bottom: 12px; border-bottom: 2px solid #f97316; margin-bottom: 14px; }
     .empresa-header-principal { display: flex; align-items: center; gap: 12px; }
     .empresa-logo { max-width: 120px; max-height: 60px; width: auto; height: auto; object-fit: contain; flex-shrink: 0; }
@@ -135,13 +134,11 @@ export class PedidoImpressaoService {
     .empresa-detalhe { font-size: 10px; color: #6b7280; margin-top: 2px; }
     .empresa-endereco-bloco { text-align: right; }
 
-    /* Título do relatório */
     .titulo-row { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb; margin-bottom: 14px; }
     .titulo { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #1a1a1a; margin: 0; }
     .titulo-data { font-size: 10px; color: #6b7280; }
     .status-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; background: #e5e7eb; color: #374151; }
 
-    /* Seção de info */
     .section { margin-bottom: 14px; }
     .section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280; margin-bottom: 6px; border-bottom: 1px solid #e5e7eb; padding-bottom: 3px; }
     .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 16px; }
@@ -150,7 +147,6 @@ export class PedidoImpressaoService {
     .info-row { margin-bottom: 3px; font-size: 11px; }
     .cliente-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
 
-    /* Tabela de itens */
     table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
     thead tr { background: #1a1a1a; color: #fff; }
     thead th { padding: 6px 8px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -162,20 +158,16 @@ export class PedidoImpressaoService {
     .row-even { background: #fff; }
     .row-odd { background: #f9fafb; }
 
-    /* Totais */
     .totais-wrapper { display: flex; justify-content: flex-end; }
     .totais-box { width: 280px; }
     .totais-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 11px; border-bottom: 1px solid #f0f0f0; }
     .totais-row.total { border-top: 2px solid #1a1a1a; border-bottom: none; padding-top: 8px; margin-top: 4px; }
     .totais-row.total .val { font-size: 16px; font-weight: 800; }
 
-    /* Observações */
     .obs-box { background: #f9fafb; border-left: 3px solid #6b7280; padding: 8px 12px; border-radius: 4px; margin-bottom: 14px; font-size: 11px; color: #374151; }
 
-    /* Rodapé */
     .footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #e5e7eb; font-size: 10px; color: #9ca3af; display: flex; justify-content: space-between; }
 
-    /* Marca d'água */
     .watermark {
       position: fixed;
       top: 50%;
@@ -212,7 +204,6 @@ ${marcaDagua ? `<div class="watermark" aria-hidden="true">${marcaDagua}</div>` :
     <span class="titulo-data">Gerado em: ${dataGeracao}</span>
   </div>
 
-  <!-- Dados do Pedido -->
   <div class="section">
     <div class="section-title">Dados do Pedido</div>
     <div class="info-grid">
@@ -223,14 +214,12 @@ ${marcaDagua ? `<div class="watermark" aria-hidden="true">${marcaDagua}</div>` :
     </div>
   </div>
 
-  <!-- Cliente -->
   <div class="section">
     <div class="section-title">Cliente</div>
     <div class="cliente-name">${cliente}</div>
     <div class="info-row">${cnpjCpf}${telefone}${cidade}</div>
   </div>
 
-  <!-- Itens -->
   <div class="section">
     <div class="section-title">Itens do Pedido</div>
     <table>
@@ -251,7 +240,6 @@ ${marcaDagua ? `<div class="watermark" aria-hidden="true">${marcaDagua}</div>` :
     </table>
   </div>
 
-  <!-- Totais -->
   <div class="totais-wrapper">
     <div class="totais-box">
       <div class="totais-row">
@@ -283,13 +271,11 @@ ${marcaDagua ? `<div class="watermark" aria-hidden="true">${marcaDagua}</div>` :
   </div>
 
   ${pedido.observacoes ? `
-  <!-- Observações -->
   <div class="section" style="margin-top:14px;">
     <div class="section-title">Observações</div>
     <div class="obs-box">${pedido.observacoes}</div>
   </div>` : ''}
 
-  <!-- Rodapé -->
   <div class="footer">
     <span>Gerado em ${dataGeracao}</span>
     <span>Pedido Nº ${pedido.id} — ${cliente}</span>

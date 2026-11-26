@@ -1,20 +1,11 @@
 import { IPonto, IDiagonal } from '../interfaces/IDesenho';
 
-/**
- * Funções do "desenho livre" do pedido: a pessoa desenha à mão (mesmo torto)
- * e, ao soltar o dedo/mouse, o traço é convertido em segmentos retos.
- */
-
 export interface IOpcoesEndireitar {
-  /** Tolerância (px) da simplificação: desvios menores que isso viram reta. */
   tolerancia?: number;
-  /** Segmentos menores que isso (px) são absorvidos pelo vizinho. */
   comprimentoMinimo?: number;
-  /** Ângulo (graus) dentro do qual a reta "gruda" em 0°, 45°, 90°... */
   snapAngulo?: number;
 }
 
-/** Converte um traço à mão livre em uma polilinha de linhas retas. */
 export function endireitarTraco(bruto: IPonto[], opcoes: IOpcoesEndireitar = {}): IPonto[] {
   const tolerancia = opcoes.tolerancia ?? 14;
   const minLen = opcoes.comprimentoMinimo ?? 18;
@@ -32,10 +23,6 @@ export function endireitarTraco(bruto: IPonto[], opcoes: IOpcoesEndireitar = {})
   return resultado.map(p => ({ x: arred(p.x), y: arred(p.y) }));
 }
 
-/**
- * Resolve o desenho de um item de pedido: o da biblioteca (cod_desenho) ou o
- * desenho livre salvo no próprio item (desenho_pontos).
- */
 export function resolverDesenhoItem(item: {
   desenho?: { descricao?: string; pontos?: unknown; diagonais?: unknown } | null;
   desenho_pontos?: IPonto[] | null;
@@ -55,8 +42,6 @@ export function resolverDesenhoItem(item: {
   }
   return null;
 }
-
-// ── Internos ────────────────────────────────────────────────────────────────
 
 function arred(n: number): number {
   return Math.round(n * 10) / 10;
@@ -84,7 +69,6 @@ function distanciaAoSegmento(p: IPonto, a: IPonto, b: IPonto): number {
   return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
 }
 
-/** Ramer–Douglas–Peucker iterativo. */
 function douglasPeucker(pts: IPonto[], eps: number): IPonto[] {
   if (pts.length < 3) return pts.slice();
   const manter = new Array<boolean>(pts.length).fill(false);
@@ -119,7 +103,6 @@ function removerSegmentosCurtos(pts: IPonto[], minLen: number): IPonto[] {
   return out;
 }
 
-/** Gruda cada segmento em múltiplos de 45° quando estiver perto, mantendo o comprimento. */
 function ajustarAngulos(pts: IPonto[], snapGraus: number): IPonto[] {
   const out: IPonto[] = [{ ...pts[0] }];
   const passo = Math.PI / 4;
@@ -136,7 +119,6 @@ function ajustarAngulos(pts: IPonto[], snapGraus: number): IPonto[] {
   return out;
 }
 
-/** Junta segmentos consecutivos com a mesma direção (após o ajuste de ângulo). */
 function unirColineares(pts: IPonto[]): IPonto[] {
   if (pts.length < 3) return pts;
   const out: IPonto[] = [pts[0]];
@@ -152,12 +134,6 @@ function unirColineares(pts: IPonto[]): IPonto[] {
   return out;
 }
 
-/**
- * Converte um traço em uma linha transversal reta (do início ao fim do traço).
- * O ângulo gruda em múltiplos de 45° quando perto e as pontas grudam no
- * desenho (vértice ou ponto da linha) quando estiverem próximas.
- * Retorna null se o traço for curto demais.
- */
 export function endireitarTransversal(
   bruto: IPonto[],
   desenho: IPonto[],
@@ -177,7 +153,6 @@ export function endireitarTransversal(
   return { p1: { x: arred(p1.x), y: arred(p1.y) }, p2: { x: arred(p2.x), y: arred(p2.y) } };
 }
 
-/** Aproxima o ponto do vértice mais próximo (prioridade) ou da linha mais próxima. */
 function imaNoDesenho(p: IPonto, desenho: IPonto[], raio: number): IPonto {
   let melhor: IPonto | null = null, dist = raio;
   for (const v of desenho) {

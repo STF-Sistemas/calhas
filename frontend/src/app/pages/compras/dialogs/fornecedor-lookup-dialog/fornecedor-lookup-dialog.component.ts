@@ -71,7 +71,6 @@ export class FornecedorLookupDialog {
     this.cnpjParaForm = this.cnpj;
     this.visible = false;
     this.showForm = true;
-    // Aguarda o Angular renderizar o componente antes de chamar abrir()
     setTimeout(
       () => this.fornecedorFormRef?.abrir(undefined, this.cnpjParaForm, this.emitenteParaForm),
       0,

@@ -13,7 +13,6 @@ export class ConfirmDialog {
   private readonly botaoConfirmar = viewChild<ElementRef<HTMLButtonElement>>('botaoConfirmar');
 
   constructor() {
-    // Foco no botão principal ao abrir (teclado e leitor de tela).
     effect(() => {
       if (this.confirmacao.aberto()) queueMicrotask(() => this.botaoConfirmar()?.nativeElement.focus());
     });

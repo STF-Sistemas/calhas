@@ -32,7 +32,6 @@ export class AuthService {
       { expiresIn: (process.env['JWT_EXPIRES_IN'] || '8h') as jwt.SignOptions['expiresIn'] },
     );
 
-    // Nunca devolver hash de senha nem token de redefinição.
     const { senha: _senha, reset_token: _token, reset_token_expiracao: _exp, ...usuarioPublico } = usuario;
 
     let empresa_expiracao: string | null = null;
@@ -49,7 +48,6 @@ export class AuthService {
 
   async esqueciSenha(dto: EsqueciSenhaDto) {
     const email = dto.email.toLowerCase().trim();
-    // Resposta sempre genérica para não revelar se o e-mail existe.
     const usuario = await this.prisma.usuario.findFirst({ where: { email, excluido: false, status: EStatusGeral.Ativo } });
 
     if (usuario) {

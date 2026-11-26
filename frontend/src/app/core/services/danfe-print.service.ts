@@ -60,7 +60,6 @@ export class DanfePrintService {
       return map[m] ?? m;
     };
 
-    // -- linhas dos itens --
     const linhasItens = d.itens.map(item => `
       <tr>
         <td class="c">${item.num}</td>
@@ -80,7 +79,6 @@ export class DanfePrintService {
         <td class="r">${item.aliq_ipi != null && item.aliq_ipi > 0 ? item.aliq_ipi + '%' : ''}</td>
       </tr>`).join('');
 
-    // -- duplicatas --
     const linhasDup = d.faturas?.map(f => `
       <td class="dup-cell">
         <span class="lbl">Nº ${f.numero}</span><br>
@@ -88,14 +86,12 @@ export class DanfePrintService {
         R$ ${fmt(f.valor)}
       </td>`).join('') ?? '';
 
-    // -- endereço emitente --
     const endEmit = [
       d.emitente.logradouro,
       d.emitente.numero ? 'Nº ' + d.emitente.numero : null,
       d.emitente.complemento,
     ].filter(Boolean).join(', ');
 
-    // -- endereço destinatário --
     const endDest = d.destinatario ? [
       d.destinatario.logradouro,
       d.destinatario.numero ? 'Nº ' + d.destinatario.numero : null,
@@ -120,7 +116,6 @@ export class DanfePrintService {
   .c { text-align: center; }
   .r { text-align: right; }
   .cell { border: 0.4pt solid #000; padding: 0.8mm 1mm; overflow: hidden; }
-  /* Header */
   .hd-emit { border: 0.4pt solid #000; padding: 1.5mm; flex: 0 0 44%; text-align: center; }
   .hd-danfe { border: 0.4pt solid #000; padding: 1mm; flex: 0 0 24%; text-align: center; display: flex; flex-direction: column; justify-content: space-around; align-items: center; }
   .hd-num { border: 0.4pt solid #000; padding: 1mm; flex: 0 0 32%; }
@@ -130,17 +125,12 @@ export class DanfePrintService {
   .danfe-sub { font-size: 5.5pt; line-height: 1.3; margin: 1mm 0; }
   .tio { border: 1pt solid #000; display: inline-block; width: 8mm; height: 8mm; line-height: 8mm; text-align: center; font-size: 14pt; font-weight: bold; }
   .nfe-num { font-size: 9pt; font-weight: bold; margin: 1mm 0; }
-  /* Sections */
   .sec-title { background: #e5e5e5; font-size: 6pt; font-weight: bold; text-transform: uppercase; padding: 0.5mm 1mm; text-align: center; border: 0.4pt solid #000; }
-  /* Chave */
   .chave-val { font-size: 7.5pt; font-family: 'Courier New', monospace; font-weight: bold; letter-spacing: 0.3mm; text-align: center; padding: 1mm; }
-  /* Emitente/Dest grid */
   .party-grid { display: flex; }
   .party-half { flex: 1; }
-  /* Tax table */
   .tax-row { display: flex; }
   .tax-cell { border: 0.4pt solid #000; padding: 0.8mm 1mm; flex: 1; }
-  /* Items table */
   table.itens { width: 100%; border-collapse: collapse; }
   table.itens th, table.itens td {
     border: 0.4pt solid #000; padding: 0.4mm 0.6mm; font-size: 6pt; vertical-align: top;
@@ -148,14 +138,11 @@ export class DanfePrintService {
   table.itens th { background: #ebebeb; font-size: 5.5pt; text-transform: uppercase; font-weight: bold; }
   table.itens td.r { text-align: right; }
   table.itens td.c { text-align: center; }
-  /* Duplicatas */
   .dup-table { display: flex; flex-wrap: wrap; border: 0.4pt solid #000; }
   .dup-cell { border: 0.4pt solid #000; padding: 0.8mm 1mm; min-width: 25mm; flex: 1; font-size: 6.5pt; }
-  /* Info adicional */
   .info-grid { display: flex; }
   .info-left { flex: 0 0 70%; border: 0.4pt solid #000; padding: 1mm; min-height: 16mm; }
   .info-right { flex: 1; border: 0.4pt solid #000; padding: 1mm; min-height: 16mm; }
-  /* Print btn */
   .print-btn { position: fixed; top: 5mm; right: 5mm; padding: 4pt 8pt; background: #1d4ed8; color: #fff; border: none; border-radius: 3pt; cursor: pointer; font-size: 8pt; }
   .source-badge { font-size: 5.5pt; color: #666; }
   .mt1 { margin-top: 0.8mm; }
@@ -167,9 +154,7 @@ export class DanfePrintService {
 <button class="print-btn no-print" onclick="window.print()">Imprimir</button>
 <div class="danfe">
 
-<!-- ====== CABEÇALHO ====== -->
 <div class="flex">
-  <!-- Emitente -->
   <div class="hd-emit">
     <div class="emit-name">${d.emitente.razao_social}</div>
     ${d.emitente.nome_fantasia ? `<div style="font-size:7pt;font-style:italic;">${d.emitente.nome_fantasia}</div>` : ''}
@@ -184,7 +169,6 @@ export class DanfePrintService {
       ${d.emitente.ie ? `<span><span class="lbl">IE</span><span class="val">${d.emitente.ie}</span></span>` : ''}
     </div>
   </div>
-  <!-- DANFE label -->
   <div class="hd-danfe">
     <div class="danfe-title">DANFE</div>
     <div class="danfe-sub">Documento Auxiliar da<br>Nota Fiscal Eletrônica</div>
@@ -196,7 +180,6 @@ export class DanfePrintService {
     <div class="lbl">Série ${d.serie ?? '1'}</div>
     ${d.source === 'db' ? '<div class="source-badge mt1">* Gerado sem XML</div>' : ''}
   </div>
-  <!-- Número/Datas -->
   <div class="hd-num">
     <div class="cell"><span class="lbl">Data de Emissão</span><span class="val">${fmtDate(d.data_emissao)}</span></div>
     <div class="cell mt1"><span class="lbl">Data de Entrada/Saída</span><span class="val">${fmtDate(d.data_saida)}</span></div>
@@ -204,7 +187,6 @@ export class DanfePrintService {
   </div>
 </div>
 
-<!-- ====== NATUREZA / PROTOCOLO ====== -->
 <div class="flex">
   <div class="cell" style="flex:0 0 60%">
     <span class="lbl">Natureza da Operação</span>
@@ -216,13 +198,11 @@ export class DanfePrintService {
   </div>
 </div>
 
-<!-- ====== CHAVE DE ACESSO ====== -->
 <div class="cell">
   <span class="lbl">Chave de Acesso</span>
   <div class="chave-val">${fmtChave(d.chave_acesso) || '—'}</div>
 </div>
 
-<!-- ====== EMITENTE ====== -->
 <div class="sec-title">Dados do Emitente</div>
 <div class="flex">
   <div class="cell" style="flex:0 0 50%"><span class="lbl">Nome/Razão Social</span><span class="val">${d.emitente.razao_social}</span></div>
@@ -237,7 +217,6 @@ export class DanfePrintService {
   <div class="cell" style="flex:0 0 5%"><span class="lbl">UF</span><span class="val">${d.emitente.uf ?? ''}</span></div>
 </div>
 
-<!-- ====== DESTINATÁRIO ====== -->
 <div class="sec-title">Dados do Destinatário/Remetente</div>
 <div class="flex">
   <div class="cell" style="flex:0 0 50%"><span class="lbl">Nome/Razão Social</span><span class="val">${d.destinatario?.razao_social ?? '—'}</span></div>
@@ -253,13 +232,11 @@ export class DanfePrintService {
   <div class="cell" style="flex:0 0 5%"><span class="lbl">UF</span><span class="val">${d.destinatario?.uf ?? ''}</span></div>
 </div>
 
-<!-- ====== DUPLICATAS ====== -->
 ${d.faturas && d.faturas.length > 0 ? `
 <div class="sec-title">Fatura / Duplicatas</div>
 <div class="dup-table">${linhasDup}</div>
 ` : ''}
 
-<!-- ====== CÁLCULO DO IMPOSTO ====== -->
 <div class="sec-title">Cálculo do Imposto</div>
 <div class="tax-row">
   <div class="tax-cell"><span class="lbl">Base de Cálculo do ICMS</span><span class="val">${fmt(d.totais.base_icms)}</span></div>
@@ -277,7 +254,6 @@ ${d.faturas && d.faturas.length > 0 ? `
   <div class="tax-cell" style="flex:1.5"><span class="lbl">Valor Total da NF</span><span class="val" style="font-size:9pt;color:#000">${fmt(d.totais.valor_total)}</span></div>
 </div>
 
-<!-- ====== TRANSPORTE ====== -->
 <div class="sec-title">Transportador/Volumes Transportados</div>
 <div class="flex">
   <div class="cell" style="flex:0 0 35%"><span class="lbl">Razão Social</span><span class="val">${d.transporte?.transportadora ?? '—'}</span></div>
@@ -297,7 +273,6 @@ ${d.faturas && d.faturas.length > 0 ? `
   <div class="cell" style="flex:0 0 10%"><span class="lbl">Peso Líquido</span><span class="val">${d.transporte?.peso_liquido ?? ''}</span></div>
 </div>
 
-<!-- ====== DADOS DOS PRODUTOS ====== -->
 <div class="sec-title">Dados dos Produtos / Serviços</div>
 <table class="itens">
   <thead>
@@ -322,7 +297,6 @@ ${d.faturas && d.faturas.length > 0 ? `
   <tbody>${linhasItens}</tbody>
 </table>
 
-<!-- ====== INFORMAÇÕES ADICIONAIS ====== -->
 <div class="sec-title">Dados Adicionais</div>
 <div class="info-grid">
   <div class="info-left">
@@ -334,7 +308,7 @@ ${d.faturas && d.faturas.length > 0 ? `
   </div>
 </div>
 
-</div><!-- end .danfe -->
+</div>
 <script>window.onload = function(){ setTimeout(function(){ window.print(); }, 400); }</script>
 </body>
 </html>`;

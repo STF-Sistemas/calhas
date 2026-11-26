@@ -54,7 +54,6 @@ export class Pagamento implements OnInit, OnDestroy {
   readonly pixCopiaECola = computed(() => {
     const p = this.pagamento();
     if (!p) return null;
-    // Em modo manual: qr_code armazena a chave Pix
     return p.qr_code;
   });
 
@@ -69,7 +68,6 @@ export class Pagamento implements OnInit, OnDestroy {
   ngOnInit() {
     this.themeService.applyTheme();
 
-    // Super admin não precisa de pagamento
     if (this.authService.isSuperAdmin()) {
       this.router.navigate(['/']);
       return;
@@ -139,7 +137,6 @@ export class Pagamento implements OnInit, OnDestroy {
         }
       },
       error: () => {
-        /* ignora erros de polling */
       },
     });
   }

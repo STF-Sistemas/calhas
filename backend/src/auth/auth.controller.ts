@@ -13,7 +13,6 @@ const QUINZE_MIN = 15 * 60 * 1000;
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
-  // Limite agressivo contra força bruta.
   @Throttle({ default: { limit: 10, ttl: QUINZE_MIN } })
   @Post('login')
   @HttpCode(200)

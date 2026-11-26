@@ -97,7 +97,7 @@ export interface IDanfeData {
   protocolo?: string;
   data_protocolo?: string;
   natureza_operacao?: string;
-  tipo_operacao?: number; // 0=entrada, 1=saída
+  tipo_operacao?: number;
   numero_nfe?: string;
   serie?: string;
   data_emissao?: string;

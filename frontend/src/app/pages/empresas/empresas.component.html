@@ -1,6 +1,5 @@
 <section class="page-section" aria-labelledby="empresas-title">
 
-  <!-- Page Header -->
   <div class="page-header">
     <div class="page-header__info">
       <div class="page-header__title-row">
@@ -22,7 +21,6 @@
     </div>
   </div>
 
-  <!-- Data Table -->
   <app-data-table
     title="Empresas Cadastradas"
     [data]="empresas"
@@ -34,6 +32,5 @@
     (delete)="onDelete($event)">
   </app-data-table>
 
-  <!-- Form Modal -->
   <app-empresa-form #form (saved)="carregarEmpresas()"></app-empresa-form>
 </section>

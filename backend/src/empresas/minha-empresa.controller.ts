@@ -4,10 +4,6 @@ import { falha } from '../common/falha';
 import { PrismaService } from '../prisma/prisma.service';
 import { MinhaEmpresaDto } from './empresa.dto';
 
-/**
- * Dados da empresa do admin logado. Campos de licença (data_expiracao, valor_mensalidade,
- * ativo) continuam exclusivos do super admin em /api/empresas.
- */
 @ApenasAdmin()
 @Controller('minha-empresa')
 export class MinhaEmpresaController {

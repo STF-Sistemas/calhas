@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -6,9 +7,10 @@ import { Injectable, signal } from '@angular/core';
 export class ThemeService {
   isDarkMode = signal(false);
   activeColor = signal('orange');
+  private readonly noNavegador = isPlatformBrowser(inject(PLATFORM_ID));
 
   constructor() {
-    this.initTheme();
+    if (this.noNavegador) this.initTheme();
   }
 
   private initTheme() {
@@ -30,12 +32,11 @@ export class ThemeService {
     }
   }
 
-  /** Re-aplica o tema salvo ao documentElement. Chamar no OnInit de cada componente raiz. */
   applyTheme() {
+    if (!this.noNavegador) return;
     const savedColor = localStorage.getItem('app-color') || 'orange';
     const savedTheme = localStorage.getItem('app-theme') === 'dark';
 
-    // Limpa todas as classes de tema e reaplicar
     document.documentElement.classList.forEach(cls => {
       if (cls.startsWith('theme-')) {
         document.documentElement.classList.remove(cls);
@@ -55,6 +56,7 @@ export class ThemeService {
 
   setDarkMode(isDark: boolean) {
     this.isDarkMode.set(isDark);
+    if (!this.noNavegador) return;
     localStorage.setItem('app-theme', isDark ? 'dark' : 'light');
     if (isDark) {
       document.documentElement.classList.add('app-dark');
@@ -64,6 +66,10 @@ export class ThemeService {
   }
 
   setColor(color: string) {
+    if (!this.noNavegador) {
+      this.activeColor.set(color);
+      return;
+    }
     document.documentElement.classList.remove(`theme-${this.activeColor()}`);
     this.activeColor.set(color);
     localStorage.setItem('app-color', color);

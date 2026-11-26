@@ -9,11 +9,7 @@ import { Subscription } from 'rxjs';
 export class CurrencyMaskDirective implements OnInit, OnDestroy {
   @Input() decimals = 2;
 
-  private units = 0; // valor interno × 10^decimals (inteiro)
-  /**
-   * Depois de digitar vírgula/ponto, os próximos dígitos vão para as casas decimais
-   * (ex.: "1,33"). Sem separador, os dígitos entram da direita como no caixa (133 → 1,33).
-   */
+  private units = 0;
   private modoDecimal = false;
   private casasDigitadas = 0;
   private _internalChange = false;
@@ -30,7 +26,6 @@ export class CurrencyMaskDirective implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.el.nativeElement.style.textAlign = 'right';
     this.el.nativeElement.setAttribute('autocomplete', 'off');
-    // Teclado numérico no celular, com vírgula/ponto quando o campo aceita decimais.
     this.el.nativeElement.setAttribute('inputmode', this.decimals > 0 ? 'decimal' : 'numeric');
 
     if (this.ngControl?.control) {
@@ -59,10 +54,6 @@ export class CurrencyMaskDirective implements OnInit, OnDestroy {
     this._subscription?.unsubscribe();
   }
 
-  /**
-   * `beforeinput` em vez de `keydown`: teclados virtuais (Android/Gboard) mandam
-   * `key = "Unidentified"` no keydown, mas o beforeinput traz o caractere digitado.
-   */
   @HostListener('beforeinput', ['$event'])
   onBeforeInput(event: InputEvent): void {
     const tipo = event.inputType;
@@ -81,7 +72,6 @@ export class CurrencyMaskDirective implements OnInit, OnDestroy {
     }
   }
 
-  /** Garante que nada digitado por fora do beforeinput (ex.: IME) fique na tela. */
   @HostListener('input')
   onInput(): void {
     this.exibir();
@@ -107,7 +97,6 @@ export class CurrencyMaskDirective implements OnInit, OnDestroy {
         if (novoValor <= this.maxUnits) this.units = novoValor;
       }
     } else if ((ch === ',' || ch === '.') && this.decimals > 0 && !this.modoDecimal) {
-      // O que foi digitado até aqui passa a ser a parte inteira.
       const inteiro = this.units * this.multiplier;
       if (inteiro <= this.maxUnits) this.units = inteiro;
       this.modoDecimal = true;
@@ -125,7 +114,6 @@ export class CurrencyMaskDirective implements OnInit, OnDestroy {
       const casa = Math.pow(10, this.decimals - 1 - this.casasDigitadas);
       this.units -= Math.floor(this.units / casa) % 10 * casa;
     } else {
-      // Apagou a vírgula: volta à digitação da direita com a parte inteira.
       this.units = Math.floor(this.units / this.multiplier);
       this.modoDecimal = false;
     }
@@ -141,7 +129,6 @@ export class CurrencyMaskDirective implements OnInit, OnDestroy {
   onPaste(event: ClipboardEvent): void {
     event.preventDefault();
     const texto = (event.clipboardData?.getData('text') ?? '').trim();
-    // Colar "1.234,56", "1234.56" ou "133": a última vírgula/ponto é o separador decimal.
     const m = texto.match(/^(.*?)[.,](\d{1,})$/);
     const num = m
       ? Number(`${m[1].replace(/\D/g, '') || '0'}.${m[2]}`)
@@ -168,7 +155,6 @@ export class CurrencyMaskDirective implements OnInit, OnDestroy {
   private exibir(): void {
     const valor = this.units / this.multiplier;
     if (this.modoDecimal) {
-      // Durante a digitação após a vírgula mostra só as casas já digitadas (ex.: "1," / "1,3").
       const inteiro = Math.floor(this.units / this.multiplier).toLocaleString('pt-BR');
       const frac = String(this.units % this.multiplier).padStart(this.decimals, '0').slice(0, this.casasDigitadas);
       this.el.nativeElement.value = `${inteiro},${frac}`;

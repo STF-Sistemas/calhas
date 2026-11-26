@@ -48,7 +48,6 @@ export class Usuarios implements OnInit {
     this.loading = true;
     this.usuarioService.listar().subscribe({
       next: (res) => {
-        // Formata perfil para exibição
         this.usuarios = res.data.map((u: IUsuario) => ({
           ...u,
           perfil: u.super_admin ? 'Super Admin' : u.admin ? 'Admin' : 'Vendedor',

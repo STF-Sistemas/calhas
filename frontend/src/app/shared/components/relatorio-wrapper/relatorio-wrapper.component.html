@@ -1,11 +1,9 @@
 <div class="relatorio-page">
 
-  <!-- Filtros — apenas na tela, não imprime -->
   <div class="relatorio-filtros no-print">
     <ng-content select="[filtros]"></ng-content>
   </div>
 
-  <!-- Botão de impressão + card imprimível -->
   <div class="relatorio-card-wrapper">
 
     <div class="relatorio-acoes no-print">
@@ -17,7 +15,6 @@
       </p-button>
     </div>
 
-    <!-- Área imprimível -->
     <div class="relatorio-card" id="relatorio-print-area">
 
       @if (isLoading) {
@@ -27,7 +24,6 @@
         </div>
       } @else {
 
-        <!-- Cabeçalho da empresa -->
         @if (empresa) {
           <div class="empresa-header">
             <div class="empresa-info-bloco">
@@ -55,16 +51,13 @@
           </div>
         }
 
-        <!-- Título do relatório -->
         <div class="relatorio-titulo-row">
           <h2 class="relatorio-titulo">{{ titulo }}</h2>
           <span class="relatorio-data-geracao">Gerado em: {{ hoje | date:'dd/MM/yyyy HH:mm' }}</span>
         </div>
 
-        <!-- Filtros aplicados (slot para cada relatório preencher) -->
         <ng-content select="[filtros-aplicados]"></ng-content>
 
-        <!-- Corpo do relatório -->
         <ng-content></ng-content>
 
       }
