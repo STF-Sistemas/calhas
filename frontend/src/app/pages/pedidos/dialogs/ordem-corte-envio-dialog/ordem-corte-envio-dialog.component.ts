@@ -106,7 +106,7 @@ export class OrdemCorteEnvioDialogComponent {
       .sort((a, b) => a.tipo - b.tipo)
       .map((item) => ({
         item,
-        descricao: item.produto?.descricao || item.corte?.descricao || item.desenho?.descricao || `Item Nº ${item.id}`,
+        descricao: item.produto?.descricao || item.corte?.descricao || item.desenho?.descricao || (item.desenho_pontos?.length ? 'Desenho livre' : '') || `Item Nº ${item.id}`,
         selecionado: true,
       }));
 

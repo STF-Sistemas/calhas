@@ -16,7 +16,8 @@ export function calcularTotalCorte(pontos: IPonto[], diagonais: IDiagonal[], med
   return Math.round(total * 100) / 100;
 }
 
-function segmentosCobertosCorte(pontos: IPonto[], diagonais: IDiagonal[]): Set<number> {
+/** Índices dos segmentos base cobertos por alguma diagonal (não entram na soma). */
+export function segmentosCobertosCorte(pontos: IPonto[], diagonais: IDiagonal[]): Set<number> {
   const set = new Set<number>();
   diagonais.forEach(d => {
     const idx = segmentoCobertoCorte(pontos, d);

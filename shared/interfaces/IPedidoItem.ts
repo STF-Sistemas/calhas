@@ -1,7 +1,7 @@
 import { IProduto } from './IProduto';
 import { ICorte } from './ICorte';
 import { IServico } from './IServico';
-import { IDesenho } from './IDesenho';
+import { IDesenho, IPonto, IDiagonal } from './IDesenho';
 
 export interface IPedidoItem {
   id: number;
@@ -11,6 +11,10 @@ export interface IPedidoItem {
   cod_corte: number | null;
   cod_desenho: number | null;
   medidas: number[] | null;
+  /** Desenho livre feito à mão no pedido (já endireitado). Usado quando cod_desenho é nulo. */
+  desenho_pontos?: IPonto[] | null;
+  /** Linhas transversais do desenho livre (2 medidas cada; vale a maior). */
+  desenho_diagonais?: IDiagonal[] | null;
   tipo: number;
   quantidade: number;
   valor_unitario: number;

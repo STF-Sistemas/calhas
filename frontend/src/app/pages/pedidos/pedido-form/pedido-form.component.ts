@@ -13,6 +13,7 @@ import { MessageService } from 'primeng/api';
 import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { DesenhoMedidaComponent } from '../desenho-medida/desenho-medida.component';
+import { DesenhoLivreComponent, IDesenhoLivreResultado } from '../desenho-livre/desenho-livre.component';
 import { PedidoService } from '#core/services/pedido.service';
 import { ClienteService } from '#core/services/cliente.service';
 import { ProdutoService } from '#core/services/produto.service';
@@ -44,13 +45,15 @@ import { calcularValorDesconto, calcularValorLiquido } from '#shared/functions/d
     CurrencyMaskDirective,
     EnterFocusNextDirective,
     DialogWrapperComponent,
-    DesenhoMedidaComponent
+    DesenhoMedidaComponent,
+    DesenhoLivreComponent
   ],
   templateUrl: './pedido-form.component.html',
   styleUrls: ['./pedido-form.component.scss']
 })
 export class PedidoFormComponent implements OnInit {
   @ViewChild('medidasDialog') medidasDialog!: DesenhoMedidaComponent;
+  @ViewChild('desenhoLivreDialog') desenhoLivreDialog!: DesenhoLivreComponent;
   @Output() saved = new EventEmitter<void>();
 
   form: FormGroup;
@@ -79,6 +82,10 @@ export class PedidoFormComponent implements OnInit {
     { label: 'Produto', value: ETipoItemPedido.Produto },
     { label: 'Corte', value: ETipoItemPedido.Corte },
     { label: 'Serviço Direto', value: ETipoItemPedido.Servico }
+  ];
+  modoDesenhoOpcoes = [
+    { label: 'Biblioteca', value: false, icon: 'pi pi-images' },
+    { label: 'Desenhar', value: true, icon: 'pi pi-pencil' },
   ];
   descontoTipoOpcoes = [
     { label: 'R$', value: EDescontoTipo.Reais },
@@ -201,6 +208,10 @@ export class PedidoFormComponent implements OnInit {
       cod_servico: [data?.cod_servico ?? null],
       cod_desenho: [data?.cod_desenho ?? null],
       medidas: [data?.medidas ?? []],
+      // desenho_livre é apenas UI — true quando o corte usa desenho feito à mão
+      desenho_livre: [!data?.cod_desenho && (data?.desenho_pontos?.length ?? 0) >= 2],
+      desenho_pontos: [data?.desenho_pontos ?? null],
+      desenho_diagonais: [data?.desenho_diagonais ?? null],
       quantidade: [qtd, [Validators.required, Validators.min(0.01)]],
       valor_unitario: [vUnit, [Validators.required, Validators.min(0)]],
       custo_unitario: [custo],
@@ -227,12 +238,20 @@ export class PedidoFormComponent implements OnInit {
   onTipoChange(index: number) {
     this.itens.at(index).patchValue({
       cod_produto: null, cod_chapa: null, cod_corte: null,
-      cod_servico: null, cod_desenho: null, medidas: [], valor_unitario: 0
+      cod_servico: null, cod_desenho: null, medidas: [], valor_unitario: 0,
+      desenho_livre: false, desenho_pontos: null, desenho_diagonais: null
     });
   }
 
   onChapaChange(index: number) {
-    this.itens.at(index).patchValue(
+    const control = this.itens.at(index);
+    if (control.get('desenho_livre')?.value) {
+      // Desenho livre independe da chapa: mantém o desenho e recalcula o corte.
+      control.patchValue({ cod_corte: null, valor_unitario: 0 }, { emitEvent: false });
+      if ((control.get('desenho_pontos')?.value?.length ?? 0) >= 2) this.calcularCorteAutomatico(index);
+      return;
+    }
+    control.patchValue(
       { cod_corte: null, cod_desenho: null, medidas: [], valor_unitario: 0 },
       { emitEvent: false }
     );
@@ -248,6 +267,44 @@ export class PedidoFormComponent implements OnInit {
     const servico = this.servicos.find(s => s.id === event.value);
     this.itens.at(index).patchValue({ valor_unitario: Number(servico?.valor) || 0, custo_unitario: 0 });
     this.recalcularTotais();
+  }
+
+  onModoDesenhoChange(index: number) {
+    this.itens.at(index).patchValue(
+      { cod_desenho: null, desenho_pontos: null, desenho_diagonais: null, medidas: [], cod_corte: null, valor_unitario: 0 },
+      { emitEvent: false }
+    );
+    this.recalcularTotais();
+  }
+
+  abrirDesenhoLivre(index: number) {
+    const control = this.itens.at(index);
+    this.desenhoLivreDialog.abrir(
+      index,
+      control.get('desenho_pontos')?.value,
+      control.get('desenho_diagonais')?.value,
+      control.get('medidas')?.value
+    );
+  }
+
+  onDesenhoLivreConfirmado(event: IDesenhoLivreResultado) {
+    this.itens.at(event.index).patchValue(
+      { desenho_pontos: event.pontos, desenho_diagonais: event.diagonais, medidas: event.medidas, cod_desenho: null },
+      { emitEvent: false }
+    );
+    this.calcularCorteAutomatico(event.index);
+  }
+
+  /** Desenho do item: o da biblioteca ou o desenho livre (com suas transversais). */
+  getDesenhoDoItem(control: any): IDesenho | undefined {
+    if (control.get('desenho_livre')?.value) {
+      const pontos: IPonto[] = control.get('desenho_pontos')?.value ?? [];
+      if (pontos.length < 2) return undefined;
+      const diagonais: IDiagonal[] = control.get('desenho_diagonais')?.value ?? [];
+      return { id: 0, cod_empresa: 0, descricao: 'Desenho livre', pontos, diagonais, status: 1, excluido: false };
+    }
+    const codDesenho = control.get('cod_desenho')?.value;
+    return this.desenhos.find(d => d.id === codDesenho);
   }
 
   abrirMedidas(index: number) {
@@ -311,9 +368,8 @@ export class PedidoFormComponent implements OnInit {
   private calcularCorteAutomatico(index: number) {
     const control = this.itens.at(index);
     const codChapa = control.get('cod_chapa')?.value;
-    const codDesenho = control.get('cod_desenho')?.value;
     const medidas: number[] = control.get('medidas')?.value || [];
-    const desenho = this.desenhos.find(d => d.id === codDesenho);
+    const desenho = this.getDesenhoDoItem(control);
 
     const totalMedida = this.calcularTotalMedidas(desenho, medidas);
 
@@ -357,9 +413,8 @@ export class PedidoFormComponent implements OnInit {
   }
 
   getMedidasLabel(control: any): string {
-    const codDesenho = control.get('cod_desenho')?.value;
-    const desenho = this.desenhos.find(d => d.id === codDesenho);
-    if (!desenho) return 'Informar Medidas';
+    const desenho = this.getDesenhoDoItem(control);
+    if (!desenho) return control.get('desenho_livre')?.value ? 'Desenhar' : 'Informar Medidas';
     const medidas: number[] = control.get('medidas')?.value || [];
     const preenchidas = medidas.filter((m: number) => m > 0).length;
     if (preenchidas === 0) return 'Informar Medidas';
@@ -377,10 +432,6 @@ export class PedidoFormComponent implements OnInit {
     const codChapa = control.get('cod_chapa')?.value;
     const corte = this.chapas.find(ch => ch.id === codChapa)?.cortes?.find(c => c.id === event.value);
     if (corte) {
-      const medidas: number[] = control.get('medidas')?.value || [];
-      const codDesenho = control.get('cod_desenho')?.value;
-      const desenho = this.desenhos.find(d => d.id === codDesenho);
-      const totalMedida = this.calcularTotalMedidas(desenho, medidas);
       control.patchValue(
         { valor_unitario: Number(corte.valor_venda ?? corte.valor ?? 0), custo_unitario: 0 },
         { emitEvent: false }
@@ -492,7 +543,13 @@ export class PedidoFormComponent implements OnInit {
     const dados = {
       ...this.form.getRawValue(),
       id: this.pedidoId,
-      itens: this.itens.getRawValue()
+      itens: this.itens.getRawValue().map((item: any) => {
+        const { desenho_livre, ...resto } = item;
+        // Mantém apenas uma origem de desenho por item
+        return desenho_livre
+          ? { ...resto, cod_desenho: null }
+          : { ...resto, desenho_pontos: null, desenho_diagonais: null };
+      })
     };
 
     this.pedidoService.salvar(dados).subscribe({

@@ -135,8 +135,60 @@
                     (onChange)="onChapaChange(i)">
                   </p-select>
 
-                  <!-- 2. Desenho (após chapa) -->
+                  <!-- 2. Origem do desenho: biblioteca ou desenho livre -->
                   @if (control.get('cod_chapa')?.value) {
+                    <p-selectButton
+                      formControlName="desenho_livre"
+                      [options]="modoDesenhoOpcoes"
+                      optionLabel="label"
+                      optionValue="value"
+                      [allowEmpty]="false"
+                      size="small"
+                      (onChange)="onModoDesenhoChange(i)"
+                      aria-label="Origem do desenho: biblioteca ou desenhar à mão">
+                    </p-selectButton>
+                  }
+
+                  <!-- 2b. Desenho livre -->
+                  @if (control.get('cod_chapa')?.value && control.get('desenho_livre')?.value) {
+                    <div class="desenho-livre-acao">
+                      @if (control.get('desenho_pontos')?.value?.length >= 2) {
+                        <svg width="56" height="26" class="desenho-livre-mini" aria-hidden="true">
+                          <polyline [attr.points]="getDesenhoPoints(control.get('desenho_pontos')?.value, 56, 26)"
+                            fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linejoin="round" stroke-linecap="round"/>
+                          @for (d of control.get('desenho_diagonais')?.value ?? []; track $index) {
+                            <polyline [attr.points]="getDesenhoDiagonalPoints(d, control.get('desenho_pontos')?.value, 56, 26)"
+                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          }
+                        </svg>
+                      }
+                      <p-button
+                        [label]="getMedidasLabel(control)"
+                        icon="pi pi-pencil"
+                        size="small"
+                        severity="secondary"
+                        [outlined]="true"
+                        (onClick)="abrirDesenhoLivre(i)"
+                        styleClass="w-full">
+                      </p-button>
+                    </div>
+
+                    @if (control.get('desenho_pontos')?.value?.length >= 2) {
+                      <p-select
+                        formControlName="cod_corte"
+                        [options]="getCortesDeChapa(control.get('cod_chapa')?.value)"
+                        optionLabel="descricao"
+                        optionValue="id"
+                        placeholder="Selecione o Corte"
+                        appendTo="body"
+                        (onChange)="onCorteManualChange(i, $event)">
+                      </p-select>
+                    }
+                  }
+
+                  <!-- 2c. Desenho da biblioteca -->
+                  @if (control.get('cod_chapa')?.value && !control.get('desenho_livre')?.value) {
                     <p-select
                       formControlName="cod_desenho"
                       [options]="desenhos"
@@ -186,7 +238,7 @@
                   }
 
                   <!-- 3. Medidas + Corte (após desenho) -->
-                  @if (control.get('cod_desenho')?.value) {
+                  @if (control.get('cod_desenho')?.value && !control.get('desenho_livre')?.value) {
                     <p-button
                       [label]="getMedidasLabel(control)"
                       icon="pi pi-ruler"
@@ -343,3 +395,4 @@
 </app-dialog-wrapper>
 
 <app-desenho-medida #medidasDialog (confirmed)="onMedidasConfirmadas($event)"></app-desenho-medida>
+<app-desenho-livre #desenhoLivreDialog (confirmed)="onDesenhoLivreConfirmado($event)"></app-desenho-livre>

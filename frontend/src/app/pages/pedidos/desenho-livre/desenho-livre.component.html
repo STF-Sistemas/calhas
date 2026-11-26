@@ -1,0 +1,163 @@
+<app-dialog-wrapper
+  [(visible)]="visible"
+  title="Desenho livre do corte"
+  width="1100px"
+  height="auto"
+  [fullscreenMobile]="true"
+  saveLabel="Confirmar desenho"
+  [saveDisabled]="pontos.length < 2"
+  (show)="onShow()"
+  (save)="confirmar()">
+
+  <div class="desenho-livre">
+
+    <!-- Área de desenho -->
+    <section class="area-desenho" aria-label="Área de desenho">
+      <div class="barra">
+        <p-selectButton
+          [options]="modoOpcoes"
+          [(ngModel)]="modo"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
+          [disabled]="pontos.length < 2"
+          size="small"
+          (onChange)="onModoChange()"
+          aria-label="Modo: desenhar linhas ou escrever medidas à mão">
+          <ng-template #item let-opt>
+            <i [class]="opt.icon" aria-hidden="true"></i>
+            <span class="modo-label">{{ opt.label }}</span>
+          </ng-template>
+        </p-selectButton>
+        <div class="acoes">
+          <p-button icon="pi pi-undo" [text]="true" [rounded]="true" severity="secondary"
+            [disabled]="!podeDesfazer" (onClick)="desfazer()"
+            pTooltip="Desfazer" aria-label="Desfazer"></p-button>
+          <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger"
+            [disabled]="!pontos.length" (onClick)="limpar()"
+            pTooltip="Limpar desenho" aria-label="Limpar desenho"></p-button>
+        </div>
+      </div>
+
+      <p class="dica">
+        @if (modo === 'desenhar') {
+          <i class="pi pi-pencil" aria-hidden="true"></i>
+          Desenhe mesmo torto — ao soltar, fica reto. Na ponta (círculo tracejado) continua o desenho;
+          em outro lugar vira <strong>transversal</strong> (P1 e P2, vale a maior).
+        } @else {
+          <i class="pi pi-pen-to-square" aria-hidden="true"></i>
+          Escreva o número em qualquer lugar do desenho (ex.: 1,33). Ao parar de escrever ele é lido e vai
+          para a medida destacada. Toque no número de uma linha para alterar a medida dela.
+        }
+      </p>
+
+      <div class="canvas-wrap">
+        <canvas #canvas class="canvas" [class.retrato]="retrato" [class.escrevendo]="modo === 'escrever'" role="img"
+          [attr.aria-label]="'Desenho com ' + segmentos.length + ' linhas e ' + diagonais.length + ' transversais'"></canvas>
+
+        @if (modo === 'escrever') {
+          <div class="escrita-status" [class.concluida]="!alvoAtual" [class.erro]="naoEntendi" aria-live="polite">
+            @if (naoEntendi) {
+              <span><i class="pi pi-exclamation-triangle" aria-hidden="true"></i> Não entendi, escreva de novo</span>
+            } @else if (alvoAtual) {
+              <span>Escreva a medida da <strong>{{ rotuloAlvo(alvoAtual) }}</strong></span>
+            } @else {
+              <span><i class="pi pi-check-circle" aria-hidden="true"></i> Medidas informadas</span>
+            }
+            @if (ultimoReconhecido) {
+              <span class="ultimo">{{ ultimoReconhecido.rotulo }} = {{ ultimoReconhecido.texto }}</span>
+            }
+            <span class="escrita-acoes">
+              @if (temTinta) {
+                <p-button icon="pi pi-check" [text]="true" [rounded]="true" size="small" severity="success"
+                  (onClick)="reconhecerAgora()" pTooltip="Ler agora" aria-label="Ler o número agora"></p-button>
+                <p-button icon="pi pi-eraser" [text]="true" [rounded]="true" size="small" severity="secondary"
+                  (onClick)="limparTinta()" pTooltip="Apagar escrita" aria-label="Apagar o que foi escrito"></p-button>
+              } @else if (alvoAtual) {
+                <p-button icon="pi pi-step-forward" [text]="true" [rounded]="true" size="small" severity="secondary"
+                  (onClick)="pularAlvo()" pTooltip="Pular medida" aria-label="Pular esta medida"></p-button>
+              }
+            </span>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Painel lateral de medidas (em ordem: 1ª medida = 1ª linha) -->
+    <aside class="painel-medidas" aria-label="Medidas das linhas">
+      <h2 class="titulo-medidas">
+        <i class="pi pi-ruler" aria-hidden="true"></i>
+        Medidas (cm)
+      </h2>
+
+      @if (segmentos.length === 0) {
+        <p class="vazio">Faça o desenho para informar as medidas.</p>
+      } @else {
+        <div class="lista" appEnterNext>
+          @for (seg of segmentos; track seg) {
+            @let coberta = cobertos.has(seg);
+            <div class="linha-medida"
+              [class.focada]="foco === 's' + seg"
+              [class.proxima]="modo === 'escrever' && alvoAtual === 's' + seg"
+              [class.coberta]="coberta">
+              <button type="button" class="numero"
+                [class.ok]="!coberta && medidasBase[seg] > 0"
+                [disabled]="coberta"
+                (click)="selecionarAlvo('s' + seg, true)"
+                [attr.aria-label]="'Escrever à mão a medida da linha ' + (seg + 1)">{{ seg + 1 }}</button>
+              @if (coberta) {
+                <span class="coberta-txt">coberta</span>
+              } @else {
+                <input pInputText appCurrencyMask
+                  type="text"
+                  [id]="'medida-livre-' + seg"
+                  [attr.aria-label]="'Medida da linha ' + (seg + 1) + ' em centímetros'"
+                  [ngModel]="medidasBase[seg]"
+                  (ngModelChange)="onMedidaBaseChange(seg, $event)"
+                  (focus)="focar('s' + seg); selecionarAlvo('s' + seg)"
+                  (blur)="focar(null)"
+                  placeholder="0,00" />
+              }
+            </div>
+          }
+
+          @for (d of diagonais; track $index; let i = $index) {
+            <div class="transversal" [class.focada]="foco?.startsWith('d' + i + '-')">
+              <div class="transversal-cab">
+                <span class="numero numero--transv" [class.ok]="maiorDiag(i) > 0">T{{ i + 1 }}</span>
+                <span class="transversal-info">
+                  @if (maiorDiag(i) > 0) { vale {{ maiorDiag(i) | number:'1.0-2':'pt-BR' }} } @else { vale a maior }
+                </span>
+                <p-button icon="pi pi-times" [text]="true" [rounded]="true" size="small" severity="danger"
+                  (onClick)="removerTransversal(i)"
+                  [attr.aria-label]="'Remover transversal ' + (i + 1)"></p-button>
+              </div>
+              @for (ponta of [1, 2]; track ponta) {
+                @let chave = 'd' + i + '-' + ponta;
+                <div class="linha-medida" [class.proxima]="modo === 'escrever' && alvoAtual === chave">
+                  <button type="button" class="ponta"
+                    (click)="selecionarAlvo(chave, true)"
+                    [attr.aria-label]="'Escrever à mão a ponta ' + ponta + ' da transversal ' + (i + 1)">P{{ ponta }}</button>
+                  <input pInputText appCurrencyMask type="text"
+                    [id]="'medida-transv-' + i + '-' + ponta"
+                    [attr.aria-label]="'Transversal ' + (i + 1) + ', ponta ' + ponta + ', em centímetros'"
+                    [ngModel]="medidasDiag[i][ponta - 1]"
+                    (ngModelChange)="onMedidaDiagChange(i, ponta === 1 ? 0 : 1, $event)"
+                    (focus)="focar(chave); selecionarAlvo(chave)"
+                    (blur)="focar(null)"
+                    placeholder="0,00" />
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="total">
+          <span>Total</span>
+          <strong>{{ total | number:'1.0-2':'pt-BR' }} cm</strong>
+        </div>
+      }
+    </aside>
+
+  </div>
+</app-dialog-wrapper>

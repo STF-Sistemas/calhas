@@ -27,3 +27,17 @@ textarea {
         position: static;
     }
 }
+
+.desenho-livre-acao {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.desenho-livre-mini {
+    display: block;
+    flex-shrink: 0;
+    border-radius: 3px;
+    background: var(--surface-100);
+    color: var(--text-color);
+}

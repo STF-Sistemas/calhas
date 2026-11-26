@@ -15,6 +15,24 @@ function toJsonMedidas(medidas: number[] | null | undefined): Prisma.NullableJso
   return medidas;
 }
 
+/** Converte pontos do desenho livre para JSON do Prisma (vazio/null → DbNull) */
+function toJsonPontos(pontos: { x: number; y: number }[] | null | undefined): Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue {
+  if (!pontos || pontos.length < 2) return Prisma.DbNull;
+  return pontos.map(p => ({ x: Math.round(p.x * 10) / 10, y: Math.round(p.y * 10) / 10 }));
+}
+
+/** Converte as transversais do desenho livre para JSON do Prisma (vazio → DbNull) */
+function toJsonDiagonais(diagonais: { p1: { x: number; y: number }; p2: { x: number; y: number } }[] | null | undefined): Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue {
+  if (!diagonais || diagonais.length === 0) return Prisma.DbNull;
+  const r = (n: number) => Math.round(n * 10) / 10;
+  return diagonais.map(d => ({ p1: { x: r(d.p1.x), y: r(d.p1.y) }, p2: { x: r(d.p2.x), y: r(d.p2.y) } }));
+}
+
+/** Desenho livre só existe sem cod_desenho e com pelo menos 2 pontos. */
+function usaDesenhoLivre(item: { cod_desenho?: number | null; desenho_pontos?: unknown[] | null }): boolean {
+  return !item.cod_desenho && Array.isArray(item.desenho_pontos) && item.desenho_pontos.length >= 2;
+}
+
 const router = Router();
 router.use(authMiddleware);
 
@@ -27,6 +45,11 @@ const include = {
 
 // ── Schemas de validação ──────────────────────────────────────────────────────
 
+const pontoSchema = z.object({
+  x: z.number().finite().min(-10_000).max(10_000),
+  y: z.number().finite().min(-10_000).max(10_000),
+});
+
 const itemSchema = z.object({
   id: z.number().int().positive().nullish(),
   tipo: z.number().int().min(10).max(12),
@@ -34,7 +57,12 @@ const itemSchema = z.object({
   cod_servico: z.number().int().positive().nullable().optional(),
   cod_corte: z.number().int().positive().nullable().optional(),
   cod_desenho: z.number().int().positive().nullable().optional(),
-  medidas: z.array(z.number()).nullable().optional(),
+  medidas: z.array(z.number().finite().min(0).max(1_000_000)).max(500).nullable().optional(),
+  desenho_pontos: z.array(pontoSchema).max(200).nullable().optional(),
+  desenho_diagonais: z.array(z.object({
+    p1: pontoSchema,
+    p2: pontoSchema,
+  })).max(50).nullable().optional(),
   quantidade: z.coerce.number().positive(),
   valor_unitario: z.coerce.number().min(0),
   observacoes: z.string().max(1000).nullable().optional(),
@@ -229,6 +257,8 @@ router.post('/', async (req: Request, res: Response) => {
       cod_corte: item.cod_corte ?? null,
       cod_desenho: item.cod_desenho ?? null,
       medidas: toJsonMedidas(item.medidas),
+      desenho_pontos: usaDesenhoLivre(item) ? toJsonPontos(item.desenho_pontos) : Prisma.DbNull,
+      desenho_diagonais: usaDesenhoLivre(item) ? toJsonDiagonais(item.desenho_diagonais) : Prisma.DbNull,
       tipo: item.tipo,
       quantidade: item.quantidade,
       valor_unitario: item.valor_unitario,
@@ -352,6 +382,8 @@ router.put('/:id', async (req: Request, res: Response) => {
               cod_corte: item.cod_corte ?? null,
               cod_desenho: item.cod_desenho ?? null,
               medidas: toJsonMedidas(item.medidas),
+      desenho_pontos: usaDesenhoLivre(item) ? toJsonPontos(item.desenho_pontos) : Prisma.DbNull,
+      desenho_diagonais: usaDesenhoLivre(item) ? toJsonDiagonais(item.desenho_diagonais) : Prisma.DbNull,
               tipo: item.tipo,
               quantidade: item.quantidade,
               valor_unitario: item.valor_unitario,
@@ -369,6 +401,8 @@ router.put('/:id', async (req: Request, res: Response) => {
               cod_corte: item.cod_corte ?? null,
               cod_desenho: item.cod_desenho ?? null,
               medidas: toJsonMedidas(item.medidas),
+      desenho_pontos: usaDesenhoLivre(item) ? toJsonPontos(item.desenho_pontos) : Prisma.DbNull,
+      desenho_diagonais: usaDesenhoLivre(item) ? toJsonDiagonais(item.desenho_diagonais) : Prisma.DbNull,
               tipo: item.tipo,
               quantidade: item.quantidade,
               valor_unitario: item.valor_unitario,
@@ -507,6 +541,8 @@ router.post('/:id/itens', async (req: Request, res: Response) => {
         cod_corte: item.cod_corte ?? null,
         cod_desenho: item.cod_desenho ?? null,
         medidas: toJsonMedidas(item.medidas),
+      desenho_pontos: usaDesenhoLivre(item) ? toJsonPontos(item.desenho_pontos) : Prisma.DbNull,
+      desenho_diagonais: usaDesenhoLivre(item) ? toJsonDiagonais(item.desenho_diagonais) : Prisma.DbNull,
         tipo: item.tipo,
         quantidade: item.quantidade,
         valor_unitario: item.valor_unitario,
@@ -542,7 +578,7 @@ router.put('/:id/itens/:itemId', async (req: Request, res: Response) => {
       res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: parse.error.issues[0].message }); return;
     }
 
-    const { tipo, quantidade, valor_unitario, cod_produto, cod_servico, cod_corte, cod_desenho, medidas, observacoes } = parse.data;
+    const { tipo, quantidade, valor_unitario, cod_produto, cod_servico, cod_corte, cod_desenho, medidas, desenho_pontos, desenho_diagonais, observacoes } = parse.data;
     await prisma.pedidoItem.update({
       where: { id: itemId },
       data: {
@@ -555,6 +591,8 @@ router.put('/:id/itens/:itemId', async (req: Request, res: Response) => {
         cod_corte: cod_corte ?? null,
         cod_desenho: cod_desenho ?? null,
         medidas: toJsonMedidas(medidas),
+        desenho_pontos: usaDesenhoLivre(parse.data) ? toJsonPontos(desenho_pontos) : Prisma.DbNull,
+        desenho_diagonais: usaDesenhoLivre(parse.data) ? toJsonDiagonais(desenho_diagonais) : Prisma.DbNull,
         observacoes: observacoes ?? null,
       },
     });

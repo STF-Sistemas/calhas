@@ -68,7 +68,11 @@ router.get('/:token', async (req: Request, res: Response) => {
           descricao: item.desenho.descricao,
           pontos: item.desenho.pontos,
           diagonais: item.desenho.diagonais,
-        } : null,
+        } : (Array.isArray(item.desenho_pontos) && item.desenho_pontos.length >= 2 ? {
+          descricao: 'Desenho livre',
+          pontos: item.desenho_pontos,
+          diagonais: Array.isArray(item.desenho_diagonais) ? item.desenho_diagonais : [],
+        } : null),
       }));
 
     if (itensEnvio.length === 0) {

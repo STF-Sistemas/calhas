@@ -3,13 +3,14 @@ import { IDiagonal, IPedido, IPedidoItem, IPonto } from '#shared/interfaces';
 import { ETipoItemPedido } from '#shared/enums';
 import { formatDate, formatCpfCnpj, formatPhone } from '#shared/functions/format.functions';
 import { calcularTotalCorte, gerarSvgCorte } from '#shared/functions/desenho-corte.functions';
+import { resolverDesenhoItem } from '#shared/functions/desenho-livre.functions';
 
 @Injectable({ providedIn: 'root' })
 export class PedidoImpressaoDesenhoService {
 
   imprimir(pedido: IPedido): void {
     const itensCorte = (pedido.itens ?? []).filter(
-      i => i.tipo === ETipoItemPedido.Corte && i.cod_desenho
+      i => i.tipo === ETipoItemPedido.Corte && !!resolverDesenhoItem(i)
     );
     if (itensCorte.length === 0) {
       alert('Este pedido não possui itens de corte com desenho para imprimir.');
@@ -35,9 +36,10 @@ export class PedidoImpressaoDesenhoService {
     const chapa    = item.corte?.chapa?.descricao ?? '-';
     const corte    = item.corte?.descricao ?? '-';
     const corteRef = item.corte?.corte != null ? `${item.corte.corte} cm` : '-';
-    const desenho  = item.desenho?.descricao ?? '-';
-    const pontos: IPonto[]     = (item.desenho?.pontos   as IPonto[])   ?? [];
-    const diagonais: IDiagonal[] = (item.desenho?.diagonais as IDiagonal[]) ?? [];
+    const resolvido = resolverDesenhoItem(item);
+    const desenho  = resolvido?.descricao ?? '-';
+    const pontos: IPonto[]       = resolvido?.pontos ?? [];
+    const diagonais: IDiagonal[] = resolvido?.diagonais ?? [];
     const medidas: number[]    = item.medidas ?? [];
 
     const total = calcularTotalCorte(pontos, diagonais, medidas);

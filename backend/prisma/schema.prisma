@@ -471,6 +471,8 @@ model PedidoItem {
   custo_unitario  Decimal @default(0) @db.Decimal(10, 4)
   observacoes     String? @db.Text
   medidas         Json?
+  desenho_pontos  Json?
+  desenho_diagonais Json?
 
   pedido  Pedido   @relation(fields: [cod_pedido], references: [id], onDelete: Cascade)
   produto Produto? @relation(fields: [cod_produto], references: [id])
