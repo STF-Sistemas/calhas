@@ -1,15 +1,18 @@
 import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { isLogoDataUriValido } from '#shared/functions/logo.functions';
 import { LOGO_EMPRESA_TIPOS_ACEITOS, LOGO_EMPRESA_TAMANHO_MAXIMO_BYTES } from '#shared/constants';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Botao } from '#ui';
 
 @Component({
   selector: 'app-logo-uploader',
   standalone: true,
-  imports: [CommonModule, ButtonModule],
+  imports: [
+    CommonModule,
+    Botao,
+  ],
   templateUrl: './logo-uploader.component.html',
   styleUrls: ['./logo-uploader.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,

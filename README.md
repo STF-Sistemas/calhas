@@ -10,7 +10,7 @@ Monorepo com três pacotes:
 | Pacote | Tecnologia | Porta (dev) |
 | --- | --- | --- |
 | `backend/` | NestJS 12 (Express 5) + Prisma 7 (PostgreSQL, adapter `pg`) | 3004 |
-| `frontend/` | Angular + PrimeNG (PWA) | 4204 |
+| `frontend/` | Angular 22 nativo, kit de UI próprio (PWA) | 4204 |
 | `shared/` | TypeScript (interfaces, enums, funções e constantes) | |
 
 O `shared/` é a fonte única de tipos e regras usada pelos dois lados (alias `#shared/*`).

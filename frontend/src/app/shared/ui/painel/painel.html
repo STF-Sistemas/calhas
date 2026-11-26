@@ -1,0 +1,14 @@
+<div class="ui-panel__cabecalho">
+  <span class="ui-panel__titulo">{{ header() }}</span>
+  @if (toggleable()) {
+    <button
+      type="button"
+      class="ui-panel__alternar"
+      [attr.aria-expanded]="!collapsed()"
+      [attr.aria-label]="collapsed() ? 'Expandir ' + header() : 'Recolher ' + header()"
+      (click)="collapsed.set(!collapsed())">
+      <i class="ic" [class.ic-chevron-down]="collapsed()" [class.ic-chevron-up]="!collapsed()" aria-hidden="true"></i>
+    </button>
+  }
+</div>
+<div class="ui-panel__conteudo" [hidden]="collapsed()"><ng-content /></div>

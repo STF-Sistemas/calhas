@@ -10,28 +10,21 @@ export interface IRowAction {
   visible?: (row: any) => boolean;
 }
 import { CommonModule } from '@angular/common';
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { TooltipModule } from 'primeng/tooltip';
-import { TagModule } from 'primeng/tag';
 import { NgxMaskPipe, provideNgxMask } from 'ngx-mask';
+import { Botao, Dica, Tag, Tabela, ColunaOrdenavel, IconeOrdem } from '#ui';
 
 @Component({
   selector: 'app-data-table',
   standalone: true,
   imports: [
     CommonModule,
-    TableModule,
-    ButtonModule,
-    InputTextModule,
-    IconFieldModule,
-    InputIconModule,
-    TooltipModule,
-    TagModule,
     NgxMaskPipe,
+    Botao,
+    Dica,
+    Tag,
+    Tabela,
+    ColunaOrdenavel,
+    IconeOrdem,
   ],
   providers: [provideNgxMask()],
   templateUrl: './data-table.component.html',
@@ -60,7 +53,7 @@ export class DataTable {
   @Input() showEditButton = true;
   @Input() showDeleteButton = true;
   @Input() showExtraButton = false;
-  @Input() extraButtonIcon = 'pi pi-cog';
+  @Input() extraButtonIcon = 'ic ic-cog';
   @Input() extraButtonTooltip = '';
   @Input() extraButtonSeverity: 'success' | 'info' | 'warn' | 'danger' | 'secondary' = 'info';
   @Input() rowActions: IRowAction[] = [];
@@ -88,7 +81,7 @@ export class DataTable {
   }
 
   toggleIcon(value: any): string {
-    return this.isAtivo(value) ? 'pi pi-toggle-on' : 'pi pi-toggle-off';
+    return this.isAtivo(value) ? 'ic ic-toggle-on' : 'ic ic-toggle-off';
   }
 
   toggleTooltip(value: any): string {

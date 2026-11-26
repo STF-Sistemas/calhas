@@ -7,7 +7,7 @@ label {
   margin-bottom: 0.5rem;
 }
 
-:host ::ng-deep .p-datatable.no-border .p-datatable-tbody > tr > td {
+:host ::ng-deep .ui-table.no-border tbody > tr > td {
   border-bottom: 1px solid var(--surface-border);
 }
 

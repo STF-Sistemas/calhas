@@ -1,8 +1,5 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
 import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
 import { ProdutoForm } from './produto-form/produto-form.component';
 import { ProdutoService, IHistoricoCompraProduto } from '#core/services/produto.service';
@@ -10,6 +7,7 @@ import { IProduto } from '#shared/interfaces';
 import { EStatusGeral } from '#shared/enums';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
+import { Botao, Dialogo, Tabela } from '#ui';
 
 @Component({
   selector: 'app-produtos',
@@ -18,9 +16,9 @@ import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.s
     CommonModule,
     DataTable,
     ProdutoForm,
-    DialogModule,
-    TableModule,
-    ButtonModule,
+    Botao,
+    Dialogo,
+    Tabela,
   ],
   templateUrl: './produtos.component.html',
   styleUrls: ['./produtos.component.css'],

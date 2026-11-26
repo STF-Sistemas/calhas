@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, ElementRef, effect, inject, viewChild } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { afterNextRender, ChangeDetectionStrategy, Component, ElementRef, effect, inject, Injector, PLATFORM_ID, viewChild } from '@angular/core';
 import { ConfirmDialogService } from '../../services/confirm-dialog.service';
 
 @Component({
@@ -6,19 +7,34 @@ import { ConfirmDialogService } from '../../services/confirm-dialog.service';
   templateUrl: './confirm-dialog.html',
   styleUrl: './confirm-dialog.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { '(document:keydown.escape)': 'cancelarComEsc()' },
 })
 export class ConfirmDialog {
   protected readonly confirmacao = inject(ConfirmDialogService);
+  private readonly dialogo = viewChild.required<ElementRef<HTMLDialogElement>>('dialogo');
   private readonly botaoConfirmar = viewChild<ElementRef<HTMLButtonElement>>('botaoConfirmar');
+  private readonly injector = inject(Injector);
+  private readonly navegador = isPlatformBrowser(inject(PLATFORM_ID));
 
   constructor() {
     effect(() => {
-      if (this.confirmacao.aberto()) queueMicrotask(() => this.botaoConfirmar()?.nativeElement.focus());
+      const aberto = this.confirmacao.aberto();
+      if (!this.navegador) return;
+      const elemento = this.dialogo().nativeElement;
+      if (aberto && !elemento.open) {
+        elemento.showModal();
+        afterNextRender(() => this.botaoConfirmar()?.nativeElement.focus(), { injector: this.injector });
+      } else if (!aberto && elemento.open) {
+        elemento.close();
+      }
     });
   }
 
-  protected cancelarComEsc(): void {
-    if (this.confirmacao.aberto()) this.confirmacao.responder(false);
+  protected aoCancelar(evento: Event): void {
+    evento.preventDefault();
+    this.confirmacao.responder(false);
+  }
+
+  protected aoClicar(evento: MouseEvent): void {
+    if (evento.target === this.dialogo().nativeElement) this.confirmacao.responder(false);
   }
 }

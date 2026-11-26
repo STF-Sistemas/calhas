@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { MeioPagamentoService } from '#core/services/meio-pagamento.service';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
@@ -13,7 +12,6 @@ import { ToastService } from '#shared-frontend/services/toast.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    InputTextModule,
     EnterFocusNextDirective,
     DialogWrapper,
   ],

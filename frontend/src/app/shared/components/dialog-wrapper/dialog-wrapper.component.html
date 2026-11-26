@@ -1,53 +1,40 @@
-<p-dialog
-    [(visible)]="visible"
-    [modal]="true"
-    [header]="title"
-    [style]="{ width: width, height: height }"
-    [contentStyle]="{ 'overflow-y': 'auto', 'flex': '1', 'min-height': '0', 'max-height': 'none' }"
-    [breakpoints]="{ '960px': '95vw', '640px': '95vw' }"
-    [styleClass]="fullscreenMobile ? 'dialog-fullscreen-mobile' : ''"
-    [position]="position"
-    [draggable]="false"
-    [resizable]="false"
-    [maximizable]="true"
-    appendTo="body"
-    (onHide)="onClose()"
-    (onShow)="show.emit()">
+<ui-dialog
+  [visible]="visible"
+  (visibleChange)="!$event && onClose()"
+  [header]="title"
+  [estilo]="{ width: width, height: height }"
+  [styleClass]="fullscreenMobile ? 'dialog-fullscreen-mobile' : ''"
+  [position]="position"
+  [maximizable]="true"
+  (onShow)="show.emit()">
+  @if (isLoadingData) {
+    <div class="dialog-wrapper__carregando">
+      <ui-spinner ariaLabel="Carregando dados" />
+    </div>
+  } @else {
+    <ng-content />
+  }
 
-    @if (isLoadingData) {
-        <div class="flex justify-content-center align-items-center p-5 min-h-10rem">
-            <p-progress-spinner ariaLabel="Carregando dados"></p-progress-spinner>
-        </div>
-    } @else {
-        <ng-content></ng-content>
-    }
-
-    @if (hasFooter) {
-        <ng-template pTemplate="footer">
-            <div class="flex justify-content-end gap-2">
-                <p-button
-                    [label]="cancelLabel"
-                    icon="pi pi-times"
-                    [text]="true"
-                    severity="secondary"
-                    (onClick)="onClose()"
-                    [disabled]="isSaving"
-                    [pTooltip]="cancelLabel"
-                    aria-label="Cancelar e fechar"
-                    styleClass="dialog-footer-btn">
-                </p-button>
-
-                <p-button
-                    [label]="isSaving ? 'Salvando...' : saveLabel"
-                    [icon]="isSaving ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
-                    severity="primary"
-                    (onClick)="save.emit()"
-                    [disabled]="isSaving || saveDisabled"
-                    [pTooltip]="saveLabel"
-                    aria-label="Salvar alterações"
-                    styleClass="dialog-footer-btn">
-                </p-button>
-            </div>
-        </ng-template>
-    }
-</p-dialog>
+  @if (hasFooter) {
+    <div rodape class="dialogo-rodape">
+      <ui-button
+        [label]="cancelLabel"
+        icon="ic ic-times"
+        [text]="true"
+        severity="secondary"
+        (onClick)="onClose()"
+        [disabled]="isSaving"
+        aria-label="Cancelar e fechar"
+        styleClass="dialog-footer-btn" />
+      <ui-button
+        [label]="isSaving ? 'Salvando...' : saveLabel"
+        icon="ic ic-check"
+        [loading]="isSaving"
+        severity="primary"
+        (onClick)="save.emit()"
+        [disabled]="saveDisabled"
+        aria-label="Salvar alterações"
+        styleClass="dialog-footer-btn" />
+    </div>
+  }
+</ui-dialog>

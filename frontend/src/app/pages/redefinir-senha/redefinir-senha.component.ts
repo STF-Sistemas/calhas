@@ -9,12 +9,11 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { ButtonModule } from 'primeng/button';
-import { PasswordModule } from 'primeng/password';
 import { ThemeService } from '#core/services/theme.service';
 import { environment } from '#environments/environment';
 import { TApiResponse } from '#shared/types';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Botao, CampoSenha } from '#ui';
 
 function senhasIguaisValidator(g: AbstractControl) {
   const nova = g.get('nova_senha')?.value;
@@ -29,8 +28,8 @@ function senhasIguaisValidator(g: AbstractControl) {
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
-    ButtonModule,
-    PasswordModule,
+    Botao,
+    CampoSenha,
   ],
   templateUrl: './redefinir-senha.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

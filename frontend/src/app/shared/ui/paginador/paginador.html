@@ -1,0 +1,35 @@
+<nav class="ui-paginador__navegacao" aria-label="Paginação">
+  <button type="button" class="ui-paginador__botao" [disabled]="pagina() === 0" aria-label="Primeira página" (click)="ir(0)">
+    <i class="ic ic-chevron-left" aria-hidden="true"></i><i class="ic ic-chevron-left ui-paginador__duplo" aria-hidden="true"></i>
+  </button>
+  <button type="button" class="ui-paginador__botao" [disabled]="pagina() === 0" aria-label="Página anterior" (click)="ir(pagina() - 1)">
+    <i class="ic ic-chevron-left" aria-hidden="true"></i>
+  </button>
+  @for (p of paginasVisiveis(); track p) {
+    <button
+      type="button"
+      class="ui-paginador__botao ui-paginador__numero"
+      [class.ui-paginador__numero--ativo]="p === pagina()"
+      [attr.aria-current]="p === pagina() ? 'page' : null"
+      [attr.aria-label]="'Página ' + (p + 1)"
+      (click)="ir(p)">
+      {{ p + 1 }}
+    </button>
+  }
+  <button type="button" class="ui-paginador__botao" [disabled]="pagina() >= totalPaginas() - 1" aria-label="Próxima página" (click)="ir(pagina() + 1)">
+    <i class="ic ic-chevron-right" aria-hidden="true"></i>
+  </button>
+  <button type="button" class="ui-paginador__botao" [disabled]="pagina() >= totalPaginas() - 1" aria-label="Última página" (click)="ir(totalPaginas() - 1)">
+    <i class="ic ic-chevron-right" aria-hidden="true"></i><i class="ic ic-chevron-right ui-paginador__duplo" aria-hidden="true"></i>
+  </button>
+</nav>
+@if (relatorio()) {
+  <span class="ui-paginador__relatorio">{{ relatorio() }}</span>
+}
+@if (rowsPerPageOptions().length) {
+  <select class="ui-paginador__linhas" aria-label="Registros por página" [value]="rows()" (change)="mudarLinhas($event)">
+    @for (opcao of rowsPerPageOptions(); track opcao) {
+      <option [value]="opcao" [selected]="opcao === rows()">{{ opcao }}</option>
+    }
+  </select>
+}

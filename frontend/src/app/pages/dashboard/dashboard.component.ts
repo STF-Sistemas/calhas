@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 import {
   DataTable,
   IRowAction,
@@ -19,6 +18,7 @@ import { EStatusPedido, ETipoItemPedido, EAprovacaoPedido } from '#shared/enums'
 import { IPedido } from '#shared/interfaces';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
+import { Botao } from '#ui';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,11 +26,11 @@ import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.s
   imports: [
     CommonModule,
     RouterModule,
-    ButtonModule,
     DataTable,
     PedidoForm,
     OrdemCorteEnvioDialog,
     AutorizacaoDialog,
+    Botao,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -48,7 +48,7 @@ export class Dashboard implements OnInit {
   rowActions: IRowAction[] = [
     {
       key: 'whatsapp',
-      icon: 'pi pi-whatsapp',
+      icon: 'ic ic-whatsapp',
       tooltip: 'Enviar pelo WhatsApp',
       ariaLabel: 'Enviar orçamento pelo WhatsApp',
       severity: 'success',
@@ -56,7 +56,7 @@ export class Dashboard implements OnInit {
     },
     {
       key: 'iniciar',
-      icon: 'pi pi-play',
+      icon: 'ic ic-play',
       tooltip: 'Iniciar Produção',
       ariaLabel: 'Mover para Em Produção',
       severity: 'warn',
@@ -64,7 +64,7 @@ export class Dashboard implements OnInit {
     },
     {
       key: 'concluir',
-      icon: 'pi pi-check',
+      icon: 'ic ic-check',
       tooltip: 'Concluir Pedido',
       ariaLabel: 'Mover para Concluído',
       severity: 'success',
@@ -72,7 +72,7 @@ export class Dashboard implements OnInit {
     },
     {
       key: 'reabrir',
-      icon: 'pi pi-replay',
+      icon: 'ic ic-replay',
       tooltip: 'Reabrir Pedido',
       ariaLabel: 'Voltar para Aberto',
       severity: 'secondary',
@@ -80,7 +80,7 @@ export class Dashboard implements OnInit {
     },
     {
       key: 'ver-autorizacao',
-      icon: 'pi pi-file-check',
+      icon: 'ic ic-file-check',
       tooltip: 'Ver Autorização/Recusa',
       ariaLabel: 'Ver detalhes da autorização ou recusa do cliente',
       severity: 'info',

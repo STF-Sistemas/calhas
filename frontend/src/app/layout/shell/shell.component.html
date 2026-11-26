@@ -5,7 +5,7 @@
   <header class="layout-topbar">
     <button type="button" class="layout-topbar-button layout-menu-button" (click)="toggleSidebar()"
       [attr.aria-expanded]="sidebarVisible()" aria-label="Abrir ou fechar o menu">
-      <i class="pi pi-bars" aria-hidden="true"></i>
+      <i class="ic ic-bars" aria-hidden="true"></i>
     </button>
 
     <a class="layout-topbar-logo" routerLink="/dashboard" aria-label="Calhas Pro, ir para o início">
@@ -22,62 +22,55 @@
     </a>
 
     <div class="layout-topbar-menu">
-      <button type="button" class="layout-topbar-button so-desktop" (click)="themeService.toggleTheme()"
-        [pTooltip]="themeService.isDarkMode() ? 'Modo claro' : 'Modo escuro'" tooltipPosition="bottom"
-        [attr.aria-label]="themeService.isDarkMode() ? 'Mudar para o modo claro' : 'Mudar para o modo escuro'">
-        <i [class]="themeService.isDarkMode() ? 'pi pi-sun' : 'pi pi-moon'" aria-hidden="true"></i>
+      <button type="button" class="layout-topbar-button so-desktop" (click)="themeService.toggleTheme()" [dica]="themeService.isDarkMode() ? 'Modo claro' : 'Modo escuro'" [attr.aria-label]="themeService.isDarkMode() ? 'Mudar para o modo claro' : 'Mudar para o modo escuro'">
+        <i [class]="themeService.isDarkMode() ? 'ic ic-sun' : 'ic ic-moon'" aria-hidden="true"></i>
       </button>
 
-      <button type="button" class="layout-topbar-button so-desktop" (click)="colorMenu.toggle($event)"
-        pTooltip="Cor do sistema" tooltipPosition="bottom" aria-label="Escolher a cor do sistema">
-        <i class="pi pi-palette" aria-hidden="true"></i>
+      <button type="button" class="layout-topbar-button so-desktop" (click)="colorMenu.toggle($event)" dica="Cor do sistema" aria-label="Escolher a cor do sistema">
+        <i class="ic ic-palette" aria-hidden="true"></i>
       </button>
-      <p-menu #colorMenu [model]="colorMenuItems" [popup]="true" appendTo="body"></p-menu>
+      <ui-menu #colorMenu [model]="colorMenuItems"></ui-menu>
 
-      <button type="button" class="layout-topbar-button notif-btn" (click)="novidades.abrir()"
-        pTooltip="Novidades" tooltipPosition="bottom" aria-label="Novidades do sistema">
-        <i class="pi pi-gift" aria-hidden="true"></i>
+      <button type="button" class="layout-topbar-button notif-btn" (click)="novidades.abrir()" dica="Novidades" aria-label="Novidades do sistema">
+        <i class="ic ic-gift" aria-hidden="true"></i>
         @if (novidades.temNaoVistas()) {
           <span class="notif-badge"></span>
         }
       </button>
 
-      <button type="button" class="layout-topbar-button notif-btn" (click)="notifPanel.toggle($event); abrirNotificacoes()"
-        pTooltip="Notificações" tooltipPosition="bottom" aria-label="Notificações">
-        <i class="pi pi-bell" aria-hidden="true"></i>
+      <button type="button" class="layout-topbar-button notif-btn" (click)="notifPanel.toggle($event); abrirNotificacoes()" dica="Notificações" aria-label="Notificações">
+        <i class="ic ic-bell" aria-hidden="true"></i>
         @if (temNotificacaoPendente()) {
           <span class="notif-badge" [class.notif-badge--urgente]="notificacaoLicenca()?.urgente"></span>
         }
       </button>
-      <p-popover #notifPanel styleClass="notif-popover" appendTo="body">
+      <ui-popover #notifPanel styleClass="notif-popover">
         <div class="notif-panel">
           @if (notificacaoService.naoLidasCount() > 0) {
-            <button pButton class="p-button-sm p-button-text w-full mb-2"
-              label="Marcar todas como lidas" icon="pi pi-check"
-              (click)="marcarTodasNotificacoesComoLidas()">
-            </button>
+            <ui-button size="small" [text]="true" class="w-full mb-2"
+              label="Marcar todas como lidas" icon="ic ic-check"
+              (onClick)="marcarTodasNotificacoesComoLidas()"></ui-button>
           }
 
           <div class="notif-lista">
             @if (notificacaoLicenca(); as notif) {
               <div class="notif-item" [class.notif-item--urgente]="notif.urgente">
                 <div class="notif-item-header">
-                  <i class="pi" [class]="notif.urgente ? 'pi-exclamation-circle' : 'pi-clock'" aria-hidden="true"></i>
+                  <i class="ic" [class]="notif.urgente ? 'ic-exclamation-circle' : 'ic-clock'" aria-hidden="true"></i>
                   <span class="notif-item-title">Licença</span>
                 </div>
                 <p class="notif-item-texto">{{ notif.texto }}</p>
                 @if (!authService.isSuperAdmin()) {
-                  <button pButton class="p-button-sm p-button-danger w-full mt-2"
-                    label="Efetuar pagamento" icon="pi pi-credit-card"
-                    (click)="irParaPagamento(); notifPanel.hide()">
-                  </button>
+                  <ui-button size="small" severity="danger" class="w-full mt-2"
+                    label="Efetuar pagamento" icon="ic ic-credit-card"
+                    (onClick)="irParaPagamento(); notifPanel.hide()"></ui-button>
                 }
               </div>
             }
 
             @if (carregandoNotificacoes()) {
               <div class="notif-vazia">
-                <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+                <i class="ic ic-spin ic-spinner" aria-hidden="true"></i>
                 <span>Carregando...</span>
               </div>
             } @else {
@@ -88,7 +81,7 @@
                   [attr.aria-label]="'Notificação: ' + notificacao.titulo"
                   (keydown.enter)="marcarNotificacaoComoLida(notificacao)">
                   <div class="notif-item-header">
-                    <i class="pi" [class]="notificacao.tipo === 'pedido_recusado' ? 'pi-times-circle' : 'pi-check-circle'" aria-hidden="true"></i>
+                    <i class="ic" [class]="notificacao.tipo === 'pedido_recusado' ? 'ic-times-circle' : 'ic-check-circle'" aria-hidden="true"></i>
                     <span class="notif-item-title">{{ notificacao.titulo }}</span>
                   </div>
                   <p class="notif-item-texto">{{ notificacao.mensagem }}</p>
@@ -96,20 +89,19 @@
               }
               @if (!notificacaoLicenca() && notificacoes().length === 0) {
                 <div class="notif-vazia">
-                  <i class="pi pi-check-circle" aria-hidden="true"></i>
+                  <i class="ic ic-check-circle" aria-hidden="true"></i>
                   <span>Nenhuma notificação</span>
                 </div>
               }
             }
           </div>
         </div>
-      </p-popover>
+      </ui-popover>
 
-      <button type="button" class="layout-topbar-button perfil-btn" (click)="profileMenu.toggle($event)"
-        pTooltip="Minha conta" tooltipPosition="bottom" aria-label="Minha conta">
+      <button type="button" class="layout-topbar-button perfil-btn" (click)="profileMenu.toggle($event)" dica="Minha conta" aria-label="Minha conta">
         <span class="perfil-iniciais" aria-hidden="true">{{ iniciais() }}</span>
       </button>
-      <p-menu #profileMenu [model]="profileMenuItems" [popup]="true" appendTo="body"></p-menu>
+      <ui-menu #profileMenu [model]="profileMenuItems"></ui-menu>
     </div>
   </header>
 
@@ -121,7 +113,7 @@
         <span>{{ authService.currentUser()?.email }}</span>
       </div>
       <button type="button" class="layout-topbar-button sidebar-fechar" (click)="sidebarVisible.set(false)" aria-label="Fechar o menu">
-        <i class="pi pi-times" aria-hidden="true"></i>
+        <i class="ic ic-times" aria-hidden="true"></i>
       </button>
     </div>
 
@@ -131,11 +123,7 @@
           <li class="layout-menuitem-root-text">{{ group.label }}</li>
           @for (item of group.items; track item.label) {
             <li>
-              <a pRipple
-                [routerLink]="item.routerLink"
-                [routerLinkActive]="item.routerLink ? 'active-route' : ''"
-                (click)="onSidebarItemClick(item)"
-                [class.cursor-pointer]="!item.routerLink">
+              <a [routerLink]="item.routerLink" [routerLinkActive]="item.routerLink ? 'active-route' : ''" (click)="onSidebarItemClick(item)" [class.cursor-pointer]="!item.routerLink">
                 <i [class]="item.icon" aria-hidden="true"></i>
                 <span>{{ item.label }}</span>
               </a>
@@ -149,7 +137,7 @@
       <span class="layout-menuitem-root-text">Aparência</span>
       <div class="sidebar-aparencia__linha">
         <button type="button" class="aparencia-tema" (click)="themeService.toggleTheme()">
-          <i [class]="themeService.isDarkMode() ? 'pi pi-sun' : 'pi pi-moon'" aria-hidden="true"></i>
+          <i [class]="themeService.isDarkMode() ? 'ic ic-sun' : 'ic ic-moon'" aria-hidden="true"></i>
           {{ themeService.isDarkMode() ? 'Modo claro' : 'Modo escuro' }}
         </button>
         <div class="aparencia-cores" role="group" aria-label="Cor do sistema">
@@ -167,7 +155,7 @@
   <div class="layout-main-container">
     @if (alertaLicenca()) {
       <div class="licenca-banner licenca-banner--{{ alertaLicenca()!.severity }} no-print" role="alert">
-        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+        <i class="ic ic-exclamation-triangle" aria-hidden="true"></i>
         <span>
           <strong>Licença:</strong> {{ alertaLicenca()!.label }}
           @if (authService.isAdmin() && !authService.isSuperAdmin()) {
@@ -201,14 +189,14 @@
       @if ($index === 1) {
         <a class="bottom-nav__item bottom-nav__novo" routerLink="/pedidos" [queryParams]="{ novo: 1 }"
           (click)="sidebarVisible.set(false)" aria-label="Novo pedido">
-          <span class="bottom-nav__novo-circulo"><i class="pi pi-plus" aria-hidden="true"></i></span>
+          <span class="bottom-nav__novo-circulo"><i class="ic ic-plus" aria-hidden="true"></i></span>
           <span>Novo pedido</span>
         </a>
       }
     }
     <button type="button" class="bottom-nav__item" [class.bottom-nav__item--ativo]="sidebarVisible()"
       (click)="toggleSidebar()" [attr.aria-expanded]="sidebarVisible()" aria-label="Abrir o menu completo">
-      <i class="pi pi-th-large" aria-hidden="true"></i>
+      <i class="ic ic-th-large" aria-hidden="true"></i>
       <span>Menu</span>
     </button>
   </nav>

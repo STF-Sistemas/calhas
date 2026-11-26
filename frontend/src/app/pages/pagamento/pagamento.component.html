@@ -1,7 +1,6 @@
 <div class="theme-switcher-fixed">
-  <button class="p-link theme-button" (click)="themeService.toggleTheme()"
-    [pTooltip]="themeService.isDarkMode() ? 'Modo Claro' : 'Modo Escuro'">
-    <i [class]="themeService.isDarkMode() ? 'pi pi-sun' : 'pi pi-moon'"></i>
+  <button class="botao-limpo theme-button" (click)="themeService.toggleTheme()" [dica]="themeService.isDarkMode() ? 'Modo Claro' : 'Modo Escuro'">
+    <i [class]="themeService.isDarkMode() ? 'ic ic-sun' : 'ic ic-moon'"></i>
   </button>
 </div>
 
@@ -11,17 +10,17 @@
     <div class="pag-card-wrapper pag-card-wrapper--success">
       <div class="pag-card">
         <div class="sucesso-icon">
-          <i class="pi pi-check-circle"></i>
+          <i class="ic ic-check-circle"></i>
         </div>
         <h1 class="pag-titulo">Pagamento confirmado!</h1>
         <p class="pag-subtitulo">Sua licença foi renovada com sucesso por mais <strong>30 dias</strong>.</p>
         @if (redirecionandoEm() > 0) {
           <p class="redirect-info">
-            <i class="pi pi-spin pi-spinner"></i>
+            <i class="ic ic-spin ic-spinner"></i>
             Redirecionando em {{ redirecionandoEm() }} segundo{{ redirecionandoEm() !== 1 ? 's' : '' }}...
           </p>
         }
-        <p-button label="Ir para o Dashboard" icon="pi pi-home" (onClick)="irParaDashboard()" styleClass="w-full mt-2"></p-button>
+        <ui-button label="Ir para o Dashboard" icon="ic ic-home" (onClick)="irParaDashboard()" styleClass="w-full mt-2"></ui-button>
       </div>
     </div>
   }
@@ -32,7 +31,7 @@
 
         <div class="pag-logo">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" width="44" height="44">
-            <rect width="32" height="32" rx="7" fill="var(--p-primary)"/>
+            <rect width="32" height="32" rx="7" fill="var(--primary-color)"/>
             <path d="M5 12 L5 18 Q5 27 16 27 Q27 27 27 18 L27 12" stroke="white" stroke-width="3"
                   stroke-linecap="round" stroke-linejoin="round" fill="none"/>
             <line x1="5" y1="12" x2="5" y2="10" stroke="white" stroke-width="3" stroke-linecap="round"/>
@@ -46,7 +45,7 @@
 
         <div class="pag-titulo-bloco">
           <h1 class="pag-titulo">
-            <i class="pi pi-lock"></i> Acesso bloqueado
+            <i class="ic ic-lock"></i> Acesso bloqueado
           </h1>
           <p class="pag-subtitulo">
             A licença desta empresa expirou. Efetue o pagamento via Pix para reativar o acesso por <strong>30 dias</strong>.
@@ -55,17 +54,16 @@
 
         @if (carregando()) {
           <div class="pag-loading">
-            <p-progress-spinner strokeWidth="4" animationDuration=".8s"></p-progress-spinner>
+            <ui-spinner></ui-spinner>
             <span>Gerando cobrança Pix...</span>
           </div>
         }
 
         @else if (erro()) {
           <div class="pag-erro">
-            <p-message severity="error">{{ erro() }}</p-message>
-            <p-button label="Tentar novamente" icon="pi pi-refresh" severity="secondary"
-              (onClick)="iniciarCobranca()" styleClass="w-full mt-3">
-            </p-button>
+            <ui-message severity="error">{{ erro() }}</ui-message>
+            <ui-button label="Tentar novamente" icon="ic ic-refresh" severity="secondary" (onClick)="iniciarCobranca()" styleClass="w-full mt-3">
+            </ui-button>
           </div>
         }
 
@@ -94,42 +92,35 @@
               <div class="pix-copia-section">
                 <span class="pix-copia-label">
                   @if (manual()) {
-                    <i class="pi pi-key"></i> Chave Pix
+                    <i class="ic ic-key"></i> Chave Pix
                   } @else {
-                    <i class="pi pi-copy"></i> Pix Copia e Cola
+                    <i class="ic ic-copy"></i> Pix Copia e Cola
                   }
                 </span>
                 <div class="pix-copia-box">
                   <span class="pix-codigo-text">{{ pixCopiaECola() }}</span>
-                  <p-button
-                    [icon]="copiado() ? 'pi pi-check' : 'pi pi-copy'"
-                    [label]="copiado() ? 'Copiado!' : 'Copiar'"
-                    [severity]="copiado() ? 'success' : 'primary'"
-                    size="small"
-                    (onClick)="copiarCodigo()">
-                  </p-button>
+                  <ui-button [icon]="copiado() ? 'ic ic-check' : 'ic ic-copy'" [label]="copiado() ? 'Copiado!' : 'Copiar'" [severity]="copiado() ? 'success' : 'primary'" size="small" (onClick)="copiarCodigo()">
+                  </ui-button>
                 </div>
               </div>
             }
 
             <div class="pix-aguardando">
-              <p-progress-spinner strokeWidth="3" animationDuration="1s" styleClass="spinner-sm"></p-progress-spinner>
+              <ui-spinner styleClass="spinner-sm"></ui-spinner>
               <span>Aguardando confirmação do pagamento...</span>
             </div>
 
             @if (manual()) {
-              <p-message severity="info"
-                text="Após efetuar o Pix, aguarde a confirmação do administrador do sistema para liberar o acesso.">
-              </p-message>
+              <ui-message severity="info" text="Após efetuar o Pix, aguarde a confirmação do administrador do sistema para liberar o acesso.">
+              </ui-message>
             }
 
           </div>
         }
 
         <div class="pag-rodape">
-          <p-button label="Sair do sistema" icon="pi pi-sign-out" severity="secondary"
-            [text]="true" size="small" (onClick)="logout()" styleClass="w-full">
-          </p-button>
+          <ui-button label="Sair do sistema" icon="ic ic-sign-out" severity="secondary" [text]="true" size="small" (onClick)="logout()" styleClass="w-full">
+          </ui-button>
         </div>
 
       </div>

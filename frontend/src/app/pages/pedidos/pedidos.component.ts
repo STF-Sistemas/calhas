@@ -3,12 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TagModule } from 'primeng/tag';
-import { PanelModule } from 'primeng/panel';
-import { DatePickerModule } from 'primeng/datepicker';
-import { SelectModule } from 'primeng/select';
-import { PaginatorModule } from 'primeng/paginator';
-import { ButtonModule } from 'primeng/button';
 import {
   DataTable,
   IRowAction,
@@ -25,6 +19,7 @@ import { obterAprovacaoTag } from '#shared/functions/aprovacao.functions';
 import { environment } from '#environments/environment';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
+import { Botao, Select, CampoData, Painel, Paginador } from '#ui';
 
 @Component({
   selector: 'app-pedidos',
@@ -36,12 +31,11 @@ import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.s
     PedidoForm,
     OrdemCorteEnvioDialog,
     AutorizacaoDialog,
-    TagModule,
-    PanelModule,
-    DatePickerModule,
-    SelectModule,
-    PaginatorModule,
-    ButtonModule,
+    Botao,
+    Select,
+    CampoData,
+    Painel,
+    Paginador,
   ],
   templateUrl: './pedidos.component.html',
   styleUrls: ['./pedidos.component.css'],
@@ -82,7 +76,7 @@ export class Pedidos implements OnInit, AfterViewInit {
   rowActions: IRowAction[] = [
     {
       key: 'whatsapp',
-      icon: 'pi pi-whatsapp',
+      icon: 'ic ic-whatsapp',
       tooltip: 'Enviar pelo WhatsApp',
       ariaLabel: 'Enviar orçamento pelo WhatsApp',
       severity: 'success',
@@ -90,7 +84,7 @@ export class Pedidos implements OnInit, AfterViewInit {
     },
     {
       key: 'iniciar',
-      icon: 'pi pi-play',
+      icon: 'ic ic-play',
       tooltip: 'Iniciar Produção',
       ariaLabel: 'Mover para Em Produção',
       severity: 'warn',
@@ -98,7 +92,7 @@ export class Pedidos implements OnInit, AfterViewInit {
     },
     {
       key: 'concluir',
-      icon: 'pi pi-check',
+      icon: 'ic ic-check',
       tooltip: 'Concluir Pedido',
       ariaLabel: 'Mover para Concluído',
       severity: 'success',
@@ -106,7 +100,7 @@ export class Pedidos implements OnInit, AfterViewInit {
     },
     {
       key: 'reabrir',
-      icon: 'pi pi-replay',
+      icon: 'ic ic-replay',
       tooltip: 'Reabrir Pedido',
       ariaLabel: 'Voltar para Aberto',
       severity: 'secondary',
@@ -114,7 +108,7 @@ export class Pedidos implements OnInit, AfterViewInit {
     },
     {
       key: 'ver-autorizacao',
-      icon: 'pi pi-file-check',
+      icon: 'ic ic-file-check',
       tooltip: 'Ver Autorização/Recusa',
       ariaLabel: 'Ver detalhes da autorização ou recusa do cliente',
       severity: 'info',

@@ -1,0 +1,72 @@
+<div class="ui-select" [class]="styleClass()" [class.ui-select--aberto]="aberto()">
+  <button
+    #gatilho
+    type="button"
+    class="ui-select__gatilho"
+    [id]="inputId() || null"
+    [disabled]="desabilitado()"
+    [attr.aria-label]="ariaLabel() || null"
+    aria-haspopup="listbox"
+    [attr.aria-expanded]="aberto()"
+    [attr.aria-controls]="idLista"
+    (click)="alternar()"
+    (keydown)="teclado($event)">
+    <span class="ui-select__valor" [class.ui-select__valor--vazio]="selecionada() === undefined">
+      @if (selecionada() !== undefined) {
+        @if (selecionadoTemplate(); as tpl) {
+          <ng-container *ngTemplateOutlet="tpl; context: { $implicit: selecionada() }" />
+        } @else {
+          {{ rotulo(selecionada()) }}
+        }
+      } @else {
+        {{ placeholder() }}
+      }
+    </span>
+    <i class="ic ic-chevron-down ui-select__seta" aria-hidden="true"></i>
+  </button>
+  @if (showClear() && selecionada() !== undefined && !desabilitado()) {
+    <button type="button" class="ui-select__limpar" aria-label="Limpar seleção" (click)="limpar($event)">
+      <i class="ic ic-times" aria-hidden="true"></i>
+    </button>
+  }
+</div>
+
+<div #painel popover="manual" class="ui-flutuante ui-select__painel">
+  @if (aberto()) {
+    @if (filter()) {
+      <div class="ui-select__busca">
+        <i class="ic ic-search" aria-hidden="true"></i>
+        <input
+          #campoFiltro
+          type="search"
+          class="ui-select__filtro"
+          placeholder="Pesquisar..."
+          aria-label="Pesquisar opções"
+          [value]="termo()"
+          (input)="aoDigitarFiltro($event)"
+          (keydown)="teclado($event)" />
+      </div>
+    }
+    <ul class="ui-select__lista" role="listbox" [id]="idLista">
+      @for (op of filtradas(); track $index) {
+        <li
+          role="option"
+          class="ui-select__opcao"
+          [attr.data-indice]="$index"
+          [class.ui-select__opcao--ativa]="$index === indiceAtivo()"
+          [class.ui-select__opcao--selecionada]="valorDe(op) === valor()"
+          [attr.aria-selected]="valorDe(op) === valor()"
+          (pointermove)="indiceAtivo.set($index)"
+          (click)="escolher(op, $event)">
+          @if (itemTemplate(); as tpl) {
+            <ng-container *ngTemplateOutlet="tpl; context: { $implicit: op }" />
+          } @else {
+            {{ rotulo(op) }}
+          }
+        </li>
+      } @empty {
+        <li class="ui-select__vazio">Nenhum resultado encontrado</li>
+      }
+    </ul>
+  }
+</div>

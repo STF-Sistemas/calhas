@@ -7,20 +7,19 @@
   position="top"
   (save)="onSave()">
 
-  <form [formGroup]="form" class="p-fluid" appEnterNext>
+  <form [formGroup]="form" appEnterNext>
 
     <h3 class="section-title">
-      <i class="pi pi-credit-card"></i>
+      <i class="ic ic-credit-card"></i>
       Dados do Meio de Pagamento
     </h3>
 
     <div class="row">
       <div class="field col-12">
         <label for="descricao">Descrição *</label>
-        <input pInputText id="descricao" formControlName="descricao"
-          placeholder="Ex: Dinheiro, Pix, Cartão de Crédito..." />
+        <input id="descricao" formControlName="descricao" placeholder="Ex: Dinheiro, Pix, Cartão de Crédito..." />
         @if (form.get('descricao')?.invalid && form.get('descricao')?.touched) {
-          <small class="p-error">Descrição é obrigatória.</small>
+          <small class="texto-erro">Descrição é obrigatória.</small>
         }
       </div>
     </div>

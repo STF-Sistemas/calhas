@@ -1,0 +1,7 @@
+.ui-popover:not(:popover-open) {
+  display: none;
+}
+
+.ui-popover {
+  padding: 0.75rem;
+}

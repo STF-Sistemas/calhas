@@ -67,7 +67,7 @@
   transition: background 0.15s, opacity 0.15s;
 }
 .install-prompt__btn--install {
-  background: var(--p-primary, #f97316);
+  background: var(--primary-color, #f97316);
   color: #fff;
   font-size: 0.85rem;
   padding: 0.45rem 0.9rem;

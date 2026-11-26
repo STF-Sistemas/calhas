@@ -2,6 +2,16 @@ import { INovidade } from '../interfaces/INovidade';
 
 export const NOVIDADES: INovidade[] = [
   {
+    versao: '2.1.0',
+    data: '26/11/2026',
+    itens: [
+      'O sistema ficou mais leve: baixa cerca de 17% menos dados ao abrir, então a primeira tela aparece mais rápido, principalmente no celular.',
+      'Campos de data agora usam o calendário do próprio aparelho. No celular, abre o seletor de data do Android ou do iPhone.',
+      'Janelas, menus e listas de opções foram refeitos: abrem mais rápido, fecham com a tecla Esc e as mensagens de aviso aparecem por cima de qualquer janela aberta.',
+      'Ícones redesenhados, mais nítidos em qualquer tamanho de tela, no modo claro e no escuro.',
+    ],
+  },
+  {
     versao: '2.0.1',
     data: '26/11/2026',
     itens: [

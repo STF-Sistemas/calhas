@@ -7,16 +7,14 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { TableModule } from 'primeng/table';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
-import { ButtonModule } from 'primeng/button';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { ChapaService } from '#core/services/chapa.service';
 import { ICorte } from '#shared/interfaces';
 import { forkJoin, of, switchMap, Observable } from 'rxjs';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Botao, Tabela } from '#ui';
 
 @Component({
   selector: 'app-chapa-form',
@@ -25,12 +23,11 @@ import { ToastService } from '#shared-frontend/services/toast.service';
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    InputTextModule,
-    TableModule,
-    ButtonModule,
     CurrencyMaskDirective,
     EnterFocusNextDirective,
     DialogWrapper,
+    Botao,
+    Tabela,
   ],
   templateUrl: './chapa-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

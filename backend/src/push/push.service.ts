@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
-import webpush from 'web-push';
+import { sendNotification, setVapidDetails } from 'web-push';
 import { falha } from '../common/falha';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -44,7 +44,7 @@ export class PushService {
     const privada = process.env['VAPID_PRIVATE_KEY'];
     this.configurado = !!publica && !!privada;
     if (this.configurado) {
-      webpush.setVapidDetails(
+      setVapidDetails(
         process.env['VAPID_SUBJECT'] || 'mailto:contato@calhaspro.com.br',
         publica as string,
         privada as string,
@@ -98,7 +98,7 @@ export class PushService {
             return;
           }
           try {
-            await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, corpo);
+            await sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, corpo);
           } catch (erro) {
             const status = (erro as { statusCode?: number }).statusCode;
             if (status === 404 || status === 410) {

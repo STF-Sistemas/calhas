@@ -12,16 +12,6 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
-import { DrawerModule } from 'primeng/drawer';
-import { ButtonModule } from 'primeng/button';
-import { RippleModule } from 'primeng/ripple';
-import { AvatarModule } from 'primeng/avatar';
-import { TooltipModule } from 'primeng/tooltip';
-import { MenuModule } from 'primeng/menu';
-import { MessageModule } from 'primeng/message';
-import { PopoverModule } from 'primeng/popover';
-import { BadgeModule } from 'primeng/badge';
-import { MenuItem } from 'primeng/api';
 import { AuthService } from '#core/services/auth.service';
 import { ThemeService } from '#core/services/theme.service';
 import { NotificacaoService } from '#core/services/notificacao.service';
@@ -30,6 +20,7 @@ import { SITE_CONFIG } from '#core/config/site-config';
 import { EmpresaForm } from '../../pages/empresas/empresa-form/empresa-form.component';
 import { NovidadesDialog } from '#shared-frontend/components/novidades-dialog/novidades-dialog.component';
 import { InstallPrompt } from '#shared-frontend/components/install-prompt/install-prompt.component';
+import { Botao, Dica, MenuFlutuante, PopoverFlutuante, IMenuItem } from '#ui';
 
 @Component({
   selector: 'app-shell',
@@ -37,18 +28,13 @@ import { InstallPrompt } from '#shared-frontend/components/install-prompt/instal
   imports: [
     CommonModule,
     RouterModule,
-    DrawerModule,
-    ButtonModule,
-    RippleModule,
-    AvatarModule,
-    TooltipModule,
-    MenuModule,
-    MessageModule,
-    PopoverModule,
-    BadgeModule,
     EmpresaForm,
     NovidadesDialog,
     InstallPrompt,
+    Botao,
+    Dica,
+    MenuFlutuante,
+    PopoverFlutuante,
   ],
   templateUrl: './shell.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -74,9 +60,9 @@ export class Shell implements OnInit, OnDestroy {
   });
 
   readonly atalhos = [
-    { label: 'Início', icone: 'pi pi-home', rota: '/dashboard' },
-    { label: 'Pedidos', icone: 'pi pi-shopping-cart', rota: '/pedidos' },
-    { label: 'Clientes', icone: 'pi pi-users', rota: '/clientes' },
+    { label: 'Início', icone: 'ic ic-home', rota: '/dashboard' },
+    { label: 'Pedidos', icone: 'ic ic-shopping-cart', rota: '/pedidos' },
+    { label: 'Clientes', icone: 'ic ic-users', rota: '/clientes' },
   ];
 
   readonly cores = [
@@ -113,13 +99,13 @@ export class Shell implements OnInit, OnDestroy {
     () => !!this.notificacaoLicenca() || this.notificacaoService.naoLidasCount() > 0,
   );
 
-  get profileMenuItems(): MenuItem[] {
-    const items: MenuItem[] = [];
+  get profileMenuItems(): IMenuItem[] {
+    const items: IMenuItem[] = [];
 
     if (this.authService.isAdmin() || this.authService.isSuperAdmin()) {
       items.push({
         label: 'Minha Empresa',
-        icon: 'pi pi-building',
+        icon: 'ic ic-building',
         command: () => this.abrirMinhaEmpresa(),
       });
     }
@@ -127,44 +113,44 @@ export class Shell implements OnInit, OnDestroy {
     items.push(
       {
         label: this.themeService.isDarkMode() ? 'Modo claro' : 'Modo escuro',
-        icon: this.themeService.isDarkMode() ? 'pi pi-sun' : 'pi pi-moon',
+        icon: this.themeService.isDarkMode() ? 'ic ic-sun' : 'ic ic-moon',
         command: () => this.themeService.toggleTheme(),
       },
-      { label: 'Meu Perfil', icon: 'pi pi-user', command: () => this.router.navigate(['/perfil']) },
+      { label: 'Meu Perfil', icon: 'ic ic-user', command: () => this.router.navigate(['/perfil']) },
       {
         label: 'Alterar Senha',
-        icon: 'pi pi-lock',
+        icon: 'ic ic-lock',
         command: () => this.router.navigate(['/alterar-senha']),
       },
       { separator: true },
-      { label: 'Sair do Sistema', icon: 'pi pi-sign-out', command: () => this.logout() },
+      { label: 'Sair do Sistema', icon: 'ic ic-sign-out', command: () => this.logout() },
     );
 
     return items;
   }
 
-  colorMenuItems: MenuItem[] = [
+  colorMenuItems: IMenuItem[] = [
     {
       label: 'Laranja',
-      icon: 'pi pi-circle-fill',
+      icon: 'ic ic-circle-fill',
       style: { color: '#f97316' },
       command: () => this.themeService.setColor('orange'),
     },
     {
       label: 'Azul',
-      icon: 'pi pi-circle-fill',
+      icon: 'ic ic-circle-fill',
       style: { color: '#3b82f6' },
       command: () => this.themeService.setColor('blue'),
     },
     {
       label: 'Esmeralda',
-      icon: 'pi pi-circle-fill',
+      icon: 'ic ic-circle-fill',
       style: { color: '#10b981' },
       command: () => this.themeService.setColor('emerald'),
     },
     {
       label: 'Índigo',
-      icon: 'pi pi-circle-fill',
+      icon: 'ic ic-circle-fill',
       style: { color: '#6366f1' },
       command: () => this.themeService.setColor('indigo'),
     },
@@ -176,7 +162,7 @@ export class Shell implements OnInit, OnDestroy {
       items: [
         {
           label: 'Dashboard',
-          icon: 'pi pi-home',
+          icon: 'ic ic-home',
           routerLink: '/dashboard',
           roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
         },
@@ -187,13 +173,13 @@ export class Shell implements OnInit, OnDestroy {
       items: [
         {
           label: 'Pedidos',
-          icon: 'pi pi-shopping-cart',
+          icon: 'ic ic-shopping-cart',
           routerLink: '/pedidos',
           roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
         },
         {
           label: 'Clientes',
-          icon: 'pi pi-users',
+          icon: 'ic ic-users',
           routerLink: '/clientes',
           roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
         },
@@ -204,13 +190,13 @@ export class Shell implements OnInit, OnDestroy {
       items: [
         {
           label: 'Fornecedores',
-          icon: 'pi pi-building',
+          icon: 'ic ic-building',
           routerLink: '/fornecedores',
           roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
         },
         {
           label: 'Entrada de Estoque',
-          icon: 'pi pi-truck',
+          icon: 'ic ic-truck',
           routerLink: '/compras',
           roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
         },
@@ -221,31 +207,31 @@ export class Shell implements OnInit, OnDestroy {
       items: [
         {
           label: 'Meios de Pagamento',
-          icon: 'pi pi-credit-card',
+          icon: 'ic ic-credit-card',
           routerLink: '/meios-pagamento',
           roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
         },
         {
           label: 'Produtos',
-          icon: 'pi pi-box',
+          icon: 'ic ic-box',
           routerLink: '/produtos',
           roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
         },
         {
           label: 'Chapas',
-          icon: 'pi pi-clone',
+          icon: 'ic ic-clone',
           routerLink: '/chapas',
           roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
         },
         {
           label: 'Desenhos',
-          icon: 'pi pi-pen-to-square',
+          icon: 'ic ic-pen-to-square',
           routerLink: '/desenhos',
           roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
         },
         {
           label: 'Serviços',
-          icon: 'pi pi-cog',
+          icon: 'ic ic-cog',
           routerLink: '/servicos',
           roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
         },
@@ -256,7 +242,7 @@ export class Shell implements OnInit, OnDestroy {
       items: [
         {
           label: 'Pedidos / Lucros',
-          icon: 'pi pi-chart-bar',
+          icon: 'ic ic-chart-bar',
           routerLink: '/relatorios/pedidos-lucros',
           roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
         },
@@ -267,21 +253,21 @@ export class Shell implements OnInit, OnDestroy {
       items: [
         {
           label: 'Minha Empresa',
-          icon: 'pi pi-building',
+          icon: 'ic ic-building',
           routerLink: null,
           action: () => this.abrirMinhaEmpresa(),
           roles: ['ADMIN'],
         },
         {
           label: 'Empresas',
-          icon: 'pi pi-building-columns',
+          icon: 'ic ic-building-columns',
           routerLink: '/empresas',
           action: null,
           roles: ['SUPER_ADMIN'],
         },
         {
           label: 'Usuários',
-          icon: 'pi pi-user-edit',
+          icon: 'ic ic-user-edit',
           routerLink: '/usuarios',
           action: null,
           roles: ['ADMIN', 'SUPER_ADMIN'],

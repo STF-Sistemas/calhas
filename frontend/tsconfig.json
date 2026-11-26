@@ -24,6 +24,7 @@
       "#shared-frontend/services/*": ["src/app/shared/services/*"],
       "#shared-frontend/utils/*": ["src/app/shared/utils/*"],
       "#shared-frontend/busca/*": ["src/app/shared/busca/*"],
+      "#ui": ["src/app/shared/ui/index.ts"],
       "#interfaces/*": ["../shared/interfaces/*"],
       "#environments/*": ["src/environments/*"]
     }

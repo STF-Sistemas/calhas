@@ -1,0 +1,48 @@
+@if (captionTpl(); as tpl) {
+  <div class="ui-table__legenda">
+    <ng-container *ngTemplateOutlet="tpl" />
+  </div>
+}
+<div
+  class="ui-table__rolagem"
+  [class.ui-table__rolagem--fixa]="scrollable() && scrollHeight() && scrollHeight() !== 'flex'"
+  [style.max-height]="scrollable() && scrollHeight() !== 'flex' ? scrollHeight() : null">
+  <table class="ui-table__tabela">
+    @if (headerTpl(); as tpl) {
+      <thead>
+        <ng-container *ngTemplateOutlet="tpl; context: { $implicit: columns() }" />
+      </thead>
+    }
+    <tbody>
+      @if (bodyTpl(); as tpl) {
+        @for (linha of visiveis(); track chave(linha, $index); let i = $index) {
+          <ng-container *ngTemplateOutlet="tpl; context: { $implicit: linha, rowIndex: primeiro() + i, columns: columns() }" />
+        } @empty {
+          @if (!loading() && vazioTpl(); as vazio) {
+            <ng-container *ngTemplateOutlet="vazio; context: { $implicit: columns() }" />
+          }
+        }
+      }
+    </tbody>
+    @if (footerTpl(); as tpl) {
+      <tfoot>
+        <ng-container *ngTemplateOutlet="tpl; context: { $implicit: columns() }" />
+      </tfoot>
+    }
+  </table>
+  @if (loading()) {
+    <div class="ui-table__carregando">
+      <ui-spinner />
+    </div>
+  }
+</div>
+@if (paginator() && filtradas().length > linhasPorPagina()) {
+  <ui-paginator
+    styleClass="ui-table__paginador"
+    [first]="primeiro()"
+    [rows]="linhasPorPagina()"
+    [totalRecords]="filtradas().length"
+    [rowsPerPageOptions]="rowsPerPageOptions()"
+    [currentPageReportTemplate]="showCurrentPageReport() ? currentPageReportTemplate() : undefined"
+    (onPageChange)="mudarPagina($event)" />
+}

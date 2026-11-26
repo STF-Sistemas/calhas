@@ -1,16 +1,20 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TagModule } from 'primeng/tag';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { PedidoService } from '#core/services/pedido.service';
 import { IPedido } from '#shared/interfaces';
 import { EAprovacaoPedido } from '#shared/enums';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Tag } from '#ui';
 
 @Component({
   selector: 'app-autorizacao-dialog',
   standalone: true,
-  imports: [CommonModule, TagModule, DialogWrapper],
+  imports: [
+    CommonModule,
+    DialogWrapper,
+    Tag,
+  ],
   templateUrl: './autorizacao-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./autorizacao-dialog.component.css'],

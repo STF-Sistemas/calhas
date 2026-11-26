@@ -1,19 +1,22 @@
 import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
 import { ProdutoService } from '#core/services/produto.service';
 import { IProduto } from '#shared/interfaces';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { normalizarBusca } from '#shared-frontend/busca/normalizar-busca';
+import { Botao, Dialogo, Tabela } from '#ui';
 
 @Component({
   selector: 'app-produto-lookup-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, TableModule, DialogModule, InputTextModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    Botao,
+    Dialogo,
+    Tabela,
+  ],
   templateUrl: './produto-lookup-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./produto-lookup-dialog.component.css'],

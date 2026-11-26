@@ -4,7 +4,7 @@
     <div class="page-header__info">
       <div class="page-header__title-row">
         <div class="page-header__icon">
-          <i class="pi pi-truck"></i>
+          <i class="ic ic-truck"></i>
         </div>
         <div>
           <h1 id="fornecedores-title" class="page-header__title">Gestão de Fornecedores</h1>
@@ -14,43 +14,40 @@
     </div>
   </div>
 
-  <p-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
+  <ui-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:1rem; align-items:flex-end;">
 
       <div style="display:flex; flex-direction:column; gap:0.25rem;">
         <label style="font-size:0.85rem; font-weight:600;">Razão Social</label>
-        <input pInputText [(ngModel)]="filtros.razaoSocial" placeholder="Buscar razão social..." (keydown.enter)="filtrar()" />
+        <input [(ngModel)]="filtros.razaoSocial" placeholder="Buscar razão social..." (keydown.enter)="filtrar()" />
       </div>
 
       <div style="display:flex; flex-direction:column; gap:0.25rem;">
         <label style="font-size:0.85rem; font-weight:600;">Nome Fantasia</label>
-        <input pInputText [(ngModel)]="filtros.nomeFantasia" placeholder="Buscar nome fantasia..." (keydown.enter)="filtrar()" />
+        <input [(ngModel)]="filtros.nomeFantasia" placeholder="Buscar nome fantasia..." (keydown.enter)="filtrar()" />
       </div>
 
       <div style="display:flex; flex-direction:column; gap:0.25rem;">
         <label style="font-size:0.85rem; font-weight:600;">CNPJ</label>
-        <input pInputText [(ngModel)]="filtros.cnpj" placeholder="00.000.000/0000-00" (keydown.enter)="filtrar()" />
+        <input [(ngModel)]="filtros.cnpj" placeholder="00.000.000/0000-00" (keydown.enter)="filtrar()" />
       </div>
 
       <div style="display:flex; flex-direction:column; gap:0.25rem;">
         <label style="font-size:0.85rem; font-weight:600;">Telefone</label>
-        <input pInputText [(ngModel)]="filtros.telefone" placeholder="(00) 00000-0000" (keydown.enter)="filtrar()" />
+        <input [(ngModel)]="filtros.telefone" placeholder="(00) 00000-0000" (keydown.enter)="filtrar()" />
       </div>
 
       <div style="display:flex; flex-direction:column; gap:0.25rem;">
         <label style="font-size:0.85rem; font-weight:600;">Status</label>
-        <p-select [(ngModel)]="filtros.status" [options]="statusOptions"
-                  optionLabel="label" optionValue="value"
-                  placeholder="Todos" [showClear]="true"
-                  appendTo="body" />
+        <ui-select [(ngModel)]="filtros.status" [options]="statusOptions" optionLabel="label" optionValue="value" placeholder="Todos" [showClear]="true" />
       </div>
 
       <div style="display:flex; align-items:flex-end;">
-        <p-button label="Filtrar" icon="pi pi-search" (onClick)="filtrar()" />
+        <ui-button label="Filtrar" icon="ic ic-search" (onClick)="filtrar()" />
       </div>
 
     </div>
-  </p-panel>
+  </ui-panel>
 
   <app-data-table
     title="Fornecedores Cadastrados"
@@ -62,7 +59,7 @@
     [showToggleStatus]="true"
     [paginator]="false"
     [showExtraButton]="true"
-    extraButtonIcon="pi pi-history"
+    extraButtonIcon="ic ic-history"
     extraButtonTooltip="Histórico de compras"
     extraButtonSeverity="info"
     (add)="onAdd()"
@@ -72,70 +69,39 @@
     (extraAction)="onHistorico($event)">
   </app-data-table>
 
-  <p-paginator
-    [rows]="limite"
-    [totalRecords]="totalRegistros"
-    [first]="(pagina - 1) * limite"
-    [rowsPerPageOptions]="[10, 25, 50]"
-    (onPageChange)="onPageChange($event)"
-    styleClass="mt-2">
-  </p-paginator>
+  <ui-paginator [rows]="limite" [totalRecords]="totalRegistros" [first]="(pagina - 1) * limite" [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="onPageChange($event)" styleClass="mt-2">
+  </ui-paginator>
 
   <app-fornecedor-form #form (saved)="carregar()"></app-fornecedor-form>
 
-  <p-dialog
-    [(visible)]="showHistorico"
-    [modal]="true"
-    [closable]="true"
-    [draggable]="false"
-    [resizable]="false"
-    appendTo="body"
-    position="top"
-    [style]="{ width: '950px' }"
-    [breakpoints]="{ '960px': '95vw', '640px': '95vw' }"
-    [header]="'Histórico de Compras | ' + fornecedorHistoricoNome">
+  <ui-dialog [(visible)]="showHistorico" [closable]="true" position="top" [estilo]="{ width: '950px' }" [header]="'Histórico de Compras | ' + fornecedorHistoricoNome">
 
-    <p-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
+    <ui-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
       <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:1rem; align-items:flex-end;">
 
         <div style="display:flex; flex-direction:column; gap:0.25rem;">
           <label style="font-size:0.85rem; font-weight:600;">Data Emissão Início</label>
-          <p-datepicker
-            [(ngModel)]="historicoFiltros.dataInicio"
-            dateFormat="dd/mm/yy"
-            [showIcon]="true"
-            appendTo="body"
-            placeholder="dd/mm/aaaa">
-          </p-datepicker>
+          <ui-datepicker [(ngModel)]="historicoFiltros.dataInicio" placeholder="dd/mm/aaaa">
+          </ui-datepicker>
         </div>
 
         <div style="display:flex; flex-direction:column; gap:0.25rem;">
           <label style="font-size:0.85rem; font-weight:600;">Data Emissão Fim</label>
-          <p-datepicker
-            [(ngModel)]="historicoFiltros.dataFim"
-            dateFormat="dd/mm/yy"
-            [showIcon]="true"
-            appendTo="body"
-            placeholder="dd/mm/aaaa">
-          </p-datepicker>
+          <ui-datepicker [(ngModel)]="historicoFiltros.dataFim" placeholder="dd/mm/aaaa">
+          </ui-datepicker>
         </div>
 
         <div style="display:flex; gap:0.5rem; align-items:flex-end;">
-          <p-button icon="pi pi-search" label="Filtrar" (onClick)="filtrarHistorico()" [loading]="historicoLoading"></p-button>
-          <p-button icon="pi pi-times" label="Limpar" severity="secondary" [outlined]="true" (onClick)="limparHistoricoFiltros()"></p-button>
+          <ui-button icon="ic ic-search" label="Filtrar" (onClick)="filtrarHistorico()" [loading]="historicoLoading"></ui-button>
+          <ui-button icon="ic ic-times" label="Limpar" severity="secondary" [outlined]="true" (onClick)="limparHistoricoFiltros()"></ui-button>
         </div>
 
       </div>
-    </p-panel>
+    </ui-panel>
 
-    <p-table
-      [value]="historicoCompras"
-      [loading]="historicoLoading"
-      styleClass="p-datatable-sm"
-      [scrollable]="true"
-      scrollHeight="340px">
+    <ui-table [value]="historicoCompras" [loading]="historicoLoading" styleClass="ui-table--compacta" [scrollable]="true" scrollHeight="340px">
 
-      <ng-template pTemplate="header">
+      <ng-template #header>
         <tr>
           <th scope="col" style="width:80px">NF-e</th>
           <th scope="col" style="width:60px">Série</th>
@@ -146,20 +112,20 @@
         </tr>
       </ng-template>
 
-      <ng-template pTemplate="body" let-compra>
+      <ng-template #body let-compra>
         <tr>
           <td>{{ compra.numero_nfe || '—' }}</td>
           <td>{{ compra.serie || '—' }}</td>
           <td>{{ compra.data_emissao ? (compra.data_emissao | date:'dd/MM/yyyy') : '—' }}</td>
           <td>{{ compra.data_entrada ? (compra.data_entrada | date:'dd/MM/yyyy') : '—' }}</td>
           <td>
-            <p-tag [value]="compra.status_label" [severity]="compra.status_severity"></p-tag>
+            <ui-tag [value]="compra.status_label" [severity]="compra.status_severity"></ui-tag>
           </td>
           <td style="text-align:right">{{ compra.valor_total | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
         </tr>
       </ng-template>
 
-      <ng-template pTemplate="emptymessage">
+      <ng-template #emptymessage>
         <tr>
           <td colspan="6" class="text-center p-4">
             @if (!historicoLoading) {
@@ -169,21 +135,14 @@
         </tr>
       </ng-template>
 
-    </p-table>
+    </ui-table>
 
-    <p-paginator
-      [rows]="historicoLimite"
-      [totalRecords]="historicoTotal"
-      [first]="(historicoPagina - 1) * historicoLimite"
-      [rowsPerPageOptions]="[10, 25, 50]"
-      (onPageChange)="onHistoricoPageChange($event)"
-      styleClass="mt-2">
-    </p-paginator>
+    <ui-paginator [rows]="historicoLimite" [totalRecords]="historicoTotal" [first]="(historicoPagina - 1) * historicoLimite" [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="onHistoricoPageChange($event)" styleClass="mt-2">
+    </ui-paginator>
 
-    <ng-template pTemplate="footer">
-      <p-button label="Fechar" icon="pi pi-times" severity="secondary"
-        (onClick)="showHistorico = false">
-      </p-button>
-    </ng-template>
-  </p-dialog>
+    <div rodape class="dialogo-rodape">
+      <ui-button label="Fechar" icon="ic ic-times" severity="secondary" (onClick)="showHistorico = false">
+      </ui-button>
+    </div>
+  </ui-dialog>
 </section>

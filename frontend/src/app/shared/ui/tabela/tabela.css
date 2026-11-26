@@ -1,0 +1,91 @@
+.ui-table {
+  display: block;
+  min-width: 0;
+}
+
+.ui-table__legenda {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ui-table__rolagem {
+  position: relative;
+  overflow-x: auto;
+}
+
+.ui-table__rolagem--fixa {
+  overflow-y: auto;
+}
+
+.ui-table__rolagem--fixa thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.ui-table__tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.ui-table__tabela th,
+.ui-table__tabela td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.ui-table__tabela thead th {
+  background: var(--surface-50);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ui-table__tabela tfoot td,
+.ui-table__tabela tfoot th {
+  background: var(--surface-50);
+  font-weight: 700;
+}
+
+.ui-table--hover .ui-table__tabela tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+.ui-table__ordenavel {
+  cursor: pointer;
+  user-select: none;
+}
+
+.ui-table__ordenavel:hover {
+  color: var(--text-color);
+}
+
+.ui-table__ordenavel:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: -2px;
+}
+
+.ui-table__ordenavel[aria-sort='ascending'],
+.ui-table__ordenavel[aria-sort='descending'] {
+  color: var(--primary-color);
+}
+
+.ui-table__carregando {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 6rem;
+  background: color-mix(in srgb, var(--surface-0) 65%, transparent);
+}
+
+.ui-table__paginador {
+  border-top: 1px solid var(--border-color);
+}

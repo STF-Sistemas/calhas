@@ -1,11 +1,4 @@
-<p-dialog
-  [(visible)]="visible"
-  [modal]="true"
-  header="Medidas do Desenho"
-  [style]="{ width: '920px' }"
-  [draggable]="false"
-  [resizable]="false"
-  appendTo="body">
+<ui-dialog [(visible)]="visible" header="Medidas do Desenho" [estilo]="{ width: '920px' }">
 
   @if (desenho) {
     <div style="border-radius:6px; overflow:hidden; border:1px solid #2a2a2a; margin-bottom:1rem;">
@@ -41,12 +34,7 @@
             Segmento {{ seg + 1 }}
             @if (coberto) { <span style="font-size:0.7rem; color:#888;">(coberto)</span> }
           </label>
-          <input pInputText appCurrencyMask
-            [ngModel]="medidas[seg]"
-            (ngModelChange)="onMedidaChange(seg, $event)"
-            [disabled]="coberto"
-            class="w-full"
-            placeholder="0,00" />
+          <input appCurrencyMask [ngModel]="medidas[seg]" (ngModelChange)="onMedidaChange(seg, $event)" [disabled]="coberto" class="w-full" placeholder="0,00" />
         </div>
       }
     </div>
@@ -54,7 +42,7 @@
     @if (segmentosDiagonaisInfo.length > 0) {
       <div style="border-top:1px solid var(--surface-200); padding-top:0.75rem; margin-bottom:1rem;">
         <p style="font-size:0.8rem; font-weight:600; margin:0 0 0.75rem; color: var(--text-color);">
-          <i class="pi pi-arrows-alt mr-1"></i>Diagonais
+          <i class="ic ic-arrows-alt mr-1"></i>Diagonais
           <span style="font-size:0.75rem; font-weight:400; color:var(--text-color-secondary); margin-left:0.5rem;">
             (o maior valor entre as duas pontas será usado no total)
           </span>
@@ -70,10 +58,7 @@
                           [style.background]="medidas[info.p1Idx] > 0 ? '#22c55e' : '#ef4444'">P1</span>
                     Ponta 1
                   </label>
-                  <input pInputText appCurrencyMask
-                    [ngModel]="medidas[info.p1Idx]"
-                    (ngModelChange)="onMedidaChange(info.p1Idx, $event)"
-                    class="w-full" placeholder="0,00" />
+                  <input appCurrencyMask [ngModel]="medidas[info.p1Idx]" (ngModelChange)="onMedidaChange(info.p1Idx, $event)" class="w-full" placeholder="0,00" />
                 </div>
                 <div style="display:flex; flex-direction:column; gap:0.25rem; flex:1; min-width:100px;">
                   <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.3rem;">
@@ -81,10 +66,7 @@
                           [style.background]="medidas[info.p2Idx] > 0 ? '#22c55e' : '#ef4444'">P2</span>
                     Ponta 2
                   </label>
-                  <input pInputText appCurrencyMask
-                    [ngModel]="medidas[info.p2Idx]"
-                    (ngModelChange)="onMedidaChange(info.p2Idx, $event)"
-                    class="w-full" placeholder="0,00" />
+                  <input appCurrencyMask [ngModel]="medidas[info.p2Idx]" (ngModelChange)="onMedidaChange(info.p2Idx, $event)" class="w-full" placeholder="0,00" />
                 </div>
               </div>
               @let maior = medidas[info.p1Idx] > medidas[info.p2Idx] ? medidas[info.p1Idx] : medidas[info.p2Idx];
@@ -98,9 +80,9 @@
     }
 
     <div style="display:flex; justify-content:flex-end; gap:0.5rem; border-top:1px solid var(--surface-200); padding-top:1rem;">
-      <p-button label="Cancelar" icon="pi pi-times" severity="secondary" [text]="true" (onClick)="visible = false"></p-button>
-      <p-button label="Confirmar Medidas" icon="pi pi-check" severity="primary" (onClick)="confirmar()"></p-button>
+      <ui-button label="Cancelar" icon="ic ic-times" severity="secondary" [text]="true" (onClick)="visible = false"></ui-button>
+      <ui-button label="Confirmar Medidas" icon="ic ic-check" severity="primary" (onClick)="confirmar()"></ui-button>
     </div>
   }
 
-</p-dialog>
+</ui-dialog>

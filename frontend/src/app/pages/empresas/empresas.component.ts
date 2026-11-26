@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TagModule } from 'primeng/tag';
 import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
 import { EmpresaForm } from './empresa-form/empresa-form.component';
 import { EmpresaService } from '#core/services/empresa.service';
 import { IEmpresa } from '#shared/interfaces';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
+import { Tag } from '#ui';
 
 @Component({
   selector: 'app-empresas',
@@ -15,7 +15,7 @@ import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.s
     CommonModule,
     DataTable,
     EmpresaForm,
-    TagModule,
+    Tag,
   ],
   templateUrl: './empresas.component.html',
   styleUrls: ['./empresas.component.css'],

@@ -10,24 +10,19 @@
   (save)="onSave()"
   (show)="onDialogShow()">
 
-  <form [formGroup]="form" class="p-fluid mb-3">
+  <form [formGroup]="form" class="mb-3">
     <div class="field">
       <label for="descricao">Descrição *</label>
-      <input pInputText id="descricao" formControlName="descricao" placeholder="Ex: Calha Meia Cana 20cm" />
+      <input id="descricao" formControlName="descricao" placeholder="Ex: Calha Meia Cana 20cm" />
       @if (form.get('descricao')?.invalid && form.get('descricao')?.touched) {
-        <small class="p-error">Descrição é obrigatória.</small>
+        <small class="texto-erro">Descrição é obrigatória.</small>
       }
     </div>
   </form>
 
   <div class="mobile-canvas-btn">
-    <p-button
-      label="Desenhar"
-      icon="pi pi-pencil"
-      severity="primary"
-      styleClass="w-full"
-      (onClick)="abrirCanvasMobile()">
-    </p-button>
+    <ui-button label="Desenhar" icon="ic ic-pencil" severity="primary" styleClass="w-full" (onClick)="abrirCanvasMobile()">
+    </ui-button>
     @if (pontos.length > 0) {
       <small class="text-500 text-center">{{ pontos.length }} ponto{{ pontos.length !== 1 ? 's' : '' }} no desenho</small>
     } @else {
@@ -38,7 +33,7 @@
   <div class="desktop-canvas">
     <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; flex-wrap:wrap;">
       <span class="text-600 text-sm">
-        <i class="pi pi-info-circle mr-1"></i>
+        <i class="ic ic-info-circle mr-1"></i>
         @if (!modoInserir) {
           Clique no canvas para adicionar pontos e formar o perfil do corte.
         } @else if (diagonalStep === 0) {
@@ -48,40 +43,16 @@
         }
       </span>
       <div style="margin-left:auto; display:flex; gap:0.4rem; flex-wrap:wrap;">
-        <p-button
-          [label]="modoInserir ? 'Modo: Diagonal' : 'Inserir Diagonal'"
-          icon="pi pi-arrows-alt"
-          [severity]="modoInserir ? 'warn' : 'secondary'"
-          [outlined]="true"
-          size="small"
-          [disabled]="pontos.length < 2"
-          (onClick)="toggleModoInserir()"
-          pTooltip="Insere 2 pontos sobre um segmento criando uma linha diagonal">
-        </p-button>
-        <p-button
-          label="Desfazer"
-          icon="pi pi-undo"
-          severity="secondary"
-          [text]="true"
-          size="small"
-          [disabled]="pontos.length === 0 && diagonalStep === 0"
-          (onClick)="undo()"
-          pTooltip="Remove o último ponto (ou cancela P1 pendente)">
-        </p-button>
-        <p-button
-          label="Limpar"
-          icon="pi pi-trash"
-          severity="danger"
-          [text]="true"
-          size="small"
-          [disabled]="pontos.length === 0"
-          (onClick)="clear()"
-          pTooltip="Apaga o desenho inteiro">
-        </p-button>
+        <ui-button [label]="modoInserir ? 'Modo: Diagonal' : 'Inserir Diagonal'" icon="ic ic-arrows-alt" [severity]="modoInserir ? 'warn' : 'secondary'" [outlined]="true" size="small" [disabled]="pontos.length < 2" (onClick)="toggleModoInserir()" dica="Insere 2 pontos sobre um segmento criando uma linha diagonal">
+        </ui-button>
+        <ui-button label="Desfazer" icon="ic ic-undo" severity="secondary" [text]="true" size="small" [disabled]="pontos.length === 0 && diagonalStep === 0" (onClick)="undo()" dica="Remove o último ponto (ou cancela P1 pendente)">
+        </ui-button>
+        <ui-button label="Limpar" icon="ic ic-trash" severity="danger" [text]="true" size="small" [disabled]="pontos.length === 0" (onClick)="clear()" dica="Apaga o desenho inteiro">
+        </ui-button>
       </div>
     </div>
 
-    <div style="position:relative; width:100%; border-radius:6px; overflow:hidden; border: 1px solid var(--p-content-border-color);">
+    <div style="position:relative; width:100%; border-radius:6px; overflow:hidden; border: 1px solid var(--border-color);">
       <canvas
         #canvas
         [style.cursor]="cursorStyle"
@@ -98,25 +69,14 @@
     <div style="margin-top:0.4rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.25rem;">
       <small class="text-400">{{ pontos.length }} ponto{{ pontos.length !== 1 ? 's' : '' }} adicionado{{ pontos.length !== 1 ? 's' : '' }}</small>
       @if (pontos.length < 2) {
-        <small class="p-error">Adicione ao menos 2 pontos para salvar.</small>
+        <small class="texto-erro">Adicione ao menos 2 pontos para salvar.</small>
       }
     </div>
   </div>
 
 </app-dialog-wrapper>
 
-<p-dialog
-  [(visible)]="canvasMobileAberto"
-  [modal]="true"
-  appendTo="body"
-  [showHeader]="false"
-  [closable]="false"
-  [style]="{ width: '100vw', height: '100dvh', margin: '0', 'border-radius': '0' }"
-  [contentStyle]="{ padding: '0', display: 'flex', 'flex-direction': 'column', height: '100%', overflow: 'hidden' }"
-  styleClass="mobile-canvas-dialog"
-  [draggable]="false"
-  [resizable]="false"
-  (onShow)="onMobileDialogShow()">
+<ui-dialog [(visible)]="canvasMobileAberto" [showHeader]="false" [closable]="false" [estilo]="{ width: '100vw', height: '100dvh', margin: '0', 'border-radius': '0' }" [contentStyle]="{ padding: '0', display: 'flex', 'flex-direction': 'column', height: '100%', overflow: 'hidden' }" styleClass="mobile-canvas-dialog" (onShow)="onMobileDialogShow()">
 
   <div class="mobile-canvas-info">
     @if (!modoInserir) {
@@ -144,40 +104,15 @@
   <div class="mobile-canvas-toolbar">
     <span class="toolbar-points">{{ pontos.length }} pt{{ pontos.length !== 1 ? 's' : '' }}</span>
     <div class="toolbar-actions">
-      <p-button
-        [label]="modoInserir ? 'Diagonal ativo' : 'Diagonal'"
-        icon="pi pi-arrows-alt"
-        [severity]="modoInserir ? 'warn' : 'secondary'"
-        [outlined]="true"
-        size="small"
-        [disabled]="pontos.length < 2"
-        (onClick)="toggleModoInserir()">
-      </p-button>
-      <p-button
-        label="Desfazer"
-        icon="pi pi-undo"
-        severity="secondary"
-        [outlined]="true"
-        size="small"
-        [disabled]="pontos.length === 0 && diagonalStep === 0"
-        (onClick)="undo()">
-      </p-button>
-      <p-button
-        label="Salvar"
-        icon="pi pi-check"
-        severity="success"
-        size="small"
-        (onClick)="salvarCanvasMobile()">
-      </p-button>
-      <p-button
-        label="Fechar"
-        icon="pi pi-times"
-        severity="danger"
-        [outlined]="true"
-        size="small"
-        (onClick)="fecharCanvasMobile()">
-      </p-button>
+      <ui-button [label]="modoInserir ? 'Diagonal ativo' : 'Diagonal'" icon="ic ic-arrows-alt" [severity]="modoInserir ? 'warn' : 'secondary'" [outlined]="true" size="small" [disabled]="pontos.length < 2" (onClick)="toggleModoInserir()">
+      </ui-button>
+      <ui-button label="Desfazer" icon="ic ic-undo" severity="secondary" [outlined]="true" size="small" [disabled]="pontos.length === 0 && diagonalStep === 0" (onClick)="undo()">
+      </ui-button>
+      <ui-button label="Salvar" icon="ic ic-check" severity="success" size="small" (onClick)="salvarCanvasMobile()">
+      </ui-button>
+      <ui-button label="Fechar" icon="ic ic-times" severity="danger" [outlined]="true" size="small" (onClick)="fecharCanvasMobile()">
+      </ui-button>
     </div>
   </div>
 
-</p-dialog>
+</ui-dialog>

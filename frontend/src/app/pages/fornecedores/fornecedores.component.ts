@@ -2,15 +2,6 @@ import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
-import { PanelModule } from 'primeng/panel';
-import { SelectModule } from 'primeng/select';
-import { PaginatorModule } from 'primeng/paginator';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { DialogModule } from 'primeng/dialog';
-import { TableModule } from 'primeng/table';
-import { DatePickerModule } from 'primeng/datepicker';
-import { TagModule } from 'primeng/tag';
 import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
 import { FornecedorForm } from './fornecedor-form/fornecedor-form.component';
 import { FornecedorService } from '#core/services/fornecedor.service';
@@ -19,6 +10,7 @@ import { IFornecedor, ICompra } from '#shared/interfaces';
 import { EStatusCompra } from '#shared/enums';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
+import { Botao, Select, Dialogo, CampoData, Tag, Painel, Paginador, Tabela } from '#ui';
 
 @Component({
   selector: 'app-fornecedores',
@@ -28,15 +20,14 @@ import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.s
     FormsModule,
     DataTable,
     FornecedorForm,
-    PanelModule,
-    SelectModule,
-    PaginatorModule,
-    ButtonModule,
-    InputTextModule,
-    DialogModule,
-    TableModule,
-    DatePickerModule,
-    TagModule,
+    Botao,
+    Select,
+    Dialogo,
+    CampoData,
+    Tag,
+    Painel,
+    Paginador,
+    Tabela,
   ],
   templateUrl: './fornecedores.component.html',
   styleUrls: ['./fornecedores.component.css'],

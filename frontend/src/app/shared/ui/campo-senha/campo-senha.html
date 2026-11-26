@@ -1,0 +1,24 @@
+<div class="ui-senha" [class.ui-senha--alternavel]="toggleMask()">
+  <input
+    class="ui-campo"
+    [class]="inputStyleClass()"
+    [type]="visivel() ? 'text' : 'password'"
+    [id]="inputId() || null"
+    [value]="texto()"
+    [disabled]="desabilitado()"
+    [attr.placeholder]="placeholder() || null"
+    [attr.autocomplete]="autocomplete()"
+    [attr.aria-label]="ariaLabel() || null"
+    (input)="aoDigitar($event)"
+    (blur)="aoTocar()" />
+  @if (toggleMask()) {
+    <button
+      type="button"
+      class="ui-senha__alternar"
+      [attr.aria-label]="visivel() ? 'Ocultar senha' : 'Mostrar senha'"
+      [attr.aria-pressed]="visivel()"
+      (click)="visivel.set(!visivel())">
+      <i class="ic" [class.ic-eye-slash]="visivel()" [class.ic-eye]="!visivel()" aria-hidden="true"></i>
+    </button>
+  }
+</div>

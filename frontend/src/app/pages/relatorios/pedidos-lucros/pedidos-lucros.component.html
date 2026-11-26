@@ -4,16 +4,13 @@
   [isLoading]="isLoading">
 
   <div filtros>
-    <p-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
+    <ui-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
       <form [formGroup]="form" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:1rem; align-items:flex-end;">
 
         <div style="display:flex; flex-direction:column; gap:0.25rem;">
           <label style="font-size:0.85rem; font-weight:600;">Data Início <span style="color:var(--red-500)">*</span></label>
-          <p-datepicker formControlName="data_inicio" dateFormat="dd/mm/yy"
-            [showIcon]="true" appendTo="body" placeholder="dd/mm/aaaa"
-            [class.ng-invalid]="form.get('data_inicio')?.invalid && form.get('data_inicio')?.touched"
-            [class.ng-dirty]="form.get('data_inicio')?.touched">
-          </p-datepicker>
+          <ui-datepicker formControlName="data_inicio" placeholder="dd/mm/aaaa" [class.ng-invalid]="form.get('data_inicio')?.invalid && form.get('data_inicio')?.touched" [class.ng-dirty]="form.get('data_inicio')?.touched">
+          </ui-datepicker>
           @if (form.get('data_inicio')?.invalid && form.get('data_inicio')?.touched) {
             <small style="color:var(--red-500)">Obrigatório.</small>
           }
@@ -21,11 +18,8 @@
 
         <div style="display:flex; flex-direction:column; gap:0.25rem;">
           <label style="font-size:0.85rem; font-weight:600;">Data Fim <span style="color:var(--red-500)">*</span></label>
-          <p-datepicker formControlName="data_fim" dateFormat="dd/mm/yy"
-            [showIcon]="true" appendTo="body" placeholder="dd/mm/aaaa"
-            [class.ng-invalid]="form.get('data_fim')?.invalid && form.get('data_fim')?.touched"
-            [class.ng-dirty]="form.get('data_fim')?.touched">
-          </p-datepicker>
+          <ui-datepicker formControlName="data_fim" placeholder="dd/mm/aaaa" [class.ng-invalid]="form.get('data_fim')?.invalid && form.get('data_fim')?.touched" [class.ng-dirty]="form.get('data_fim')?.touched">
+          </ui-datepicker>
           @if (form.get('data_fim')?.invalid && form.get('data_fim')?.touched) {
             <small style="color:var(--red-500)">Obrigatório.</small>
           }
@@ -33,39 +27,23 @@
 
         <div style="display:flex; flex-direction:column; gap:0.25rem; min-width:0;">
           <label style="font-size:0.85rem; font-weight:600;">Cliente</label>
-          <p-select
-            formControlName="cod_cliente"
-            [options]="clienteOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Todos os clientes"
-            [filter]="true"
-            [showClear]="true"
-            appendTo="body">
-          </p-select>
+          <ui-select formControlName="cod_cliente" [options]="clienteOptions" optionLabel="label" optionValue="value" placeholder="Todos os clientes" [filter]="true" [showClear]="true">
+          </ui-select>
         </div>
 
         <div style="display:flex; flex-direction:column; gap:0.25rem; min-width:0;">
           <label style="font-size:0.85rem; font-weight:600;">Produto</label>
-          <p-select
-            formControlName="cod_produto"
-            [options]="produtoOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Todos os produtos"
-            [filter]="true"
-            [showClear]="true"
-            appendTo="body">
-          </p-select>
+          <ui-select formControlName="cod_produto" [options]="produtoOptions" optionLabel="label" optionValue="value" placeholder="Todos os produtos" [filter]="true" [showClear]="true">
+          </ui-select>
         </div>
 
         <div style="display:flex; gap:0.5rem; align-items:flex-end;">
-          <p-button icon="pi pi-search" label="Gerar" (onClick)="gerar()" [loading]="isLoading"></p-button>
-          <p-button icon="pi pi-times" label="Limpar" severity="secondary" [outlined]="true" (onClick)="limpar()"></p-button>
+          <ui-button icon="ic ic-search" label="Gerar" (onClick)="gerar()" [loading]="isLoading"></ui-button>
+          <ui-button icon="ic ic-times" label="Limpar" severity="secondary" [outlined]="true" (onClick)="limpar()"></ui-button>
         </div>
 
       </form>
-    </p-panel>
+    </ui-panel>
   </div>
 
   @if (relatorio) {
@@ -86,7 +64,7 @@
   }
 
   @if (erro) {
-    <p-message severity="error" styleClass="w-full mt-2">{{ erro }}</p-message>
+    <ui-message severity="error" styleClass="w-full mt-2">{{ erro }}</ui-message>
   }
 
   @if (relatorio) {
@@ -121,8 +99,8 @@
           <div class="pedido-header">
             <div class="pedido-id">Pedido #{{ pedido.id }}</div>
             <div class="pedido-info">
-              <span><i class="pi pi-calendar"></i> {{ pedido.data_pedido | date:'dd/MM/yyyy' }}</span>
-              <span><i class="pi pi-user"></i> {{ pedido.cliente.razao_social }}</span>
+              <span><i class="ic ic-calendar"></i> {{ pedido.data_pedido | date:'dd/MM/yyyy' }}</span>
+              <span><i class="ic ic-user"></i> {{ pedido.cliente.razao_social }}</span>
             </div>
             <div class="pedido-resumo">
               <span class="resumo-item">Venda: <strong>{{ pedido.valor_total | number:'1.2-2' }}</strong></span>
@@ -133,8 +111,8 @@
           </div>
 
           <div class="tabela-scroll">
-          <p-table [value]="pedido.itens" styleClass="p-datatable-sm p-datatable-gridlines">
-            <ng-template pTemplate="header">
+          <ui-table [value]="pedido.itens" styleClass="ui-table--compacta ui-table--grade">
+            <ng-template #header>
               <tr>
                 <th class="col-desc">Descrição</th>
                 <th class="col-qtd">Qtd</th>
@@ -146,7 +124,7 @@
                 <th class="col-num">Margem</th>
               </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-item>
+            <ng-template #body let-item>
               <tr>
                 <td class="col-desc">{{ item.descricao }}</td>
                 <td class="col-qtd">{{ item.quantidade | number:'1.2-4' }}</td>
@@ -160,7 +138,7 @@
                 <td class="col-num">{{ margem(item.lucro, item.valor_total) | number:'1.1-1' }}%</td>
               </tr>
             </ng-template>
-            <ng-template pTemplate="footer">
+            <ng-template #footer>
               <tr class="footer-totais">
                 <td><strong>Total do Pedido</strong></td>
                 <td></td>
@@ -174,7 +152,7 @@
                 <td class="col-num"><strong>{{ margem(pedido.lucro, pedido.valor_total) | number:'1.1-1' }}%</strong></td>
               </tr>
             </ng-template>
-          </p-table>
+          </ui-table>
           </div>
 
         </div>

@@ -1,0 +1,3 @@
+.ui-campo-host > input[type='date'] {
+  min-width: 0;
+}

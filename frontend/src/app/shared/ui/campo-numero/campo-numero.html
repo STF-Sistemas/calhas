@@ -1,0 +1,19 @@
+<div class="ui-numero" [class]="styleClass()">
+  <input
+    type="number"
+    class="ui-campo"
+    [attr.inputmode]="maxFractionDigits() > 0 ? 'decimal' : 'numeric'"
+    [id]="inputId() || null"
+    [value]="texto()"
+    [min]="min() ?? null"
+    [max]="max() ?? null"
+    [step]="passo()"
+    [disabled]="desabilitado()"
+    [attr.placeholder]="placeholder() || null"
+    [attr.aria-label]="ariaLabel() || null"
+    (input)="aoDigitar($event)"
+    (blur)="aoTocar($event)" />
+  @if (suffix()) {
+    <span class="ui-numero__sufixo" aria-hidden="true">{{ suffix() }}</span>
+  }
+</div>

@@ -8,25 +8,22 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { MessageModule } from 'primeng/message';
-import { TooltipModule } from 'primeng/tooltip';
 import { PagamentoService } from '#core/services/pagamento.service';
 import { AuthService } from '#core/services/auth.service';
 import { ThemeService } from '#core/services/theme.service';
 import { IPagamentoPix } from '#shared/interfaces';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Botao, Dica, Mensagem, Spinner } from '#ui';
 
 @Component({
   selector: 'app-pagamento',
   standalone: true,
   imports: [
     CommonModule,
-    ButtonModule,
-    ProgressSpinnerModule,
-    MessageModule,
-    TooltipModule,
+    Botao,
+    Dica,
+    Mensagem,
+    Spinner,
   ],
   templateUrl: './pagamento.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

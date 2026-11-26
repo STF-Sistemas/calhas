@@ -8,19 +8,19 @@
   position="top"
   (save)="onSave()">
 
-  <form [formGroup]="form" class="p-fluid" appEnterNext>
+  <form [formGroup]="form" appEnterNext>
 
     <h3 class="section-title">
-      <i class="pi pi-th-large"></i>
+      <i class="ic ic-th-large"></i>
       Dados da Chapa
     </h3>
 
     <div class="row">
       <div class="field col-12">
         <label for="descricao">Descrição da Chapa *</label>
-        <input pInputText id="descricao" formControlName="descricao" placeholder="Ex: Chapa Galvalume 0,43mm" />
+        <input id="descricao" formControlName="descricao" placeholder="Ex: Chapa Galvalume 0,43mm" />
         @if (form.get('descricao')?.invalid && form.get('descricao')?.touched) {
-          <small class="p-error">Descrição é obrigatória.</small>
+          <small class="texto-erro">Descrição é obrigatória.</small>
         }
       </div>
     </div>
@@ -28,21 +28,14 @@
   </form>
 
   <h3 class="section-title mt-2">
-    <i class="pi pi-list"></i>
+    <i class="ic ic-list"></i>
     Cortes desta Chapa
-    <p-button
-      label="Adicionar Corte"
-      icon="pi pi-plus"
-      [text]="true"
-      severity="primary"
-      size="small"
-      (onClick)="adicionarCorte()"
-      [style]="{'margin-left': 'auto'}">
-    </p-button>
+    <ui-button label="Adicionar Corte" icon="ic ic-plus" [text]="true" severity="primary" size="small" (onClick)="adicionarCorte()" [style]="{'margin-left': 'auto'}">
+    </ui-button>
   </h3>
 
-  <p-table [value]="cortesVisiveis" styleClass="p-datatable-sm">
-    <ng-template pTemplate="header">
+  <ui-table [value]="cortesVisiveis" styleClass="ui-table--compacta">
+    <ng-template #header>
       <tr>
         <th>Descrição *</th>
         <th style="width: 8rem">Corte (cm)</th>
@@ -50,36 +43,30 @@
         <th style="width: 4rem"></th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-corte>
+    <ng-template #body let-corte>
       <tr>
         <td>
-          <input pInputText [(ngModel)]="corte.descricao" class="p-inputtext-sm w-full" placeholder="Descrição do corte" />
+          <input [(ngModel)]="corte.descricao" class="ui-campo--pequeno w-full" placeholder="Descrição do corte" />
         </td>
         <td>
-          <input pInputText appCurrencyMask [(ngModel)]="corte.corte" class="w-full" />
+          <input appCurrencyMask [(ngModel)]="corte.corte" class="w-full" />
         </td>
         <td>
-          <input pInputText appCurrencyMask [(ngModel)]="corte.valor" class="w-full" />
+          <input appCurrencyMask [(ngModel)]="corte.valor" class="w-full" />
         </td>
         <td class="text-center">
-          <p-button
-            icon="pi pi-trash"
-            severity="danger"
-            [text]="true"
-            [rounded]="true"
-            (onClick)="removerCorte(corte)"
-            aria-label="Remover corte">
-          </p-button>
+          <ui-button icon="ic ic-trash" severity="danger" [text]="true" [rounded]="true" (onClick)="removerCorte(corte)" aria-label="Remover corte">
+          </ui-button>
         </td>
       </tr>
     </ng-template>
-    <ng-template pTemplate="emptymessage">
+    <ng-template #emptymessage>
       <tr>
         <td colspan="4" class="text-center p-3 text-600">
           Nenhum corte cadastrado.
         </td>
       </tr>
     </ng-template>
-  </p-table>
+  </ui-table>
 
 </app-dialog-wrapper>

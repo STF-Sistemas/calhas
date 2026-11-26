@@ -1,14 +1,16 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { Botao, Dialogo, Spinner } from '#ui';
 
 @Component({
   selector: 'app-dialog-wrapper',
   standalone: true,
-  imports: [CommonModule, DialogModule, ButtonModule, TooltipModule, ProgressSpinnerModule],
+  imports: [
+    CommonModule,
+    Botao,
+    Dialogo,
+    Spinner,
+  ],
   templateUrl: './dialog-wrapper.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./dialog-wrapper.component.css'],

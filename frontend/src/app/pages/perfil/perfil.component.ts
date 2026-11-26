@@ -3,17 +3,13 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { AvatarModule } from 'primeng/avatar';
-import { ToggleSwitch } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
 import { environment } from '#environments/environment';
 import { TApiResponse } from '#shared/types';
 import { IUsuario } from '#shared/interfaces';
 import { PushNotificacaoService } from '#core/services/push-notificacao.service';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Botao, Avatar, Cartao } from '#ui';
 
 @Component({
   selector: 'app-perfil',
@@ -22,11 +18,9 @@ import { ToastService } from '#shared-frontend/services/toast.service';
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    InputTextModule,
-    ButtonModule,
-    CardModule,
-    AvatarModule,
-    ToggleSwitch,
+    Botao,
+    Avatar,
+    Cartao,
   ],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './perfil.component.html',

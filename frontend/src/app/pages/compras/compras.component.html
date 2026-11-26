@@ -7,7 +7,7 @@
     [loading]="loading"
     addButtonLabel="Nova Compra"
     [showExtraButton]="true"
-    extraButtonIcon="pi pi-sync"
+    extraButtonIcon="ic ic-sync"
     extraButtonTooltip="Atualizar custo dos produtos com esta nota"
     extraButtonSeverity="info"
     [rowActions]="rowActions"
@@ -20,12 +20,7 @@
 
   <app-compra-form #form (saved)="carregar()"></app-compra-form>
 
-  <p-dialog
-    [(visible)]="showCancelDialog"
-    [modal]="true"
-    [closable]="!isSavingStatus"
-    header="Cancelar Compra"
-    [style]="{ width: '480px' }">
+  <ui-dialog [(visible)]="showCancelDialog" [closable]="!isSavingStatus" header="Cancelar Compra" [estilo]="{ width: '480px' }">
 
     <div class="cancel-dialog-body">
       <p class="cancel-msg">
@@ -37,44 +32,23 @@
         }.
       </p>
       <p class="cancel-aviso">
-        <i class="pi pi-info-circle"></i>
+        <i class="ic ic-info-circle"></i>
         O estoque dos produtos será revertido após a confirmação.
       </p>
       <div class="field">
         <label for="motivo_cancelamento">Motivo <span class="required">*</span></label>
-        <textarea
-          pInputTextarea
-          id="motivo_cancelamento"
-          [(ngModel)]="motivoCancelamento"
-          [rows]="3"
-          [maxlength]="500"
-          class="w-full"
-          placeholder="Descreva o motivo do cancelamento..."
-          aria-label="Motivo do cancelamento">
+        <textarea id="motivo_cancelamento" [(ngModel)]="motivoCancelamento" [rows]="3" [maxlength]="500" class="w-full" placeholder="Descreva o motivo do cancelamento..." aria-label="Motivo do cancelamento">
         </textarea>
         <small class="char-count">{{ motivoCancelamento.length }}/500</small>
       </div>
     </div>
 
-    <ng-template pTemplate="footer">
-      <p-button
-        label="Voltar"
-        icon="pi pi-arrow-left"
-        severity="secondary"
-        [text]="true"
-        [disabled]="isSavingStatus"
-        (onClick)="showCancelDialog = false"
-        aria-label="Fechar dialog de cancelamento">
-      </p-button>
-      <p-button
-        label="Confirmar Cancelamento"
-        icon="pi pi-ban"
-        severity="danger"
-        [loading]="isSavingStatus"
-        (onClick)="onConfirmarCancelamento()"
-        aria-label="Confirmar cancelamento da compra">
-      </p-button>
-    </ng-template>
-  </p-dialog>
+    <div rodape class="dialogo-rodape">
+      <ui-button label="Voltar" icon="ic ic-arrow-left" severity="secondary" [text]="true" [disabled]="isSavingStatus" (onClick)="showCancelDialog = false" aria-label="Fechar dialog de cancelamento">
+      </ui-button>
+      <ui-button label="Confirmar Cancelamento" icon="ic ic-ban" severity="danger" [loading]="isSavingStatus" (onClick)="onConfirmarCancelamento()" aria-label="Confirmar cancelamento da compra">
+      </ui-button>
+    </div>
+  </ui-dialog>
 
 </main>

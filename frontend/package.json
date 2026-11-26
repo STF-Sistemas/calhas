@@ -6,13 +6,12 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "icones": "node scripts/gerar-icones.mjs"
   },
   "private": true,
   "packageManager": "npm@10.5.1",
   "dependencies": {
-    "@angular/animations": "^22.3.0",
-    "@angular/cdk": "^22.3.0",
     "@angular/common": "^22.3.0",
     "@angular/compiler": "^22.3.0",
     "@angular/core": "^22.3.0",
@@ -23,22 +22,20 @@
     "@angular/service-worker": "^22.3.0",
     "@angular/ssr": "^22.3.0",
     "@fontsource-variable/inter": "^5.3.0",
-    "@primeuix/themes": "^3.1.1",
     "ngx-mask": "^22.3.2",
-    "primeicons": "^7.0.0",
-    "primeng": "^22.1.5",
     "rxjs": "~7.8.0",
-    "signature_pad": "^5.1.4",
-    "tslib": "^2.3.0",
-    "zone.js": "^0.16.1"
+    "signature_pad": "^5.1.7",
+    "tslib": "^2.9.1",
+    "zone.js": "^0.16.3"
   },
   "devDependencies": {
     "@angular/build": "^22.3.0",
     "@angular/cli": "^22.3.0",
     "@angular/compiler-cli": "^22.3.0",
+    "@material-symbols/svg-400": "^0.49.0",
     "@resvg/resvg-js": "^2.6.2",
-    "@types/node": "^22.12.0",
-    "prettier": "^3.8.1",
+    "@types/node": "^24.19.4",
+    "prettier": "^3.10.1",
     "typescript": "~6.0.3"
   }
 }

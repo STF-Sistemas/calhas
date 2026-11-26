@@ -3,7 +3,7 @@
     @if (preview) {
       <img [src]="preview" alt="Pré-visualização do logo da empresa" width="160" height="90">
     } @else {
-      <i class="pi pi-image" aria-hidden="true"></i>
+      <i class="ic ic-image" aria-hidden="true"></i>
       <span>Sem logo</span>
     }
   </div>
@@ -13,35 +13,17 @@
       (change)="aoSelecionarArquivo($event)" aria-label="Selecionar arquivo de logo da empresa">
 
     <div class="logo-botoes">
-      <p-button
-        type="button"
-        [label]="preview ? 'Trocar Logo' : 'Selecionar Logo'"
-        icon="pi pi-upload"
-        severity="secondary"
-        [outlined]="true"
-        size="small"
-        [disabled]="disabled"
-        (onClick)="abrirSeletor()"
-        aria-label="Selecionar arquivo de logo da empresa">
-      </p-button>
+      <ui-button type="button" [label]="preview ? 'Trocar Logo' : 'Selecionar Logo'" icon="ic ic-upload" severity="secondary" [outlined]="true" size="small" [disabled]="disabled" (onClick)="abrirSeletor()" aria-label="Selecionar arquivo de logo da empresa">
+      </ui-button>
       @if (preview) {
-        <p-button
-          type="button"
-          label="Remover"
-          icon="pi pi-trash"
-          severity="danger"
-          [outlined]="true"
-          size="small"
-          [disabled]="disabled"
-          (onClick)="remover()"
-          aria-label="Remover logo da empresa">
-        </p-button>
+        <ui-button type="button" label="Remover" icon="ic ic-trash" severity="danger" [outlined]="true" size="small" [disabled]="disabled" (onClick)="remover()" aria-label="Remover logo da empresa">
+        </ui-button>
       }
     </div>
 
     <small class="field-hint">PNG ou JPG, máx. 1MB. Aparece no orçamento enviado ao cliente e na impressão.</small>
     @if (erro) {
-      <small class="p-error">{{ erro }}</small>
+      <small class="texto-erro">{{ erro }}</small>
     }
   </div>
 </div>

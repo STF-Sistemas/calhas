@@ -1,0 +1,13 @@
+<input
+  type="date"
+  class="ui-campo"
+  [class]="styleClass()"
+  [id]="inputId() || null"
+  [value]="texto()"
+  [min]="minimo()"
+  [max]="maximo()"
+  [disabled]="desabilitado()"
+  [attr.placeholder]="placeholder() || null"
+  [attr.aria-label]="ariaLabel() || null"
+  (input)="aoDigitar($event)"
+  (blur)="aoTocar()" />

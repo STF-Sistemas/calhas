@@ -30,7 +30,7 @@
 .versao-numero {
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
   font-weight: 700;
-  color: var(--p-primary-color, var(--p-primary));
+  color: var(--primary-color, var(--primary-color));
 }
 
 .versao-data {
@@ -44,8 +44,8 @@
   text-transform: uppercase;
   padding: 0.1rem 0.45rem;
   border-radius: 999px;
-  background: var(--p-primary-color, var(--p-primary));
-  color: var(--p-primary-contrast-color, var(--surface-0));
+  background: var(--primary-color, var(--primary-color));
+  color: var(--primary-color-text, var(--surface-0));
 }
 
 ul {

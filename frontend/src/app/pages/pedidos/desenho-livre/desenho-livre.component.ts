@@ -10,9 +10,6 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { TooltipModule } from 'primeng/tooltip';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
@@ -23,7 +20,7 @@ import {
   segmentosCobertosCorte,
 } from '#shared/functions/desenho-corte.functions';
 import { reconhecerNumero } from '#shared/functions/reconhecer-numero.functions';
-import { SelectButtonModule } from 'primeng/selectbutton';
+import { Botao, Dica, SelecaoBotoes } from '#ui';
 
 export interface IDesenhoLivreResultado {
   index: number;
@@ -45,13 +42,12 @@ interface ISnapshot {
   imports: [
     CommonModule,
     FormsModule,
-    ButtonModule,
-    InputTextModule,
-    TooltipModule,
-    SelectButtonModule,
     DialogWrapper,
     CurrencyMaskDirective,
     EnterFocusNextDirective,
+    Botao,
+    Dica,
+    SelecaoBotoes,
   ],
   templateUrl: './desenho-livre.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -79,8 +75,8 @@ export class DesenhoLivre implements OnDestroy {
 
   modo: 'desenhar' | 'escrever' = 'desenhar';
   readonly modoOpcoes = [
-    { label: 'Desenhar', value: 'desenhar', icon: 'pi pi-pencil' },
-    { label: 'Escrever medida', value: 'escrever', icon: 'pi pi-pen-to-square' },
+    { label: 'Desenhar', value: 'desenhar', icon: 'ic ic-pencil' },
+    { label: 'Escrever medida', value: 'escrever', icon: 'ic ic-pen-to-square' },
   ];
   alvoAtual: string | null = null;
   ultimoReconhecido: { rotulo: string; texto: string } | null = null;
@@ -561,10 +557,10 @@ export class DesenhoLivre implements OnDestroy {
     const fundo = this.cor('--surface-0', '#ffffff');
     const grade = this.cor('--surface-border', '#e5e7eb');
     const texto = this.cor('--text-color', '#1f2937');
-    const primaria = this.cor('--p-primary-color', this.cor('--p-primary', '#3b82f6'));
-    const verde = this.cor('--p-green-500', '#22c55e');
-    const ambar = this.cor('--p-amber-500', '#f59e0b');
-    const transv = this.cor('--p-purple-500', '#a855f7');
+    const primaria = this.cor('--primary-color', '#3b82f6');
+    const verde = this.cor('--cor-sucesso', '#22c55e');
+    const ambar = this.cor('--cor-alerta', '#f59e0b');
+    const transv = this.cor('--cor-ajuda', '#a855f7');
     const neutro = this.cor('--text-color-secondary', '#6b7280');
 
     const destaque = this.foco ?? (this.modo === 'escrever' ? this.alvoAtual : null);

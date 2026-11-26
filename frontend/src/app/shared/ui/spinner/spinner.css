@@ -1,0 +1,14 @@
+.ui-spinner {
+  display: inline-flex;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.ui-spinner__anel {
+  width: 100%;
+  height: 100%;
+  border: 3px solid color-mix(in srgb, var(--primary-color) 20%, transparent);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: ic-girar 0.8s linear infinite;
+}

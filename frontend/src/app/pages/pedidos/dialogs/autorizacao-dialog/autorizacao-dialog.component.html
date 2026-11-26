@@ -8,7 +8,7 @@
 
   @if (pedido) {
     <div class="autorizacao-conteudo">
-      <p-tag [value]="label()" [severity]="severity()" styleClass="autorizacao-tag"></p-tag>
+      <ui-tag [value]="label()" [severity]="severity()" styleClass="autorizacao-tag"></ui-tag>
 
       @if (pedido.aprovacao_status !== EAprovacaoPedido.Pendente) {
         <dl class="autorizacao-info">

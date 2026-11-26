@@ -11,15 +11,12 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-import { DialogModule } from 'primeng/dialog';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { DesenhoService } from '#core/services/desenho.service';
 import { ThemeService } from '#core/services/theme.service';
 import { IDiagonal, IPonto } from '#shared/interfaces';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Botao, Dica, Dialogo } from '#ui';
 
 @Component({
   selector: 'app-desenho-form',
@@ -27,11 +24,10 @@ import { ToastService } from '#shared-frontend/services/toast.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    InputTextModule,
-    ButtonModule,
-    TooltipModule,
-    DialogModule,
     DialogWrapper,
+    Botao,
+    Dica,
+    Dialogo,
   ],
   templateUrl: './desenho-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

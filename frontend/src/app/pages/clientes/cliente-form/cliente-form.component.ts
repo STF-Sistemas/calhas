@@ -2,17 +2,12 @@ import { TecladoNumericoDirective } from '#shared-frontend/directives/teclado-nu
 import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputMaskModule } from 'primeng/inputmask';
-import { ButtonModule } from 'primeng/button';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { TooltipModule } from 'primeng/tooltip';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { ClienteService } from '#core/services/cliente.service';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Dica } from '#ui';
 
 @Component({
   selector: 'app-cliente-form',
@@ -21,15 +16,10 @@ import { ToastService } from '#shared-frontend/services/toast.service';
     TecladoNumericoDirective,
     CommonModule,
     ReactiveFormsModule,
-    InputTextModule,
-    InputMaskModule,
-    ButtonModule,
-    IconFieldModule,
-    InputIconModule,
-    TooltipModule,
     NgxMaskDirective,
     EnterFocusNextDirective,
     DialogWrapper,
+    Dica,
   ],
   providers: [provideNgxMask()],
   templateUrl: './cliente-form.component.html',

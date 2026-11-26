@@ -15,22 +15,24 @@ Todos os componentes devem ser criados com separação total de responsabilidade
 - **Sem comentários no código-fonte** (TS, HTML, CSS, backend e frontend): nada de `//`, `/* */`, JSDoc ou `<!-- -->`. Explicações vão no commit.
 - **Novos arquivos** seguem o padrão do Angular 22: `nome.ts`, `nome.html`, `nome.css` (sem `.component` no nome).
 
-## 2. Uso Mandatório de PrimeNG
-Para garantir uma experiência premium e consistente (Design System):
-- **Componentes de UI:** É OBRIGATÓRIO o uso de componentes do **PrimeNG** para todos os elementos de interface, a menos que o PrimeNG não forneça uma solução nativa.
-    - **Botões:** Usar `p-button`, `p-splitbutton`, `p-speeddial`, etc.
-    - **Formulários:** Usar `pInputText`, `p-select`, `p-checkbox`, `p-datepicker`, `p-inputnumber`, `p-inputmask`.
-    - **Containers:** Usar `p-card`, `p-toolbar`, `p-tabs`, `p-panel`.
-    - **Seletores em minúsculas:** o PrimeNG 22 só reconhece as tags em minúsculas ou com hífen (`p-inputmask`, `p-toggleswitch`, `p-progress-spinner`). Tag em camelCase (`p-inputMask`) não é reconhecida e o campo do formulário quebra com `NG01203: No value accessor`.
-    - **Feedback:** Usar `p-progressspinner`, `p-progressbar`.
-- **Toast e confirmação (PROIBIDO `alert()`, `confirm()`, `MessageService`, `ConfirmationService`, `<p-toast>`, `<p-confirmdialog>`):**
+## 2. Kit de UI próprio (`#ui`), sem bibliotecas de componentes
+O projeto usa só Angular nativo. É PROIBIDO instalar PrimeNG, Angular Material, CDK ou qualquer outra biblioteca de componentes. Toda a interface vem do kit em `src/app/shared/ui`, importado pelo alias `#ui`:
+- **Botões:** `ui-button` (`label`, `icon`, `severity`, `text`, `outlined`, `rounded`, `size`, `loading`, `disabled`, `(onClick)`).
+- **Formulários:** `<input>`, `<textarea>` e `<select>` nativos (o estilo é global), `ui-select` (com `filter`, `#item` e `#selecionado`), `ui-datepicker` (input `date` nativo, valor `Date`), `ui-input-number`, `ui-password`, `ui-selectbutton`. Checkbox e switch são `<input type="checkbox">` nativos (switch com `role="switch"`). Máscara com `NgxMaskDirective` no próprio `<input>`.
+- **Containers:** `ui-card`, `ui-panel`, `ui-tabs`/`ui-tablist`/`ui-tab`/`ui-tabpanels`/`ui-tabpanel`.
+- **Sobreposições:** `ui-dialog` (`<dialog>` nativo com `showModal`; rodapé em `<div rodape class="dialogo-rodape">`), `ui-menu` e `ui-popover` (Popover API em modo manual, ficam acima de diálogos abertos).
+- **Tabelas:** `ui-table` com `#caption`, `#header`, `#body`, `#footer`, `#emptymessage`, `[uiSortableColumn]` e `ui-sorticon`. `ui-paginator` para paginação no servidor.
+- **Feedback:** `ui-spinner`, `ui-tag`, `ui-message`. Dica de botão com a diretiva `dica`.
+- **Ícones:** `<i class="ic ic-nome">`. Os SVGs vêm do Material Symbols e ficam em `src/icones.css`, gerado por `npm run icones`. Ícone novo: adicionar no mapa de `scripts/gerar-icones.mjs` e rodar o script.
+- **Componente novo no kit:** segue a seção 1 (três arquivos), `ViewEncapsulation.None`, classes com prefixo `ui-`, `OnPush`, signals e `ControlValueAccessor` quando for campo.
+- **Toast e confirmação (PROIBIDO `alert()`, `confirm()` e bibliotecas de toast):**
     - Resultado de ação: `ToastService` (`#shared-frontend/services/toast.service`) com `success`, `error`, `info`, `warn`.
     - Confirmação: `await this.confirmDialog.confirm({ title, message, confirmText, danger })` do `ConfirmDialogService`; retorna `Promise<boolean>`.
     - Os dois já estão montados uma vez no `app.html`. Não montar de novo nas páginas.
     - A mensagem é texto puro (sem HTML); use `
 ` para quebrar linha.
     - Erro de validação de campo continua inline, perto do campo.
-- **Acessibilidade:** Utilize sempre os atributos de acessibilidade fornecidos pelo PrimeNG:
+- **Acessibilidade:**
     - Todo botão sem texto visível DEVE ter `aria-label` descritivo.
     - Todo campo de input DEVE ter label associado ou `aria-labelledby`.
     - Inputs DEVEM ter `type` correto: `type="email"`, `type="password"`, `type="number"`.
@@ -39,7 +41,7 @@ Para garantir uma experiência premium e consistente (Design System):
 ## 3. Uso Obrigatório de Wrapper para Modais
 Para manter a consistência visual e funcional de todos os diálogos:
 - **Componente Base:** Todo e qualquer modal deve utilizar o componente `app-dialog-wrapper` (`DialogWrapper`) em seu template HTML.
-- **Estrutura:** Insira o conteúdo específico dentro das tags do wrapper, configurando `title`, `isLoadingData`, `hasFooter` e os eventos de salvamento/fechamento conforme a necessidade. No PrimeNG, isso será integrado com `DynamicDialog` ou `p-dialog`.
+- **Estrutura:** Insira o conteúdo específico dentro das tags do wrapper, configurando `title`, `isLoadingData`, `hasFooter` e os eventos de salvamento/fechamento conforme a necessidade. O wrapper usa o `ui-dialog` por baixo.
 
 ## 4. Localização de Interfaces e Tipos (ver rule `pasta-shared-compartilhada.md`)
 Para garantir a consistência entre Frontend e Backend:
@@ -58,7 +60,7 @@ Para garantir a consistência entre Frontend e Backend:
 ## 5. Uso Obrigatório de Data-Table para Listagens
 Para manter a consistência visual, funcionalidades de filtro e paginação em todas as listagens:
 - **Componente Base:** Toda e qualquer listagem (tabela) deve obrigatoriamente utilizar o componente `app-data-table` (`DataTable`).
-- **Implementação:** É PROIBIDO construir tabelas usando diretamente `p-table` nos componentes de página. Utilize as propriedades `data`, `columns` and `actions` do `app-data-table` para configurar a listagem.
+- **Implementação:** É PROIBIDO construir listagens usando diretamente `ui-table` nos componentes de página (o `ui-table` direto fica para tabelas de itens dentro de formulários e diálogos). Utilize as propriedades `data`, `columns` and `actions` do `app-data-table` para configurar a listagem.
 
 ## 6. Qualidade Lighthouse (obrigatório: ver rule específica)
 Toda tela implementada DEVE satisfazer os critérios da rule `qualidade-lighthouse-performance-seo-acessibilidade.md`:
@@ -105,16 +107,16 @@ Para exibir/ocultar elementos condicionalmente, utilize **sempre a sintaxe de fl
 
 <!-- ✅ Correto: ng-container agrupa sem gerar DOM real -->
 @if (isSaving) {
-  <p-progress-spinner styleClass="w-2rem h-2rem" strokeWidth="4"></p-progress-spinner>
+  <ui-spinner />
 } @else {
   <ng-container>
-    <i class="pi pi-save"></i>
+    <i class="ic ic-save"></i>
     Salvar
   </ng-container>
 }
 
 <!-- ❌ Causa warning NG8011: dois nós raiz no @else -->
 } @else {
-  <i class="pi pi-save"></i>
+  <i class="ic ic-save"></i>
   Salvar
 }

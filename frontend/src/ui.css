@@ -1,0 +1,230 @@
+:root {
+  --cor-sucesso: #16a34a;
+  --cor-info: #0ea5e9;
+  --cor-alerta: #f59e0b;
+  --cor-perigo: #ef4444;
+  --cor-ajuda: #a855f7;
+  --campo-fundo: var(--surface-0);
+  --campo-borda: var(--surface-300);
+}
+
+.app-dark {
+  --cor-sucesso: #22c55e;
+  --cor-info: #38bdf8;
+  --cor-alerta: #fbbf24;
+  --cor-perigo: #f87171;
+  --cor-ajuda: #c084fc;
+  --campo-fundo: var(--surface-0);
+  --campo-borda: var(--surface-200);
+}
+
+.ui-campo-host {
+  display: block;
+  min-width: 0;
+}
+
+.ui-campo,
+input:not([type='checkbox'], [type='radio'], [type='range'], [type='file'], [type='color'], [type='submit'], [type='button'], [type='hidden']),
+textarea,
+select {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--campo-borda);
+  border-radius: 8px;
+  background: var(--campo-fundo);
+  color: var(--text-color);
+  font: inherit;
+  font-size: 0.9rem;
+  color-scheme: light;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.app-dark .ui-campo,
+.app-dark input,
+.app-dark textarea,
+.app-dark select {
+  color-scheme: dark;
+}
+
+textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+.ui-campo::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.ui-campo:hover:not(:disabled, :focus),
+input:hover:not(:disabled, :focus, [type='checkbox'], [type='radio']),
+textarea:hover:not(:disabled, :focus),
+select:hover:not(:disabled, :focus) {
+  border-color: var(--surface-400);
+}
+
+.ui-campo:focus,
+input:focus:not([type='checkbox'], [type='radio']),
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.ui-campo:disabled,
+input:disabled:not([type='checkbox'], [type='radio']),
+textarea:disabled,
+select:disabled {
+  opacity: 0.6;
+  background: var(--surface-100);
+  cursor: not-allowed;
+}
+
+input.ng-invalid.ng-touched:not(form),
+textarea.ng-invalid.ng-touched,
+.ng-invalid.ng-touched > .ui-campo,
+.ng-invalid.ng-touched .ui-senha > .ui-campo,
+.ng-invalid.ng-touched .ui-numero > .ui-campo {
+  border-color: var(--cor-perigo);
+}
+
+input[type='checkbox'] {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+input[type='checkbox'][role='switch'] {
+  appearance: none;
+  position: relative;
+  width: 2.75rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: var(--surface-300);
+  transition: background-color 0.2s;
+}
+
+input[type='checkbox'][role='switch']::after {
+  content: '';
+  position: absolute;
+  top: 0.2rem;
+  left: 0.2rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+  transition: transform 0.2s;
+}
+
+input[type='checkbox'][role='switch']:checked {
+  background: var(--primary-color);
+}
+
+input[type='checkbox'][role='switch']:checked::after {
+  transform: translateX(1.25rem);
+}
+
+input[type='checkbox']:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+input[type='checkbox']:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ui-iconfield {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.ui-iconfield > .ic {
+  position: absolute;
+  top: 50%;
+  left: 0.75rem;
+  color: var(--text-secondary);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.ui-iconfield > input {
+  padding-left: 2.25rem;
+}
+
+@media (pointer: coarse) {
+  .ui-campo,
+  input:not([type='checkbox'], [type='radio'], [type='range'], [type='file'], [type='color']),
+  select {
+    min-height: 2.75rem;
+  }
+
+  input[type='checkbox']:not([role='switch']) {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .ui-campo,
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+.texto-erro {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--cor-perigo);
+  font-size: 0.8rem;
+}
+
+.ui-table--compacta .ui-table__tabela th,
+.ui-table--compacta .ui-table__tabela td {
+  padding: 0.45rem 0.6rem;
+}
+
+.ui-table--grade .ui-table__tabela th,
+.ui-table--grade .ui-table__tabela td {
+  border: 1px solid var(--border-color);
+}
+
+.ui-campo--pequeno {
+  min-height: 2rem;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+.botao-limpo {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ui-flutuante {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--surface-0);
+  color: var(--text-color);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 16%), 0 2px 6px rgb(0 0 0 / 8%);
+}

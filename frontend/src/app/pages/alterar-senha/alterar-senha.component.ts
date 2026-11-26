@@ -9,13 +9,11 @@ import {
 } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { PasswordModule } from 'primeng/password';
 import { environment } from '#environments/environment';
 import { TApiResponse } from '#shared/types';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { AuthService } from '#core/services/auth.service';
+import { Botao, CampoSenha, Cartao } from '#ui';
 
 function senhasIguaisValidator(g: AbstractControl) {
   const nova = g.get('nova_senha')?.value;
@@ -29,9 +27,9 @@ function senhasIguaisValidator(g: AbstractControl) {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    ButtonModule,
-    CardModule,
-    PasswordModule,
+    Botao,
+    CampoSenha,
+    Cartao,
   ],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './alterar-senha.component.html',

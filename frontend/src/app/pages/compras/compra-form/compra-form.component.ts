@@ -9,14 +9,7 @@ import {
 } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
-import { TableModule } from 'primeng/table';
-import { DatePickerModule } from 'primeng/datepicker';
-import { TooltipModule } from 'primeng/tooltip';
-import { SelectModule } from 'primeng/select';
-import { DialogModule } from 'primeng/dialog';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CompraService } from '#core/services/compra.service';
@@ -29,6 +22,7 @@ import { ICompra, IFornecedor, IProduto } from '#shared/interfaces';
 import { EStatusCompra } from '#shared/enums';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Botao, Dica, Dialogo, CampoData, Tabela } from '#ui';
 
 @Component({
   selector: 'app-compra-form',
@@ -38,20 +32,18 @@ import { ToastService } from '#shared-frontend/services/toast.service';
     CommonModule,
     DecimalPipe,
     ReactiveFormsModule,
-    InputTextModule,
-    ButtonModule,
     CurrencyMaskDirective,
-    TableModule,
-    DatePickerModule,
-    TooltipModule,
-    SelectModule,
-    DialogModule,
     NgxMaskDirective,
     EnterFocusNextDirective,
     DialogWrapper,
     FornecedorLookupDialog,
     ProdutoLookupDialog,
     ProdutoForm,
+    Botao,
+    Dica,
+    Dialogo,
+    CampoData,
+    Tabela,
   ],
   providers: [provideNgxMask()],
   templateUrl: './compra-form.component.html',

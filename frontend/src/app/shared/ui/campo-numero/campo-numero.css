@@ -1,0 +1,18 @@
+.ui-numero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.ui-numero__sufixo {
+  position: absolute;
+  right: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+.ui-numero:has(.ui-numero__sufixo) > .ui-campo {
+  padding-right: 2rem;
+}

@@ -1,0 +1,39 @@
+.ui-message {
+  --cor: var(--cor-info);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--cor) 35%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--cor) 10%, transparent);
+  color: var(--text-color);
+  font-size: 0.875rem;
+}
+
+.ui-message > .ic {
+  margin-top: 0.1rem;
+  color: var(--cor);
+  font-size: 1.05rem;
+}
+
+.ui-message--success {
+  --cor: var(--cor-sucesso);
+}
+
+.ui-message--warn {
+  --cor: var(--cor-alerta);
+}
+
+.ui-message--error {
+  --cor: var(--cor-perigo);
+}
+
+.ui-message--secondary {
+  --cor: var(--surface-500);
+}
+
+.ui-message__texto {
+  flex: 1;
+  min-width: 0;
+}

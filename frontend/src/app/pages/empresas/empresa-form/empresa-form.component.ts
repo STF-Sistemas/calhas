@@ -2,16 +2,6 @@ import { TecladoNumericoDirective } from '#shared-frontend/directives/teclado-nu
 import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputMaskModule } from 'primeng/inputmask';
-import { DatePickerModule } from 'primeng/datepicker';
-import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
-import { Textarea } from 'primeng/textarea';
-import { TagModule } from 'primeng/tag';
-import { CheckboxModule } from 'primeng/checkbox';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { NgxMaskDirective } from 'ngx-mask';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { LogoUploader } from '#shared-frontend/components/logo-uploader/logo-uploader.component';
@@ -23,6 +13,7 @@ import { HttpClient } from '@angular/common/http';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { environment } from '#environments/environment';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Botao, Dica, CampoData, CampoNumero, Tag, Abas, ListaAbas, Aba, PaineisAbas, PainelAba } from '#ui';
 
 @Component({
   selector: 'app-empresa-form',
@@ -31,25 +22,21 @@ import { ToastService } from '#shared-frontend/services/toast.service';
     TecladoNumericoDirective,
     CommonModule,
     ReactiveFormsModule,
-    InputTextModule,
-    InputMaskModule,
-    DatePickerModule,
-    ButtonModule,
-    TooltipModule,
-    Tabs,
-    TabList,
-    Tab,
-    TabPanels,
-    TabPanel,
-    Textarea,
-    TagModule,
-    CheckboxModule,
-    InputNumberModule,
     NgxMaskDirective,
     CurrencyMaskDirective,
     EnterFocusNextDirective,
     DialogWrapper,
     LogoUploader,
+    Botao,
+    Dica,
+    CampoData,
+    CampoNumero,
+    Tag,
+    Abas,
+    ListaAbas,
+    Aba,
+    PaineisAbas,
+    PainelAba,
   ],
   templateUrl: './empresa-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

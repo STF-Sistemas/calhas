@@ -2,8 +2,6 @@ import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
-import { DialogModule } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
 import {
   DataTable,
   IRowAction,
@@ -15,6 +13,7 @@ import { ICompra } from '#shared/interfaces';
 import { EStatusCompra } from '#shared/enums';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
+import { Botao, Dialogo } from '#ui';
 
 @Component({
   selector: 'app-compras',
@@ -24,8 +23,8 @@ import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.s
     FormsModule,
     DataTable,
     CompraForm,
-    DialogModule,
-    ButtonModule,
+    Botao,
+    Dialogo,
   ],
   templateUrl: './compras.component.html',
   styleUrls: ['./compras.component.css'],
@@ -53,7 +52,7 @@ export class Compras implements OnInit {
   rowActions: IRowAction[] = [
     {
       key: 'danfe',
-      icon: 'pi pi-file-pdf',
+      icon: 'ic ic-file-pdf',
       tooltip: 'Imprimir DANFE',
       ariaLabel: 'Imprimir DANFE da nota fiscal',
       severity: 'info',
@@ -61,7 +60,7 @@ export class Compras implements OnInit {
     },
     {
       key: 'confirmar',
-      icon: 'pi pi-check-circle',
+      icon: 'ic ic-check-circle',
       tooltip: 'Confirmar compra',
       ariaLabel: 'Confirmar compra e atualizar estoque',
       severity: 'success',
@@ -69,7 +68,7 @@ export class Compras implements OnInit {
     },
     {
       key: 'cancelar',
-      icon: 'pi pi-ban',
+      icon: 'ic ic-ban',
       tooltip: 'Cancelar compra',
       ariaLabel: 'Cancelar compra confirmada',
       severity: 'danger',

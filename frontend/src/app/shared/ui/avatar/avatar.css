@@ -1,0 +1,15 @@
+.ui-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--primary-color) 15%, transparent);
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.ui-avatar--circle {
+  border-radius: 50%;
+}

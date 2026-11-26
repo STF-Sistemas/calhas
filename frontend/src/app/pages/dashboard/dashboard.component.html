@@ -11,20 +11,14 @@
       <p class="dashboard-subtitle">Aqui está o resumo da sua operação hoje.</p>
     </div>
     <div class="dashboard-header-actions">
-      <p-button
-        label="Novo Pedido"
-        icon="pi pi-plus"
-        routerLink="/pedidos"
-        [queryParams]="{ novo: 1 }"
-        aria-label="Criar novo pedido"
-        styleClass="p-button-primary dashboard-new-btn">
-      </p-button>
+      <ui-button label="Novo Pedido" icon="ic ic-plus" routerLink="/pedidos" [queryParams]="{ novo: 1 }" aria-label="Criar novo pedido" styleClass=" dashboard-new-btn">
+      </ui-button>
     </div>
   </div>
 
   @if (loading) {
     <div style="display:flex; justify-content:center; padding: 4rem;">
-      <i class="pi pi-spin pi-spinner" style="font-size:2rem;"></i>
+      <i class="ic ic-spin ic-spinner" style="font-size:2rem;"></i>
     </div>
   } @else {
 
@@ -32,11 +26,11 @@
       <div class="stat-card stat-card--blue">
         <div class="stat-card__header">
           <span class="stat-card__label">Pedidos do Mês</span>
-          <div class="stat-card__icon-wrap"><i class="pi pi-shopping-bag"></i></div>
+          <div class="stat-card__icon-wrap"><i class="ic ic-shopping-bag"></i></div>
         </div>
         <div class="stat-card__value">{{ stats?.pedidosMes ?? 0 }}</div>
         <div class="stat-card__detail">
-          <i class="pi pi-calendar"></i>
+          <i class="ic ic-calendar"></i>
           Mês atual
         </div>
       </div>
@@ -44,11 +38,11 @@
       <div class="stat-card stat-card--green">
         <div class="stat-card__header">
           <span class="stat-card__label">Receita do Mês</span>
-          <div class="stat-card__icon-wrap"><i class="pi pi-dollar"></i></div>
+          <div class="stat-card__icon-wrap"><i class="ic ic-dollar"></i></div>
         </div>
         <div class="stat-card__value">{{ formatCurrency(stats?.receitaMes ?? 0) }}</div>
         <div class="stat-card__detail">
-          <i class="pi pi-arrow-up"></i>
+          <i class="ic ic-arrow-up"></i>
           Faturamento mês atual
         </div>
       </div>
@@ -56,11 +50,11 @@
       <div class="stat-card stat-card--purple">
         <div class="stat-card__header">
           <span class="stat-card__label">Clientes Ativos</span>
-          <div class="stat-card__icon-wrap"><i class="pi pi-users"></i></div>
+          <div class="stat-card__icon-wrap"><i class="ic ic-users"></i></div>
         </div>
         <div class="stat-card__value">{{ stats?.clientesAtivos ?? 0 }}</div>
         <div class="stat-card__detail">
-          <i class="pi pi-user"></i>
+          <i class="ic ic-user"></i>
           Total de clientes
         </div>
       </div>
@@ -68,11 +62,11 @@
       <div class="stat-card stat-card--orange">
         <div class="stat-card__header">
           <span class="stat-card__label">Pedidos em Aberto</span>
-          <div class="stat-card__icon-wrap"><i class="pi pi-clock"></i></div>
+          <div class="stat-card__icon-wrap"><i class="ic ic-clock"></i></div>
         </div>
         <div class="stat-card__value">{{ stats?.pedidosAbertos ?? 0 }}</div>
         <div class="stat-card__detail">
-          <i class="pi pi-info-circle"></i>
+          <i class="ic ic-info-circle"></i>
           Aguardando produção
         </div>
       </div>
@@ -99,46 +93,46 @@
       <div class="content-grid__aside">
         <div class="panel">
           <h2 class="panel__title">
-            <i class="pi pi-bolt"></i>
+            <i class="ic ic-bolt"></i>
             Atalhos Rápidos
           </h2>
           <div class="quick-actions">
             <a class="quick-action" routerLink="/pedidos" aria-label="Criar novo pedido">
               <div class="quick-action__icon quick-action__icon--primary">
-                <i class="pi pi-shopping-cart"></i>
+                <i class="ic ic-shopping-cart"></i>
               </div>
               <div class="quick-action__content">
                 <span class="quick-action__label">Novo Pedido</span>
                 <span class="quick-action__desc">Registrar venda</span>
               </div>
-              <i class="pi pi-chevron-right quick-action__arrow"></i>
+              <i class="ic ic-chevron-right quick-action__arrow"></i>
             </a>
             <a class="quick-action" routerLink="/clientes" aria-label="Cadastrar novo cliente">
               <div class="quick-action__icon quick-action__icon--success">
-                <i class="pi pi-user-plus"></i>
+                <i class="ic ic-user-plus"></i>
               </div>
               <div class="quick-action__content">
                 <span class="quick-action__label">Novo Cliente</span>
                 <span class="quick-action__desc">Cadastrar cliente</span>
               </div>
-              <i class="pi pi-chevron-right quick-action__arrow"></i>
+              <i class="ic ic-chevron-right quick-action__arrow"></i>
             </a>
             <a class="quick-action" routerLink="/produtos" aria-label="Cadastrar produto">
               <div class="quick-action__icon quick-action__icon--warning">
-                <i class="pi pi-box"></i>
+                <i class="ic ic-box"></i>
               </div>
               <div class="quick-action__content">
                 <span class="quick-action__label">Novo Produto</span>
                 <span class="quick-action__desc">Adicionar ao catálogo</span>
               </div>
-              <i class="pi pi-chevron-right quick-action__arrow"></i>
+              <i class="ic ic-chevron-right quick-action__arrow"></i>
             </a>
           </div>
         </div>
 
         <div class="panel">
           <h2 class="panel__title">
-            <i class="pi pi-chart-bar"></i>
+            <i class="ic ic-chart-bar"></i>
             Status dos Pedidos
           </h2>
           <div class="status-list">

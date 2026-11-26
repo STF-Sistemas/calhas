@@ -1,0 +1,31 @@
+.ui-senha {
+  position: relative;
+  width: 100%;
+}
+
+.ui-senha--alternavel > .ui-campo {
+  padding-right: 2.75rem;
+}
+
+.ui-senha__alternar {
+  position: absolute;
+  top: 50%;
+  right: 0.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.ui-senha__alternar:hover {
+  background: var(--surface-hover);
+  color: var(--text-color);
+}

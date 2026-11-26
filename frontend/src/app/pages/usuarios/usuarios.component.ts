@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TagModule } from 'primeng/tag';
 import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
 import { UsuarioForm } from './usuario-form/usuario-form.component';
 import { UsuarioService } from '#core/services/usuario.service';
@@ -15,7 +14,6 @@ import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.s
     CommonModule,
     DataTable,
     UsuarioForm,
-    TagModule,
   ],
   templateUrl: './usuarios.component.html',
   styleUrls: ['./usuarios.component.css'],

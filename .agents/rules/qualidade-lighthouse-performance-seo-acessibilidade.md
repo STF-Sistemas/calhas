@@ -20,12 +20,12 @@ Todas as telas e componentes desenvolvidos neste projeto DEVEM atender os seguin
 Todo elemento interativo e de conteúdo DEVE satisfazer as diretrizes WCAG 2.1 AA:
 
 ### 1.1 Atributos Obrigatórios
-- **`aria-label`**: Todo `<button>`, `<a>`, componentes interativos do PrimeNG (como `p-button`, `p-speeddial`) e elemento interativo sem texto visível DEVE ter `aria-label` descritivo.
+- **`aria-label`**: Todo `<button>`, `<a>`, componente interativo do kit `#ui` (como `ui-button`) e elemento interativo sem texto visível DEVE ter `aria-label` descritivo.
   ```html
   <!-- ✅ Correto -->
-  <button pButton icon="pi pi-times" aria-label="Fechar diálogo"></button>
+  <ui-button icon="ic ic-times" aria-label="Fechar diálogo" />
   <!-- ❌ Errado -->
-  <button pButton icon="pi pi-times"></button>
+  <ui-button icon="ic ic-times" />
   ```
 - **`alt`**: Todo `<img>` DEVE ter atributo `alt` descritivo (nunca vazio, a não ser que seja decorativa e não transmita informação).
 - **`id` único**: Todo campo de formulário DEVE ter `id` único na página.
@@ -39,12 +39,12 @@ Todo elemento interativo e de conteúdo DEVE satisfazer as diretrizes WCAG 2.1 A
 ### 1.3 Contraste de Cores
 - A razão de contraste entre texto e fundo DEVE ser **≥ 4.5:1** para texto normal e **≥ 3:1** para texto grande (≥ 18px bold ou ≥ 24px normal).
 - Nunca use cinza claro sobre branco, ou texto amarelo sobre fundo claro.
-- Verifique sempre usando a paleta de cores do tema PrimeNG configurado.
+- Verifique sempre usando as variáveis de cor do tema (`styles.css` e `ui.css`), nos modos claro e escuro.
 
 ### 1.4 Foco e Navegação por Teclado
 - Todos os elementos interativos DEVEM ser acessíveis via `Tab`.
 - Nunca remova o outline de foco com `outline: none` sem substituir por uma alternativa visual clara.
-- Modais DEVEM capturar o foco ao abrir (os diálogos do PrimeNG fazem isso automaticamente).
+- Modais DEVEM capturar o foco ao abrir (o `ui-dialog` usa `<dialog>` com `showModal`, que faz isso nativamente).
 
 ### 1.5 Atributos de Formulário
 - Campos de senha DEVEM ter `type="password"`.

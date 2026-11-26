@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { ServicoService } from '#core/services/servico.service';
@@ -14,7 +13,6 @@ import { ToastService } from '#shared-frontend/services/toast.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    InputTextModule,
     CurrencyMaskDirective,
     EnterFocusNextDirective,
     DialogWrapper,

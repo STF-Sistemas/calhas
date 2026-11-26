@@ -2,14 +2,14 @@
 
   @if (estado === 'carregando') {
     <div class="estado-mensagem">
-      <i class="pi pi-spin pi-spinner" style="font-size:2rem; color:var(--primary-color)"></i>
+      <i class="ic ic-spin ic-spinner" style="font-size:2rem; color:var(--primary-color)"></i>
       <p>Carregando ordem de corte...</p>
     </div>
   }
 
   @if (estado === 'expirado') {
     <div class="estado-mensagem estado-erro">
-      <i class="pi pi-clock" style="font-size:2.5rem; color:var(--orange-500)"></i>
+      <i class="ic ic-clock" style="font-size:2.5rem; color:var(--orange-500)"></i>
       <h2>Link de acesso expirado</h2>
       <p>O prazo de validade deste link foi encerrado.<br>Solicite um novo link à empresa.</p>
     </div>
@@ -17,7 +17,7 @@
 
   @if (estado === 'cancelado') {
     <div class="estado-mensagem estado-erro">
-      <i class="pi pi-times-circle" style="font-size:2.5rem; color:var(--red-500)"></i>
+      <i class="ic ic-times-circle" style="font-size:2.5rem; color:var(--red-500)"></i>
       <h2>Pedido cancelado</h2>
       <p>Este pedido foi cancelado e não está mais disponível.</p>
     </div>
@@ -25,7 +25,7 @@
 
   @if (estado === 'invalido') {
     <div class="estado-mensagem estado-erro">
-      <i class="pi pi-ban" style="font-size:2.5rem; color:var(--red-500)"></i>
+      <i class="ic ic-ban" style="font-size:2.5rem; color:var(--red-500)"></i>
       <h2>Link inválido</h2>
       <p>O link acessado não existe ou não possui itens disponíveis para envio.</p>
     </div>
@@ -55,10 +55,10 @@
               <p class="razao-social">{{ pedido.empresa.razao_social }}</p>
             }
             @if (pedido.empresa.telefone) {
-              <p><i class="pi pi-phone"></i> {{ formatTelefone(pedido.empresa.telefone) }}</p>
+              <p><i class="ic ic-phone"></i> {{ formatTelefone(pedido.empresa.telefone) }}</p>
             }
             @if (pedido.empresa.email) {
-              <p><i class="pi pi-envelope"></i> {{ pedido.empresa.email }}</p>
+              <p><i class="ic ic-envelope"></i> {{ pedido.empresa.email }}</p>
             }
           </div>
         </div>

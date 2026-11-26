@@ -3,12 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
 import { ThemeService } from '#core/services/theme.service';
 import { environment } from '#environments/environment';
 import { TApiResponse } from '#shared/types';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Botao } from '#ui';
 
 @Component({
   selector: 'app-esqueci-senha',
@@ -17,8 +16,7 @@ import { ToastService } from '#shared-frontend/services/toast.service';
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
-    ButtonModule,
-    InputTextModule,
+    Botao,
   ],
   templateUrl: './esqueci-senha.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

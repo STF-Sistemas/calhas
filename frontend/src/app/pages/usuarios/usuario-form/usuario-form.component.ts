@@ -1,10 +1,6 @@
 import { Component, EventEmitter, Output, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { PasswordModule } from 'primeng/password';
-import { SelectModule } from 'primeng/select';
-import { CheckboxModule } from 'primeng/checkbox';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { UsuarioService } from '#core/services/usuario.service';
 import { EmpresaService } from '#core/services/empresa.service';
@@ -13,6 +9,7 @@ import { IEmpresa } from '#shared/interfaces';
 import { EStatusGeral } from '#shared/enums';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Select, CampoSenha } from '#ui';
 
 @Component({
   selector: 'app-usuario-form',
@@ -20,12 +17,10 @@ import { ToastService } from '#shared-frontend/services/toast.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    InputTextModule,
-    PasswordModule,
-    SelectModule,
-    CheckboxModule,
     EnterFocusNextDirective,
     DialogWrapper,
+    Select,
+    CampoSenha,
   ],
   templateUrl: './usuario-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

@@ -1,13 +1,16 @@
 import { Component, Input, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { IEmpresa } from '#shared/interfaces';
+import { Botao, Spinner } from '#ui';
 
 @Component({
   selector: 'app-relatorio-wrapper',
   standalone: true,
-  imports: [CommonModule, ButtonModule, ProgressSpinnerModule],
+  imports: [
+    CommonModule,
+    Botao,
+    Spinner,
+  ],
   templateUrl: './relatorio-wrapper.component.html',
   styleUrls: ['./relatorio-wrapper.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,

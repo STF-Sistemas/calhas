@@ -1,0 +1,45 @@
+.ui-menu {
+  min-width: 12rem;
+  padding: 0.3rem;
+}
+
+.ui-menu:not(:popover-open) {
+  display: none;
+}
+
+.ui-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-color);
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ui-menu__item:hover:not(:disabled),
+.ui-menu__item:focus-visible {
+  outline: none;
+  background: var(--surface-hover);
+}
+
+.ui-menu__item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ui-menu__rotulo {
+  color: var(--text-color);
+}
+
+.ui-menu__separador {
+  margin: 0.3rem 0;
+  border: 0;
+  border-top: 1px solid var(--border-color);
+}

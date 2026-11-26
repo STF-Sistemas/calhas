@@ -1,13 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { DatePickerModule } from 'primeng/datepicker';
-import { SelectModule } from 'primeng/select';
-import { TableModule } from 'primeng/table';
-import { TooltipModule } from 'primeng/tooltip';
-import { MessageModule } from 'primeng/message';
-import { PanelModule } from 'primeng/panel';
 import { RelatorioWrapper } from 'src/app/shared/components/relatorio-wrapper/relatorio-wrapper.component';
 import { RelatorioService } from 'src/app/core/services/relatorio.service';
 import { ClienteService } from 'src/app/core/services/cliente.service';
@@ -15,6 +8,7 @@ import { ProdutoService } from 'src/app/core/services/produto.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { EmpresaService } from 'src/app/core/services/empresa.service';
 import { IRelatorioPedidosLucros, IEmpresa } from '#shared/interfaces';
+import { Botao, Select, CampoData, Mensagem, Painel, Tabela } from '#ui';
 
 @Component({
   selector: 'app-pedidos-lucros',
@@ -22,14 +16,13 @@ import { IRelatorioPedidosLucros, IEmpresa } from '#shared/interfaces';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    ButtonModule,
-    DatePickerModule,
-    SelectModule,
-    TableModule,
-    TooltipModule,
-    MessageModule,
-    PanelModule,
     RelatorioWrapper,
+    Botao,
+    Select,
+    CampoData,
+    Mensagem,
+    Painel,
+    Tabela,
   ],
   templateUrl: './pedidos-lucros.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

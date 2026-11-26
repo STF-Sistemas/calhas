@@ -27,7 +27,7 @@ h1 {
   font-size: 0.875rem;
   color: var(--orange-600, #ea580c);
 }
-.cancel-aviso .pi {
+.cancel-aviso .ic {
   margin-top: 0.1rem;
   flex-shrink: 0;
 }

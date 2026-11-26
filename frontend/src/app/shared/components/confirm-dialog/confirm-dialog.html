@@ -1,24 +1,31 @@
-@if (confirmacao.aberto(); as dados) {
-  <div class="fundo" (click)="confirmacao.responder(false)"></div>
-  <div class="caixa" role="alertdialog" aria-modal="true" aria-labelledby="confirm-titulo" aria-describedby="confirm-texto">
-    <div class="caixa__icone" [class.caixa__icone--perigo]="dados.danger" aria-hidden="true">
-      <i [class]="dados.danger ? 'pi pi-exclamation-triangle' : 'pi pi-question-circle'"></i>
+<dialog
+  #dialogo
+  class="caixa"
+  role="alertdialog"
+  aria-labelledby="confirm-titulo"
+  aria-describedby="confirm-texto"
+  (cancel)="aoCancelar($event)"
+  (click)="aoClicar($event)">
+  @if (confirmacao.aberto(); as dados) {
+    <div class="caixa__corpo">
+      <div class="caixa__icone" [class.caixa__icone--perigo]="dados.danger" aria-hidden="true">
+        <i [class]="dados.danger ? 'ic ic-exclamation-triangle' : 'ic ic-question-circle'"></i>
+      </div>
+      <h2 id="confirm-titulo">{{ dados.title }}</h2>
+      <p id="confirm-texto">{{ dados.message }}</p>
+      <div class="caixa__acoes">
+        <button type="button" class="botao botao--secundario" (click)="confirmacao.responder(false)">
+          {{ dados.cancelText }}
+        </button>
+        <button
+          #botaoConfirmar
+          type="button"
+          class="botao"
+          [class.botao--perigo]="dados.danger"
+          (click)="confirmacao.responder(true)">
+          {{ dados.confirmText }}
+        </button>
+      </div>
     </div>
-    <h2 id="confirm-titulo">{{ dados.title }}</h2>
-    <p id="confirm-texto">{{ dados.message }}</p>
-    <div class="caixa__acoes">
-      <button type="button" class="botao botao--secundario" (click)="confirmacao.responder(false)">
-        {{ dados.cancelText }}
-      </button>
-      <button
-        #botaoConfirmar
-        type="button"
-        class="botao"
-        [class.botao--perigo]="dados.danger"
-        (click)="confirmacao.responder(true)"
-      >
-        {{ dados.confirmText }}
-      </button>
-    </div>
-  </div>
-}
+  }
+</dialog>

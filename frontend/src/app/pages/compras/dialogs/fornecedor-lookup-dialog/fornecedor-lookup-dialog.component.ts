@@ -1,15 +1,12 @@
 import { Component, EventEmitter, Output, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
 import { FornecedorService } from '#core/services/fornecedor.service';
 import { FornecedorForm } from '../../../fornecedores/fornecedor-form/fornecedor-form.component';
 import { IFornecedor } from '#shared/interfaces';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { normalizarBusca } from '#shared-frontend/busca/normalizar-busca';
+import { Botao, Dialogo, Tabela } from '#ui';
 
 @Component({
   selector: 'app-fornecedor-lookup-dialog',
@@ -17,11 +14,10 @@ import { normalizarBusca } from '#shared-frontend/busca/normalizar-busca';
   imports: [
     CommonModule,
     FormsModule,
-    ButtonModule,
-    TableModule,
-    DialogModule,
-    InputTextModule,
     FornecedorForm,
+    Botao,
+    Dialogo,
+    Tabela,
   ],
   templateUrl: './fornecedor-lookup-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

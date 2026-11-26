@@ -212,20 +212,20 @@
   width: 100%;
 }
 
-p-datepicker.w-full {
+ui-datepicker.w-full {
   display: flex;
   width: 100%;
 }
 
-p-select.w-full {
+ui-select.w-full {
   display: block;
   width: 100%;
 }
 
-::ng-deep .compra-form p-datepicker .p-datepicker-input {
-  background: var(--p-inputtext-background, var(--surface-0));
-  color: var(--p-inputtext-color, var(--text-color));
-  border: 1px solid var(--p-inputtext-border-color, var(--surface-border));
+::ng-deep .compra-form ui-datepicker .ui-campo {
+  background: var(--campo-fundo, var(--surface-0));
+  color: var(--text-color, var(--text-color));
+  border: 1px solid var(--campo-borda, var(--surface-border));
   flex: 1 1 0%;
   min-width: 0;
 }
@@ -354,7 +354,7 @@ p-select.w-full {
   gap: 0.4rem;
   align-items: flex-start;
 }
-.help-custo__obs .pi {
+.help-custo__obs .ic {
   margin-top: 0.1rem;
   flex-shrink: 0;
 }

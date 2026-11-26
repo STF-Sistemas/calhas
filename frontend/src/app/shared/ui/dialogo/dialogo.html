@@ -1,0 +1,34 @@
+<dialog
+  #dialogo
+  [class]="classes()"
+  [style]="estilo()"
+  [attr.aria-label]="header() || null"
+  (cancel)="aoCancelar($event)"
+  (close)="aoFechar()">
+  @if (showHeader()) {
+    <header class="ui-dialog__cabecalho">
+      <h2 class="ui-dialog__titulo">{{ header() }}</h2>
+      <ng-content select="[cabecalho]" />
+      <div class="ui-dialog__acoes">
+        @if (maximizable()) {
+          <button
+            type="button"
+            class="ui-dialog__acao ui-dialog__maximizar"
+            [attr.aria-label]="maximizado() ? 'Restaurar tamanho' : 'Maximizar'"
+            (click)="maximizado.set(!maximizado())">
+            <i class="ic" [class.ic-window-minimize]="maximizado()" [class.ic-window-maximize]="!maximizado()" aria-hidden="true"></i>
+          </button>
+        }
+        @if (closable()) {
+          <button type="button" class="ui-dialog__acao" aria-label="Fechar" (click)="fechar()">
+            <i class="ic ic-times" aria-hidden="true"></i>
+          </button>
+        }
+      </div>
+    </header>
+  }
+  <div class="ui-dialog__conteudo" [style]="contentStyle()">
+    <ng-content />
+  </div>
+  <div class="ui-dialog__rodape"><ng-content select="[rodape]" /></div>
+</dialog>

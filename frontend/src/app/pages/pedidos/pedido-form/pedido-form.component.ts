@@ -8,14 +8,6 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { SelectButtonModule } from 'primeng/selectbutton';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { DatePickerModule } from 'primeng/datepicker';
-import { TooltipModule } from 'primeng/tooltip';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { DesenhoMedida } from '../desenho-medida/desenho-medida.component';
@@ -46,6 +38,7 @@ import { ThemeService } from '#core/services/theme.service';
 import { IPonto } from '#shared/interfaces';
 import { calcularValorDesconto, calcularValorLiquido } from '#shared/functions/desconto.functions';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Botao, Dica, Select, CampoData, CampoNumero, SelecaoBotoes, Tabela } from '#ui';
 
 @Component({
   selector: 'app-pedido-form',
@@ -53,19 +46,18 @@ import { ToastService } from '#shared-frontend/services/toast.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    InputTextModule,
-    SelectModule,
-    SelectButtonModule,
-    InputNumberModule,
-    ButtonModule,
-    TableModule,
-    DatePickerModule,
-    TooltipModule,
     CurrencyMaskDirective,
     EnterFocusNextDirective,
     DialogWrapper,
     DesenhoMedida,
     DesenhoLivre,
+    Botao,
+    Dica,
+    Select,
+    CampoData,
+    CampoNumero,
+    SelecaoBotoes,
+    Tabela,
   ],
   templateUrl: './pedido-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -104,8 +96,8 @@ export class PedidoForm implements OnInit {
     { label: 'Serviço Direto', value: ETipoItemPedido.Servico },
   ];
   modoDesenhoOpcoes = [
-    { label: 'Biblioteca', value: false, icon: 'pi pi-images' },
-    { label: 'Desenhar', value: true, icon: 'pi pi-pencil' },
+    { label: 'Biblioteca', value: false, icon: 'ic ic-images' },
+    { label: 'Desenhar', value: true, icon: 'ic ic-pencil' },
   ];
   descontoTipoOpcoes = [
     { label: 'R$', value: EDescontoTipo.Reais },

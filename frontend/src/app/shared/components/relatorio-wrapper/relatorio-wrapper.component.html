@@ -7,19 +7,15 @@
   <div class="relatorio-card-wrapper">
 
     <div class="relatorio-acoes no-print">
-      <p-button
-        icon="pi pi-print"
-        label="Imprimir Relatório"
-        [disabled]="isLoading"
-        (onClick)="imprimir()">
-      </p-button>
+      <ui-button icon="ic ic-print" label="Imprimir Relatório" [disabled]="isLoading" (onClick)="imprimir()">
+      </ui-button>
     </div>
 
     <div class="relatorio-card" id="relatorio-print-area">
 
       @if (isLoading) {
         <div class="relatorio-loading">
-          <p-progress-spinner strokeWidth="4" [style]="{ width: '48px', height: '48px' }"></p-progress-spinner>
+          <ui-spinner [style]="{ width: '48px', height: '48px' }"></ui-spinner>
           <span>Gerando relatório...</span>
         </div>
       } @else {

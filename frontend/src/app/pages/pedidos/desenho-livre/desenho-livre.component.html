@@ -13,38 +13,25 @@
 
     <section class="area-desenho" aria-label="Área de desenho">
       <div class="barra">
-        <p-selectbutton
-          [options]="modoOpcoes"
-          [(ngModel)]="modo"
-          optionLabel="label"
-          optionValue="value"
-          [allowEmpty]="false"
-          [disabled]="pontos.length < 2"
-          size="small"
-          (onChange)="onModoChange()"
-          aria-label="Modo: desenhar linhas ou escrever medidas à mão">
+        <ui-selectbutton [options]="modoOpcoes" [(ngModel)]="modo" optionLabel="label" optionValue="value" [allowEmpty]="false" [disabled]="pontos.length < 2" size="small" (onChange)="onModoChange()" aria-label="Modo: desenhar linhas ou escrever medidas à mão">
           <ng-template #item let-opt>
             <i [class]="opt.icon" aria-hidden="true"></i>
             <span class="modo-label">{{ opt.label }}</span>
           </ng-template>
-        </p-selectbutton>
+        </ui-selectbutton>
         <div class="acoes">
-          <p-button icon="pi pi-undo" [text]="true" [rounded]="true" severity="secondary"
-            [disabled]="!podeDesfazer" (onClick)="desfazer()"
-            pTooltip="Desfazer" aria-label="Desfazer"></p-button>
-          <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger"
-            [disabled]="!pontos.length" (onClick)="limpar()"
-            pTooltip="Limpar desenho" aria-label="Limpar desenho"></p-button>
+          <ui-button icon="ic ic-undo" [text]="true" [rounded]="true" severity="secondary" [disabled]="!podeDesfazer" (onClick)="desfazer()" dica="Desfazer" aria-label="Desfazer"></ui-button>
+          <ui-button icon="ic ic-trash" [text]="true" [rounded]="true" severity="danger" [disabled]="!pontos.length" (onClick)="limpar()" dica="Limpar desenho" aria-label="Limpar desenho"></ui-button>
         </div>
       </div>
 
       <p class="dica">
         @if (modo === 'desenhar') {
-          <i class="pi pi-pencil" aria-hidden="true"></i>
+          <i class="ic ic-pencil" aria-hidden="true"></i>
           Desenhe mesmo torto: ao soltar, fica reto. Na ponta (círculo tracejado) continua o desenho;
           em outro lugar vira <strong>transversal</strong> (P1 e P2, vale a maior).
         } @else {
-          <i class="pi pi-pen-to-square" aria-hidden="true"></i>
+          <i class="ic ic-pen-to-square" aria-hidden="true"></i>
           Escreva o número em qualquer lugar do desenho (ex.: 1,33). Ao parar de escrever ele é lido e vai
           para a medida destacada. Toque no número de uma linha para alterar a medida dela.
         }
@@ -57,24 +44,21 @@
         @if (modo === 'escrever') {
           <div class="escrita-status" [class.concluida]="!alvoAtual" [class.erro]="naoEntendi" aria-live="polite">
             @if (naoEntendi) {
-              <span><i class="pi pi-exclamation-triangle" aria-hidden="true"></i> Não entendi, escreva de novo</span>
+              <span><i class="ic ic-exclamation-triangle" aria-hidden="true"></i> Não entendi, escreva de novo</span>
             } @else if (alvoAtual) {
               <span>Escreva a medida da <strong>{{ rotuloAlvo(alvoAtual) }}</strong></span>
             } @else {
-              <span><i class="pi pi-check-circle" aria-hidden="true"></i> Medidas informadas</span>
+              <span><i class="ic ic-check-circle" aria-hidden="true"></i> Medidas informadas</span>
             }
             @if (ultimoReconhecido) {
               <span class="ultimo">{{ ultimoReconhecido.rotulo }} = {{ ultimoReconhecido.texto }}</span>
             }
             <span class="escrita-acoes">
               @if (temTinta) {
-                <p-button icon="pi pi-check" [text]="true" [rounded]="true" size="small" severity="success"
-                  (onClick)="reconhecerAgora()" pTooltip="Ler agora" aria-label="Ler o número agora"></p-button>
-                <p-button icon="pi pi-eraser" [text]="true" [rounded]="true" size="small" severity="secondary"
-                  (onClick)="limparTinta()" pTooltip="Apagar escrita" aria-label="Apagar o que foi escrito"></p-button>
+                <ui-button icon="ic ic-check" [text]="true" [rounded]="true" size="small" severity="success" (onClick)="reconhecerAgora()" dica="Ler agora" aria-label="Ler o número agora"></ui-button>
+                <ui-button icon="ic ic-eraser" [text]="true" [rounded]="true" size="small" severity="secondary" (onClick)="limparTinta()" dica="Apagar escrita" aria-label="Apagar o que foi escrito"></ui-button>
               } @else if (alvoAtual) {
-                <p-button icon="pi pi-step-forward" [text]="true" [rounded]="true" size="small" severity="secondary"
-                  (onClick)="pularAlvo()" pTooltip="Pular medida" aria-label="Pular esta medida"></p-button>
+                <ui-button icon="ic ic-step-forward" [text]="true" [rounded]="true" size="small" severity="secondary" (onClick)="pularAlvo()" dica="Pular medida" aria-label="Pular esta medida"></ui-button>
               }
             </span>
           </div>
@@ -84,7 +68,7 @@
 
     <aside class="painel-medidas" aria-label="Medidas das linhas">
       <h2 class="titulo-medidas">
-        <i class="pi pi-ruler" aria-hidden="true"></i>
+        <i class="ic ic-ruler" aria-hidden="true"></i>
         Medidas (cm)
       </h2>
 
@@ -106,15 +90,7 @@
               @if (coberta) {
                 <span class="coberta-txt">coberta</span>
               } @else {
-                <input pInputText appCurrencyMask
-                  type="text"
-                  [id]="'medida-livre-' + seg"
-                  [attr.aria-label]="'Medida da linha ' + (seg + 1) + ' em centímetros'"
-                  [ngModel]="medidasBase[seg]"
-                  (ngModelChange)="onMedidaBaseChange(seg, $event)"
-                  (focus)="focar('s' + seg); selecionarAlvo('s' + seg)"
-                  (blur)="focar(null)"
-                  placeholder="0,00" />
+                <input appCurrencyMask type="text" [id]="'medida-livre-' + seg" [attr.aria-label]="'Medida da linha ' + (seg + 1) + ' em centímetros'" [ngModel]="medidasBase[seg]" (ngModelChange)="onMedidaBaseChange(seg, $event)" (focus)="focar('s' + seg); selecionarAlvo('s' + seg)" (blur)="focar(null)" placeholder="0,00" />
               }
             </div>
           }
@@ -126,9 +102,7 @@
                 <span class="transversal-info">
                   @if (maiorDiag(i) > 0) { vale {{ maiorDiag(i) | number:'1.0-2':'pt-BR' }} } @else { vale a maior }
                 </span>
-                <p-button icon="pi pi-times" [text]="true" [rounded]="true" size="small" severity="danger"
-                  (onClick)="removerTransversal(i)"
-                  [attr.aria-label]="'Remover transversal ' + (i + 1)"></p-button>
+                <ui-button icon="ic ic-times" [text]="true" [rounded]="true" size="small" severity="danger" (onClick)="removerTransversal(i)" [aria-label]="'Remover transversal ' + (i + 1)"></ui-button>
               </div>
               @for (ponta of [1, 2]; track ponta) {
                 @let chave = 'd' + i + '-' + ponta;
@@ -136,14 +110,7 @@
                   <button type="button" class="ponta"
                     (click)="selecionarAlvo(chave, true)"
                     [attr.aria-label]="'Escrever à mão a ponta ' + ponta + ' da transversal ' + (i + 1)">P{{ ponta }}</button>
-                  <input pInputText appCurrencyMask type="text"
-                    [id]="'medida-transv-' + i + '-' + ponta"
-                    [attr.aria-label]="'Transversal ' + (i + 1) + ', ponta ' + ponta + ', em centímetros'"
-                    [ngModel]="medidasDiag[i][ponta - 1]"
-                    (ngModelChange)="onMedidaDiagChange(i, ponta === 1 ? 0 : 1, $event)"
-                    (focus)="focar(chave); selecionarAlvo(chave)"
-                    (blur)="focar(null)"
-                    placeholder="0,00" />
+                  <input appCurrencyMask type="text" [id]="'medida-transv-' + i + '-' + ponta" [attr.aria-label]="'Transversal ' + (i + 1) + ', ponta ' + ponta + ', em centímetros'" [ngModel]="medidasDiag[i][ponta - 1]" (ngModelChange)="onMedidaDiagChange(i, ponta === 1 ? 0 : 1, $event)" (focus)="focar(chave); selecionarAlvo(chave)" (blur)="focar(null)" placeholder="0,00" />
                 </div>
               }
             </div>

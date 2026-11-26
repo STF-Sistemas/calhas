@@ -2,12 +2,10 @@ import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { TagModule } from 'primeng/tag';
-import { ButtonModule } from 'primeng/button';
-import { Textarea } from 'primeng/textarea';
 import { PedidoService } from '#core/services/pedido.service';
 import { EDescontoTipo, EAprovacaoPedido, EStatusPedido } from '#shared/enums';
 import { AssinaturaCanvas } from '#shared-frontend/components/assinatura-canvas/assinatura-canvas.component';
+import { Botao, Tag } from '#ui';
 
 @Component({
   selector: 'app-orcamento-publico',
@@ -15,10 +13,9 @@ import { AssinaturaCanvas } from '#shared-frontend/components/assinatura-canvas/
   imports: [
     CommonModule,
     FormsModule,
-    TagModule,
-    ButtonModule,
-    Textarea,
     AssinaturaCanvas,
+    Botao,
+    Tag,
   ],
   templateUrl: './orcamento-publico.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

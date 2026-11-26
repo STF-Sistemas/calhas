@@ -9,13 +9,6 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputMaskModule } from 'primeng/inputmask';
-import { SelectModule } from 'primeng/select';
-import { ButtonModule } from 'primeng/button';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { TooltipModule } from 'primeng/tooltip';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { FornecedorService } from '#core/services/fornecedor.service';
@@ -24,6 +17,7 @@ import { IFornecedor } from '#shared/interfaces';
 import { ECrt } from '#shared/enums';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Dica, Select } from '#ui';
 
 @Component({
   selector: 'app-fornecedor-form',
@@ -32,16 +26,11 @@ import { ToastService } from '#shared-frontend/services/toast.service';
     TecladoNumericoDirective,
     CommonModule,
     ReactiveFormsModule,
-    InputTextModule,
-    InputMaskModule,
-    SelectModule,
-    ButtonModule,
-    IconFieldModule,
-    InputIconModule,
-    TooltipModule,
     NgxMaskDirective,
     EnterFocusNextDirective,
     DialogWrapper,
+    Dica,
+    Select,
   ],
   providers: [provideNgxMask()],
   templateUrl: './fornecedor-form.component.html',

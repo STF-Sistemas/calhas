@@ -9,13 +9,11 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { IDiagonal, IDesenho, IPonto } from '#shared/interfaces';
 import { ThemeService } from '#core/services/theme.service';
+import { Botao, Dialogo } from '#ui';
 
 @Component({
   selector: 'app-desenho-medida',
@@ -23,11 +21,10 @@ import { ThemeService } from '#core/services/theme.service';
   imports: [
     CommonModule,
     FormsModule,
-    ButtonModule,
-    DialogModule,
-    InputTextModule,
     CurrencyMaskDirective,
     EnterFocusNextDirective,
+    Botao,
+    Dialogo,
   ],
   templateUrl: './desenho-medida.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

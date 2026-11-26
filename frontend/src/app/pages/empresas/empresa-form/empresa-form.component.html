@@ -3,78 +3,73 @@
   position="top" (save)="onSave()">
 
   <form [formGroup]="form" appEnterNext>
-    <p-tabs value="0">
-      <p-tablist>
-        <p-tab value="0">
-          <i class="pi pi-building mr-2"></i>
+    <ui-tabs value="0">
+      <ui-tablist>
+        <ui-tab value="0">
+          <i class="ic ic-building mr-2"></i>
           Dados da Empresa
-        </p-tab>
-        <p-tab value="1">
-          <i class="pi pi-cog mr-2"></i>
+        </ui-tab>
+        <ui-tab value="1">
+          <i class="ic ic-cog mr-2"></i>
           Configurações
-        </p-tab>
+        </ui-tab>
         @if (empresaId && authService.isSuperAdmin()) {
-          <p-tab value="2">
-            <i class="pi pi-calendar mr-2"></i>
+          <ui-tab value="2">
+            <i class="ic ic-calendar mr-2"></i>
             Licença
-          </p-tab>
+          </ui-tab>
         }
-      </p-tablist>
+      </ui-tablist>
 
-      <p-tabpanels>
+      <ui-tabpanels>
 
-        <p-tabpanel value="0">
+        <ui-tabpanel value="0">
 
           <h3 class="section-title">
-            <i class="pi pi-building"></i>
+            <i class="ic ic-building"></i>
             Dados da Empresa
           </h3>
 
           <div class="row">
             <div class="field col-12 col-md-6">
               <label for="razao_social">Razão Social *</label>
-              <input pInputText id="razao_social" formControlName="razao_social" placeholder="Nome completo da empresa"
-                [class.ng-invalid]="form.get('razao_social')?.invalid && form.get('razao_social')?.touched"
-                [class.ng-dirty]="form.get('razao_social')?.touched" />
+              <input id="razao_social" formControlName="razao_social" placeholder="Nome completo da empresa" [class.ng-invalid]="form.get('razao_social')?.invalid && form.get('razao_social')?.touched" [class.ng-dirty]="form.get('razao_social')?.touched" />
               @if (form.get('razao_social')?.invalid && form.get('razao_social')?.touched) {
-                <small class="p-error">Razão Social é obrigatória.</small>
+                <small class="texto-erro">Razão Social é obrigatória.</small>
               }
             </div>
 
             <div class="field col-12 col-md-6">
               <label for="nome_fantasia">Nome Fantasia</label>
-              <input pInputText id="nome_fantasia" formControlName="nome_fantasia" placeholder="Nome popular / fantasia" />
+              <input id="nome_fantasia" formControlName="nome_fantasia" placeholder="Nome popular / fantasia" />
             </div>
           </div>
 
           <div class="row">
             <div class="field col-12 col-md-6">
               <label for="cnpj">CNPJ *</label>
-              <p-inputmask appTecladoNumerico id="cnpj" mask="99.999.999/9999-99" formControlName="cnpj" placeholder="00.000.000/0000-00"
-                [class.ng-invalid]="form.get('cnpj')?.invalid && form.get('cnpj')?.touched"
-                [class.ng-dirty]="form.get('cnpj')?.touched">
-              </p-inputmask>
+              <input type="text" appTecladoNumerico id="cnpj" mask="00.000.000/0000-00" formControlName="cnpj" placeholder="00.000.000/0000-00" [class.ng-invalid]="form.get('cnpj')?.invalid && form.get('cnpj')?.touched" [class.ng-dirty]="form.get('cnpj')?.touched" [dropSpecialCharacters]="false" />
+              
               @if (form.get('cnpj')?.invalid && form.get('cnpj')?.touched) {
-                <small class="p-error">CNPJ é obrigatório.</small>
+                <small class="texto-erro">CNPJ é obrigatório.</small>
               }
             </div>
 
             <div class="field col-12 col-md-6">
               <label for="email">E-mail Comercial</label>
-              <input pInputText id="email" type="email" formControlName="email" placeholder="contato@empresa.com.br" />
+              <input id="email" type="email" formControlName="email" placeholder="contato@empresa.com.br" />
             </div>
           </div>
 
           <div class="row">
             <div class="field col-12 col-md-6">
               <label for="telefone">Telefone</label>
-              <input appTecladoNumerico pInputText id="telefone" formControlName="telefone" type="tel"
-                placeholder="(00) 0000-0000 ou (00) 00000-0000" mask="(00) 0000-0000 || (00) 00000-0000" />
+              <input appTecladoNumerico id="telefone" formControlName="telefone" type="tel" placeholder="(00) 0000-0000 ou (00) 00000-0000" mask="(00) 0000-0000 || (00) 00000-0000" />
             </div>
           </div>
 
           <h3 class="section-title mt-2">
-            <i class="pi pi-image"></i>
+            <i class="ic ic-image"></i>
             Logo da Empresa
           </h3>
           <div class="row">
@@ -85,30 +80,25 @@
           </div>
 
           <h3 class="section-title mt-2">
-            <i class="pi pi-map-marker"></i>
+            <i class="ic ic-map-marker"></i>
             Endereço / Sede
           </h3>
 
           <div class="row">
             <div class="field col-12 col-sm-4 col-md-3">
               <label for="cep">CEP *</label>
-              <p-inputmask appTecladoNumerico id="cep" mask="99999-999" formControlName="cep" placeholder="00000-000"
-                (onComplete)="onCepChange()"
-                [class.ng-invalid]="form.get('cep')?.invalid && form.get('cep')?.touched"
-                [class.ng-dirty]="form.get('cep')?.touched">
-              </p-inputmask>
+              <input type="text" appTecladoNumerico id="cep" mask="00000-000" formControlName="cep" placeholder="00000-000" (input)="$any($event.target).value.length === 9 && onCepChange()" [class.ng-invalid]="form.get('cep')?.invalid && form.get('cep')?.touched" [class.ng-dirty]="form.get('cep')?.touched" [dropSpecialCharacters]="false" />
+              
               @if (form.get('cep')?.invalid && form.get('cep')?.touched) {
-                <small class="p-error">CEP é obrigatório.</small>
+                <small class="texto-erro">CEP é obrigatório.</small>
               }
             </div>
 
             <div class="field col-12 col-sm-8 col-md-9">
               <label for="endereco">Logradouro *</label>
-              <input pInputText id="endereco" formControlName="endereco" placeholder="Rua, Avenida, etc."
-                [class.ng-invalid]="form.get('endereco')?.invalid && form.get('endereco')?.touched"
-                [class.ng-dirty]="form.get('endereco')?.touched" />
+              <input id="endereco" formControlName="endereco" placeholder="Rua, Avenida, etc." [class.ng-invalid]="form.get('endereco')?.invalid && form.get('endereco')?.touched" [class.ng-dirty]="form.get('endereco')?.touched" />
               @if (form.get('endereco')?.invalid && form.get('endereco')?.touched) {
-                <small class="p-error">Logradouro é obrigatório.</small>
+                <small class="texto-erro">Logradouro é obrigatório.</small>
               }
             </div>
           </div>
@@ -116,21 +106,17 @@
           <div class="row">
             <div class="field col-12 col-sm-4 col-md-3">
               <label for="numero">Número *</label>
-              <input pInputText id="numero" formControlName="numero" placeholder="Ex: 123"
-                [class.ng-invalid]="form.get('numero')?.invalid && form.get('numero')?.touched"
-                [class.ng-dirty]="form.get('numero')?.touched" />
+              <input id="numero" formControlName="numero" placeholder="Ex: 123" [class.ng-invalid]="form.get('numero')?.invalid && form.get('numero')?.touched" [class.ng-dirty]="form.get('numero')?.touched" />
               @if (form.get('numero')?.invalid && form.get('numero')?.touched) {
-                <small class="p-error">Número é obrigatório.</small>
+                <small class="texto-erro">Número é obrigatório.</small>
               }
             </div>
 
             <div class="field col-12 col-sm-8 col-md-9">
               <label for="bairro">Bairro *</label>
-              <input pInputText id="bairro" formControlName="bairro" placeholder="Nome do bairro"
-                [class.ng-invalid]="form.get('bairro')?.invalid && form.get('bairro')?.touched"
-                [class.ng-dirty]="form.get('bairro')?.touched" />
+              <input id="bairro" formControlName="bairro" placeholder="Nome do bairro" [class.ng-invalid]="form.get('bairro')?.invalid && form.get('bairro')?.touched" [class.ng-dirty]="form.get('bairro')?.touched" />
               @if (form.get('bairro')?.invalid && form.get('bairro')?.touched) {
-                <small class="p-error">Bairro é obrigatório.</small>
+                <small class="texto-erro">Bairro é obrigatório.</small>
               }
             </div>
           </div>
@@ -141,21 +127,19 @@
                 Cidade *
                 <span class="label-hint">(preenchida automaticamente via CEP)</span>
               </label>
-              <input pInputText id="cidade" formControlName="cidade_nome" placeholder="Preenchida via CEP"
-                [class.ng-invalid]="form.get('cod_cidade')?.invalid && form.get('cod_cidade')?.touched"
-                [class.ng-dirty]="form.get('cod_cidade')?.touched" />
+              <input id="cidade" formControlName="cidade_nome" placeholder="Preenchida via CEP" [class.ng-invalid]="form.get('cod_cidade')?.invalid && form.get('cod_cidade')?.touched" [class.ng-dirty]="form.get('cod_cidade')?.touched" />
               @if (form.get('cod_cidade')?.invalid && form.get('cod_cidade')?.touched) {
-                <small class="p-error">Cidade é obrigatória. Informe um CEP válido para preenchimento automático.</small>
+                <small class="texto-erro">Cidade é obrigatória. Informe um CEP válido para preenchimento automático.</small>
               }
             </div>
           </div>
 
-        </p-tabpanel>
+        </ui-tabpanel>
 
-        <p-tabpanel value="1">
+        <ui-tabpanel value="1">
 
           <h3 class="section-title">
-            <i class="pi pi-print"></i>
+            <i class="ic ic-print"></i>
             Impressão
           </h3>
 
@@ -165,14 +149,7 @@
               <span class="label-hint">
                 Texto exibido como marca d'água na impressão dos pedidos (máx. 250 caracteres).
               </span>
-              <textarea
-                pTextarea
-                id="marca_dagua"
-                formControlName="marca_dagua"
-                rows="3"
-                placeholder="Ex.: CÓPIA NÃO VÁLIDA, RASCUNHO, nome da empresa..."
-                aria-label="Marca d'água para impressão de pedidos"
-                [autoResize]="true">
+              <textarea id="marca_dagua" formControlName="marca_dagua" rows="3" placeholder="Ex.: CÓPIA NÃO VÁLIDA, RASCUNHO, nome da empresa..." aria-label="Marca d'água para impressão de pedidos">
               </textarea>
             </div>
           </div>
@@ -181,58 +158,42 @@
             <div class="field col-12 col-sm-4 col-md-3">
               <label for="quantidade_desenho_por_folha">Desenhos por Folha</label>
               <span class="label-hint">Quantidade de desenhos impressos por página A4 (1 a 20).</span>
-              <p-inputnumber
-                id="quantidade_desenho_por_folha"
-                formControlName="quantidade_desenho_por_folha"
-                [min]="1" [max]="20" [showButtons]="true"
-                placeholder="5"
-                aria-label="Quantidade de desenhos por folha">
-              </p-inputnumber>
+              <ui-input-number inputId="quantidade_desenho_por_folha" formControlName="quantidade_desenho_por_folha" [min]="1" [max]="20" placeholder="5" aria-label="Quantidade de desenhos por folha">
+              </ui-input-number>
               @if (form.get('quantidade_desenho_por_folha')?.invalid && form.get('quantidade_desenho_por_folha')?.touched) {
-                <small class="p-error">Informe um valor entre 1 e 20.</small>
+                <small class="texto-erro">Informe um valor entre 1 e 20.</small>
               }
             </div>
           </div>
 
           <h3 class="section-title mt-2">
-            <i class="pi pi-whatsapp"></i>
+            <i class="ic ic-whatsapp"></i>
             WhatsApp / Link de Orçamento
           </h3>
 
           <div class="row">
             <div class="field col-12 col-md-3">
               <label for="link_validade_dias">Validade do link (dias)</label>
-              <p-inputnumber
-                inputId="link_validade_dias"
-                formControlName="link_validade_dias"
-                [min]="1" [max]="365"
-                [showButtons]="true"
-                placeholder="Ex: 7"
-                aria-label="Validade do link de orçamento em dias">
-              </p-inputnumber>
+              <ui-input-number inputId="link_validade_dias" formControlName="link_validade_dias" [min]="1" [max]="365" placeholder="Ex: 7" aria-label="Validade do link de orçamento em dias">
+              </ui-input-number>
               <small class="field-hint">Após este prazo o link expira e o cliente não consegue mais acessar.</small>
               @if (form.get('link_validade_dias')?.invalid && form.get('link_validade_dias')?.touched) {
-                <small class="p-error">Informe um valor entre 1 e 365.</small>
+                <small class="texto-erro">Informe um valor entre 1 e 365.</small>
               }
             </div>
             <div class="field col-12 col-md-9">
               <div style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin-bottom:.4rem;">
                 <label for="whatsapp_mensagem_padrao" style="margin:0;">Mensagem padrão do WhatsApp</label>
-                <p-button label="{link}" icon="pi pi-tag" size="small" severity="secondary" [outlined]="true"
-                  pTooltip="Inserir tag do link na posição do cursor"
-                  (onClick)="inserirTagLink(msgTextarea)">
-                </p-button>
+                <ui-button label="{link}" icon="ic ic-tag" size="small" severity="secondary" [outlined]="true" dica="Inserir tag do link na posição do cursor" (onClick)="inserirTagLink(msgTextarea)">
+                </ui-button>
               </div>
-              <textarea #msgTextarea pTextarea id="whatsapp_mensagem_padrao" formControlName="whatsapp_mensagem_padrao" rows="3"
-                placeholder="Ex: Olá! Segue o seu orçamento: {link}"
-                aria-label="Mensagem padrão para envio pelo WhatsApp"
-                [autoResize]="true">
+              <textarea #msgTextarea id="whatsapp_mensagem_padrao" formControlName="whatsapp_mensagem_padrao" rows="3" placeholder="Ex: Olá! Segue o seu orçamento: {link}" aria-label="Mensagem padrão para envio pelo WhatsApp">
               </textarea>
             </div>
           </div>
 
           <h3 class="section-title mt-2">
-            <i class="pi pi-box"></i>
+            <i class="ic ic-box"></i>
             Estoque
           </h3>
 
@@ -242,12 +203,8 @@
                 <label for="validar_estoque" style="margin:0; cursor:pointer;">
                   Validar estoque nos pedidos
                 </label>
-                <p-checkbox
-                  inputId="validar_estoque"
-                  formControlName="validar_estoque"
-                  [binary]="true"
-                  aria-label="Validar estoque ao movimentar pedidos">
-                </p-checkbox>
+                <input type="checkbox" id="validar_estoque" formControlName="validar_estoque" aria-label="Validar estoque ao movimentar pedidos" />
+                
               </div>
               <small class="field-hint">
                 Se marcado, o estoque será validado ao colocar um pedido <strong>Em Produção</strong>.
@@ -255,24 +212,23 @@
             </div>
           </div>
 
-        </p-tabpanel>
+        </ui-tabpanel>
 
         @if (empresaId && authService.isSuperAdmin()) {
-          <p-tabpanel value="2">
+          <ui-tabpanel value="2">
 
             <h3 class="section-title">
-              <i class="pi pi-calendar"></i>
+              <i class="ic ic-calendar"></i>
               Controle de Licença
             </h3>
 
             <div class="row">
               <div class="field col-12">
                 <label for="valor_mensalidade">Valor da Mensalidade (R$)</label>
-                <input pInputText appCurrencyMask id="valor_mensalidade"
-                  formControlName="valor_mensalidade" placeholder="0,00" style="max-width: 200px;" />
+                <input appCurrencyMask id="valor_mensalidade" formControlName="valor_mensalidade" placeholder="0,00" style="max-width: 200px;" />
                 <small class="field-hint">Valor cobrado mensalmente por Pix para renovação da licença.</small>
                 @if (form.get('valor_mensalidade')?.invalid && form.get('valor_mensalidade')?.touched) {
-                  <small class="p-error">Informe um valor válido.</small>
+                  <small class="texto-erro">Informe um valor válido.</small>
                 }
               </div>
             </div>
@@ -280,21 +236,19 @@
             <div class="licenca-status-row">
               <span class="licenca-label">Status atual:</span>
               @if (statusLicenca === 'ativa') {
-                <p-tag severity="success" value="Licença Ativa"></p-tag>
+                <ui-tag severity="success" value="Licença Ativa"></ui-tag>
               } @else if (statusLicenca === 'expirada') {
-                <p-tag severity="danger" value="Licença Expirada"></p-tag>
+                <ui-tag severity="danger" value="Licença Expirada"></ui-tag>
               } @else {
-                <p-tag severity="secondary" value="Sem validade definida"></p-tag>
+                <ui-tag severity="secondary" value="Sem validade definida"></ui-tag>
               }
             </div>
 
             <div class="row mt-2">
               <div class="field col-12">
                 <label for="data_expiracao">Data de Vencimento da Licença</label>
-                <p-datepicker formControlName="data_expiracao" dateFormat="dd/mm/yy"
-                  [showIcon]="true" appendTo="body" placeholder="dd/mm/aaaa"
-                  id="data_expiracao">
-                </p-datepicker>
+                <ui-datepicker formControlName="data_expiracao" placeholder="dd/mm/aaaa" inputId="data_expiracao">
+                </ui-datepicker>
                 <small class="field-hint">
                   Deixe em branco para licença sem prazo de vencimento.
                 </small>
@@ -302,18 +256,16 @@
             </div>
 
             <div class="licenca-acoes">
-              <p-button icon="pi pi-plus" label="+30 dias" severity="secondary" [outlined]="true"
-                size="small" (onClick)="prorrogar30Dias()" pTooltip="Prorrogar 30 dias a partir da validade atual">
-              </p-button>
-              <p-button icon="pi pi-save" label="Salvar Validade" severity="primary"
-                [loading]="isSavingValidade" (onClick)="salvarValidade()">
-              </p-button>
+              <ui-button icon="ic ic-plus" label="+30 dias" severity="secondary" [outlined]="true" size="small" (onClick)="prorrogar30Dias()" dica="Prorrogar 30 dias a partir da validade atual">
+              </ui-button>
+              <ui-button icon="ic ic-save" label="Salvar Validade" severity="primary" [loading]="isSavingValidade" (onClick)="salvarValidade()">
+              </ui-button>
             </div>
 
-          </p-tabpanel>
+          </ui-tabpanel>
         }
 
-      </p-tabpanels>
-    </p-tabs>
+      </ui-tabpanels>
+    </ui-tabs>
   </form>
 </app-dialog-wrapper>

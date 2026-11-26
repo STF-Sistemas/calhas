@@ -2,17 +2,10 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { PasswordModule } from 'primeng/password';
-import { CardModule } from 'primeng/card';
-import { TooltipModule } from 'primeng/tooltip';
-import { MenuModule } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
 import { AuthService } from '#core/services/auth.service';
 import { ThemeService } from '#core/services/theme.service';
-import { CheckboxModule } from 'primeng/checkbox';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Botao, Dica, CampoSenha, MenuFlutuante, IMenuItem } from '#ui';
 
 @Component({
   selector: 'app-login',
@@ -21,13 +14,10 @@ import { ToastService } from '#shared-frontend/services/toast.service';
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
-    ButtonModule,
-    InputTextModule,
-    PasswordModule,
-    CardModule,
-    CheckboxModule,
-    TooltipModule,
-    MenuModule,
+    Botao,
+    Dica,
+    CampoSenha,
+    MenuFlutuante,
   ],
   templateUrl: './login.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -38,25 +28,25 @@ export class Login {
   isLoading = false;
   currentYear = new Date().getFullYear();
 
-  colorMenuItems: MenuItem[] = [
+  colorMenuItems: IMenuItem[] = [
     {
       label: 'Laranja (Sakai)',
-      icon: 'pi pi-circle-fill text-orange-500',
+      icon: 'ic ic-circle-fill text-orange-500',
       command: () => this.themeService.setColor('orange'),
     },
     {
       label: 'Azul',
-      icon: 'pi pi-circle-fill text-blue-500',
+      icon: 'ic ic-circle-fill text-blue-500',
       command: () => this.themeService.setColor('blue'),
     },
     {
       label: 'Esmeralda',
-      icon: 'pi pi-circle-fill text-emerald-500',
+      icon: 'ic ic-circle-fill text-emerald-500',
       command: () => this.themeService.setColor('emerald'),
     },
     {
       label: 'Índigo',
-      icon: 'pi pi-circle-fill text-indigo-500',
+      icon: 'ic ic-circle-fill text-indigo-500',
       command: () => this.themeService.setColor('indigo'),
     },
   ];

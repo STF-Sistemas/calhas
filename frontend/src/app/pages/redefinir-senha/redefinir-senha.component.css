@@ -11,7 +11,7 @@
 .login-card-wrapper {
   padding: 1px;
   border-radius: var(--radius-xl);
-  background: linear-gradient(180deg, var(--p-primary) 10%, color-mix(in srgb, var(--p-primary) 0%, transparent) 30%);
+  background: linear-gradient(180deg, var(--primary-color) 10%, color-mix(in srgb, var(--primary-color) 0%, transparent) 30%);
   width: 30rem;
   max-width: 95vw;
 }
@@ -37,34 +37,34 @@
     padding: 3rem 1.5rem;
   }
 }
-:host ::ng-deep .p-inputtext, :host ::ng-deep .p-password, :host ::ng-deep .p-password input {
+:host ::ng-deep input:not([type="checkbox"]), :host ::ng-deep .ui-senha, :host ::ng-deep .ui-senha input {
   width: 100% !important;
 }
-:host ::ng-deep .p-inputtext {
+:host ::ng-deep input:not([type="checkbox"]) {
   border-radius: var(--radius-md);
   border-color: var(--border-color);
 }
-:host ::ng-deep .p-inputtext:focus {
-  border-color: var(--p-primary);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--p-primary) 20%, transparent);
+:host ::ng-deep input:not([type="checkbox"]):focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 20%, transparent);
 }
-:host ::ng-deep .p-password input {
+:host ::ng-deep .ui-senha input {
   border-radius: var(--radius-md);
 }
-:host ::ng-deep .p-button {
-  background-color: var(--p-primary);
-  border-color: var(--p-primary);
+:host ::ng-deep .ui-button {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
   color: #ffffff;
   border-radius: var(--radius-md);
 }
-:host ::ng-deep .p-button:hover {
-  background-color: var(--p-primary-hover);
-  border-color: var(--p-primary-hover);
+:host ::ng-deep .ui-button:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
-:host ::ng-deep .p-button:disabled {
+:host ::ng-deep .ui-button:disabled {
   opacity: 0.6;
 }
 
 .app-dark .login-card-wrapper {
-  background: linear-gradient(180deg, var(--p-primary) 10%, color-mix(in srgb, var(--p-primary) 5%, transparent) 50%);
+  background: linear-gradient(180deg, var(--primary-color) 10%, color-mix(in srgb, var(--primary-color) 5%, transparent) 50%);
 }

@@ -1,15 +1,18 @@
 import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { NOVIDADES, VERSAO_ATUAL } from '#shared/constants';
 import { INovidade } from '#shared/interfaces';
+import { Botao } from '#ui';
 
 const CHAVE_VERSAO_VISTA = 'calhas.novidades.versaoVista';
 
 @Component({
   selector: 'app-novidades-dialog',
   standalone: true,
-  imports: [ButtonModule, DialogWrapper],
+  imports: [
+    DialogWrapper,
+    Botao,
+  ],
   templateUrl: './novidades-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./novidades-dialog.component.css'],

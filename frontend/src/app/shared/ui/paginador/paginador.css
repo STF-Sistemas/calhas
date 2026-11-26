@@ -1,0 +1,62 @@
+.ui-paginador {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 1rem;
+  padding: 0.6rem 0.75rem;
+}
+
+.ui-paginador__navegacao {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.ui-paginador__botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 0.4rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.ui-paginador__botao:hover:not(:disabled) {
+  background: var(--surface-hover);
+  color: var(--text-color);
+}
+
+.ui-paginador__botao:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ui-paginador__duplo {
+  margin-left: -0.7em;
+}
+
+.ui-paginador__numero--ativo,
+.ui-paginador__numero--ativo:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--primary-color) 14%, transparent);
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.ui-paginador__relatorio {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.ui-paginador__linhas {
+  width: auto;
+  min-height: 2.25rem;
+  padding: 0.25rem 0.5rem;
+}

@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-install-prompt',
   standalone: true,
-  imports: [CommonModule, ButtonModule],
+  imports: [
+    CommonModule,
+  ],
   templateUrl: './install-prompt.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./install-prompt.component.css'],

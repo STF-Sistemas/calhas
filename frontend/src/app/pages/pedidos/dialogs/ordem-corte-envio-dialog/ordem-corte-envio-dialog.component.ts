@@ -1,9 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { SelectModule } from 'primeng/select';
-import { CheckboxModule } from 'primeng/checkbox';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { PedidoService } from '#core/services/pedido.service';
 import { FornecedorService } from '#core/services/fornecedor.service';
@@ -12,6 +9,7 @@ import { IPedido, IPedidoItem, IFornecedor } from '#shared/interfaces';
 import { ETipoItemPedido } from '#shared/enums';
 import { formatPhone } from '#shared/functions/format.functions';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Botao, Select } from '#ui';
 
 interface IItemSelecionavel {
   item: IPedidoItem;
@@ -25,10 +23,9 @@ interface IItemSelecionavel {
   imports: [
     CommonModule,
     FormsModule,
-    ButtonModule,
-    SelectModule,
-    CheckboxModule,
     DialogWrapper,
+    Botao,
+    Select,
   ],
   templateUrl: './ordem-corte-envio-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

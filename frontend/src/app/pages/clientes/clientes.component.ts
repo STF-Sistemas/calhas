@@ -1,15 +1,6 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PanelModule } from 'primeng/panel';
-import { SelectModule } from 'primeng/select';
-import { PaginatorModule } from 'primeng/paginator';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { DialogModule } from 'primeng/dialog';
-import { TableModule } from 'primeng/table';
-import { DatePickerModule } from 'primeng/datepicker';
-import { TagModule } from 'primeng/tag';
 import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
 import { ClienteForm } from './cliente-form/cliente-form.component';
 import { ClienteService } from '#core/services/cliente.service';
@@ -18,6 +9,7 @@ import { ICliente, IPedido } from '#shared/interfaces';
 import { EStatusPedido } from '#shared/enums';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
+import { Botao, Select, Dialogo, CampoData, Tag, Painel, Paginador, Tabela } from '#ui';
 
 @Component({
   selector: 'app-clientes',
@@ -27,15 +19,14 @@ import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.s
     FormsModule,
     DataTable,
     ClienteForm,
-    PanelModule,
-    SelectModule,
-    PaginatorModule,
-    ButtonModule,
-    InputTextModule,
-    DialogModule,
-    TableModule,
-    DatePickerModule,
-    TagModule,
+    Botao,
+    Select,
+    Dialogo,
+    CampoData,
+    Tag,
+    Painel,
+    Paginador,
+    Tabela,
   ],
   templateUrl: './clientes.component.html',
   styleUrls: ['./clientes.component.css'],

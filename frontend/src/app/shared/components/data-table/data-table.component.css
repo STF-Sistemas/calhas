@@ -10,13 +10,13 @@
   overflow-x: auto;
 }
 
-:host ::ng-deep .p-datatable .p-datatable-header {
+:host ::ng-deep .ui-table__legenda {
   background: var(--surface-card);
   border: none;
   padding: 0;
 }
 
-:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+:host ::ng-deep .ui-table__tabela thead th {
   background: var(--surface-section);
   padding: 0.85rem 1rem;
   color: var(--text-color);
@@ -24,22 +24,22 @@
   border-bottom: 1px solid var(--surface-border);
 }
 
-:host ::ng-deep .p-datatable .p-datatable-tbody > tr {
+:host ::ng-deep .ui-table__tabela tbody tr {
   background: var(--surface-card);
   transition: background 0.2s;
 }
 
-:host ::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
+:host ::ng-deep .ui-table__tabela tbody tr:hover {
   background: var(--surface-hover);
 }
 
-:host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+:host ::ng-deep .ui-table__tabela tbody tr > td {
   padding: 0.85rem 1rem;
   border: none;
   border-bottom: 1px solid var(--surface-border);
 }
 
-:host ::ng-deep .p-paginator {
+:host ::ng-deep .ui-paginador {
   background: var(--surface-card);
   border: none;
   border-top: 1px solid var(--surface-border);
@@ -116,15 +116,15 @@
 }
 
 @media (max-width: 767px) {
-  :host ::ng-deep .p-datatable .p-datatable-thead {
+  :host ::ng-deep .ui-table__tabela thead {
     display: none;
   }
 
-  :host ::ng-deep .p-datatable table {
+  :host ::ng-deep .ui-table__tabela {
     min-width: 0 !important;
   }
 
-  :host ::ng-deep .p-datatable .p-datatable-tbody > tr {
+  :host ::ng-deep .ui-table__tabela tbody tr {
     display: block;
     margin: 0.75rem;
     border: 1px solid var(--surface-border);
@@ -132,11 +132,11 @@
     overflow: hidden;
   }
 
-  :host ::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
+  :host ::ng-deep .ui-table__tabela tbody tr:hover {
     background: var(--surface-card);
   }
 
-  :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+  :host ::ng-deep .ui-table__tabela tbody tr > td {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -148,7 +148,7 @@
     word-break: break-word;
   }
 
-  :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td[data-label]::before {
+  :host ::ng-deep .ui-table__tabela tbody tr > td[data-label]::before {
     content: attr(data-label);
     flex-shrink: 0;
     max-width: 45%;
@@ -158,7 +158,7 @@
     color: var(--text-color-secondary);
   }
 
-  :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td.dt-titulo {
+  :host ::ng-deep .ui-table__tabela tbody tr > td.dt-titulo {
     justify-content: flex-start;
     text-align: left;
     font-size: 1rem;
@@ -167,11 +167,11 @@
     border-bottom-style: solid;
   }
 
-  :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td.dt-titulo::before {
+  :host ::ng-deep .ui-table__tabela tbody tr > td.dt-titulo::before {
     display: none;
   }
 
-  :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td.dt-acoes {
+  :host ::ng-deep .ui-table__tabela tbody tr > td.dt-acoes {
     justify-content: flex-end;
     border-bottom: none;
     background: var(--surface-section);
@@ -183,21 +183,21 @@
     justify-content: flex-end;
   }
 
-  :host ::ng-deep .dt-acoes .p-button {
+  :host ::ng-deep .dt-acoes .ui-button {
     width: 2.75rem;
     height: 2.75rem;
   }
 
-  :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td.dt-vazio {
+  :host ::ng-deep .ui-table__tabela tbody tr > td.dt-vazio {
     display: block;
     border: none;
   }
 
-  :host ::ng-deep .p-datatable .p-datatable-tbody > tr:has(.dt-vazio) {
+  :host ::ng-deep .ui-table__tabela tbody tr:has(.dt-vazio) {
     border: none;
   }
 
-  :host ::ng-deep .p-paginator-current {
+  :host ::ng-deep .ui-paginador__relatorio {
     display: none;
   }
 }

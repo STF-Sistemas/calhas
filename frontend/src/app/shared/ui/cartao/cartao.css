@@ -1,0 +1,11 @@
+.ui-card {
+  display: block;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--surface-0);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
+}
+
+.ui-card__corpo {
+  padding: 1.25rem;
+}

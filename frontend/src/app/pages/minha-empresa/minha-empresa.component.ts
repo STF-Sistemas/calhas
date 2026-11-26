@@ -4,15 +4,6 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputMaskModule } from 'primeng/inputmask';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-import { CheckboxModule } from 'primeng/checkbox';
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
-import { Textarea } from 'primeng/textarea';
-import { CardModule } from 'primeng/card';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { ClienteService } from '#core/services/cliente.service';
 import { environment } from '#environments/environment';
@@ -20,6 +11,7 @@ import { IEmpresa } from '#shared/interfaces';
 import { TApiResponse } from '#shared/types';
 import { LogoUploader } from '#shared-frontend/components/logo-uploader/logo-uploader.component';
 import { ToastService } from '#shared-frontend/services/toast.service';
+import { Botao, Dica, CampoNumero, Cartao, Abas, ListaAbas, Aba, PaineisAbas, PainelAba } from '#ui';
 
 @Component({
   selector: 'app-minha-empresa',
@@ -28,21 +20,17 @@ import { ToastService } from '#shared-frontend/services/toast.service';
     TecladoNumericoDirective,
     CommonModule,
     ReactiveFormsModule,
-    InputTextModule,
-    InputMaskModule,
-    InputNumberModule,
-    ButtonModule,
-    TooltipModule,
-    CheckboxModule,
-    Tabs,
-    TabList,
-    Tab,
-    TabPanels,
-    TabPanel,
-    Textarea,
-    CardModule,
     NgxMaskDirective,
     LogoUploader,
+    Botao,
+    Dica,
+    CampoNumero,
+    Cartao,
+    Abas,
+    ListaAbas,
+    Aba,
+    PaineisAbas,
+    PainelAba,
   ],
   providers: [provideNgxMask()],
   changeDetection: ChangeDetectionStrategy.Eager,

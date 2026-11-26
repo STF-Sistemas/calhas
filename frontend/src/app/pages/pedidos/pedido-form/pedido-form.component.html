@@ -7,110 +7,67 @@
   position="top"
   (save)="onSave()"
 >
-  <form [formGroup]="form" class="grid p-fluid" appEnterNext>
+  <form [formGroup]="form" class="grid" appEnterNext>
     <div class="col-12 xl:col-9">
       <div class="mb-4">
         <h3 class="section-title">
-          <i class="pi pi-file-edit"></i>
+          <i class="ic ic-file-edit"></i>
           Dados do Pedido
         </h3>
 
         <div class="grid">
           <div class="col-12 md:col-5 lg:col-5 field">
             <label for="cod_cliente">Cliente *</label>
-            <p-select
-              id="cod_cliente"
-              formControlName="cod_cliente"
-              [options]="clientes"
-              optionLabel="razao_social"
-              optionValue="id"
-              placeholder="Selecione o Cliente"
-              [filter]="true"
-              filterBy="razao_social"
-              appendTo="body"
-            >
-            </p-select>
+            <ui-select inputId="cod_cliente" formControlName="cod_cliente" [options]="clientes" optionLabel="razao_social" optionValue="id" placeholder="Selecione o Cliente" [filter]="true" filterBy="razao_social">
+            </ui-select>
             @if (form.get('cod_cliente')?.invalid && form.get('cod_cliente')?.touched) {
-              <small class="p-error">Cliente é obrigatório.</small>
+              <small class="texto-erro">Cliente é obrigatório.</small>
             }
           </div>
 
           <div class="col-12 md:col-4 lg:col-4 field">
             <label for="data_pedido">Data do Pedido *</label>
-            <p-datepicker
-              id="data_pedido"
-              formControlName="data_pedido"
-              [showIcon]="true"
-              dateFormat="dd/mm/yy"
-              appendTo="body"
-            ></p-datepicker>
+            <ui-datepicker inputId="data_pedido" formControlName="data_pedido"></ui-datepicker>
             @if (form.get('data_pedido')?.invalid && form.get('data_pedido')?.touched) {
-              <small class="p-error">Data do pedido é obrigatória.</small>
+              <small class="texto-erro">Data do pedido é obrigatória.</small>
             }
           </div>
 
           <div class="col-12 md:col-3 lg:col-3 field">
             <label for="status">Status *</label>
-            <p-select
-              id="status"
-              formControlName="status"
-              [options]="statusOpcoes"
-              appendTo="body"
-            ></p-select>
+            <ui-select inputId="status" formControlName="status" [options]="statusOpcoes"></ui-select>
             @if (form.get('status')?.invalid && form.get('status')?.touched) {
-              <small class="p-error">Status é obrigatório.</small>
+              <small class="texto-erro">Status é obrigatório.</small>
             }
           </div>
 
           <div class="col-12 md:col-4 lg:col-4 field">
             <label for="cod_meio_pagamento">Meio de Pagamento *</label>
-            <p-select
-              id="cod_meio_pagamento"
-              formControlName="cod_meio_pagamento"
-              [options]="meiosPagamento"
-              optionLabel="descricao"
-              optionValue="id"
-              placeholder="Selecione o meio de pagamento"
-              appendTo="body"
-            >
-            </p-select>
+            <ui-select inputId="cod_meio_pagamento" formControlName="cod_meio_pagamento" [options]="meiosPagamento" optionLabel="descricao" optionValue="id" placeholder="Selecione o meio de pagamento">
+            </ui-select>
             @if (
               form.get('cod_meio_pagamento')?.invalid && form.get('cod_meio_pagamento')?.touched
             ) {
-              <small class="p-error">Meio de pagamento é obrigatório.</small>
+              <small class="texto-erro">Meio de pagamento é obrigatório.</small>
             }
           </div>
 
           <div class="col-12 field">
             <label for="observacoes">Observações Internas</label>
-            <textarea
-              id="observacoes"
-              pInputTextarea
-              formControlName="observacoes"
-              rows="2"
-              placeholder="Notas sobre a fabricação ou entrega..."
-            ></textarea>
+            <textarea id="observacoes" formControlName="observacoes" rows="2" placeholder="Notas sobre a fabricação ou entrega..."></textarea>
           </div>
         </div>
       </div>
 
       <h3 class="section-title">
-        <i class="pi pi-list"></i>
+        <i class="ic ic-list"></i>
         Itens do Pedido
-        <p-button
-          label="Adicionar Item"
-          icon="pi pi-plus"
-          [text]="true"
-          severity="primary"
-          size="small"
-          (onClick)="adicionarItem()"
-          [style]="{ 'margin-left': 'auto' }"
-        >
-        </p-button>
+        <ui-button label="Adicionar Item" icon="ic ic-plus" [text]="true" severity="primary" size="small" (onClick)="adicionarItem()" [style]="{ 'margin-left': 'auto' }">
+        </ui-button>
       </h3>
 
-      <p-table [value]="itens.controls" styleClass="p-datatable-sm">
-        <ng-template pTemplate="header">
+      <ui-table [value]="itens.controls" styleClass="ui-table--compacta">
+        <ng-template #header>
           <tr>
             <th style="width: 15%">Tipo</th>
             <th style="width: 35%">Item</th>
@@ -120,54 +77,23 @@
             <th style="width: 8%"></th>
           </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-control let-i="rowIndex">
+        <ng-template #body let-control let-i="rowIndex">
           <tr [formGroup]="$any(control)">
             <td>
-              <p-select
-                formControlName="tipo"
-                [options]="tiposItem"
-                (onChange)="onTipoChange(i)"
-                appendTo="body"
-              ></p-select>
+              <ui-select formControlName="tipo" [options]="tiposItem" (onChange)="onTipoChange(i)"></ui-select>
             </td>
             <td>
               @if (control.get('tipo')?.value === ETipoItemPedido.Produto) {
-                <p-select
-                  formControlName="cod_produto"
-                  [options]="produtos"
-                  optionLabel="descricao"
-                  optionValue="id"
-                  [filter]="true"
-                  (onChange)="onSelecaoProduto(i, $event)"
-                  placeholder="Selecione Produto"
-                  appendTo="body"
-                >
-                </p-select>
+                <ui-select formControlName="cod_produto" [options]="produtos" optionLabel="descricao" optionValue="id" [filter]="true" (onChange)="onSelecaoProduto(i, $event)" placeholder="Selecione Produto">
+                </ui-select>
               } @else if (control.get('tipo')?.value === ETipoItemPedido.Corte) {
                 <div style="display: flex; flex-direction: column; gap: 0.35rem">
-                  <p-select
-                    formControlName="cod_chapa"
-                    [options]="chapas"
-                    optionLabel="descricao"
-                    optionValue="id"
-                    placeholder="1. Selecione a Chapa"
-                    appendTo="body"
-                    (onChange)="onChapaChange(i)"
-                  >
-                  </p-select>
+                  <ui-select formControlName="cod_chapa" [options]="chapas" optionLabel="descricao" optionValue="id" placeholder="1. Selecione a Chapa" (onChange)="onChapaChange(i)">
+                  </ui-select>
 
                   @if (control.get('cod_chapa')?.value) {
-                    <p-selectbutton
-                      formControlName="desenho_livre"
-                      [options]="modoDesenhoOpcoes"
-                      optionLabel="label"
-                      optionValue="value"
-                      [allowEmpty]="false"
-                      size="small"
-                      (onChange)="onModoDesenhoChange(i)"
-                      aria-label="Origem do desenho: biblioteca ou desenhar à mão"
-                    >
-                    </p-selectbutton>
+                    <ui-selectbutton formControlName="desenho_livre" [options]="modoDesenhoOpcoes" optionLabel="label" optionValue="value" [allowEmpty]="false" size="small" (onChange)="onModoDesenhoChange(i)" aria-label="Origem do desenho: biblioteca ou desenhar à mão">
+                    </ui-selectbutton>
                   }
 
                   @if (control.get('cod_chapa')?.value && control.get('desenho_livre')?.value) {
@@ -206,46 +132,23 @@
                           }
                         </svg>
                       }
-                      <p-button
-                        [label]="getMedidasLabel(control)"
-                        icon="pi pi-pencil"
-                        size="small"
-                        severity="secondary"
-                        [outlined]="true"
-                        (onClick)="abrirDesenhoLivre(i)"
-                        styleClass="w-full"
-                      >
-                      </p-button>
+                      <ui-button [label]="getMedidasLabel(control)" icon="ic ic-pencil" size="small" severity="secondary" [outlined]="true" (onClick)="abrirDesenhoLivre(i)" styleClass="w-full">
+                      </ui-button>
                     </div>
 
                     @if (control.get('desenho_pontos')?.value?.length >= 2) {
-                      <p-select
-                        formControlName="cod_corte"
-                        [options]="
+                      <ui-select formControlName="cod_corte" [options]="
                           getCortesDeChapa(
                             $safeNavigationMigration(control.get('cod_chapa')?.value)
                           )
-                        "
-                        optionLabel="descricao"
-                        optionValue="id"
-                        placeholder="Selecione o Corte"
-                        appendTo="body"
-                        (onChange)="onCorteManualChange(i, $event)"
-                      >
-                      </p-select>
+                        " optionLabel="descricao" optionValue="id" placeholder="Selecione o Corte" (onChange)="onCorteManualChange(i, $event)">
+                      </ui-select>
                     }
                   }
 
                   @if (control.get('cod_chapa')?.value && !control.get('desenho_livre')?.value) {
-                    <p-select
-                      formControlName="cod_desenho"
-                      [options]="desenhos"
-                      optionLabel="descricao"
-                      optionValue="id"
-                      placeholder="2. Selecione o Desenho"
-                      appendTo="body"
-                    >
-                      <ng-template pTemplate="selectedItem" let-opt>
+                    <ui-select formControlName="cod_desenho" [options]="desenhos" optionLabel="descricao" optionValue="id" placeholder="2. Selecione o Desenho">
+                      <ng-template #selecionado let-opt>
                         @if (opt) {
                           <div style="display: flex; align-items: center; gap: 0.5rem">
                             <svg
@@ -285,7 +188,7 @@
                           </div>
                         }
                       </ng-template>
-                      <ng-template pTemplate="item" let-opt>
+                      <ng-template #item let-opt>
                         <div style="display: flex; align-items: center; gap: 0.5rem">
                           <svg
                             width="56"
@@ -321,81 +224,50 @@
                           <span>{{ opt.descricao }}</span>
                         </div>
                       </ng-template>
-                    </p-select>
+                    </ui-select>
                   }
 
                   @if (control.get('cod_desenho')?.value && !control.get('desenho_livre')?.value) {
-                    <p-button
-                      [label]="getMedidasLabel(control)"
-                      icon="pi pi-ruler"
-                      size="small"
-                      severity="secondary"
-                      [outlined]="true"
-                      (onClick)="abrirMedidas(i)"
-                      styleClass="w-full"
-                    >
-                    </p-button>
+                    <ui-button [label]="getMedidasLabel(control)" icon="ic ic-ruler" size="small" severity="secondary" [outlined]="true" (onClick)="abrirMedidas(i)" styleClass="w-full">
+                    </ui-button>
 
-                    <p-select
-                      formControlName="cod_corte"
-                      [options]="
+                    <ui-select formControlName="cod_corte" [options]="
                         getCortesDeChapa($safeNavigationMigration(control.get('cod_chapa')?.value))
-                      "
-                      optionLabel="descricao"
-                      optionValue="id"
-                      placeholder="4. Selecione o Corte"
-                      appendTo="body"
-                      (onChange)="onCorteManualChange(i, $event)"
-                    >
-                    </p-select>
+                      " optionLabel="descricao" optionValue="id" placeholder="4. Selecione o Corte" (onChange)="onCorteManualChange(i, $event)">
+                    </ui-select>
                   }
                 </div>
               } @else {
-                <p-select
-                  formControlName="cod_servico"
-                  [options]="servicos"
-                  optionLabel="descricao"
-                  optionValue="id"
-                  [filter]="true"
-                  (onChange)="onSelecaoServico(i, $event)"
-                  placeholder="Selecione Serviço"
-                  appendTo="body"
-                >
-                </p-select>
+                <ui-select formControlName="cod_servico" [options]="servicos" optionLabel="descricao" optionValue="id" [filter]="true" (onChange)="onSelecaoServico(i, $event)" placeholder="Selecione Serviço">
+                </ui-select>
               }
             </td>
             <td>
-              <input pInputText appCurrencyMask formControlName="quantidade" class="w-full" />
+              <input appCurrencyMask formControlName="quantidade" class="w-full" />
             </td>
             <td>
-              <input pInputText appCurrencyMask formControlName="valor_unitario" class="w-full" />
+              <input appCurrencyMask formControlName="valor_unitario" class="w-full" />
             </td>
             <td class="font-bold">
               {{ control.get('subtotal').value | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
             </td>
             <td class="text-center">
-              <p-button
-                icon="pi pi-trash"
-                severity="danger"
-                [text]="true"
-                [rounded]="true"
-                (onClick)="removerItem(i)"
-              ></p-button>
+              <ui-button icon="ic ic-trash" severity="danger" [text]="true" [rounded]="true" (onClick)="removerItem(i)"></ui-button>
             </td>
           </tr>
         </ng-template>
-        <ng-template pTemplate="emptymessage">
+        <ng-template #emptymessage>
           <tr>
             <td colspan="6" class="text-center p-4 text-600">Nenhum item adicionado.</td>
           </tr>
         </ng-template>
-      </p-table>
+      </ui-table>
     </div>
 
     <div class="col-12 xl:col-3">
       <div style="position: sticky; top: 0">
         <h3 class="section-title">
-          <i class="pi pi-calculator"></i>
+          <i class="ic ic-calculator"></i>
           Resumo do Pedido
         </h3>
 
@@ -429,10 +301,7 @@
           >
             <span class="text-600">Serviço:</span>
             <div style="display: flex; align-items: center; gap: 0.4rem">
-              <i
-                class="pi pi-info-circle text-blue-500"
-                pTooltip="Calculado automaticamente sobre o material"
-              ></i>
+              <i class="ic ic-info-circle text-blue-500" dica="Calculado automaticamente sobre o material"></i>
               <span class="font-bold">{{
                 $safeNavigationMigration(form.get('valor_servico')?.value)
                   | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
@@ -459,7 +328,7 @@
             "
           >
             <span class="font-bold" style="font-size: 1rem">Total do Pedido:</span>
-            <span style="font-size: 1.5rem; font-weight: 700; color: var(--p-primary)">{{
+            <span style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color)">{{
               $safeNavigationMigration(form.get('valor_total')?.value)
                 | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
             }}</span>
@@ -472,42 +341,18 @@
               >Desconto</label
             >
             <div style="display: flex; gap: 0.5rem; align-items: center">
-              <p-selectbutton
-                formControlName="desconto_tipo"
-                [options]="descontoTipoOpcoes"
-                optionLabel="label"
-                optionValue="value"
-                [allowEmpty]="false"
-                (onChange)="onDescontoTipoChange()"
-                aria-label="Tipo de desconto: reais ou percentual"
-              >
-              </p-selectbutton>
+              <ui-selectbutton formControlName="desconto_tipo" [options]="descontoTipoOpcoes" optionLabel="label" optionValue="value" [allowEmpty]="false" (onChange)="onDescontoTipoChange()" aria-label="Tipo de desconto: reais ou percentual">
+              </ui-selectbutton>
 
               @if (form.get('desconto_tipo')?.value === EDescontoTipo.Percentual) {
-                <p-inputnumber
-                  inputId="desconto_valor"
-                  formControlName="desconto_valor"
-                  suffix="%"
-                  [min]="0"
-                  [max]="100"
-                  [maxFractionDigits]="2"
-                  styleClass="w-full"
-                  aria-label="Valor do desconto em percentual"
-                >
-                </p-inputnumber>
+                <ui-input-number inputId="desconto_valor" formControlName="desconto_valor" suffix="%" [min]="0" [max]="100" [maxFractionDigits]="2" styleClass="w-full" aria-label="Valor do desconto em percentual">
+                </ui-input-number>
               } @else {
-                <input
-                  pInputText
-                  appCurrencyMask
-                  id="desconto_valor"
-                  formControlName="desconto_valor"
-                  class="w-full"
-                  aria-label="Valor do desconto em reais"
-                />
+                <input appCurrencyMask id="desconto_valor" formControlName="desconto_valor" class="w-full" aria-label="Valor do desconto em reais" />
               }
             </div>
             @if (form.get('desconto_valor')?.invalid && form.get('desconto_valor')?.touched) {
-              <small class="p-error">Desconto percentual não pode ser maior que 100%.</small>
+              <small class="texto-erro">Desconto percentual não pode ser maior que 100%.</small>
             }
           </div>
         </div>
@@ -524,7 +369,7 @@
               "
             >
               <span class="text-600">Desconto aplicado:</span>
-              <span class="font-bold" style="color: var(--p-red-500, #ef4444)">
+              <span class="font-bold" style="color: var(--cor-perigo, #ef4444)">
                 -
                 {{
                   $safeNavigationMigration(form.get('valor_desconto')?.value)
@@ -537,7 +382,7 @@
 
         <div
           class="row"
-          style="border-top: 2px solid var(--p-primary); padding-top: 0.75rem; margin-top: 0.5rem"
+          style="border-top: 2px solid var(--primary-color); padding-top: 0.75rem; margin-top: 0.5rem"
         >
           <div
             class="col-12"
@@ -549,7 +394,7 @@
             "
           >
             <span class="font-bold" style="font-size: 1rem">Total Líquido:</span>
-            <span style="font-size: 1.6rem; font-weight: 800; color: var(--p-green-600, #16a34a)">{{
+            <span style="font-size: 1.6rem; font-weight: 800; color: var(--cor-sucesso, #16a34a)">{{
               $safeNavigationMigration(form.get('valor_liquido')?.value)
                 | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
             }}</span>
@@ -562,7 +407,7 @@
             padding: 0.75rem;
             background: var(--surface-100);
             border-radius: 8px;
-            border-left: 3px solid var(--p-primary);
+            border-left: 3px solid var(--primary-color);
           "
         >
           <p

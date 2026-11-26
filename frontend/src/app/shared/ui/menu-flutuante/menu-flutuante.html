@@ -1,0 +1,22 @@
+<div #painel popover="manual" class="ui-flutuante ui-menu" role="menu">
+  @if (aberto()) {
+    @for (item of model(); track $index) {
+      @if (item.separator) {
+        <hr class="ui-menu__separador" />
+      } @else {
+        <button
+          type="button"
+          role="menuitem"
+          class="ui-menu__item"
+          [style]="item.style"
+          [disabled]="item.disabled"
+          (click)="executar(item)">
+          @if (item.icon) {
+            <i [class]="item.icon" aria-hidden="true"></i>
+          }
+          <span class="ui-menu__rotulo">{{ item.label }}</span>
+        </button>
+      }
+    }
+  }
+</div>
