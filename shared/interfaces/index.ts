@@ -25,3 +25,4 @@ export * from './IRelatorioPedidosLucros';
 export * from './IPagamentoPix';
 export * from './IDanfeData';
 export * from './INotificacao';
+export * from './INovidade';

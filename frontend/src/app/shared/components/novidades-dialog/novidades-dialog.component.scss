@@ -1,0 +1,65 @@
+.novidades {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.versao-atual {
+  margin: 0;
+  color: var(--text-color-secondary);
+  font-size: 0.95rem;
+}
+
+.lista {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.versao-titulo {
+  margin: 0 0 0.35rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 1rem;
+}
+
+.versao-numero {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-weight: 700;
+  color: var(--p-primary-color, var(--p-primary));
+}
+
+.versao-data {
+  font-weight: 600;
+  color: var(--text-color-secondary);
+}
+
+.versao-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: var(--p-primary-color, var(--p-primary));
+  color: var(--p-primary-contrast-color, var(--surface-0));
+}
+
+ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: var(--text-color);
+  line-height: 1.5;
+  font-size: 0.92rem;
+}
+
+.rodape {
+  display: flex;
+  justify-content: flex-end;
+}

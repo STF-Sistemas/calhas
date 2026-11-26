@@ -2,3 +2,4 @@
 // Adicione cada nova constante aqui ao criá-la
 // Exemplo: export * from './API_ROUTES';
 export * from './LOGO_EMPRESA';
+export * from './NOVIDADES';

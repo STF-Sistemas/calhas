@@ -1,0 +1,38 @@
+<app-dialog-wrapper
+  [visible]="visible"
+  (visibleChange)="onVisibleChange($event)"
+  title="Novidades do Calhas Pro"
+  width="720px"
+  height="auto"
+  maxHeight="85vh"
+  [hasFooter]="false">
+
+  <div class="novidades">
+    <p class="versao-atual">
+      Você está na versão <strong>{{ versaoAtual }}</strong>. O que entrou em cada versão:
+    </p>
+
+    <div class="lista" tabindex="0" aria-label="Lista de novidades por versão">
+      @for (n of novidades; track n.versao; let primeira = $first) {
+        <section class="versao" [attr.aria-label]="'Versão ' + n.versao">
+          <h2 class="versao-titulo">
+            <span class="versao-numero">{{ n.versao }}</span>
+            <span class="versao-data">{{ n.data }}</span>
+            @if (primeira) {
+              <span class="versao-tag">atual</span>
+            }
+          </h2>
+          <ul>
+            @for (item of n.itens; track $index) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+
+    <div class="rodape">
+      <p-button label="Entendi" icon="pi pi-check" (onClick)="entendi()"></p-button>
+    </div>
+  </div>
+</app-dialog-wrapper>

@@ -17,6 +17,7 @@ import { ThemeService } from '#core/services/theme.service';
 import { NotificacaoService } from '#core/services/notificacao.service';
 import { INotificacao } from '#shared/interfaces';
 import { EmpresaFormComponent } from '../../pages/empresas/empresa-form/empresa-form.component';
+import { NovidadesDialogComponent } from '#shared-frontend/components/novidades-dialog/novidades-dialog.component';
 
 @Component({
   selector: 'app-shell',
@@ -35,6 +36,7 @@ import { EmpresaFormComponent } from '../../pages/empresas/empresa-form/empresa-
     BadgeModule,
     ToastModule,
     EmpresaFormComponent,
+    NovidadesDialogComponent,
   ],
   templateUrl: './shell.component.html',
   styleUrls: ['./shell.component.scss']

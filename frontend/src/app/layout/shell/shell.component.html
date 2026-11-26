@@ -35,6 +35,14 @@
       </button>
       <p-menu #colorMenu [model]="colorMenuItems" [popup]="true"></p-menu>
 
+      <button class="p-link layout-topbar-button notif-btn" (click)="novidades.abrir()"
+        pTooltip="Novidades" aria-label="Novidades do sistema">
+        <i class="pi pi-gift"></i>
+        @if (novidades.temNaoVistas()) {
+          <span class="notif-badge"></span>
+        }
+      </button>
+
       <button class="p-link layout-topbar-button notif-btn" (click)="notifPanel.toggle($event); abrirNotificacoes()"
         pTooltip="Notificações" aria-label="Notificações">
         <i class="pi pi-bell"></i>
@@ -172,3 +180,5 @@
 <!-- Dialog: Minha Empresa (admin/super_admin) -->
 <app-empresa-form #empresaForm></app-empresa-form>
 <p-toast></p-toast>
+
+<app-novidades-dialog #novidades></app-novidades-dialog>
