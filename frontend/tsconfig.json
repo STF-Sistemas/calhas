@@ -21,7 +21,9 @@
       "#core/*": ["src/app/core/*"],
       "#shared-frontend/components/*": ["src/app/shared/components/*"],
       "#shared-frontend/directives/*": ["src/app/shared/directives/*"],
-      "#shared-frontend/services/*": ["src/app/shared/services/*"]
+      "#shared-frontend/services/*": ["src/app/shared/services/*"],
+      "#interfaces/*": ["../shared/interfaces/*"],
+      "#environments/*": ["src/environments/*"]
     }
   },
   "angularCompilerOptions": {

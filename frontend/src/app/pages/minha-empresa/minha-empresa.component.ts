@@ -15,7 +15,7 @@ import { Textarea } from 'primeng/textarea';
 import { CardModule } from 'primeng/card';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { ClienteService } from '#core/services/cliente.service';
-import { environment } from 'src/environments/environment';
+import { environment } from '#environments/environment';
 import { IEmpresa } from '#shared/interfaces';
 import { TApiResponse } from '#shared/types';
 import { LogoUploader } from '#shared-frontend/components/logo-uploader/logo-uploader.component';
@@ -62,7 +62,7 @@ export class MinhaEmpresa implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.title.setTitle('Minha Empresa — Calhas Pro');
+    this.title.setTitle('Minha Empresa | Calhas Pro');
 
     this.form = this.fb.group({
       razao_social: ['', [Validators.required, Validators.maxLength(200)]],

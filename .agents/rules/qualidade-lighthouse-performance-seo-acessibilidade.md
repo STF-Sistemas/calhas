@@ -62,7 +62,7 @@ Todo elemento interativo e de conteúdo DEVE satisfazer as diretrizes WCAG 2.1 A
 ### 2.1 Meta Tags Obrigatórias no `index.html`
 O arquivo `frontend/src/index.html` DEVE conter:
 ```html
-<meta name="description" content="[Descrição específica da aplicação — mínimo 70, máximo 160 caracteres]">
+<meta name="description" content="[Descrição específica da aplicação: mínimo 70, máximo 160 caracteres]">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="[URL canônica da página]">
 ```
@@ -112,7 +112,7 @@ O arquivo `frontend/src/index.html` DEVE conter:
   ```html
   <img src="..." alt="..." loading="lazy">
   ```
-- Rotas Angular DEVEM usar `loadComponent` (lazy loading) — nunca importação estática no `app.routes.ts`.
+- Rotas Angular DEVEM usar `loadComponent` (lazy loading): nunca importação estática no `app.routes.ts`.
 
 ### 3.5 Sem Erros no Console do Browser
 - Toda tela implementada deve ser verificada. Não deve haver erros JavaScript no console do browser.

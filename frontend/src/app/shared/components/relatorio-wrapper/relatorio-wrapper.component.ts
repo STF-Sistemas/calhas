@@ -31,6 +31,6 @@ export class RelatorioWrapper {
       partes.push(this.empresa.endereco + (this.empresa.numero ? ', ' + this.empresa.numero : ''));
     }
     if (this.empresa.bairro) partes.push(this.empresa.bairro);
-    return partes.join(' — ');
+    return partes.join(', ');
   }
 }

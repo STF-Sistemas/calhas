@@ -485,7 +485,7 @@ export class PedidoForm implements OnInit {
     if (preenchidas === 0) return 'Informar Medidas';
     const total = this.calcularTotalMedidas(desenho, medidas);
     const segCount = Math.max(0, desenho.pontos.length - 1) + (desenho.diagonais?.length ?? 0) * 2;
-    return `Medidas (${preenchidas}/${segCount}) — Total: ${total}cm`;
+    return `Medidas (${preenchidas}/${segCount}) , total: ${total}cm`;
   }
 
   getCortesDeChapa(codChapa: number) {
@@ -513,7 +513,7 @@ export class PedidoForm implements OnInit {
     if (!codCorte) return '';
     for (const ch of this.chapas) {
       const c = ch.cortes?.find((ct) => ct.id === codCorte);
-      if (c) return `${c.descricao} — ${c.corte}cm`;
+      if (c) return `${c.descricao}, ${c.corte}cm`;
     }
     return '';
   }

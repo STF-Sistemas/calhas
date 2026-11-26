@@ -46,7 +46,7 @@ export const NOVIDADES: INovidade[] = [
     versao: '1.6.0',
     data: '26/11/2026',
     itens: [
-      'Pedido › item de Corte: nova opção "Desenhar". Desenhe o perfil com o dedo ou o mouse, mesmo torto — ao soltar, as linhas ficam retas sozinhas. Não precisa mais cadastrar o desenho antes.',
+      'Pedido › item de Corte: nova opção "Desenhar". Desenhe o perfil com o dedo ou o mouse, mesmo torto: ao soltar, as linhas ficam retas sozinhas. Não precisa mais cadastrar o desenho antes.',
       'Linha transversal: depois do desenho pronto, um traço feito por cima vira uma transversal com duas medidas (P1 e P2). Na soma entra só a maior, e a linha que ela cobre deixa de contar.',
       'Medidas escritas à mão: no modo "Escrever medida", escreva o número em cima do desenho (ex.: 1,33) e ele vai sozinho para a próxima medida livre. Para corrigir, toque no número da linha e escreva de novo, ou digite no campo ao lado.',
       'O corte é escolhido automaticamente pelo total das medidas, e o desenho aparece na impressão e no link enviado ao fornecedor.',

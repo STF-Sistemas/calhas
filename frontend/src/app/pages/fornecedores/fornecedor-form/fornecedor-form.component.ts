@@ -61,7 +61,7 @@ export class FornecedorForm implements OnInit {
 
   crtOpcoes = [
     { label: 'Simples Nacional', value: ECrt.SimplesNacional },
-    { label: 'Simples Nacional — Excesso', value: ECrt.SimplesNacionalExcesso },
+    { label: 'Simples Nacional (excesso de sublimite)', value: ECrt.SimplesNacionalExcesso },
     { label: 'Regime Normal', value: ECrt.RegimeNormal },
   ];
 

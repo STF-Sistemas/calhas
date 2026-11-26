@@ -73,7 +73,7 @@ export class PedidoImpressaoService {
     const partes: string[] = [];
     if (emp.endereco) partes.push(emp.endereco + (emp.numero ? ', ' + emp.numero : ''));
     if (emp.bairro) partes.push(emp.bairro);
-    const enderecoLinha = partes.length ? `<div class="empresa-detalhe">${partes.join(' — ')}</div>` : '';
+    const enderecoLinha = partes.length ? `<div class="empresa-detalhe">${partes.join(', ')}</div>` : '';
     const cidadeLinha = emp.cidade
       ? `<div class="empresa-detalhe">${emp.cidade.descricao}/${emp.cidade.uf}</div>` : '';
     const cepLinha = emp.cep ? `<div class="empresa-detalhe">CEP: ${emp.cep}</div>` : '';
@@ -200,7 +200,7 @@ ${marcaDagua ? `<div class="watermark" aria-hidden="true">${marcaDagua}</div>` :
   ${this.gerarEmpresaHeader(pedido)}
 
   <div class="titulo-row">
-    <h2 class="titulo">Pedido de Fabricação — Nº ${pedido.id} &nbsp;<span class="status-badge">${status}</span></h2>
+    <h2 class="titulo">Pedido de Fabricação | Nº ${pedido.id} &nbsp;<span class="status-badge">${status}</span></h2>
     <span class="titulo-data">Gerado em: ${dataGeracao}</span>
   </div>
 
@@ -278,7 +278,7 @@ ${marcaDagua ? `<div class="watermark" aria-hidden="true">${marcaDagua}</div>` :
 
   <div class="footer">
     <span>Gerado em ${dataGeracao}</span>
-    <span>Pedido Nº ${pedido.id} — ${cliente}</span>
+    <span>Pedido Nº ${pedido.id}, ${cliente}</span>
   </div>
 
 </div>

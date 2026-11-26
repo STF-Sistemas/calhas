@@ -84,7 +84,7 @@ export class PedidoImpressaoDesenhoService {
     const partes: string[] = [];
     if (emp.endereco) partes.push(emp.endereco + (emp.numero ? ', ' + emp.numero : ''));
     if (emp.bairro) partes.push(emp.bairro);
-    const enderecoLinha = partes.length ? `<div class="empresa-detalhe">${partes.join(' — ')}</div>` : '';
+    const enderecoLinha = partes.length ? `<div class="empresa-detalhe">${partes.join(', ')}</div>` : '';
     const cidadeLinha = emp.cidade ? `<div class="empresa-detalhe">${emp.cidade.descricao}/${emp.cidade.uf}</div>` : '';
     const cepLinha = emp.cep ? `<div class="empresa-detalhe">CEP: ${emp.cep}</div>` : '';
     return `
@@ -137,7 +137,7 @@ export class PedidoImpressaoDesenhoService {
         ${watermarkHtml}
         ${this.gerarEmpresaHeader(pedido)}
         <div class="titulo-row">
-          <h2 class="titulo">Ordem de Corte — Pedido Nº ${pedido.id}</h2>
+          <h2 class="titulo">Ordem de Corte | Pedido Nº ${pedido.id}</h2>
           <span class="titulo-data">Gerado em: ${dataGeracao}${paginas.length > 1 ? ` &nbsp;|&nbsp; Pág. ${pIdx + 1}/${paginas.length}` : ''}</span>
         </div>
         ${infoCliente}
@@ -156,7 +156,7 @@ export class PedidoImpressaoDesenhoService {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Ordem de Corte — Pedido Nº ${pedido.id}</title>
+  <title>Ordem de Corte | Pedido Nº ${pedido.id}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; font-size: 10px; color: #1a1a1a; background: #fff; }

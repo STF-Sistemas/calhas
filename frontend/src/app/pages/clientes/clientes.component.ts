@@ -137,7 +137,7 @@ export class Clientes implements OnInit {
       const cidade = (c as any).cidade;
       partes.push(`${cidade.descricao}/${cidade.uf}`);
     }
-    return partes.join(' — ');
+    return partes.join(', ');
   }
 
   onPageChange(event: { first?: number; rows?: number }) {

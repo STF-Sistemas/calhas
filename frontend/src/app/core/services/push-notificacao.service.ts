@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { SwPush } from '@angular/service-worker';
-import { environment } from 'src/environments/environment';
+import { environment } from '#environments/environment';
 import { TApiResponse } from '#shared/types';
 
 @Injectable({ providedIn: 'root' })

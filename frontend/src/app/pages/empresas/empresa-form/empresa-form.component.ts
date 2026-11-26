@@ -21,7 +21,7 @@ import { AuthService } from '#core/services/auth.service';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { HttpClient } from '@angular/common/http';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
-import { environment } from 'src/environments/environment';
+import { environment } from '#environments/environment';
 import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({

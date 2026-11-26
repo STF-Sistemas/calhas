@@ -102,7 +102,7 @@ export class DanfePrintService {
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>DANFE — NF-e ${fmtNfe(d.numero_nfe)}</title>
+<title>DANFE | NF-e ${fmtNfe(d.numero_nfe)}</title>
 <style>
   @page { size: A4 portrait; margin: 5mm; }
   @media print { body { margin: 0; } .no-print { display: none; } }
@@ -194,7 +194,7 @@ export class DanfePrintService {
   </div>
   <div class="cell" style="flex:1">
     <span class="lbl">Protocolo de Autorização de Uso</span>
-    <span class="val">${d.protocolo ? d.protocolo + (d.data_protocolo ? ' — ' + fmtDate(d.data_protocolo) : '') : '—'}</span>
+    <span class="val">${d.protocolo ? d.protocolo + (d.data_protocolo ? ' | ' + fmtDate(d.data_protocolo) : '') : '—'}</span>
   </div>
 </div>
 

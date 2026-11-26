@@ -98,7 +98,7 @@ export class Fornecedores implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.titleService.setTitle('Fornecedores — Calhas');
+    this.titleService.setTitle('Fornecedores | Calhas Pro');
     this.carregar();
   }
 

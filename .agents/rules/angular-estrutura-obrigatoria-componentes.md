@@ -12,6 +12,7 @@ Todos os componentes devem ser criados com separação total de responsabilidade
 - **Configuração do @Component:** O decorador deve conter apenas referências externas: `templateUrl` e `styleUrl` (ou `styleUrls`).
 - **Estilos:** CSS puro (sem SCSS/Sass). Mobile-first com `@media (min-width: ...)`. Cores sempre por variáveis CSS do tema (dark mode).
 - **Nome da classe sem sufixo:** `export class Clientes`, `export class DataTable` (nunca `ClientesComponent`).
+- **Sem comentários no código-fonte** (TS, HTML, CSS, backend e frontend): nada de `//`, `/* */`, JSDoc ou `<!-- -->`. Explicações vão no commit.
 - **Novos arquivos** seguem o padrão do Angular 22: `nome.ts`, `nome.html`, `nome.css` (sem `.component` no nome).
 
 ## 2. Uso Mandatório de PrimeNG
@@ -43,7 +44,7 @@ Para manter a consistência visual e funcional de todos os diálogos:
 Para garantir a consistência entre Frontend e Backend:
 - **Diretório Único:** Crie todas as interfaces (contratos de API, modelos de dados, DTOs) obrigatoriamente na pasta raiz `shared/interfaces` do monorepo (`d:/Pingo/calhas/shared/interfaces`).
 - **Nomenclatura:** Utilize o prefixo "I" (ex: `ICalha.ts`) e exporte no `index.ts` barrel da subpasta.
-- **Importação Obrigatória:** Use **sempre** o alias `#shared/interfaces` — nunca caminhos relativos que saiam do projeto:
+- **Importação Obrigatória:** Use **sempre** o alias `#shared/interfaces`: nunca caminhos relativos que saiam do projeto:
   ```typescript
   // ✅ CORRETO
   import { ICalha } from '#shared/interfaces';
@@ -58,7 +59,7 @@ Para manter a consistência visual, funcionalidades de filtro e paginação em t
 - **Componente Base:** Toda e qualquer listagem (tabela) deve obrigatoriamente utilizar o componente `app-data-table` (`DataTable`).
 - **Implementação:** É PROIBIDO construir tabelas usando diretamente `p-table` nos componentes de página. Utilize as propriedades `data`, `columns` and `actions` do `app-data-table` para configurar a listagem.
 
-## 6. Qualidade Lighthouse (obrigatório — ver rule específica)
+## 6. Qualidade Lighthouse (obrigatório: ver rule específica)
 Toda tela implementada DEVE satisfazer os critérios da rule `qualidade-lighthouse-performance-seo-acessibilidade.md`:
 - **Performance ≥ 90**: lazy loading de rotas (`loadComponent`), `trackBy` em `*ngFor` ou `@for`, `OnPush` onde aplicável, sem `console.log()` de debug.
 - **Acessibilidade ≥ 95**: `aria-label` em todos os ícones interativos, `<h1>` único por página, contraste ≥ 4.5:1, `lang="pt-BR"` no HTML.
@@ -79,29 +80,29 @@ Antes de declarar uma tela como concluída, verifique mentalmente:
 - [ ] Conteúdo principal dentro de `<main>`?
 - [ ] Não há erros no console do browser?
 
-## 8. Controle de Visibilidade Condicional — `@if` vs `[hidden]`
+## 8. Controle de Visibilidade Condicional: `@if` vs `[hidden]`
 Para exibir/ocultar elementos condicionalmente, utilize **sempre a sintaxe de fluxo de controle moderna** do Angular 17+. É PROIBIDO o uso de `*ngIf` (sintaxe legada).
 
 ### 8.1 Regra de Escolha
 
 | Situação | Usar | Motivo |
 |---|---|---|
-| Elemento alternado raramente (ex: estados de carregamento, permissões) | `@if` / `@else` | Remove do DOM — sem custo de memória ou ciclo de vida |
-| Elemento alternado com altíssima frequência (ex: animações em tempo real) | `[hidden]` | Mantém no DOM — evita recriação constante |
+| Elemento alternado raramente (ex: estados de carregamento, permissões) | `@if` / `@else` | Remove do DOM: sem custo de memória ou ciclo de vida |
+| Elemento alternado com altíssima frequência (ex: animações em tempo real) | `[hidden]` | Mantém no DOM: evita recriação constante |
 
 ### 8.2 Sintaxe Obrigatória
 ```html
-<!-- ✅ Correto — sintaxe moderna Angular 17+ -->
+<!-- ✅ Correto: sintaxe moderna Angular 17+ -->
 @if (condicao) {
   <elemento-a></elemento-a>
 } @else {
   <elemento-b></elemento-b>
 }
 
-<!-- ❌ PROIBIDO — sintaxe legada -->
+<!-- ❌ PROIBIDO: sintaxe legada -->
 <elemento-a *ngIf="condicao"></elemento-a>
 
-<!-- ✅ Correto — ng-container agrupa sem gerar DOM real -->
+<!-- ✅ Correto: ng-container agrupa sem gerar DOM real -->
 @if (isSaving) {
   <p-progress-spinner styleClass="w-2rem h-2rem" strokeWidth="4"></p-progress-spinner>
 } @else {
@@ -111,7 +112,7 @@ Para exibir/ocultar elementos condicionalmente, utilize **sempre a sintaxe de fl
   </ng-container>
 }
 
-<!-- ❌ Causa warning NG8011 — dois nós raiz no @else -->
+<!-- ❌ Causa warning NG8011: dois nós raiz no @else -->
 } @else {
   <i class="pi pi-save"></i>
   Salvar

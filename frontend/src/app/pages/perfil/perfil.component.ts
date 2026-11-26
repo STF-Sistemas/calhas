@@ -9,7 +9,7 @@ import { CardModule } from 'primeng/card';
 import { AvatarModule } from 'primeng/avatar';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
-import { environment } from 'src/environments/environment';
+import { environment } from '#environments/environment';
 import { TApiResponse } from '#shared/types';
 import { IUsuario } from '#shared/interfaces';
 import { PushNotificacaoService } from '#core/services/push-notificacao.service';
@@ -47,7 +47,7 @@ export class Perfil implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.title.setTitle('Meu Perfil — Calhas Pro');
+    this.title.setTitle('Meu Perfil | Calhas Pro');
 
     this.form = this.fb.group({
       nome: ['', [Validators.required, Validators.maxLength(150)]],

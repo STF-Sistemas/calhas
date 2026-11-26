@@ -2,7 +2,7 @@
 trigger: always_on
 ---
 
-# Pasta Shared Compartilhada — Padrões Obrigatórios
+# Pasta Shared Compartilhada: Padrões Obrigatórios
 
 Esta rule define a estrutura, localização e padrões de importação da pasta `shared/`, que é compartilhada entre os projetos **frontend** (Angular) e **backend** (Node/Express/Prisma). Toda regra aqui descrita deve ser seguida rigorosamente em qualquer implementação.
 
@@ -10,7 +10,7 @@ Esta rule define a estrutura, localização e padrões de importação da pasta 
 
 ## 1. Estrutura Obrigatória da Pasta `shared/`
 
-A pasta `shared/` fica na **raiz do monorepo** (`d:/Pingo/calhas/shared`) e é compartilhada por frontend e backend. Nunca duplique tipos, interfaces ou enums nos projetos individuais — a fonte da verdade é sempre a pasta `shared/`.
+A pasta `shared/` fica na **raiz do monorepo** (`d:/Pingo/calhas/shared`) e é compartilhada por frontend e backend. Nunca duplique tipos, interfaces ou enums nos projetos individuais: a fonte da verdade é sempre a pasta `shared/`.
 
 ```
 calhas/
@@ -31,7 +31,7 @@ calhas/
 ### 1.1 Criação de subpastas
 
 - Se uma subpasta ainda não existir, crie-a junto com seu `index.ts` (barrel).
-- Nunca crie arquivos avulsos na raiz de `shared/` — use sempre as subpastas corretas.
+- Nunca crie arquivos avulsos na raiz de `shared/`: use sempre as subpastas corretas.
 
 ---
 
@@ -58,20 +58,20 @@ export enum EStatusGeral {
 
 ---
 
-## 3. Padrões de Importação com Path Alias — `#shared/*`
+## 3. Padrões de Importação com Path Alias: `#shared/*`
 
 Tanto no **frontend** quanto no **backend**, o alias `#shared` deve ser configurado para apontar para a pasta `shared/` da raiz do monorepo. As importações DEVEM sempre usar o alias, nunca caminhos relativos que saiam do projeto (`../../shared/...`).
 
 ### 3.1 Sintaxe obrigatória de importação
 
 ```typescript
-// ✅ CORRETO — usar sempre o alias
+// ✅ CORRETO: usar sempre o alias
 import { ICalha } from '#shared/interfaces';
 import { StatusPedido } from '#shared/enums';
 import { TApiResponse } from '#shared/types';
 import { API_ROUTES } from '#shared/constants';
 
-// ❌ PROIBIDO — caminho relativo saindo do projeto
+// ❌ PROIBIDO: caminho relativo saindo do projeto
 import { ICalha } from '../../shared/interfaces';
 import { ICalha } from '../../../shared/interfaces/ICalha';
 ```
@@ -82,16 +82,16 @@ import { ICalha } from '../../../shared/interfaces/ICalha';
 - Importe do arquivo individual apenas quando o barrel gerar problemas de dependência circular.
 
 ```typescript
-// ✅ Preferido — via barrel
+// ✅ Preferido: via barrel
 import { ICalha, IUsuario } from '#shared/interfaces';
 
-// ✅ Aceitável — arquivo individual (somente se necessário)
+// ✅ Aceitável: arquivo individual (somente se necessário)
 import { ICalha } from '#shared/interfaces/ICalha';
 ```
 
 ---
 
-## 4. Configuração do Alias `#shared` — Backend (Node/TypeScript)
+## 4. Configuração do Alias `#shared`: Backend (Node/TypeScript)
 
 No arquivo `backend/tsconfig.json`, adicione/mantenha os paths:
 
@@ -120,7 +120,7 @@ Se o backend usar **Node.js com importações nativas** (ESM com `"type": "modul
 
 ---
 
-## 5. Configuração do Alias `#shared` — Frontend (Angular)
+## 5. Configuração do Alias `#shared`: Frontend (Angular)
 
 No arquivo `frontend/tsconfig.json`, adicione/mantenha os paths:
 
@@ -135,11 +135,11 @@ No arquivo `frontend/tsconfig.json`, adicione/mantenha os paths:
 }
 ```
 
-> O Angular CLI resolve automaticamente os paths do `tsconfig.json` — nenhuma configuração de webpack adicional é necessária.
+> O Angular CLI resolve automaticamente os paths do `tsconfig.json`: nenhuma configuração de webpack adicional é necessária.
 
 ---
 
-## 6. Barrel Files (`index.ts`) — Padrão Obrigatório
+## 6. Barrel Files (`index.ts`): Padrão Obrigatório
 
 Cada subpasta de `shared/` DEVE ter um `index.ts` que re-exporta tudo:
 
@@ -166,7 +166,7 @@ export * from './constants';
 
 ---
 
-## 7. Regras de Conteúdo — O que PODE e o que NÃO PODE estar em `shared/`
+## 7. Regras de Conteúdo: O que PODE e o que NÃO PODE estar em `shared/`
 
 ### ✅ PODE estar em `shared/`
 - Interfaces de entidades (`ICalha`, `IUsuario`, `IPedido`)

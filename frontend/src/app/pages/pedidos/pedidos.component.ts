@@ -20,7 +20,7 @@ import { PedidoImpressaoService } from '#core/services/pedido-impressao.service'
 import { IPedido, ICliente } from '#shared/interfaces';
 import { EStatusPedido, ETipoItemPedido, EAprovacaoPedido } from '#shared/enums';
 import { obterAprovacaoTag } from '#shared/functions/aprovacao.functions';
-import { environment } from 'src/environments/environment';
+import { environment } from '#environments/environment';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
 

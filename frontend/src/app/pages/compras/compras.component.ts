@@ -86,7 +86,7 @@ export class Compras implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.titleService.setTitle('Compras — Calhas');
+    this.titleService.setTitle('Compras | Calhas Pro');
     this.carregar();
   }
 

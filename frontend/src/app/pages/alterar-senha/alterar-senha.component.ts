@@ -12,7 +12,7 @@ import { HttpClient } from '@angular/common/http';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { PasswordModule } from 'primeng/password';
-import { environment } from 'src/environments/environment';
+import { environment } from '#environments/environment';
 import { TApiResponse } from '#shared/types';
 import { ToastService } from '#shared-frontend/services/toast.service';
 
@@ -47,7 +47,7 @@ export class AlterarSenha implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.title.setTitle('Alterar Senha — Calhas Pro');
+    this.title.setTitle('Alterar Senha | Calhas Pro');
 
     this.form = this.fb.group(
       {
