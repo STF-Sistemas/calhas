@@ -24,7 +24,7 @@ import { TApiResponse } from '#shared/types';
   ],
   templateUrl: './esqueci-senha.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./esqueci-senha.component.scss'],
+  styleUrls: ['./esqueci-senha.component.css'],
 })
 export class EsqueciSenhaComponent {
   form: FormGroup;

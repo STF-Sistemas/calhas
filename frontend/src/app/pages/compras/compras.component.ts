@@ -31,7 +31,7 @@ import { EStatusCompra } from '#shared/enums';
     ButtonModule,
   ],
   templateUrl: './compras.component.html',
-  styleUrls: ['./compras.component.scss'],
+  styleUrls: ['./compras.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })

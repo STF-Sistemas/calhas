@@ -24,7 +24,7 @@ import { IFornecedor } from '#shared/interfaces';
   ],
   templateUrl: './fornecedor-lookup-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./fornecedor-lookup-dialog.component.scss'],
+  styleUrls: ['./fornecedor-lookup-dialog.component.css'],
 })
 export class FornecedorLookupDialogComponent {
   @ViewChild('fornecedorForm') fornecedorFormRef?: FornecedorFormComponent;

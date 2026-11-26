@@ -13,7 +13,7 @@ import { EAprovacaoPedido } from '#shared/enums';
   imports: [CommonModule, TagModule, DialogWrapperComponent],
   templateUrl: './autorizacao-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./autorizacao-dialog.component.scss'],
+  styleUrls: ['./autorizacao-dialog.component.css'],
 })
 export class AutorizacaoDialogComponent {
   visible = false;

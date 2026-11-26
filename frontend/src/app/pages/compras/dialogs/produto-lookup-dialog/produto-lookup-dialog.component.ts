@@ -15,7 +15,7 @@ import { IProduto } from '#shared/interfaces';
   imports: [CommonModule, FormsModule, ButtonModule, TableModule, DialogModule, InputTextModule],
   templateUrl: './produto-lookup-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./produto-lookup-dialog.component.scss'],
+  styleUrls: ['./produto-lookup-dialog.component.css'],
 })
 export class ProdutoLookupDialogComponent {
   @Output() selecionado = new EventEmitter<{ produto: IProduto; itemIndex: number }>();

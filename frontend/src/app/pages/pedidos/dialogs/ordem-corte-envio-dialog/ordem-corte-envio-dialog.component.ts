@@ -32,7 +32,7 @@ interface IItemSelecionavel {
   ],
   templateUrl: './ordem-corte-envio-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./ordem-corte-envio-dialog.component.scss'],
+  styleUrls: ['./ordem-corte-envio-dialog.component.css'],
 })
 export class OrdemCorteEnvioDialogComponent {
   visible = false;

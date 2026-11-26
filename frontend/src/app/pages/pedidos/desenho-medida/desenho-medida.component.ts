@@ -31,7 +31,7 @@ import { ThemeService } from '#core/services/theme.service';
   ],
   templateUrl: './desenho-medida.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./desenho-medida.component.scss'],
+  styleUrls: ['./desenho-medida.component.css'],
 })
 export class DesenhoMedidaComponent implements AfterViewInit {
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;

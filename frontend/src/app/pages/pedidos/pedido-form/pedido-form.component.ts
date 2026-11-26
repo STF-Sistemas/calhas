@@ -69,7 +69,7 @@ import { calcularValorDesconto, calcularValorLiquido } from '#shared/functions/d
   ],
   templateUrl: './pedido-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./pedido-form.component.scss'],
+  styleUrls: ['./pedido-form.component.css'],
 })
 export class PedidoFormComponent implements OnInit {
   @ViewChild('medidasDialog') medidasDialog!: DesenhoMedidaComponent;

@@ -17,7 +17,7 @@ const CHAVE_VERSAO_VISTA = 'calhas.novidades.versaoVista';
   imports: [ButtonModule, DialogWrapperComponent],
   templateUrl: './novidades-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./novidades-dialog.component.scss'],
+  styleUrls: ['./novidades-dialog.component.css'],
 })
 export class NovidadesDialogComponent implements OnInit {
   readonly novidades: INovidade[] = NOVIDADES;

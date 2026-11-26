@@ -11,7 +11,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
   imports: [CommonModule, DialogModule, ButtonModule, TooltipModule, ProgressSpinnerModule],
   templateUrl: './dialog-wrapper.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./dialog-wrapper.component.scss'],
+  styleUrls: ['./dialog-wrapper.component.css'],
 })
 export class DialogWrapperComponent {
   @Input() visible = false;

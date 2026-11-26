@@ -53,7 +53,7 @@ import { environment } from 'src/environments/environment';
   ],
   templateUrl: './empresa-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./empresa-form.component.scss'],
+  styleUrls: ['./empresa-form.component.css'],
 })
 export class EmpresaFormComponent {
   @Output() saved = new EventEmitter<void>();

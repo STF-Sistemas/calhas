@@ -34,7 +34,7 @@ import { ClienteService } from '#core/services/cliente.service';
   providers: [provideNgxMask()],
   templateUrl: './cliente-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./cliente-form.component.scss'],
+  styleUrls: ['./cliente-form.component.css'],
 })
 export class ClienteFormComponent {
   @Output() saved = new EventEmitter<void>();

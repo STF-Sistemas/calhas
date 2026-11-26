@@ -20,7 +20,7 @@ import { EStatusGeral } from '#shared/enums';
     ToastModule,
   ],
   templateUrl: './meios-pagamento.component.html',
-  styleUrls: ['./meios-pagamento.component.scss'],
+  styleUrls: ['./meios-pagamento.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })

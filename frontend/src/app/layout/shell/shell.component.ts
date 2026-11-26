@@ -49,7 +49,7 @@ import { NovidadesDialogComponent } from '#shared-frontend/components/novidades-
   ],
   templateUrl: './shell.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./shell.component.scss'],
+  styleUrls: ['./shell.component.css'],
 })
 export class ShellComponent implements OnInit, OnDestroy {
   @ViewChild('empresaForm') empresaFormRef?: EmpresaFormComponent;

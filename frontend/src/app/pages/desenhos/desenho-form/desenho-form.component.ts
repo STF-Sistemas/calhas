@@ -35,7 +35,7 @@ import { IDiagonal, IPonto } from '#shared/interfaces';
   ],
   templateUrl: './desenho-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./desenho-form.component.scss'],
+  styleUrls: ['./desenho-form.component.css'],
 })
 export class DesenhoFormComponent implements OnInit, AfterViewInit {
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;

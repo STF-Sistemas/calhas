@@ -56,7 +56,7 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
   providers: [provideNgxMask()],
   templateUrl: './compra-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./compra-form.component.scss'],
+  styleUrls: ['./compra-form.component.css'],
 })
 export class CompraFormComponent implements OnInit {
   @ViewChild('fornecedorLookup') fornecedorLookup!: FornecedorLookupDialogComponent;

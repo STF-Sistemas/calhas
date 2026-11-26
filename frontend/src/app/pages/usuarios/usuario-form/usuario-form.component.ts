@@ -29,7 +29,7 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
   ],
   templateUrl: './usuario-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./usuario-form.component.scss'],
+  styleUrls: ['./usuario-form.component.css'],
 })
 export class UsuarioFormComponent implements OnInit {
   @Output() saved = new EventEmitter<void>();

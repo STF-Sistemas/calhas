@@ -14,7 +14,7 @@ import { EStatusGeral } from '#shared/enums';
   standalone: true,
   imports: [CommonModule, DataTableComponent, ChapaFormComponent, ConfirmDialogModule, ToastModule],
   templateUrl: './chapas.component.html',
-  styleUrls: ['./chapas.component.scss'],
+  styleUrls: ['./chapas.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })

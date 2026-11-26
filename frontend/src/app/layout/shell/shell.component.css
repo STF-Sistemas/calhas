@@ -1,0 +1,269 @@
+/*
+  Shell Component Styles
+  Estilos dos botões e elementos da topbar.
+*/
+/* ===========================
+   Topbar Buttons
+=========================== */
+:host ::ng-deep .layout-topbar-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: var(--text-color);
+  flex-shrink: 0;
+}
+:host ::ng-deep .layout-topbar-button i {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+:host ::ng-deep .layout-topbar-button:hover {
+  background-color: var(--surface-100);
+}
+:host ::ng-deep .layout-topbar-button:focus-visible {
+  outline: 2px solid var(--p-primary);
+  outline-offset: 2px;
+}
+:host ::ng-deep {
+  /* Tema escuro: ícones mais claros */
+}
+:host ::ng-deep .app-dark .layout-topbar-button {
+  color: var(--surface-700);
+}
+:host ::ng-deep .app-dark .layout-topbar-button:hover {
+  background-color: var(--surface-200);
+}
+
+/* ===========================
+   Topbar Logo
+=========================== */
+.layout-topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.layout-topbar-logo span {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-color);
+  white-space: nowrap;
+}
+
+/* ===========================
+   Sidebar Menu
+=========================== */
+.layout-menu ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.layout-menu li a {
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  outline: 0 none;
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 0.7rem 0.875rem;
+  border-radius: 10px;
+  transition: background-color 0.15s, color 0.15s;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.layout-menu li a i {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+.layout-menu li a:hover {
+  background-color: var(--surface-100);
+}
+.layout-menu li a:hover i {
+  color: var(--p-primary);
+}
+.layout-menu li a.active-route {
+  font-weight: 600;
+  color: var(--p-primary);
+  background-color: color-mix(in srgb, var(--p-primary) 10%, transparent);
+}
+.layout-menu li a.active-route i {
+  color: var(--p-primary);
+}
+
+/* ===========================
+   Mobile mask
+=========================== */
+.layout-mask {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 998;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+}
+
+.layout-wrapper.layout-mobile-active .layout-mask {
+  display: block;
+}
+
+/* ===========================
+   Responsive
+=========================== */
+@media (max-width: 991px) {
+  .layout-topbar-logo span {
+    display: none;
+  }
+}
+.licenca-banner {
+  position: fixed;
+  top: 5rem;
+  left: 0;
+  right: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+}
+.licenca-banner i {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.licenca-banner span {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.licenca-banner .licenca-link {
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.licenca-banner--error {
+  background: #fef2f2;
+  color: #991b1b;
+  border-bottom: 1px solid #fecaca;
+}
+.licenca-banner--error .licenca-link {
+  color: #991b1b;
+}
+
+:host-context(.app-dark) .licenca-banner--error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border-bottom-color: rgba(239, 68, 68, 0.2);
+}
+
+.notif-btn {
+  position: relative;
+}
+.notif-btn .notif-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--p-amber-400, #fbbf24);
+  border: 2px solid var(--surface-0);
+}
+.notif-btn .notif-badge--urgente {
+  background-color: var(--p-red-500, #ef4444);
+}
+
+:host ::ng-deep .notif-popover .p-popover-content {
+  padding: 0.5rem;
+}
+
+.notif-panel {
+  min-width: 260px;
+  max-width: 300px;
+}
+
+.notif-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.notif-item {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: var(--surface-50);
+  border: 1px solid var(--surface-border);
+  border-left: 3px solid var(--p-amber-400, #fbbf24);
+}
+.notif-item--urgente {
+  border-left-color: var(--p-red-500, #ef4444);
+}
+.notif-item--nao-lida {
+  border-left-color: var(--p-primary-color, #f97316);
+  cursor: pointer;
+}
+
+.notif-item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+}
+.notif-item-header i {
+  font-size: 0.9rem;
+  color: var(--p-amber-500, #f59e0b);
+}
+
+.notif-item--urgente .notif-item-header i {
+  color: var(--p-red-500, #ef4444);
+}
+
+.notif-item-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-color);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.notif-item-texto {
+  font-size: 0.875rem;
+  color: var(--text-color);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.notif-vazia {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: var(--text-color-secondary);
+  font-size: 0.875rem;
+}
+.notif-vazia i {
+  color: var(--p-green-500, #22c55e);
+  font-size: 1rem;
+}

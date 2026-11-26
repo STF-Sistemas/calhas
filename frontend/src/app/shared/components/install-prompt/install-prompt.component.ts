@@ -8,7 +8,7 @@ import { ButtonModule } from 'primeng/button';
   imports: [CommonModule, ButtonModule],
   templateUrl: './install-prompt.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./install-prompt.component.scss'],
+  styleUrls: ['./install-prompt.component.css'],
 })
 export class InstallPromptComponent implements OnInit, OnDestroy {
   visible = false;

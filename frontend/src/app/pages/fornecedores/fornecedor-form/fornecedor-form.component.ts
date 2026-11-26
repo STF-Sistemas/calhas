@@ -46,7 +46,7 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
   providers: [provideNgxMask()],
   templateUrl: './fornecedor-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./fornecedor-form.component.scss'],
+  styleUrls: ['./fornecedor-form.component.css'],
 })
 export class FornecedorFormComponent implements OnInit {
   /** Quando usado como sub-componente de lookup, pré-preenche o CNPJ */

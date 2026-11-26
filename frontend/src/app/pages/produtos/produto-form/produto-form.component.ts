@@ -23,7 +23,7 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
   ],
   templateUrl: './produto-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./produto-form.component.scss'],
+  styleUrls: ['./produto-form.component.css'],
 })
 export class ProdutoFormComponent implements OnDestroy {
   @Output() saved = new EventEmitter<IProduto>();

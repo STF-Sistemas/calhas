@@ -34,7 +34,7 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
   ],
   templateUrl: './chapa-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./chapa-form.component.scss'],
+  styleUrls: ['./chapa-form.component.css'],
 })
 export class ChapaFormComponent {
   @Output() saved = new EventEmitter<void>();

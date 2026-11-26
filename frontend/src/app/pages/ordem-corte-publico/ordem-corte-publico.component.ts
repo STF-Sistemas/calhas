@@ -35,7 +35,7 @@ interface IItemCorteExibicao {
   imports: [CommonModule],
   templateUrl: './ordem-corte-publico.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./ordem-corte-publico.component.scss'],
+  styleUrls: ['./ordem-corte-publico.component.css'],
 })
 export class OrdemCortePublicoComponent implements OnInit {
   estado: 'carregando' | 'ok' | 'expirado' | 'cancelado' | 'invalido' = 'carregando';

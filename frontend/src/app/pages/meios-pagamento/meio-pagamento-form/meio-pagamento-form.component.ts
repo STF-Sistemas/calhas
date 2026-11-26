@@ -19,7 +19,7 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
   ],
   templateUrl: './meio-pagamento-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./meio-pagamento-form.component.scss'],
+  styleUrls: ['./meio-pagamento-form.component.css'],
 })
 export class MeioPagamentoFormComponent {
   @Output() saved = new EventEmitter<void>();

@@ -22,7 +22,7 @@ import { AssinaturaCanvasComponent } from '#shared-frontend/components/assinatur
   ],
   templateUrl: './orcamento-publico.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./orcamento-publico.component.scss'],
+  styleUrls: ['./orcamento-publico.component.css'],
 })
 export class OrcamentoPublicoComponent implements OnInit {
   @ViewChild(AssinaturaCanvasComponent) assinaturaCanvas?: AssinaturaCanvasComponent;

@@ -21,7 +21,7 @@ import { IEmpresa } from '#shared/interfaces';
     TagModule,
   ],
   templateUrl: './empresas.component.html',
-  styleUrls: ['./empresas.component.scss'],
+  styleUrls: ['./empresas.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })

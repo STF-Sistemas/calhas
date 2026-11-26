@@ -42,7 +42,7 @@ import { EStatusCompra } from '#shared/enums';
     TagModule,
   ],
   templateUrl: './fornecedores.component.html',
-  styleUrls: ['./fornecedores.component.scss'],
+  styleUrls: ['./fornecedores.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })

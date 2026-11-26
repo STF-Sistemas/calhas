@@ -21,7 +21,7 @@ import { IUsuario } from '#shared/interfaces';
     TagModule,
   ],
   templateUrl: './usuarios.component.html',
-  styleUrls: ['./usuarios.component.scss'],
+  styleUrls: ['./usuarios.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })

@@ -41,7 +41,7 @@ import { EStatusPedido } from '#shared/enums';
     TagModule,
   ],
   templateUrl: './clientes.component.html',
-  styleUrls: ['./clientes.component.scss'],
+  styleUrls: ['./clientes.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })

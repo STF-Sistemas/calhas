@@ -21,7 +21,7 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
   ],
   templateUrl: './servico-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./servico-form.component.scss'],
+  styleUrls: ['./servico-form.component.css'],
 })
 export class ServicoFormComponent {
   @Output() saved = new EventEmitter<void>();

@@ -26,7 +26,7 @@ import { EStatusGeral } from '#shared/enums';
     ButtonModule,
   ],
   templateUrl: './produtos.component.html',
-  styleUrls: ['./produtos.component.scss'],
+  styleUrls: ['./produtos.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })

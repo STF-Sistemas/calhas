@@ -45,7 +45,7 @@ import { environment } from 'src/environments/environment';
     ButtonModule,
   ],
   templateUrl: './pedidos.component.html',
-  styleUrls: ['./pedidos.component.scss'],
+  styleUrls: ['./pedidos.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })

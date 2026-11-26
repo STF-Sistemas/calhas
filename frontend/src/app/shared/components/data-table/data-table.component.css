@@ -1,0 +1,51 @@
+.drawing-bg {
+  fill: #f8f8f8;
+}
+
+.table-scroll-wrapper {
+  overflow-x: auto;
+}
+
+:host-context(.app-dark) .drawing-bg {
+  fill: #141414;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-header {
+  background: var(--surface-card);
+  border: none;
+}
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  background: var(--surface-section);
+  padding: 1rem;
+  color: var(--text-color);
+  font-weight: 600;
+  border-bottom: 1px solid var(--surface-border);
+}
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr {
+  background: var(--surface-card);
+  transition: background 0.2s;
+}
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
+  background: var(--surface-hover);
+}
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+  padding: 1rem;
+  border: none;
+}
+:host ::ng-deep .p-paginator {
+  background: var(--surface-card);
+  border: none;
+  border-top: 1px solid var(--surface-border);
+  padding: 0.75rem;
+}
+
+@media screen and (max-width: 960px) {
+  :host ::ng-deep .p-datatable-stack .p-datatable-tbody > tr > td {
+    text-align: left;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--surface-border);
+  }
+}

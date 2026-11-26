@@ -19,7 +19,7 @@ import { IDesenho } from '#shared/interfaces';
     ToastModule,
   ],
   templateUrl: './desenhos.component.html',
-  styleUrls: ['./desenhos.component.scss'],
+  styleUrls: ['./desenhos.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })

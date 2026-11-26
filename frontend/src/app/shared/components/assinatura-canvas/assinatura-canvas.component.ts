@@ -7,7 +7,7 @@ import SignaturePad from 'signature_pad';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './assinatura-canvas.component.html',
-  styleUrls: ['./assinatura-canvas.component.scss'],
+  styleUrls: ['./assinatura-canvas.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssinaturaCanvasComponent implements AfterViewInit, OnDestroy {

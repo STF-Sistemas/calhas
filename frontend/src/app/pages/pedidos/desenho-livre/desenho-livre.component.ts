@@ -64,7 +64,7 @@ interface ISnapshot {
   ],
   templateUrl: './desenho-livre.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./desenho-livre.component.scss'],
+  styleUrls: ['./desenho-livre.component.css'],
 })
 export class DesenhoLivreComponent implements OnDestroy {
   @ViewChild('canvas') canvasRef?: ElementRef<HTMLCanvasElement>;

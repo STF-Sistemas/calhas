@@ -32,7 +32,7 @@ import { IPagamentoPix } from '#shared/interfaces';
   ],
   templateUrl: './pagamento.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./pagamento.component.scss'],
+  styleUrls: ['./pagamento.component.css'],
 })
 export class PagamentoComponent implements OnInit, OnDestroy {
   carregando = signal(true);

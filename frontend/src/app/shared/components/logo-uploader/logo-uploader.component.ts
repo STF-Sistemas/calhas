@@ -11,7 +11,7 @@ import { LOGO_EMPRESA_TIPOS_ACEITOS, LOGO_EMPRESA_TAMANHO_MAXIMO_BYTES } from '#
   standalone: true,
   imports: [CommonModule, ButtonModule],
   templateUrl: './logo-uploader.component.html',
-  styleUrls: ['./logo-uploader.component.scss'],
+  styleUrls: ['./logo-uploader.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

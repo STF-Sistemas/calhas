@@ -33,7 +33,7 @@ import { IRelatorioPedidosLucros, IEmpresa } from '#shared/interfaces';
   ],
   templateUrl: './pedidos-lucros.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./pedidos-lucros.component.scss'],
+  styleUrls: ['./pedidos-lucros.component.css'],
 })
 export class PedidosLucrosComponent implements OnInit {
   form: FormGroup;

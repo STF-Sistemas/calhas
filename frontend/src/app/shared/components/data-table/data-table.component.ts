@@ -36,7 +36,7 @@ import { NgxMaskPipe, provideNgxMask } from 'ngx-mask';
   providers: [provideNgxMask()],
   templateUrl: './data-table.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./data-table.component.scss'],
+  styleUrls: ['./data-table.component.css'],
 })
 export class DataTableComponent {
   constructor(public themeService: ThemeService) {}
