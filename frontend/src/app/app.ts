@@ -1,10 +1,12 @@
 import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ThemeService } from '#core/services/theme.service';
+import { ToastContainer } from '#shared-frontend/components/toast-container/toast-container';
+import { ConfirmDialog } from '#shared-frontend/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, ToastContainer, ConfirmDialog],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './app.html',
 })

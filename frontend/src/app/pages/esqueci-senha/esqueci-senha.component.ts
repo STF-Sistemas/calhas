@@ -5,11 +5,10 @@ import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
 import { ThemeService } from '#core/services/theme.service';
 import { environment } from 'src/environments/environment';
 import { TApiResponse } from '#shared/types';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-esqueci-senha',
@@ -20,7 +19,6 @@ import { TApiResponse } from '#shared/types';
     ReactiveFormsModule,
     ButtonModule,
     InputTextModule,
-    ToastModule,
   ],
   templateUrl: './esqueci-senha.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -34,7 +32,7 @@ export class EsqueciSenha {
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
     public themeService: ThemeService,
   ) {
     this.form = this.fb.group({

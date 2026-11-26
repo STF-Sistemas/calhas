@@ -1,9 +1,6 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 import { TagModule } from 'primeng/tag';
 import { PanelModule } from 'primeng/panel';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -24,6 +21,8 @@ import { IPedido, ICliente } from '#shared/interfaces';
 import { EStatusPedido, ETipoItemPedido, EAprovacaoPedido } from '#shared/enums';
 import { obterAprovacaoTag } from '#shared/functions/aprovacao.functions';
 import { environment } from 'src/environments/environment';
+import { ToastService } from '#shared-frontend/services/toast.service';
+import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-pedidos',
@@ -35,8 +34,6 @@ import { environment } from 'src/environments/environment';
     PedidoForm,
     OrdemCorteEnvioDialog,
     AutorizacaoDialog,
-    ConfirmDialogModule,
-    ToastModule,
     TagModule,
     PanelModule,
     DatePickerModule,
@@ -47,7 +44,6 @@ import { environment } from 'src/environments/environment';
   templateUrl: './pedidos.component.html',
   styleUrls: ['./pedidos.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  providers: [ConfirmationService],
 })
 export class Pedidos implements OnInit {
   @ViewChild('form') form!: PedidoForm;
@@ -135,8 +131,8 @@ export class Pedidos implements OnInit {
     private pedidoService: PedidoService,
     private clienteService: ClienteService,
     private impressaoService: PedidoImpressaoService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
+    private readonly toast: ToastService,
+    private readonly confirmDialog: ConfirmDialogService,
   ) {}
 
   ngOnInit(): void {
@@ -190,11 +186,7 @@ export class Pedidos implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar pedidos',
-        });
+        this.toast.error('Falha ao carregar pedidos');
         this.loading = false;
       },
     });
@@ -218,11 +210,7 @@ export class Pedidos implements OnInit {
     this.pedidoService.buscarPorId(pedido.id).subscribe({
       next: (res) => this.impressaoService.imprimir(res.data),
       error: () =>
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar dados do pedido',
-        }),
+        this.toast.error('Falha ao carregar dados do pedido'),
     });
   }
 
@@ -233,21 +221,13 @@ export class Pedidos implements OnInit {
           (i) => i.tipo === ETipoItemPedido.Corte || i.tipo === ETipoItemPedido.Produto,
         );
         if (!temItensEnviaveis) {
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'Atenção',
-            detail: 'Este pedido não possui produtos ou cortes para envio.',
-          });
+          this.toast.warn('Este pedido não possui produtos ou cortes para envio.');
           return;
         }
         this.ordemCorteDialog.abrir(res.data);
       },
       error: () =>
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar dados do pedido',
-        }),
+        this.toast.error('Falha ao carregar dados do pedido'),
     });
   }
 
@@ -269,37 +249,27 @@ export class Pedidos implements OnInit {
     const acao = mapa[event.key];
     if (!acao) return;
 
-    this.confirmationService.confirm({
-      message: `Deseja ${acao.label} o Pedido Nº <strong>${event.row.id}</strong>?`,
-      header: 'Alterar Status',
-      icon: 'pi pi-question-circle',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
-      accept: () => {
+    this.confirmDialog.confirm({
+      title: 'Alterar Status',
+      message: `Deseja ${acao.label} o Pedido Nº ${event.row.id}?`,
+      confirmText: 'Sim',
+      cancelText: 'Não',
+    }).then((ok) => {
+      if (!ok) return;
         this.pedidoService.alterarStatus(event.row.id, acao.status).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Status do pedido atualizado.',
-            });
+            this.toast.success('Status do pedido atualizado.');
             this.carregarPedidos();
           },
           error: (err) => {
             const erros: string[] = err.error?.erros ?? [];
             const summary = err.error?.message || 'Falha ao alterar status';
-            this.messageService.add({ severity: 'error', summary, life: 6000 });
+            this.toast.error(summary);
             erros.forEach((e) =>
-              this.messageService.add({
-                severity: 'warn',
-                summary: 'Estoque insuficiente',
-                detail: e,
-                life: 8000,
-              }),
+              this.toast.warn(e, 'Estoque insuficiente'),
             );
           },
         });
-      },
     });
   }
 
@@ -320,42 +290,30 @@ export class Pedidos implements OnInit {
         window.open(waUrl, '_blank', 'noopener,noreferrer');
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao gerar link do WhatsApp.',
-        });
+        this.toast.error('Falha ao gerar link do WhatsApp.');
       },
     });
   }
 
   onDelete(pedido: IPedido) {
     if (pedido.status !== EStatusPedido.Aberto) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Não permitido',
-        detail: 'Apenas pedidos em status ABERTO podem ser excluídos.',
-      });
+      this.toast.warn('Apenas pedidos em status ABERTO podem ser excluídos.', 'Não permitido');
       return;
     }
-    this.confirmationService.confirm({
+    this.confirmDialog.confirm({
+      title: 'Confirmar Exclusão',
       message: `Deseja realmente excluir o pedido Nº ${pedido.id}? Esta ação é irreversível.`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-exclamation-danger',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
-      accept: () => {
+      confirmText: 'Sim',
+      cancelText: 'Não',
+      danger: true,
+    }).then((ok) => {
+      if (!ok) return;
         this.pedidoService.remover(pedido.id).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Pedido excluído',
-            });
+            this.toast.success('Pedido excluído');
             this.carregarPedidos();
           },
         });
-      },
     });
   }
 }

@@ -1,12 +1,11 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
 import { DesenhoForm } from './desenho-form/desenho-form.component';
 import { DesenhoService } from '#core/services/desenho.service';
 import { IDesenho } from '#shared/interfaces';
+import { ToastService } from '#shared-frontend/services/toast.service';
+import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-desenhos',
@@ -15,13 +14,10 @@ import { IDesenho } from '#shared/interfaces';
     CommonModule,
     DataTable,
     DesenhoForm,
-    ConfirmDialogModule,
-    ToastModule,
   ],
   templateUrl: './desenhos.component.html',
   styleUrls: ['./desenhos.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  providers: [ConfirmationService],
 })
 export class Desenhos implements OnInit {
   @ViewChild('form') form!: DesenhoForm;
@@ -37,8 +33,8 @@ export class Desenhos implements OnInit {
 
   constructor(
     private desenhoService: DesenhoService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
+    private readonly toast: ToastService,
+    private readonly confirmDialog: ConfirmDialogService,
   ) {}
 
   ngOnInit() {
@@ -53,11 +49,7 @@ export class Desenhos implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar desenhos',
-        });
+        this.toast.error('Falha ao carregar desenhos');
         this.loading = false;
       },
     });
@@ -72,24 +64,20 @@ export class Desenhos implements OnInit {
   }
 
   onDelete(desenho: IDesenho) {
-    this.confirmationService.confirm({
+    this.confirmDialog.confirm({
+      title: 'Confirmar Exclusão',
       message: `Deseja realmente excluir o desenho "${desenho.descricao}"?`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
-      accept: () => {
+      confirmText: 'Sim',
+      cancelText: 'Não',
+      danger: true,
+    }).then((ok) => {
+      if (!ok) return;
         this.desenhoService.desativar(desenho.id).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Desenho excluído',
-            });
+            this.toast.success('Desenho excluído');
             this.carregarDesenhos();
           },
         });
-      },
     });
   }
 }

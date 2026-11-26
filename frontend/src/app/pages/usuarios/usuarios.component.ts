@@ -1,13 +1,12 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 import { TagModule } from 'primeng/tag';
 import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
 import { UsuarioForm } from './usuario-form/usuario-form.component';
 import { UsuarioService } from '#core/services/usuario.service';
 import { IUsuario } from '#shared/interfaces';
+import { ToastService } from '#shared-frontend/services/toast.service';
+import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-usuarios',
@@ -16,14 +15,11 @@ import { IUsuario } from '#shared/interfaces';
     CommonModule,
     DataTable,
     UsuarioForm,
-    ConfirmDialogModule,
-    ToastModule,
     TagModule,
   ],
   templateUrl: './usuarios.component.html',
   styleUrls: ['./usuarios.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  providers: [ConfirmationService],
 })
 export class Usuarios implements OnInit {
   @ViewChild('form') form!: UsuarioForm;
@@ -40,8 +36,8 @@ export class Usuarios implements OnInit {
 
   constructor(
     private usuarioService: UsuarioService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
+    private readonly toast: ToastService,
+    private readonly confirmDialog: ConfirmDialogService,
   ) {}
 
   ngOnInit(): void {
@@ -60,11 +56,7 @@ export class Usuarios implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar usuários',
-        });
+        this.toast.error('Falha ao carregar usuários');
         this.loading = false;
       },
     });
@@ -79,24 +71,20 @@ export class Usuarios implements OnInit {
   }
 
   onDelete(usuario: IUsuario) {
-    this.confirmationService.confirm({
+    this.confirmDialog.confirm({
+      title: 'Confirmar Exclusão',
       message: `Deseja realmente excluir o usuário "${usuario.nome}"?`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
-      accept: () => {
+      confirmText: 'Sim',
+      cancelText: 'Não',
+      danger: true,
+    }).then((ok) => {
+      if (!ok) return;
         this.usuarioService.desativar(usuario.id).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Usuário excluído',
-            });
+            this.toast.success('Usuário excluído');
             this.carregarUsuarios();
           },
         });
-      },
     });
   }
 }

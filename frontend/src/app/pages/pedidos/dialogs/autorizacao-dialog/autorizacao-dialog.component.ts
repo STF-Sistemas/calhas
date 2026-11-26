@@ -1,11 +1,11 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TagModule } from 'primeng/tag';
-import { MessageService } from 'primeng/api';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { PedidoService } from '#core/services/pedido.service';
 import { IPedido } from '#shared/interfaces';
 import { EAprovacaoPedido } from '#shared/enums';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-autorizacao-dialog',
@@ -23,7 +23,7 @@ export class AutorizacaoDialog {
 
   constructor(
     private pedidoService: PedidoService,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
   ) {}
 
   abrir(pedido: IPedido): void {
@@ -36,11 +36,7 @@ export class AutorizacaoDialog {
         this.isLoadingData = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar dados da autorização.',
-        });
+        this.toast.error('Falha ao carregar dados da autorização.');
         this.isLoadingData = false;
       },
     });

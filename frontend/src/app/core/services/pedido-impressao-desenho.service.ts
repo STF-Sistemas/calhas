@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { ToastService } from '#shared-frontend/services/toast.service';
 import { IDiagonal, IPedido, IPedidoItem, IPonto } from '#shared/interfaces';
 import { ETipoItemPedido } from '#shared/enums';
 import { formatDate, formatCpfCnpj, formatPhone } from '#shared/functions/format.functions';
@@ -7,18 +8,19 @@ import { resolverDesenhoItem } from '#shared/functions/desenho-livre.functions';
 
 @Injectable({ providedIn: 'root' })
 export class PedidoImpressaoDesenhoService {
+  private readonly toast = inject(ToastService);
 
   imprimir(pedido: IPedido): void {
     const itensCorte = (pedido.itens ?? []).filter(
       i => i.tipo === ETipoItemPedido.Corte && !!resolverDesenhoItem(i)
     );
     if (itensCorte.length === 0) {
-      alert('Este pedido não possui itens de corte com desenho para imprimir.');
+      this.toast.warn('Este pedido não possui itens de corte com desenho para imprimir.');
       return;
     }
     const html = this.gerarHtml(pedido, itensCorte);
     const win = window.open('', '_blank');
-    if (!win) { alert('Permita pop-ups para imprimir o pedido.'); return; }
+    if (!win) { this.toast.warn('Permita as janelas pop-up deste site para imprimir o pedido.'); return; }
     win.document.write(html);
     win.document.close();
     win.onload = () => win.print();

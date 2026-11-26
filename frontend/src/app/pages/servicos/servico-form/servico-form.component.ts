@@ -2,11 +2,11 @@ import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angul
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
-import { MessageService } from 'primeng/api';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { ServicoService } from '#core/services/servico.service';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-servico-form',
@@ -35,7 +35,7 @@ export class ServicoForm {
   constructor(
     private fb: FormBuilder,
     private servicoService: ServicoService,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
   ) {
     this.form = this.fb.group({
       descricao: ['', [Validators.required, Validators.maxLength(200)]],
@@ -56,11 +56,7 @@ export class ServicoForm {
           this.isLoadingData = false;
         },
         error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Falha ao buscar dados do serviço',
-          });
+          this.toast.error('Falha ao buscar dados do serviço');
           this.visible = false;
         },
       });
@@ -70,11 +66,7 @@ export class ServicoForm {
   onSave() {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Preencha todos os campos obrigatórios.',
-      });
+      this.toast.warn('Preencha todos os campos obrigatórios.');
       return;
     }
 
@@ -84,22 +76,14 @@ export class ServicoForm {
     this.servicoService.salvar(dados).subscribe({
       next: (res) => {
         if (res.success) {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: `Serviço ${this.servicoId ? 'atualizado' : 'criado'} com sucesso`,
-          });
+          this.toast.success(`Serviço ${this.servicoId ? 'atualizado' : 'criado'} com sucesso`);
           this.saved.emit();
           this.visible = false;
         }
         this.isSaving = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao salvar serviço',
-        });
+        this.toast.error('Falha ao salvar serviço');
         this.isSaving = false;
       },
     });

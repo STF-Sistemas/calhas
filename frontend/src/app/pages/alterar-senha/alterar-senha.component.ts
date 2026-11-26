@@ -12,10 +12,9 @@ import { HttpClient } from '@angular/common/http';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { PasswordModule } from 'primeng/password';
-import { MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
 import { environment } from 'src/environments/environment';
 import { TApiResponse } from '#shared/types';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 function senhasIguaisValidator(g: AbstractControl) {
   const nova = g.get('nova_senha')?.value;
@@ -32,7 +31,6 @@ function senhasIguaisValidator(g: AbstractControl) {
     ButtonModule,
     CardModule,
     PasswordModule,
-    ToastModule,
   ],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './alterar-senha.component.html',
@@ -44,7 +42,7 @@ export class AlterarSenha implements OnInit {
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
     private title: Title,
   ) {}
 
@@ -74,20 +72,12 @@ export class AlterarSenha implements OnInit {
       .put<TApiResponse<null>>(`${environment.apiUrl}/perfil/senha`, { senha_atual, nova_senha })
       .subscribe({
         next: (res) => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: res.message ?? 'Senha alterada com sucesso.',
-          });
+          this.toast.success(res.message ?? 'Senha alterada com sucesso.');
           this.form.reset();
           this.isSaving = false;
         },
         error: (err) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: err?.error?.message ?? 'Falha ao alterar senha.',
-          });
+          this.toast.error(err?.error?.message ?? 'Falha ao alterar senha.');
           this.isSaving = false;
         },
       });

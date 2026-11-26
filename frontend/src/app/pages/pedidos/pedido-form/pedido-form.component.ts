@@ -16,7 +16,6 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageService } from 'primeng/api';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { DesenhoMedida } from '../desenho-medida/desenho-medida.component';
@@ -46,6 +45,7 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
 import { ThemeService } from '#core/services/theme.service';
 import { IPonto } from '#shared/interfaces';
 import { calcularValorDesconto, calcularValorLiquido } from '#shared/functions/desconto.functions';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-pedido-form',
@@ -121,7 +121,7 @@ export class PedidoForm implements OnInit {
     private servicoService: ServicoService,
     private desenhoService: DesenhoService,
     private meioPagamentoService: MeioPagamentoService,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
     public themeService: ThemeService,
   ) {
     this.form = this.fb.group({
@@ -480,19 +480,11 @@ export class PedidoForm implements OnInit {
       );
       this.atualizarSubtotal(control as FormGroup);
       this.recalcularTotais();
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Corte selecionado',
-        detail: `"${corte.descricao}" (${corte.corte}cm) para ${totalMedida}cm de perfil`,
-      });
+      this.toast.success(`"${corte.descricao}" (${corte.corte}cm) para ${totalMedida}cm de perfil`, 'Corte selecionado');
     } else {
       control.patchValue({ cod_corte: null, valor_unitario: 0 }, { emitEvent: false });
       this.recalcularTotais();
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Corte não encontrado',
-        detail: `Nenhum corte ≥ ${totalMedida}cm disponível nesta chapa. Selecione manualmente.`,
-      });
+      this.toast.warn(`Nenhum corte ≥ ${totalMedida}cm disponível nesta chapa. Selecione manualmente.`, 'Corte não encontrado');
     }
   }
 
@@ -628,20 +620,12 @@ export class PedidoForm implements OnInit {
     });
 
     if (this.itens.length === 0) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Adicione pelo menos um item ao pedido.',
-      });
+      this.toast.warn('Adicione pelo menos um item ao pedido.');
       return;
     }
 
     if (itemInvalido !== -1) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: `Item ${itemInvalido + 1}: selecione o produto, corte ou serviço.`,
-      });
+      this.toast.warn(`Item ${itemInvalido + 1}: selecione o produto, corte ou serviço.`);
       return;
     }
 
@@ -661,11 +645,7 @@ export class PedidoForm implements OnInit {
     this.pedidoService.salvar(dados).subscribe({
       next: (res) => {
         if (res.success) {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: `Pedido ${this.pedidoId ? 'atualizado' : 'criado'} com sucesso`,
-          });
+          this.toast.success(`Pedido ${this.pedidoId ? 'atualizado' : 'criado'} com sucesso`);
           this.saved.emit();
           this.visible = false;
         }
@@ -674,14 +654,9 @@ export class PedidoForm implements OnInit {
       error: (err) => {
         const erros: string[] = err.error?.erros ?? [];
         const summary = err.error?.message || 'Falha ao salvar pedido';
-        this.messageService.add({ severity: 'error', summary, life: 6000 });
+        this.toast.error(summary);
         erros.forEach((e) =>
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'Estoque insuficiente',
-            detail: e,
-            life: 8000,
-          }),
+          this.toast.warn(e, 'Estoque insuficiente'),
         );
         this.isSaving = false;
       },

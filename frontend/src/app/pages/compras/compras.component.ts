@@ -2,9 +2,6 @@ import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import {
@@ -16,6 +13,8 @@ import { CompraService } from '#core/services/compra.service';
 import { DanfePrintService } from '#core/services/danfe-print.service';
 import { ICompra } from '#shared/interfaces';
 import { EStatusCompra } from '#shared/enums';
+import { ToastService } from '#shared-frontend/services/toast.service';
+import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-compras',
@@ -25,15 +24,12 @@ import { EStatusCompra } from '#shared/enums';
     FormsModule,
     DataTable,
     CompraForm,
-    ConfirmDialogModule,
-    ToastModule,
     DialogModule,
     ButtonModule,
   ],
   templateUrl: './compras.component.html',
   styleUrls: ['./compras.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  providers: [ConfirmationService],
 })
 export class Compras implements OnInit {
   @ViewChild('form') form!: CompraForm;
@@ -84,8 +80,8 @@ export class Compras implements OnInit {
 
   constructor(
     private compraService: CompraService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
+    private readonly toast: ToastService,
+    private readonly confirmDialog: ConfirmDialogService,
     private titleService: Title,
     private danfePrintService: DanfePrintService,
   ) {}
@@ -107,11 +103,7 @@ export class Compras implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar compras',
-        });
+        this.toast.error('Falha ao carregar compras');
         this.loading = false;
       },
     });
@@ -146,35 +138,25 @@ export class Compras implements OnInit {
 
   private onConfirmar(compra: ICompra) {
     const nfe = compra.numero_nfe ? `NF-e ${compra.numero_nfe}` : `#${compra.id}`;
-    this.confirmationService.confirm({
-      message: `Confirmar a compra <strong>${nfe}</strong>?<br><br>O estoque dos produtos será atualizado.`,
-      header: 'Confirmar Compra',
-      icon: 'pi pi-check-circle',
-      acceptLabel: 'Sim, confirmar',
-      rejectLabel: 'Não',
-      acceptButtonStyleClass: 'p-button-success',
-      accept: () => {
+    this.confirmDialog.confirm({
+      title: 'Confirmar Compra',
+      message: `Confirmar a compra ${nfe}?\n\nO estoque dos produtos será atualizado.`,
+      confirmText: 'Sim, confirmar',
+      cancelText: 'Não',
+    }).then((ok) => {
+      if (!ok) return;
         this.isSavingStatus = true;
         this.compraService.alterarStatus(compra.id, EStatusCompra.Confirmada).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Confirmada',
-              detail: `Compra ${nfe} confirmada com sucesso.`,
-            });
+            this.toast.success(`Compra ${nfe} confirmada com sucesso.`, 'Confirmada');
             this.carregar();
             this.isSavingStatus = false;
           },
           error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Erro',
-              detail: err?.error?.message ?? 'Falha ao confirmar compra.',
-            });
+            this.toast.error(err?.error?.message ?? 'Falha ao confirmar compra.');
             this.isSavingStatus = false;
           },
         });
-      },
     });
   }
 
@@ -186,11 +168,7 @@ export class Compras implements OnInit {
 
   onConfirmarCancelamento() {
     if (!this.motivoCancelamento.trim()) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Informe o motivo do cancelamento.',
-      });
+      this.toast.warn('Informe o motivo do cancelamento.');
       return;
     }
     const compra = this.compraCancelando!;
@@ -200,22 +178,14 @@ export class Compras implements OnInit {
       .alterarStatus(compra.id, EStatusCompra.Cancelada, this.motivoCancelamento.trim())
       .subscribe({
         next: () => {
-          this.messageService.add({
-            severity: 'info',
-            summary: 'Cancelada',
-            detail: `Compra ${nfe} cancelada. Estoque revertido.`,
-          });
+          this.toast.info(`Compra ${nfe} cancelada. Estoque revertido.`, 'Cancelada');
           this.showCancelDialog = false;
           this.compraCancelando = null;
           this.carregar();
           this.isSavingStatus = false;
         },
         error: (err) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: err?.error?.message ?? 'Falha ao cancelar compra.',
-          });
+          this.toast.error(err?.error?.message ?? 'Falha ao cancelar compra.');
           this.isSavingStatus = false;
         },
       });
@@ -225,62 +195,42 @@ export class Compras implements OnInit {
     const nfe = compra.numero_nfe ? `NF-e ${compra.numero_nfe}` : `#${compra.id}`;
     const avisoEstoque =
       compra.status === EStatusCompra.Confirmada
-        ? '<br><br><strong>Atenção:</strong> o estoque dos produtos será revertido.'
+        ? '\n\nAtenção: o estoque dos produtos será revertido.'
         : '';
-    this.confirmationService.confirm({
+    this.confirmDialog.confirm({
+      title: 'Confirmar Exclusão',
       message: `Deseja realmente excluir a compra ${nfe}?${avisoEstoque}`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
-      accept: () => {
+      confirmText: 'Sim',
+      cancelText: 'Não',
+      danger: true,
+    }).then((ok) => {
+      if (!ok) return;
         this.compraService.excluir(compra.id).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Compra excluída',
-            });
+            this.toast.success('Compra excluída');
             this.carregar();
           },
           error: (err) =>
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Erro',
-              detail: err?.error?.message ?? 'Falha ao excluir compra',
-            }),
+            this.toast.error(err?.error?.message ?? 'Falha ao excluir compra'),
         });
-      },
     });
   }
 
   onAtualizarCusto(compra: ICompra) {
     const nfe = compra.numero_nfe ? `NF-e ${compra.numero_nfe}` : `#${compra.id}`;
-    this.confirmationService.confirm({
-      message: `Deseja atualizar o custo dos produtos com base na <strong>${nfe}</strong>?<br><br>
-                O custo será recalculado considerando os impostos dos itens e o rateio de
-                frete, seguro e outros valores da nota.`,
-      header: 'Atualizar Custo dos Produtos',
-      icon: 'pi pi-sync',
-      acceptLabel: 'Sim, atualizar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-success',
-      accept: () => {
+    this.confirmDialog.confirm({
+      title: 'Atualizar Custo dos Produtos',
+      message: `Deseja atualizar o custo dos produtos com base na ${nfe}?\n\nO custo será recalculado considerando os impostos dos itens e o rateio de frete, seguro e outros valores da nota.`,
+      confirmText: 'Sim, atualizar',
+      cancelText: 'Cancelar',
+    }).then((ok) => {
+      if (!ok) return;
         this.compraService.atualizarCusto(compra.id).subscribe({
           next: () =>
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Custo Atualizado',
-              detail: `Custo dos produtos da ${nfe} atualizado com sucesso.`,
-            }),
+            this.toast.success(`Custo dos produtos da ${nfe} atualizado com sucesso.`, 'Custo Atualizado'),
           error: (err) =>
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Erro',
-              detail: err?.error?.message ?? 'Falha ao atualizar custo.',
-            }),
+            this.toast.error(err?.error?.message ?? 'Falha ao atualizar custo.'),
         });
-      },
     });
   }
 }

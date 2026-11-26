@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, forwardRef }
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { MessageService } from 'primeng/api';
 import { isLogoDataUriValido } from '#shared/functions/logo.functions';
 import { LOGO_EMPRESA_TIPOS_ACEITOS, LOGO_EMPRESA_TAMANHO_MAXIMO_BYTES } from '#shared/constants';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-logo-uploader',
@@ -31,7 +31,7 @@ export class LogoUploader implements ControlValueAccessor {
   private onChange: (value: string | null) => void = () => {};
   private onTouched: () => void = () => {};
 
-  constructor(private messageService: MessageService) {}
+  constructor(private readonly toast: ToastService) {}
 
   writeValue(value: string | null): void {
     this.preview = value ?? null;
@@ -63,13 +63,13 @@ export class LogoUploader implements ControlValueAccessor {
 
     if (!(LOGO_EMPRESA_TIPOS_ACEITOS as readonly string[]).includes(arquivo.type)) {
       this.erro = 'Formato inválido. Envie um arquivo PNG, JPG ou JPEG.';
-      this.messageService.add({ severity: 'warn', summary: 'Formato inválido', detail: this.erro });
+      this.toast.warn(this.erro, 'Formato inválido');
       return;
     }
 
     if (arquivo.size > LOGO_EMPRESA_TAMANHO_MAXIMO_BYTES) {
       this.erro = 'Arquivo muito grande. Tamanho máximo: 1MB.';
-      this.messageService.add({ severity: 'warn', summary: 'Arquivo muito grande', detail: this.erro });
+      this.toast.warn(this.erro, 'Arquivo muito grande');
       return;
     }
 
@@ -78,7 +78,7 @@ export class LogoUploader implements ControlValueAccessor {
       const resultado = leitor.result as string;
       if (!isLogoDataUriValido(resultado)) {
         this.erro = 'Não foi possível processar o arquivo selecionado.';
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: this.erro });
+        this.toast.error(this.erro);
         return;
       }
       this.preview = resultado;
@@ -87,7 +87,7 @@ export class LogoUploader implements ControlValueAccessor {
     };
     leitor.onerror = () => {
       this.erro = 'Falha ao ler o arquivo selecionado.';
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: this.erro });
+      this.toast.error(this.erro);
     };
     leitor.readAsDataURL(arquivo);
   }

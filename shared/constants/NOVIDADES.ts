@@ -13,6 +13,15 @@ import { INovidade } from '../interfaces/INovidade';
  */
 export const NOVIDADES: INovidade[] = [
   {
+    versao: '1.9.1',
+    data: '26/11/2026',
+    itens: [
+      'Avisos de "salvo", "excluído" e de erro com visual novo: aparecem no topo, cabem na tela do celular e somem sozinhos. Dá para fechar no X.',
+      'Perguntas de confirmação (excluir, confirmar compra, mudar status do pedido) com janela nova, botões grandes para o dedo e destaque em vermelho quando a ação apaga algo.',
+      'Impressão: quando o navegador bloqueia a janela de impressão, o sistema agora avisa na própria tela como liberar, em vez de uma caixa de alerta.',
+    ],
+  },
+  {
     versao: '1.9.0',
     data: '26/11/2026',
     itens: [

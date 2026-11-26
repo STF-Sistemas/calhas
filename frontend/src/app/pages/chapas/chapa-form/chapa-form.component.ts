@@ -11,12 +11,12 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { ButtonModule } from 'primeng/button';
-import { MessageService } from 'primeng/api';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { ChapaService } from '#core/services/chapa.service';
 import { ICorte } from '#shared/interfaces';
 import { forkJoin, of, switchMap, Observable } from 'rxjs';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-chapa-form',
@@ -50,7 +50,7 @@ export class ChapaForm {
   constructor(
     private fb: FormBuilder,
     private chapaService: ChapaService,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
   ) {
     this.form = this.fb.group({
       descricao: ['', [Validators.required, Validators.maxLength(200)]],
@@ -76,11 +76,7 @@ export class ChapaForm {
           this.isLoadingData = false;
         },
         error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Falha ao buscar dados da chapa',
-          });
+          this.toast.error('Falha ao buscar dados da chapa');
           this.visible = false;
         },
       });
@@ -108,31 +104,19 @@ export class ChapaForm {
   onSave() {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Informe a descrição da chapa.',
-      });
+      this.toast.warn('Informe a descrição da chapa.');
       return;
     }
 
     const cortesAtivos = this.cortesVisiveis;
     if (cortesAtivos.length === 0) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Adicione ao menos um corte antes de salvar.',
-      });
+      this.toast.warn('Adicione ao menos um corte antes de salvar.');
       return;
     }
 
     const cortesInvalidos = cortesAtivos.filter((c) => !c.descricao?.trim() || c.valor == null);
     if (cortesInvalidos.length > 0) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Todos os cortes precisam ter descrição e valor preenchidos.',
-      });
+      this.toast.warn('Todos os cortes precisam ter descrição e valor preenchidos.');
       return;
     }
 
@@ -178,21 +162,13 @@ export class ChapaForm {
             this.isSaving = false;
             return;
           }
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: 'Chapa salva com sucesso',
-          });
+          this.toast.success('Chapa salva com sucesso');
           this.saved.emit();
           this.visible = false;
           this.isSaving = false;
         },
         error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Falha ao salvar chapa',
-          });
+          this.toast.error('Falha ao salvar chapa');
           this.isSaving = false;
         },
       });

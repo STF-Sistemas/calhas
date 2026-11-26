@@ -11,11 +11,10 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
 import { ThemeService } from '#core/services/theme.service';
 import { environment } from 'src/environments/environment';
 import { TApiResponse } from '#shared/types';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 function senhasIguaisValidator(g: AbstractControl) {
   const nova = g.get('nova_senha')?.value;
@@ -32,7 +31,6 @@ function senhasIguaisValidator(g: AbstractControl) {
     ReactiveFormsModule,
     ButtonModule,
     PasswordModule,
-    ToastModule,
   ],
   templateUrl: './redefinir-senha.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -49,7 +47,7 @@ export class RedefinirSenha implements OnInit {
     private fb: FormBuilder,
     private http: HttpClient,
     private route: ActivatedRoute,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
     public themeService: ThemeService,
   ) {}
 
@@ -89,7 +87,7 @@ export class RedefinirSenha implements OnInit {
           if (msg.toLowerCase().includes('inválido') || msg.toLowerCase().includes('expirado')) {
             this.tokenInvalido = true;
           } else {
-            this.messageService.add({ severity: 'error', summary: 'Erro', detail: msg });
+            this.toast.error(msg);
           }
           this.isLoading = false;
         },

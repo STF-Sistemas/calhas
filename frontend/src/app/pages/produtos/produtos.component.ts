@@ -1,8 +1,5 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -11,6 +8,8 @@ import { ProdutoForm } from './produto-form/produto-form.component';
 import { ProdutoService, IHistoricoCompraProduto } from '#core/services/produto.service';
 import { IProduto } from '#shared/interfaces';
 import { EStatusGeral } from '#shared/enums';
+import { ToastService } from '#shared-frontend/services/toast.service';
+import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-produtos',
@@ -19,8 +18,6 @@ import { EStatusGeral } from '#shared/enums';
     CommonModule,
     DataTable,
     ProdutoForm,
-    ConfirmDialogModule,
-    ToastModule,
     DialogModule,
     TableModule,
     ButtonModule,
@@ -28,7 +25,6 @@ import { EStatusGeral } from '#shared/enums';
   templateUrl: './produtos.component.html',
   styleUrls: ['./produtos.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  providers: [ConfirmationService],
 })
 export class Produtos implements OnInit {
   @ViewChild('form') form!: ProdutoForm;
@@ -52,8 +48,8 @@ export class Produtos implements OnInit {
 
   constructor(
     private produtoService: ProdutoService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
+    private readonly toast: ToastService,
+    private readonly confirmDialog: ConfirmDialogService,
   ) {}
 
   ngOnInit(): void {
@@ -68,11 +64,7 @@ export class Produtos implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar produtos',
-        });
+        this.toast.error('Falha ao carregar produtos');
         this.loading = false;
       },
     });
@@ -94,11 +86,7 @@ export class Produtos implements OnInit {
         produto.status = novoStatus;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao alterar status do produto',
-        });
+        this.toast.error('Falha ao alterar status do produto');
       },
     });
   }
@@ -114,11 +102,7 @@ export class Produtos implements OnInit {
         this.historicoLoading = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao buscar histórico de compras',
-        });
+        this.toast.error('Falha ao buscar histórico de compras');
         this.historicoLoading = false;
         this.showHistorico = false;
       },
@@ -126,24 +110,20 @@ export class Produtos implements OnInit {
   }
 
   onDelete(produto: IProduto) {
-    this.confirmationService.confirm({
+    this.confirmDialog.confirm({
+      title: 'Confirmar Exclusão',
       message: `Deseja realmente excluir o produto "${produto.descricao}"?`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
-      accept: () => {
+      confirmText: 'Sim',
+      cancelText: 'Não',
+      danger: true,
+    }).then((ok) => {
+      if (!ok) return;
         this.produtoService.desativar(produto.id).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Produto excluído',
-            });
+            this.toast.success('Produto excluído');
             this.carregarProdutos();
           },
         });
-      },
     });
   }
 }

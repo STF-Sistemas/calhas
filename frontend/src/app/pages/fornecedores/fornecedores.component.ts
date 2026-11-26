@@ -2,9 +2,6 @@ import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 import { PanelModule } from 'primeng/panel';
 import { SelectModule } from 'primeng/select';
 import { PaginatorModule } from 'primeng/paginator';
@@ -20,6 +17,8 @@ import { FornecedorService } from '#core/services/fornecedor.service';
 import { CompraService } from '#core/services/compra.service';
 import { IFornecedor, ICompra } from '#shared/interfaces';
 import { EStatusCompra } from '#shared/enums';
+import { ToastService } from '#shared-frontend/services/toast.service';
+import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-fornecedores',
@@ -29,8 +28,6 @@ import { EStatusCompra } from '#shared/enums';
     FormsModule,
     DataTable,
     FornecedorForm,
-    ConfirmDialogModule,
-    ToastModule,
     PanelModule,
     SelectModule,
     PaginatorModule,
@@ -44,7 +41,6 @@ import { EStatusCompra } from '#shared/enums';
   templateUrl: './fornecedores.component.html',
   styleUrls: ['./fornecedores.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  providers: [ConfirmationService],
 })
 export class Fornecedores implements OnInit {
   @ViewChild('form') form!: FornecedorForm;
@@ -97,8 +93,8 @@ export class Fornecedores implements OnInit {
   constructor(
     private fornecedorService: FornecedorService,
     private compraService: CompraService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
+    private readonly toast: ToastService,
+    private readonly confirmDialog: ConfirmDialogService,
     private titleService: Title,
   ) {}
 
@@ -131,11 +127,7 @@ export class Fornecedores implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar fornecedores',
-        });
+        this.toast.error('Falha ao carregar fornecedores');
         this.loading = false;
       },
     });
@@ -192,11 +184,7 @@ export class Fornecedores implements OnInit {
         this.historicoLoading = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar histórico de compras',
-        });
+        this.toast.error('Falha ao carregar histórico de compras');
         this.historicoLoading = false;
       },
     });
@@ -241,47 +229,31 @@ export class Fornecedores implements OnInit {
     const novoStatus = fornecedor.status === 1 ? 2 : 1;
     this.fornecedorService.alterarStatus(fornecedor.id, novoStatus).subscribe({
       next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Sucesso',
-          detail: 'Status alterado',
-        });
+        this.toast.success('Status alterado');
         this.carregar();
       },
       error: () =>
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao alterar status',
-        }),
+        this.toast.error('Falha ao alterar status'),
     });
   }
 
   onDelete(fornecedor: IFornecedor) {
-    this.confirmationService.confirm({
+    this.confirmDialog.confirm({
+      title: 'Confirmar Exclusão',
       message: `Deseja realmente excluir o fornecedor "${fornecedor.razao_social}"?`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
-      accept: () => {
+      confirmText: 'Sim',
+      cancelText: 'Não',
+      danger: true,
+    }).then((ok) => {
+      if (!ok) return;
         this.fornecedorService.excluir(fornecedor.id).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Fornecedor excluído',
-            });
+            this.toast.success('Fornecedor excluído');
             this.carregar();
           },
           error: () =>
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Erro',
-              detail: 'Falha ao excluir fornecedor',
-            }),
+            this.toast.error('Falha ao excluir fornecedor'),
         });
-      },
     });
   }
 }

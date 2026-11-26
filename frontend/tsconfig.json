@@ -20,7 +20,8 @@
       "#shared/*": ["../shared/*"],
       "#core/*": ["src/app/core/*"],
       "#shared-frontend/components/*": ["src/app/shared/components/*"],
-      "#shared-frontend/directives/*": ["src/app/shared/directives/*"]
+      "#shared-frontend/directives/*": ["src/app/shared/directives/*"],
+      "#shared-frontend/services/*": ["src/app/shared/services/*"]
     }
   },
   "angularCompilerOptions": {

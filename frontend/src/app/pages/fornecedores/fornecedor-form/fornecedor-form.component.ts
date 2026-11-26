@@ -16,7 +16,6 @@ import { ButtonModule } from 'primeng/button';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageService } from 'primeng/api';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { FornecedorService } from '#core/services/fornecedor.service';
@@ -24,6 +23,7 @@ import { ClienteService } from '#core/services/cliente.service';
 import { IFornecedor } from '#shared/interfaces';
 import { ECrt } from '#shared/enums';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-fornecedor-form',
@@ -100,7 +100,7 @@ export class FornecedorForm implements OnInit {
     private fb: FormBuilder,
     private fornecedorService: FornecedorService,
     private clienteService: ClienteService,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
   ) {}
 
   ngOnInit() {
@@ -144,11 +144,7 @@ export class FornecedorForm implements OnInit {
           this.isLoadingData = false;
         },
         error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Falha ao buscar dados do fornecedor',
-          });
+          this.toast.error('Falha ao buscar dados do fornecedor');
           this.visible = false;
         },
       });
@@ -187,11 +183,7 @@ export class FornecedorForm implements OnInit {
   onBuscarCnpj() {
     const cnpj = this.form.get('cnpj')?.value?.replace(/\D/g, '');
     if (!cnpj || cnpj.length !== 14) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Informe um CNPJ completo (14 dígitos).',
-      });
+      this.toast.warn('Informe um CNPJ completo (14 dígitos).');
       return;
     }
     this.buscandoCnpj = true;
@@ -211,16 +203,12 @@ export class FornecedorForm implements OnInit {
           cod_cidade: d.cod_cidade,
           cidade_nome: d.cidade_nome && d.uf ? `${d.cidade_nome}/${d.uf}` : d.cidade_nome,
         });
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Receita Federal',
-          detail: 'Dados preenchidos automaticamente.',
-        });
+        this.toast.success('Dados preenchidos automaticamente.', 'Receita Federal');
         this.buscandoCnpj = false;
       },
       error: (err) => {
         const detail = err?.error?.message ?? 'Não foi possível consultar o CNPJ.';
-        this.messageService.add({ severity: 'warn', summary: 'Receita Federal', detail });
+        this.toast.warn(detail, 'Receita Federal');
         this.buscandoCnpj = false;
       },
     });
@@ -239,19 +227,11 @@ export class FornecedorForm implements OnInit {
               cod_cidade: res.data.cidade.id,
               cidade_nome: `${res.data.cidade.descricao}/${res.data.uf}`,
             });
-            this.messageService.add({
-              severity: 'info',
-              summary: 'CEP Localizado',
-              detail: 'Endereço preenchido automaticamente',
-            });
+            this.toast.info('Endereço preenchido automaticamente', 'CEP Localizado');
           }
         },
         error: () => {
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'CEP',
-            detail: 'Falha ao localizar CEP. Preencha manualmente.',
-          });
+          this.toast.warn('Falha ao localizar CEP. Preencha manualmente.', 'CEP');
         },
       });
     }
@@ -260,11 +240,7 @@ export class FornecedorForm implements OnInit {
   onSave() {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Preencha todos os campos obrigatórios.',
-      });
+      this.toast.warn('Preencha todos os campos obrigatórios.');
       return;
     }
 
@@ -282,11 +258,7 @@ export class FornecedorForm implements OnInit {
     this.fornecedorService.salvar(dados).subscribe({
       next: (res) => {
         if (res.success) {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: `Fornecedor ${this.fornecedorId ? 'atualizado' : 'criado'} com sucesso`,
-          });
+          this.toast.success(`Fornecedor ${this.fornecedorId ? 'atualizado' : 'criado'} com sucesso`);
           this.saved.emit(res.data);
           this.visible = false;
         }
@@ -294,7 +266,7 @@ export class FornecedorForm implements OnInit {
       },
       error: (err) => {
         const msg = err?.error?.message ?? 'Falha ao salvar fornecedor';
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: msg });
+        this.toast.error(msg);
         this.isSaving = false;
       },
     });

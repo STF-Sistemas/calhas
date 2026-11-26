@@ -8,11 +8,11 @@ import { ButtonModule } from 'primeng/button';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageService } from 'primeng/api';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { ClienteService } from '#core/services/cliente.service';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-cliente-form',
@@ -49,7 +49,7 @@ export class ClienteForm {
   constructor(
     private fb: FormBuilder,
     private clienteService: ClienteService,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
   ) {
     this.form = this.fb.group({
       razao_social: ['', [Validators.required, Validators.maxLength(200)]],
@@ -84,11 +84,7 @@ export class ClienteForm {
           this.isLoadingData = false;
         },
         error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Falha ao buscar dados do cliente',
-          });
+          this.toast.error('Falha ao buscar dados do cliente');
           this.visible = false;
         },
       });
@@ -98,27 +94,19 @@ export class ClienteForm {
   onBuscarCpfCnpj() {
     const cpfCnpj = this.form.get('cpf_cnpj')?.value?.replace(/\D/g, '');
     if (!cpfCnpj || (cpfCnpj.length !== 11 && cpfCnpj.length !== 14)) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Informe um CPF (11 dígitos) ou CNPJ (14 dígitos) completo.',
-      });
+      this.toast.warn('Informe um CPF (11 dígitos) ou CNPJ (14 dígitos) completo.');
       return;
     }
     this.buscandoCpfCnpj = true;
     this.clienteService.consultarReceita(cpfCnpj).subscribe({
       next: (res) => {
         this.form.patchValue(res.data);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Receita Federal',
-          detail: 'Dados preenchidos automaticamente.',
-        });
+        this.toast.success('Dados preenchidos automaticamente.', 'Receita Federal');
         this.buscandoCpfCnpj = false;
       },
       error: (err) => {
         const detail = err?.error?.message ?? 'Não foi possível consultar o CPF/CNPJ.';
-        this.messageService.add({ severity: 'warn', summary: 'Receita Federal', detail });
+        this.toast.warn(detail, 'Receita Federal');
         this.buscandoCpfCnpj = false;
       },
     });
@@ -137,19 +125,11 @@ export class ClienteForm {
               cod_cidade: res.data.cidade.id,
               cidade_nome: res.data.cidade.descricao,
             });
-            this.messageService.add({
-              severity: 'info',
-              summary: 'CEP Localizado',
-              detail: 'Endereço e Cidade preenchidos automaticamente',
-            });
+            this.toast.info('Endereço e Cidade preenchidos automaticamente', 'CEP Localizado');
           }
         },
         error: () => {
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'CEP',
-            detail: 'Falha ao localizar CEP. Preencha manualmente',
-          });
+          this.toast.warn('Falha ao localizar CEP. Preencha manualmente', 'CEP');
         },
       });
     }
@@ -158,11 +138,7 @@ export class ClienteForm {
   onSave() {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Preencha todos os campos obrigatórios.',
-      });
+      this.toast.warn('Preencha todos os campos obrigatórios.');
       return;
     }
 
@@ -172,22 +148,14 @@ export class ClienteForm {
     this.clienteService.salvar(dados).subscribe({
       next: (res) => {
         if (res.success) {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: `Cliente ${this.clienteId ? 'atualizado' : 'criado'} com sucesso`,
-          });
+          this.toast.success(`Cliente ${this.clienteId ? 'atualizado' : 'criado'} com sucesso`);
           this.saved.emit();
           this.visible = false;
         }
         this.isSaving = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao salvar cliente',
-        });
+        this.toast.error('Falha ao salvar cliente');
         this.isSaving = false;
       },
     });

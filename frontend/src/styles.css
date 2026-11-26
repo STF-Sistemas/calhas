@@ -750,26 +750,11 @@ body {
   color: var(--p-primary) !important;
 }
 
-/* Botão de confirmação padrão do ConfirmDialog */
-.p-confirmdialog .p-button:not(.p-button-outlined):not(.p-button-text) {
-  background-color: var(--p-primary) !important;
-  border-color: var(--p-primary) !important;
-  color: #fff !important;
-}
-
 /* ==========================================================
    Dialog Global — layout flex + suporte a altura fixa
    PrimeNG renderiza o dialog em portal (body), portanto
    ::ng-deep no componente não alcança estes elementos.
    ========================================================== */
-/* Toast sempre acima de tudo.
-   max-width evita que a largura fixa (25rem) do PrimeNG estoure a tela
-   e corte o texto em viewports estreitos (celular/PWA). */
-.p-toast {
-  z-index: 99999 !important;
-  max-width: calc(100vw - 40px);
-}
-
 /* Modal cobre tudo do topo ao rodapé */
 .p-dialog-mask {
   top: 0 !important;

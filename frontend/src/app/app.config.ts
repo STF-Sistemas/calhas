@@ -10,7 +10,6 @@ import localePtBr from '@angular/common/locales/pt';
 
 import { routes } from './app.routes';
 import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
-import { MessageService, ConfirmationService } from 'primeng/api';
 import { provideNgxMask } from 'ngx-mask';
 
 registerLocaleData(localePtBr);
@@ -30,8 +29,6 @@ export const appConfig: ApplicationConfig = {
       },
     }),
     { provide: LOCALE_ID, useValue: 'pt' },
-    MessageService,
-    ConfirmationService,
     provideNgxMask(),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),

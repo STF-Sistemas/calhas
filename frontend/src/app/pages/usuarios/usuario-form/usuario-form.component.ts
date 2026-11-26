@@ -5,7 +5,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
-import { MessageService } from 'primeng/api';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { UsuarioService } from '#core/services/usuario.service';
 import { EmpresaService } from '#core/services/empresa.service';
@@ -13,6 +12,7 @@ import { AuthService } from '#core/services/auth.service';
 import { IEmpresa } from '#shared/interfaces';
 import { EStatusGeral } from '#shared/enums';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-usuario-form',
@@ -52,7 +52,7 @@ export class UsuarioForm implements OnInit {
     private usuarioService: UsuarioService,
     private empresaService: EmpresaService,
     public authService: AuthService,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
   ) {
     this.form = this.fb.group({
       cod_empresa: [null, [Validators.required]],
@@ -69,11 +69,7 @@ export class UsuarioForm implements OnInit {
       this.empresaService.listar().subscribe({
         next: (res) => (this.empresas = res.data),
         error: () =>
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Falha ao carregar empresas',
-          }),
+          this.toast.error('Falha ao carregar empresas'),
       });
     }
   }
@@ -106,11 +102,7 @@ export class UsuarioForm implements OnInit {
           this.isLoadingData = false;
         },
         error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Falha ao buscar dados do usuário',
-          });
+          this.toast.error('Falha ao buscar dados do usuário');
           this.visible = false;
         },
       });
@@ -131,22 +123,14 @@ export class UsuarioForm implements OnInit {
     this.usuarioService.salvar(dados).subscribe({
       next: (res) => {
         if (res.success) {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: `Usuário ${this.usuarioId ? 'atualizado' : 'criado'} com sucesso`,
-          });
+          this.toast.success(`Usuário ${this.usuarioId ? 'atualizado' : 'criado'} com sucesso`);
           this.saved.emit();
           this.visible = false;
         }
         this.isSaving = false;
       },
       error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: err.error?.message || 'Falha ao salvar usuário',
-        });
+        this.toast.error(err.error?.message || 'Falha ao salvar usuário');
         this.isSaving = false;
       },
     });

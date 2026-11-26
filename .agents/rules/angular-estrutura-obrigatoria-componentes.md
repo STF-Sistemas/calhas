@@ -8,9 +8,11 @@ Ao atuar neste projeto, siga rigorosamente as seguintes regras para garantir con
 
 ## 1. Estrutura de Componentes Angular
 Todos os componentes devem ser criados com separação total de responsabilidades. É terminantemente PROIBIDO o uso de código "inline" (CSS ou HTML).
-- **Arquivos Obrigatórios:** Cada componente DEVE consistir em 3 arquivos: [.ts](file:///d:/Pingo/calhas/frontend/src/app/shared/components/example.ts) (lógica), [.html](file:///d:/Pingo/calhas/frontend/src/app/shared/components/example.html) (template) e [.scss](file:///d:/Pingo/calhas/frontend/src/app/shared/components/example.scss) (estilos).
-- **Configuração do @Component:** O decorador no arquivo TypeScript deve conter apenas as referências externas usando `templateUrl` e `styleUrls` (em um array).
-- **Pré-processador:** O padrão obrigatório para estilos é SCSS.
+- **Arquivos Obrigatórios:** Cada componente DEVE consistir em 3 arquivos: `.ts` (lógica), `.html` (template) e `.css` (estilos).
+- **Configuração do @Component:** O decorador deve conter apenas referências externas: `templateUrl` e `styleUrl` (ou `styleUrls`).
+- **Estilos:** CSS puro (sem SCSS/Sass). Mobile-first com `@media (min-width: ...)`. Cores sempre por variáveis CSS do tema (dark mode).
+- **Nome da classe sem sufixo:** `export class Clientes`, `export class DataTable` (nunca `ClientesComponent`).
+- **Novos arquivos** seguem o padrão do Angular 22: `nome.ts`, `nome.html`, `nome.css` (sem `.component` no nome).
 
 ## 2. Uso Mandatório de PrimeNG
 Para garantir uma experiência premium e consistente (Design System):
@@ -18,7 +20,14 @@ Para garantir uma experiência premium e consistente (Design System):
     - **Botões:** Usar `p-button`, `p-splitbutton`, `p-speeddial`, etc.
     - **Formulários:** Usar `p-inputtext`, `p-dropdown`, `p-checkbox`, `p-calendar`, `p-inputnumber`.
     - **Containers:** Usar `p-card`, `p-toolbar`, `p-tabview`, `p-panel`.
-    - **Feedback:** Usar `p-progressspinner`, `p-progressbar`, `MessageService` (Toast/Messages).
+    - **Feedback:** Usar `p-progressspinner`, `p-progressbar`.
+- **Toast e confirmação (PROIBIDO `alert()`, `confirm()`, `MessageService`, `ConfirmationService`, `<p-toast>`, `<p-confirmdialog>`):**
+    - Resultado de ação: `ToastService` (`#shared-frontend/services/toast.service`) com `success`, `error`, `info`, `warn`.
+    - Confirmação: `await this.confirmDialog.confirm({ title, message, confirmText, danger })` do `ConfirmDialogService`; retorna `Promise<boolean>`.
+    - Os dois já estão montados uma vez no `app.html`. Não montar de novo nas páginas.
+    - A mensagem é texto puro (sem HTML); use `
+` para quebrar linha.
+    - Erro de validação de campo continua inline, perto do campo.
 - **Acessibilidade:** Utilize sempre os atributos de acessibilidade fornecidos pelo PrimeNG:
     - Todo botão sem texto visível DEVE ter `aria-label` descritivo.
     - Todo campo de input DEVE ter label associado ou `aria-labelledby`.
@@ -27,7 +36,7 @@ Para garantir uma experiência premium e consistente (Design System):
 
 ## 3. Uso Obrigatório de Wrapper para Modais
 Para manter a consistência visual e funcional de todos os diálogos:
-- **Componente Base:** Todo e qualquer modal deve utilizar o componente `app-dialog-wrapper` (`DialogWrapperComponent`) em seu template HTML.
+- **Componente Base:** Todo e qualquer modal deve utilizar o componente `app-dialog-wrapper` (`DialogWrapper`) em seu template HTML.
 - **Estrutura:** Insira o conteúdo específico dentro das tags do wrapper, configurando `title`, `isLoadingData`, `hasFooter` e os eventos de salvamento/fechamento conforme a necessidade. No PrimeNG, isso será integrado com `DynamicDialog` ou `p-dialog`.
 
 ## 4. Localização de Interfaces e Tipos (ver rule `pasta-shared-compartilhada.md`)
@@ -46,7 +55,7 @@ Para garantir a consistência entre Frontend e Backend:
 
 ## 5. Uso Obrigatório de Data-Table para Listagens
 Para manter a consistência visual, funcionalidades de filtro e paginação em todas as listagens:
-- **Componente Base:** Toda e qualquer listagem (tabela) deve obrigatoriamente utilizar o componente `app-data-table` (`DataTableComponent`).
+- **Componente Base:** Toda e qualquer listagem (tabela) deve obrigatoriamente utilizar o componente `app-data-table` (`DataTable`).
 - **Implementação:** É PROIBIDO construir tabelas usando diretamente `p-table` nos componentes de página. Utilize as propriedades `data`, `columns` and `actions` do `app-data-table` para configurar a listagem.
 
 ## 6. Qualidade Lighthouse (obrigatório — ver rule específica)
@@ -94,7 +103,7 @@ Para exibir/ocultar elementos condicionalmente, utilize **sempre a sintaxe de fl
 
 <!-- ✅ Correto — ng-container agrupa sem gerar DOM real -->
 @if (isSaving) {
-  <p-progressSpinner styleClass="w-2rem h-2rem" strokeWidth="4"></p-progressSpinner>
+  <p-progress-spinner styleClass="w-2rem h-2rem" strokeWidth="4"></p-progress-spinner>
 } @else {
   <ng-container>
     <i class="pi pi-save"></i>

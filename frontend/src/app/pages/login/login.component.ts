@@ -6,14 +6,13 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { CardModule } from 'primeng/card';
-import { MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 import { AuthService } from '#core/services/auth.service';
 import { ThemeService } from '#core/services/theme.service';
 import { CheckboxModule } from 'primeng/checkbox';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -26,7 +25,6 @@ import { CheckboxModule } from 'primeng/checkbox';
     InputTextModule,
     PasswordModule,
     CardModule,
-    ToastModule,
     CheckboxModule,
     TooltipModule,
     MenuModule,
@@ -67,7 +65,7 @@ export class Login {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
     public themeService: ThemeService,
   ) {
     this.loginForm = this.fb.group({
@@ -86,17 +84,13 @@ export class Login {
         if (res.success) {
           this.router.navigate(['/']);
         } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: res.message || 'Credenciais inválidas',
-          });
+          this.toast.error(res.message || 'Credenciais inválidas');
         }
         this.isLoading = false;
       },
       error: (err) => {
         const detail = err?.error?.message || 'Erro ao conectar ao servidor';
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail });
+        this.toast.error(detail);
         this.isLoading = false;
       },
     });

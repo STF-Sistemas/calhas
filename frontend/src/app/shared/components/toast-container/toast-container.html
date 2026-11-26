@@ -1,0 +1,16 @@
+<div class="toasts" aria-live="polite" aria-atomic="false">
+  @for (item of toast.toasts(); track item.id) {
+    <div class="toast" [class]="'toast toast--' + item.tipo" [attr.role]="item.tipo === 'error' ? 'alert' : 'status'">
+      <i [class]="icones[item.tipo]" aria-hidden="true"></i>
+      <div class="toast__texto">
+        @if (item.titulo) {
+          <strong>{{ item.titulo }}</strong>
+        }
+        <span>{{ item.texto }}</span>
+      </div>
+      <button type="button" class="toast__fechar" (click)="toast.fechar(item.id)" aria-label="Fechar mensagem">
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+  }
+</div>

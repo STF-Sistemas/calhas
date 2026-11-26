@@ -5,10 +5,10 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { MessageService } from 'primeng/api';
 import { FornecedorService } from '#core/services/fornecedor.service';
 import { FornecedorForm } from '../../../fornecedores/fornecedor-form/fornecedor-form.component';
 import { IFornecedor } from '#shared/interfaces';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-fornecedor-lookup-dialog',
@@ -46,7 +46,7 @@ export class FornecedorLookupDialog {
 
   constructor(
     private fornecedorService: FornecedorService,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
   ) {}
 
   abrir(cnpj: string, emitente?: Record<string, unknown>) {
@@ -86,11 +86,7 @@ export class FornecedorLookupDialog {
         this.fornecedoresFiltrados = res.data;
       },
       error: () =>
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar fornecedores',
-        }),
+        this.toast.error('Falha ao carregar fornecedores'),
     });
   }
 

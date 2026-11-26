@@ -1,13 +1,12 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
 import { MeioPagamentoForm } from './meio-pagamento-form/meio-pagamento-form.component';
 import { MeioPagamentoService } from '#core/services/meio-pagamento.service';
 import { IMeioPagamento } from '#shared/interfaces';
 import { EStatusGeral } from '#shared/enums';
+import { ToastService } from '#shared-frontend/services/toast.service';
+import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-meios-pagamento',
@@ -16,13 +15,10 @@ import { EStatusGeral } from '#shared/enums';
     CommonModule,
     DataTable,
     MeioPagamentoForm,
-    ConfirmDialogModule,
-    ToastModule,
   ],
   templateUrl: './meios-pagamento.component.html',
   styleUrls: ['./meios-pagamento.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  providers: [ConfirmationService],
 })
 export class MeiosPagamento implements OnInit {
   @ViewChild('form') form!: MeioPagamentoForm;
@@ -37,8 +33,8 @@ export class MeiosPagamento implements OnInit {
 
   constructor(
     private meioService: MeioPagamentoService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
+    private readonly toast: ToastService,
+    private readonly confirmDialog: ConfirmDialogService,
   ) {}
 
   ngOnInit(): void {
@@ -53,11 +49,7 @@ export class MeiosPagamento implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar meios de pagamento',
-        });
+        this.toast.error('Falha ao carregar meios de pagamento');
         this.loading = false;
       },
     });
@@ -79,34 +71,26 @@ export class MeiosPagamento implements OnInit {
         meio.ativo = novoStatus;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao alterar status',
-        });
+        this.toast.error('Falha ao alterar status');
       },
     });
   }
 
   onDelete(meio: IMeioPagamento) {
-    this.confirmationService.confirm({
+    this.confirmDialog.confirm({
+      title: 'Confirmar Exclusão',
       message: `Deseja realmente excluir o meio de pagamento "${meio.descricao}"?`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
-      accept: () => {
+      confirmText: 'Sim',
+      cancelText: 'Não',
+      danger: true,
+    }).then((ok) => {
+      if (!ok) return;
         this.meioService.desativar(meio.id).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Meio de pagamento excluído',
-            });
+            this.toast.success('Meio de pagamento excluído');
             this.carregar();
           },
         });
-      },
     });
   }
 }

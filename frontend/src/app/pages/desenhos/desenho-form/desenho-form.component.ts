@@ -15,11 +15,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { DialogModule } from 'primeng/dialog';
-import { MessageService } from 'primeng/api';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { DesenhoService } from '#core/services/desenho.service';
 import { ThemeService } from '#core/services/theme.service';
 import { IDiagonal, IPonto } from '#shared/interfaces';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-desenho-form',
@@ -71,7 +71,7 @@ export class DesenhoForm implements OnInit, AfterViewInit {
   constructor(
     private fb: FormBuilder,
     private desenhoService: DesenhoService,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
     private themeService: ThemeService,
   ) {
     this.form = this.fb.group({
@@ -148,11 +148,7 @@ export class DesenhoForm implements OnInit, AfterViewInit {
           }, 0);
         },
         error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Falha ao buscar desenho',
-          });
+          this.toast.error('Falha ao buscar desenho');
           this.visible = false;
         },
       });
@@ -458,19 +454,11 @@ export class DesenhoForm implements OnInit, AfterViewInit {
   onSave() {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Informe a descrição do desenho.',
-      });
+      this.toast.warn('Informe a descrição do desenho.');
       return;
     }
     if (this.pontos.length < 2) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'O desenho precisa ter ao menos 2 pontos.',
-      });
+      this.toast.warn('O desenho precisa ter ao menos 2 pontos.');
       return;
     }
 
@@ -485,22 +473,14 @@ export class DesenhoForm implements OnInit, AfterViewInit {
     this.desenhoService.salvar(dados).subscribe({
       next: (res) => {
         if (res.success) {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: `Desenho ${this.desenhoId ? 'atualizado' : 'criado'} com sucesso`,
-          });
+          this.toast.success(`Desenho ${this.desenhoId ? 'atualizado' : 'criado'} com sucesso`);
           this.saved.emit();
           this.visible = false;
         }
         this.isSaving = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao salvar desenho',
-        });
+        this.toast.error('Falha ao salvar desenho');
         this.isSaving = false;
       },
     });

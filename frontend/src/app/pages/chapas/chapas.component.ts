@@ -1,22 +1,20 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
 import { ChapaForm } from './chapa-form/chapa-form.component';
 import { ChapaService } from '#core/services/chapa.service';
 import { IChapa } from '#shared/interfaces';
 import { EStatusGeral } from '#shared/enums';
+import { ToastService } from '#shared-frontend/services/toast.service';
+import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-chapas',
   standalone: true,
-  imports: [CommonModule, DataTable, ChapaForm, ConfirmDialogModule, ToastModule],
+  imports: [CommonModule, DataTable, ChapaForm],
   templateUrl: './chapas.component.html',
   styleUrls: ['./chapas.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  providers: [ConfirmationService],
 })
 export class Chapas implements OnInit {
   @ViewChild('form') form!: ChapaForm;
@@ -31,8 +29,8 @@ export class Chapas implements OnInit {
 
   constructor(
     private chapaService: ChapaService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
+    private readonly toast: ToastService,
+    private readonly confirmDialog: ConfirmDialogService,
   ) {}
 
   ngOnInit(): void {
@@ -47,11 +45,7 @@ export class Chapas implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar chapas',
-        });
+        this.toast.error('Falha ao carregar chapas');
         this.loading = false;
       },
     });
@@ -73,34 +67,26 @@ export class Chapas implements OnInit {
         chapa.status = novoStatus;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao alterar status da chapa',
-        });
+        this.toast.error('Falha ao alterar status da chapa');
       },
     });
   }
 
   onDelete(chapa: IChapa) {
-    this.confirmationService.confirm({
+    this.confirmDialog.confirm({
+      title: 'Confirmar Exclusão',
       message: `Deseja realmente excluir a chapa "${chapa.descricao}"?`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
-      accept: () => {
+      confirmText: 'Sim',
+      cancelText: 'Não',
+      danger: true,
+    }).then((ok) => {
+      if (!ok) return;
         this.chapaService.desativar(chapa.id).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Chapa excluída',
-            });
+            this.toast.success('Chapa excluída');
             this.carregarChapas();
           },
         });
-      },
     });
   }
 }

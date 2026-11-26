@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
-import { MessageService } from 'primeng/api';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { PedidoService } from '#core/services/pedido.service';
 import { FornecedorService } from '#core/services/fornecedor.service';
@@ -12,6 +11,7 @@ import { PedidoImpressaoDesenhoService } from '#core/services/pedido-impressao-d
 import { IPedido, IPedidoItem, IFornecedor } from '#shared/interfaces';
 import { ETipoItemPedido } from '#shared/enums';
 import { formatPhone } from '#shared/functions/format.functions';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 interface IItemSelecionavel {
   item: IPedidoItem;
@@ -50,7 +50,7 @@ export class OrdemCorteEnvioDialog {
     private pedidoService: PedidoService,
     private fornecedorService: FornecedorService,
     private impressaoDesenhoService: PedidoImpressaoDesenhoService,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
   ) {}
 
   abrir(pedido: IPedido): void {
@@ -81,11 +81,7 @@ export class OrdemCorteEnvioDialog {
         this.carregandoFornecedores = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar fornecedores.',
-        });
+        this.toast.error('Falha ao carregar fornecedores.');
         this.carregandoFornecedores = false;
       },
     });
@@ -151,21 +147,13 @@ export class OrdemCorteEnvioDialog {
 
     const fone = this.fornecedorSelecionado.fone_vendedor?.replace(/\D/g, '');
     if (!fone) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Este fornecedor não possui telefone do vendedor cadastrado.',
-      });
+      this.toast.warn('Este fornecedor não possui telefone do vendedor cadastrado.');
       return;
     }
 
     const itensIds = this.itensSelecionaveis.filter((i) => i.selecionado).map((i) => i.item.id);
     if (itensIds.length === 0) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Selecione ao menos um item para enviar.',
-      });
+      this.toast.warn('Selecione ao menos um item para enviar.');
       return;
     }
 
@@ -184,11 +172,7 @@ export class OrdemCorteEnvioDialog {
         this.fechar();
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao gerar link da ordem de corte.',
-        });
+        this.toast.error('Falha ao gerar link da ordem de corte.');
         this.enviando = false;
       },
     });

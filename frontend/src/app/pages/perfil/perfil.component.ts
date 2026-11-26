@@ -6,8 +6,6 @@ import { HttpClient } from '@angular/common/http';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
 import { AvatarModule } from 'primeng/avatar';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +13,7 @@ import { environment } from 'src/environments/environment';
 import { TApiResponse } from '#shared/types';
 import { IUsuario } from '#shared/interfaces';
 import { PushNotificacaoService } from '#core/services/push-notificacao.service';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-perfil',
@@ -26,7 +25,6 @@ import { PushNotificacaoService } from '#core/services/push-notificacao.service'
     InputTextModule,
     ButtonModule,
     CardModule,
-    ToastModule,
     AvatarModule,
     ToggleSwitch,
   ],
@@ -43,7 +41,7 @@ export class Perfil implements OnInit {
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
     private title: Title,
     public pushService: PushNotificacaoService,
   ) {}
@@ -65,26 +63,13 @@ export class Perfil implements OnInit {
     try {
       if (ativar) {
         await this.pushService.ativar();
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Notificações ativadas',
-          detail: 'Você receberá notificações push neste dispositivo.',
-        });
+        this.toast.success('Você receberá notificações push neste dispositivo.', 'Notificações ativadas');
       } else {
         await this.pushService.desativar();
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Notificações desativadas',
-          detail: 'Você não receberá mais notificações push neste dispositivo.',
-        });
+        this.toast.info('Você não receberá mais notificações push neste dispositivo.', 'Notificações desativadas');
       }
     } catch {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Erro',
-        detail:
-          'Não foi possível alterar as notificações push. Verifique a permissão do navegador.',
-      });
+      this.toast.error('Não foi possível alterar as notificações push. Verifique a permissão do navegador.');
     } finally {
       this.alterandoPush = false;
     }
@@ -99,11 +84,7 @@ export class Perfil implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar perfil.',
-        });
+        this.toast.error('Falha ao carregar perfil.');
         this.isLoading = false;
       },
     });
@@ -122,19 +103,11 @@ export class Perfil implements OnInit {
         next: (res) => {
           this.usuario = res.data;
           this.form.patchValue({ nome: res.data.nome, email: res.data.email });
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: 'Perfil atualizado com sucesso.',
-          });
+          this.toast.success('Perfil atualizado com sucesso.');
           this.isSaving = false;
         },
         error: (err) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: err?.error?.message ?? 'Falha ao salvar.',
-          });
+          this.toast.error(err?.error?.message ?? 'Falha ao salvar.');
           this.isSaving = false;
         },
       });

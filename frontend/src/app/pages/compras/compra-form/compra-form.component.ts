@@ -17,7 +17,6 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
 import { SelectModule } from 'primeng/select';
 import { DialogModule } from 'primeng/dialog';
-import { MessageService } from 'primeng/api';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CompraService } from '#core/services/compra.service';
@@ -29,6 +28,7 @@ import { ProdutoForm } from '../../produtos/produto-form/produto-form.component'
 import { ICompra, IFornecedor, IProduto } from '#shared/interfaces';
 import { EStatusCompra } from '#shared/enums';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-compra-form',
@@ -97,7 +97,7 @@ export class CompraForm implements OnInit {
     private compraService: CompraService,
     private fornecedorService: FornecedorService,
     private produtoService: ProdutoService,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
   ) {}
 
   ngOnInit() {
@@ -166,11 +166,7 @@ export class CompraForm implements OnInit {
           this.isLoadingData = false;
         },
         error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Falha ao buscar compra',
-          });
+          this.toast.error('Falha ao buscar compra');
           this.visible = false;
         },
       });
@@ -193,11 +189,7 @@ export class CompraForm implements OnInit {
         if (err.status === 404) {
           this.fornecedorLookup.abrir(cnpj);
         } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Erro ao buscar fornecedor',
-          });
+          this.toast.error('Erro ao buscar fornecedor');
         }
       },
     });
@@ -383,13 +375,9 @@ export class CompraForm implements OnInit {
     this.compraService.importarXml(arquivo).subscribe({
       next: (res) => {
         if (!res.success) {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: String(
+          this.toast.error(String(
               (res as unknown as Record<string, unknown>)['message'] ?? 'Erro ao importar XML',
-            ),
-          });
+            ), 'Erro');
           input.value = '';
           return;
         }
@@ -432,7 +420,7 @@ export class CompraForm implements OnInit {
       error: (err) => {
         const msg =
           (err as { error?: { message?: string } })?.error?.message ?? 'Falha ao importar XML';
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: msg });
+        this.toast.error(msg);
         input.value = '';
       },
     });
@@ -467,12 +455,7 @@ export class CompraForm implements OnInit {
                 descricao: res.data.descricao,
                 unidade: res.data.unidade_medida,
               });
-              this.messageService.add({
-                severity: 'info',
-                summary: 'Produto relacionado',
-                detail: `"${res.data.descricao}" identificado pelo código do fornecedor`,
-                life: 2500,
-              });
+              this.toast.info(`"${res.data.descricao}" identificado pelo código do fornecedor`, 'Produto relacionado');
               buscarProximo(idx + 1);
             },
             error: () => {
@@ -497,12 +480,7 @@ export class CompraForm implements OnInit {
             descricao_xml: String(item['descricao'] ?? ''),
             descricao: res.data.descricao,
           });
-          this.messageService.add({
-            severity: 'info',
-            summary: 'Produto relacionado',
-            detail: `"${res.data.descricao}" identificado pelo código de barras`,
-            life: 2500,
-          });
+          this.toast.info(`"${res.data.descricao}" identificado pelo código de barras`, 'Produto relacionado');
           buscarProximo(idx + 1);
         },
         error: (err) => {
@@ -527,11 +505,7 @@ export class CompraForm implements OnInit {
       const pulados =
         this.filaProdutosPendentes.length -
         (this.filaProdutosPendentes.length - this.filaProdutoIndex);
-      this.messageService.add({
-        severity: 'success',
-        summary: 'XML Processado',
-        detail: `${total} ${total === 1 ? 'item adicionado' : 'itens adicionados'} à compra.`,
-      });
+      this.toast.success(`${total} ${total === 1 ? 'item adicionado' : 'itens adicionados'} à compra.`, 'XML Processado');
       return;
     }
 
@@ -585,20 +559,12 @@ export class CompraForm implements OnInit {
   onSave() {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Preencha todos os campos obrigatórios e vincule os produtos.',
-      });
+      this.toast.warn('Preencha todos os campos obrigatórios e vincule os produtos.');
       return;
     }
 
     if (this.itens.length === 0) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Adicione pelo menos um item antes de gravar a compra.',
-      });
+      this.toast.warn('Adicione pelo menos um item antes de gravar a compra.');
       return;
     }
 
@@ -647,11 +613,7 @@ export class CompraForm implements OnInit {
         if (res.success) {
           this.compraId = res.data.id;
           this.compraIdSalva = res.data.id;
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: `Compra ${dados.id ? 'atualizada' : 'criada'} com sucesso`,
-          });
+          this.toast.success(`Compra ${dados.id ? 'atualizada' : 'criada'} com sucesso`);
           // Pergunta se deseja atualizar custo dos produtos
           this.showConfirmaAtualizacaoCusto = true;
         }
@@ -659,7 +621,7 @@ export class CompraForm implements OnInit {
       },
       error: (err) => {
         const msg = err?.error?.message ?? 'Falha ao salvar compra';
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: msg });
+        this.toast.error(msg);
         this.isSaving = false;
       },
     });
@@ -671,22 +633,14 @@ export class CompraForm implements OnInit {
     this.isAtualizandoCusto = true;
     this.compraService.atualizarCusto(this.compraIdSalva!).subscribe({
       next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Custo Atualizado',
-          detail: 'Custo dos produtos atualizado com sucesso.',
-        });
+        this.toast.success('Custo dos produtos atualizado com sucesso.', 'Custo Atualizado');
         this.isAtualizandoCusto = false;
         this.showConfirmaAtualizacaoCusto = false;
         this.saved.emit();
         this.visible = false;
       },
       error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: err?.error?.message ?? 'Falha ao atualizar custo.',
-        });
+        this.toast.error(err?.error?.message ?? 'Falha ao atualizar custo.');
         this.isAtualizandoCusto = false;
       },
     });
@@ -702,21 +656,13 @@ export class CompraForm implements OnInit {
     if (!this.compraId) return;
     this.compraService.alterarStatus(this.compraId, EStatusCompra.Confirmada).subscribe({
       next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Compra Confirmada',
-          detail: 'Estoque e custos dos produtos foram atualizados.',
-        });
+        this.toast.success('Estoque e custos dos produtos foram atualizados.', 'Compra Confirmada');
         this.statusAtual = EStatusCompra.Confirmada;
         this.saved.emit();
         this.visible = false;
       },
       error: (err) =>
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: err?.error?.message ?? 'Falha ao confirmar compra',
-        }),
+        this.toast.error(err?.error?.message ?? 'Falha ao confirmar compra'),
     });
   }
 

@@ -19,8 +19,7 @@ import { MenuModule } from 'primeng/menu';
 import { MessageModule } from 'primeng/message';
 import { PopoverModule } from 'primeng/popover';
 import { BadgeModule } from 'primeng/badge';
-import { ToastModule } from 'primeng/toast';
-import { MenuItem, MessageService } from 'primeng/api';
+import { MenuItem } from 'primeng/api';
 import { AuthService } from '#core/services/auth.service';
 import { ThemeService } from '#core/services/theme.service';
 import { NotificacaoService } from '#core/services/notificacao.service';
@@ -43,7 +42,6 @@ import { NovidadesDialog } from '#shared-frontend/components/novidades-dialog/no
     MessageModule,
     PopoverModule,
     BadgeModule,
-    ToastModule,
     EmpresaForm,
     NovidadesDialog,
   ],

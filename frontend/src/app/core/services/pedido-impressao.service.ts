@@ -1,16 +1,18 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { ToastService } from '#shared-frontend/services/toast.service';
 import { IPedido, IPedidoItem } from '#shared/interfaces';
 import { ETipoItemPedido, EStatusPedido, EDescontoTipo } from '#shared/enums';
 import { formatCurrency, formatNumber, formatCpfCnpj, formatPhone, formatDate } from '#shared/functions/format.functions';
 
 @Injectable({ providedIn: 'root' })
 export class PedidoImpressaoService {
+  private readonly toast = inject(ToastService);
 
   imprimir(pedido: IPedido): void {
     const html = this.gerarHtml(pedido);
     const win = window.open('', '_blank');
     if (!win) {
-      alert('Permita pop-ups para imprimir o pedido.');
+      this.toast.warn('Permita as janelas pop-up deste site para imprimir o pedido.');
       return;
     }
     win.document.write(html);

@@ -1,9 +1,6 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 import { PanelModule } from 'primeng/panel';
 import { SelectModule } from 'primeng/select';
 import { PaginatorModule } from 'primeng/paginator';
@@ -19,6 +16,8 @@ import { ClienteService } from '#core/services/cliente.service';
 import { PedidoService } from '#core/services/pedido.service';
 import { ICliente, IPedido } from '#shared/interfaces';
 import { EStatusPedido } from '#shared/enums';
+import { ToastService } from '#shared-frontend/services/toast.service';
+import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-clientes',
@@ -28,8 +27,6 @@ import { EStatusPedido } from '#shared/enums';
     FormsModule,
     DataTable,
     ClienteForm,
-    ConfirmDialogModule,
-    ToastModule,
     PanelModule,
     SelectModule,
     PaginatorModule,
@@ -43,7 +40,6 @@ import { EStatusPedido } from '#shared/enums';
   templateUrl: './clientes.component.html',
   styleUrls: ['./clientes.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  providers: [ConfirmationService],
 })
 export class Clientes implements OnInit {
   @ViewChild('form') form!: ClienteForm;
@@ -95,8 +91,8 @@ export class Clientes implements OnInit {
   constructor(
     private clienteService: ClienteService,
     private pedidoService: PedidoService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
+    private readonly toast: ToastService,
+    private readonly confirmDialog: ConfirmDialogService,
   ) {}
 
   ngOnInit(): void {
@@ -127,11 +123,7 @@ export class Clientes implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar clientes',
-        });
+        this.toast.error('Falha ao carregar clientes');
         this.loading = false;
       },
     });
@@ -200,11 +192,7 @@ export class Clientes implements OnInit {
         this.historicoLoading = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar histórico de pedidos',
-        });
+        this.toast.error('Falha ao carregar histórico de pedidos');
         this.historicoLoading = false;
       },
     });
@@ -248,24 +236,20 @@ export class Clientes implements OnInit {
   }
 
   onDelete(cliente: ICliente) {
-    this.confirmationService.confirm({
+    this.confirmDialog.confirm({
+      title: 'Confirmar Exclusão',
       message: `Deseja realmente excluir o cliente "${cliente.razao_social}"?`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
-      accept: () => {
+      confirmText: 'Sim',
+      cancelText: 'Não',
+      danger: true,
+    }).then((ok) => {
+      if (!ok) return;
         this.clienteService.desativar(cliente.id).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Cliente excluído',
-            });
+            this.toast.success('Cliente excluído');
             this.carregarClientes();
           },
         });
-      },
     });
   }
 }

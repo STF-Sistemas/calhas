@@ -1,13 +1,12 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 import { DataTable } from '#shared-frontend/components/data-table/data-table.component';
 import { ServicoForm } from './servico-form/servico-form.component';
 import { ServicoService } from '#core/services/servico.service';
 import { IServico } from '#shared/interfaces';
 import { EStatusGeral } from '#shared/enums';
+import { ToastService } from '#shared-frontend/services/toast.service';
+import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-servicos',
@@ -16,13 +15,10 @@ import { EStatusGeral } from '#shared/enums';
     CommonModule,
     DataTable,
     ServicoForm,
-    ConfirmDialogModule,
-    ToastModule,
   ],
   templateUrl: './servicos.component.html',
   styleUrls: ['./servicos.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  providers: [ConfirmationService],
 })
 export class Servicos implements OnInit {
   @ViewChild('form') form!: ServicoForm;
@@ -38,8 +34,8 @@ export class Servicos implements OnInit {
 
   constructor(
     private servicoService: ServicoService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
+    private readonly toast: ToastService,
+    private readonly confirmDialog: ConfirmDialogService,
   ) {}
 
   ngOnInit(): void {
@@ -54,11 +50,7 @@ export class Servicos implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar serviços',
-        });
+        this.toast.error('Falha ao carregar serviços');
         this.loading = false;
       },
     });
@@ -80,34 +72,26 @@ export class Servicos implements OnInit {
         servico.status = novoStatus;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao alterar status do serviço',
-        });
+        this.toast.error('Falha ao alterar status do serviço');
       },
     });
   }
 
   onDelete(servico: IServico) {
-    this.confirmationService.confirm({
+    this.confirmDialog.confirm({
+      title: 'Confirmar Exclusão',
       message: `Deseja realmente excluir o serviço "${servico.descricao}"?`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
-      accept: () => {
+      confirmText: 'Sim',
+      cancelText: 'Não',
+      danger: true,
+    }).then((ok) => {
+      if (!ok) return;
         this.servicoService.desativar(servico.id).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Serviço excluído',
-            });
+            this.toast.success('Serviço excluído');
             this.carregarServicos();
           },
         });
-      },
     });
   }
 }

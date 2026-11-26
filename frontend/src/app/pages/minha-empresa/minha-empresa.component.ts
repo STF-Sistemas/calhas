@@ -13,14 +13,13 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { Textarea } from 'primeng/textarea';
 import { CardModule } from 'primeng/card';
-import { MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { ClienteService } from '#core/services/cliente.service';
 import { environment } from 'src/environments/environment';
 import { IEmpresa } from '#shared/interfaces';
 import { TApiResponse } from '#shared/types';
 import { LogoUploader } from '#shared-frontend/components/logo-uploader/logo-uploader.component';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-minha-empresa',
@@ -42,7 +41,6 @@ import { LogoUploader } from '#shared-frontend/components/logo-uploader/logo-upl
     TabPanel,
     Textarea,
     CardModule,
-    ToastModule,
     NgxMaskDirective,
     LogoUploader,
   ],
@@ -59,7 +57,7 @@ export class MinhaEmpresa implements OnInit {
     private fb: FormBuilder,
     private http: HttpClient,
     private clienteService: ClienteService,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
     private title: Title,
   ) {}
 
@@ -100,11 +98,7 @@ export class MinhaEmpresa implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar dados da empresa.',
-        });
+        this.toast.error('Falha ao carregar dados da empresa.');
         this.isLoading = false;
       },
     });
@@ -122,11 +116,7 @@ export class MinhaEmpresa implements OnInit {
               cod_cidade: res.data.cidade.id,
               cidade_nome: res.data.cidade.descricao,
             });
-            this.messageService.add({
-              severity: 'info',
-              summary: 'CEP Localizado',
-              detail: 'Endereço preenchido automaticamente.',
-            });
+            this.toast.info('Endereço preenchido automaticamente.', 'CEP Localizado');
           }
         },
       });
@@ -147,11 +137,7 @@ export class MinhaEmpresa implements OnInit {
   onSave(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Preencha todos os campos obrigatórios.',
-      });
+      this.toast.warn('Preencha todos os campos obrigatórios.');
       return;
     }
 
@@ -165,19 +151,11 @@ export class MinhaEmpresa implements OnInit {
           ...res.data,
           cidade_nome: res.data.cidade?.descricao ?? '',
         });
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Sucesso',
-          detail: 'Dados da empresa atualizados com sucesso.',
-        });
+        this.toast.success('Dados da empresa atualizados com sucesso.');
         this.isSaving = false;
       },
       error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: err?.error?.message ?? 'Falha ao salvar.',
-        });
+        this.toast.error(err?.error?.message ?? 'Falha ao salvar.');
         this.isSaving = false;
       },
     });

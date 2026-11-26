@@ -5,9 +5,9 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { MessageService } from 'primeng/api';
 import { ProdutoService } from '#core/services/produto.service';
 import { IProduto } from '#shared/interfaces';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-produto-lookup-dialog',
@@ -32,7 +32,7 @@ export class ProdutoLookupDialog {
 
   constructor(
     private produtoService: ProdutoService,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
   ) {}
 
   abrir(itemIndex: number, codigoDigitado: string) {
@@ -59,11 +59,7 @@ export class ProdutoLookupDialog {
         this.produtosFiltrados = this.produtos;
       },
       error: () =>
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar produtos',
-        }),
+        this.toast.error('Falha ao carregar produtos'),
     });
   }
 

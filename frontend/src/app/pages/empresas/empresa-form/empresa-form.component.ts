@@ -12,7 +12,6 @@ import { Textarea } from 'primeng/textarea';
 import { TagModule } from 'primeng/tag';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { MessageService } from 'primeng/api';
 import { NgxMaskDirective } from 'ngx-mask';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { LogoUploader } from '#shared-frontend/components/logo-uploader/logo-uploader.component';
@@ -23,6 +22,7 @@ import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask
 import { HttpClient } from '@angular/common/http';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { environment } from 'src/environments/environment';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-empresa-form',
@@ -69,7 +69,7 @@ export class EmpresaForm {
     private fb: FormBuilder,
     private empresaService: EmpresaService,
     private clienteService: ClienteService, // Usado para buscar CEP (rota compartilhada no backend /cep)
-    private messageService: MessageService,
+    private readonly toast: ToastService,
     private http: HttpClient,
     public authService: AuthService,
   ) {
@@ -125,19 +125,11 @@ export class EmpresaForm {
       })
       .subscribe({
         next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: 'Licença atualizada.',
-          });
+          this.toast.success('Licença atualizada.');
           this.isSavingValidade = false;
         },
         error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Falha ao atualizar licença.',
-          });
+          this.toast.error('Falha ao atualizar licença.');
           this.isSavingValidade = false;
         },
       });
@@ -161,11 +153,7 @@ export class EmpresaForm {
           this.isLoadingData = false;
         },
         error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Falha ao buscar dados da empresa',
-          });
+          this.toast.error('Falha ao buscar dados da empresa');
           this.visible = false;
         },
       });
@@ -184,11 +172,7 @@ export class EmpresaForm {
               cod_cidade: res.data.cidade.id,
               cidade_nome: res.data.cidade.descricao,
             });
-            this.messageService.add({
-              severity: 'info',
-              summary: 'CEP Localizado',
-              detail: 'Endereço e Cidade preenchidos automaticamente',
-            });
+            this.toast.info('Endereço e Cidade preenchidos automaticamente', 'CEP Localizado');
           }
         },
       });
@@ -216,22 +200,14 @@ export class EmpresaForm {
     this.empresaService.salvar(dados).subscribe({
       next: (res) => {
         if (res.success) {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: `Empresa ${this.empresaId ? 'atualizada' : 'criada'} com sucesso`,
-          });
+          this.toast.success(`Empresa ${this.empresaId ? 'atualizada' : 'criada'} com sucesso`);
           this.saved.emit();
           this.visible = false;
         }
         this.isSaving = false;
       },
       error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: err.error?.message || 'Falha ao salvar empresa',
-        });
+        this.toast.error(err.error?.message || 'Falha ao salvar empresa');
         this.isSaving = false;
       },
     });

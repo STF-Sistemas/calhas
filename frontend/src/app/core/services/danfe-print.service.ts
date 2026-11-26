@@ -1,22 +1,24 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { ToastService } from '#shared-frontend/services/toast.service';
 import { CompraService } from './compra.service';
 import { IDanfeData } from '#shared/interfaces';
 
 @Injectable({ providedIn: 'root' })
 export class DanfePrintService {
+  private readonly toast = inject(ToastService);
   constructor(private compraService: CompraService) {}
 
   imprimir(compraId: number): void {
     this.compraService.getDanfeData(compraId).subscribe({
       next: (res) => this.abrirJanelaDanfe(res.data),
-      error: (err) => alert(err?.error?.message ?? 'Erro ao gerar DANFE.'),
+      error: (err) => this.toast.error(err?.error?.message ?? 'Erro ao gerar DANFE.'),
     });
   }
 
   private abrirJanelaDanfe(data: IDanfeData): void {
     const html = this.gerarHtml(data);
     const win = window.open('', '_blank', 'width=900,height=700');
-    if (!win) { alert('Permita popups para imprimir.'); return; }
+    if (!win) { this.toast.warn('Permita as janelas pop-up deste site para imprimir.'); return; }
     win.document.open();
     win.document.write(html);
     win.document.close();

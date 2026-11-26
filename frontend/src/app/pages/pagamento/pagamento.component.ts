@@ -11,13 +11,12 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageModule } from 'primeng/message';
-import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageService } from 'primeng/api';
 import { PagamentoService } from '#core/services/pagamento.service';
 import { AuthService } from '#core/services/auth.service';
 import { ThemeService } from '#core/services/theme.service';
 import { IPagamentoPix } from '#shared/interfaces';
+import { ToastService } from '#shared-frontend/services/toast.service';
 
 @Component({
   selector: 'app-pagamento',
@@ -27,7 +26,6 @@ import { IPagamentoPix } from '#shared/interfaces';
     ButtonModule,
     ProgressSpinnerModule,
     MessageModule,
-    ToastModule,
     TooltipModule,
   ],
   templateUrl: './pagamento.component.html',
@@ -64,7 +62,7 @@ export class Pagamento implements OnInit, OnDestroy {
     private pagamentoService: PagamentoService,
     private authService: AuthService,
     private router: Router,
-    private messageService: MessageService,
+    private readonly toast: ToastService,
     public themeService: ThemeService,
   ) {}
 
@@ -151,12 +149,7 @@ export class Pagamento implements OnInit, OnDestroy {
     if (novaExpiracao) {
       this.authService.atualizarEmpresaExpiracao(new Date(novaExpiracao));
     }
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Pagamento confirmado!',
-      detail: 'Sua licença foi renovada por 30 dias.',
-      life: 8000,
-    });
+    this.toast.success('Sua licença foi renovada por 30 dias.', 'Pagamento confirmado!');
     this.redirecionandoEm.set(5);
     this.redirectInterval = setInterval(() => {
       this.redirecionandoEm.update((v) => v - 1);
@@ -179,12 +172,7 @@ export class Pagamento implements OnInit, OnDestroy {
     if (!codigo) return;
     navigator.clipboard.writeText(codigo).then(() => {
       this.copiado.set(true);
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Copiado!',
-        detail: 'Código Pix copiado para a área de transferência.',
-        life: 3000,
-      });
+      this.toast.success('Código Pix copiado para a área de transferência.', 'Copiado!');
       setTimeout(() => this.copiado.set(false), 3000);
     });
   }
