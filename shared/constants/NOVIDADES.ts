@@ -13,6 +13,15 @@ import { INovidade } from '../interfaces/INovidade';
  */
 export const NOVIDADES: INovidade[] = [
   {
+    versao: '1.9.0',
+    data: '26/11/2026',
+    itens: [
+      'Servidor do sistema reescrito: respostas mais rápidas e compactadas, menos memória e proteção reforçada contra acessos indevidos entre empresas.',
+      'Pesquisa de clientes e fornecedores agora ignora acentos: buscar "Joao" encontra "João".',
+      'Pagamento da licença por Pix ficou à prova de confirmação dupla: cada pagamento prorroga a licença uma única vez.',
+    ],
+  },
+  {
     versao: '1.8.0',
     data: '26/11/2026',
     itens: [
