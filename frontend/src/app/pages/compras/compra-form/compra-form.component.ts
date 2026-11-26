@@ -1,5 +1,12 @@
 import { TecladoNumericoDirective } from '#shared-frontend/directives/teclado-numerico.directive';
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewChild,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -48,6 +55,7 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
   ],
   providers: [provideNgxMask()],
   templateUrl: './compra-form.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./compra-form.component.scss'],
 })
 export class CompraFormComponent implements OnInit {
@@ -89,7 +97,7 @@ export class CompraFormComponent implements OnInit {
     private compraService: CompraService,
     private fornecedorService: FornecedorService,
     private produtoService: ProdutoService,
-    private messageService: MessageService
+    private messageService: MessageService,
   ) {}
 
   ngOnInit() {
@@ -152,11 +160,17 @@ export class CompraFormComponent implements OnInit {
             valor_outros: Number(compra.valor_outros),
             observacao: compra.observacao ?? '',
           });
-          compra.itens?.forEach((item) => this.adicionarItem(item as unknown as Partial<Record<string, unknown>>));
+          compra.itens?.forEach((item) =>
+            this.adicionarItem(item as unknown as Partial<Record<string, unknown>>),
+          );
           this.isLoadingData = false;
         },
         error: () => {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao buscar compra' });
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Falha ao buscar compra',
+          });
           this.visible = false;
         },
       });
@@ -179,7 +193,11 @@ export class CompraFormComponent implements OnInit {
         if (err.status === 404) {
           this.fornecedorLookup.abrir(cnpj);
         } else {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao buscar fornecedor' });
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Erro ao buscar fornecedor',
+          });
         }
       },
     });
@@ -219,7 +237,10 @@ export class CompraFormComponent implements OnInit {
       ncm: [String(data?.['ncm'] ?? '')],
       cfop: [String(data?.['cfop'] ?? '')],
       unidade: [String(data?.['unidade'] ?? 'UN'), [Validators.required]],
-      quantidade: [Number(data?.['quantidade'] ?? 0), [Validators.required, Validators.min(0.0001)]],
+      quantidade: [
+        Number(data?.['quantidade'] ?? 0),
+        [Validators.required, Validators.min(0.0001)],
+      ],
       valor_unitario: [Number(data?.['valor_unitario'] ?? 0)],
       valor_total: [{ value: Number(data?.['valor_total'] ?? 0), disabled: true }],
       desconto: [Number(data?.['desconto'] ?? 0)],
@@ -241,7 +262,7 @@ export class CompraFormComponent implements OnInit {
     // Recalcular valor_total automaticamente (qtd × vlr_unit) e depois custo
     const recalcTotal = () => {
       const qty = Number(itemGroup.get('quantidade')?.value || 0);
-      const vu  = Number(itemGroup.get('valor_unitario')?.value || 0);
+      const vu = Number(itemGroup.get('valor_unitario')?.value || 0);
       itemGroup.get('valor_total')?.setValue(qty * vu, { emitEvent: true });
       this.calcularCustoItem(idx);
     };
@@ -266,13 +287,16 @@ export class CompraFormComponent implements OnInit {
   }
 
   preencherProdutoNoItem(index: number, produto: IProduto) {
-    this.itens.at(index).patchValue({
-      cod_produto: produto.id,
-      descricao: produto.descricao,
-      unidade: produto.unidade_medida,
-      ncm: produto.ncm ?? '',
-      cfop: produto.cfop_padrao ?? '',
-    }, { emitEvent: false });
+    this.itens.at(index).patchValue(
+      {
+        cod_produto: produto.id,
+        descricao: produto.descricao,
+        unidade: produto.unidade_medida,
+        ncm: produto.ncm ?? '',
+        cfop: produto.cfop_padrao ?? '',
+      },
+      { emitEvent: false },
+    );
     this.calcularCustoItem(index);
   }
 
@@ -280,7 +304,12 @@ export class CompraFormComponent implements OnInit {
     if (event.itemIndex === -1) {
       // Contexto de fila: relaciona o item pendente ao produto selecionado
       const item = this.produtoConfirmaAtual!;
-      this.adicionarItem({ ...item, cod_produto: event.produto.id, descricao: event.produto.descricao, unidade: event.produto.unidade_medida });
+      this.adicionarItem({
+        ...item,
+        cod_produto: event.produto.id,
+        descricao: event.produto.descricao,
+        unidade: event.produto.unidade_medida,
+      });
       this.salvarVinculoFornecedorSeNecessario(event.produto.id, item, true);
       this.filaProdutoIndex++;
       setTimeout(() => this.processarProximoPendente(), 100);
@@ -293,7 +322,10 @@ export class CompraFormComponent implements OnInit {
 
   calcularCustoItem(itemIndex: number) {
     const item = (this.itens.at(itemIndex) as FormGroup).getRawValue() as Record<string, number>;
-    const somaItens = this.itens.controls.reduce((s, c) => s + (Number((c as FormGroup).getRawValue()['valor_total']) || 0), 0);
+    const somaItens = this.itens.controls.reduce(
+      (s, c) => s + (Number((c as FormGroup).getRawValue()['valor_total']) || 0),
+      0,
+    );
     const cab = this.form.value as Record<string, number>;
     const totalAdicional =
       (Number(cab['valor_frete']) || 0) +
@@ -305,22 +337,28 @@ export class CompraFormComponent implements OnInit {
     const custo =
       item['quantidade'] > 0
         ? ((Number(item['valor_total']) || 0) -
-           (Number(item['desconto']) || 0) +
-           (Number(item['valor_ipi']) || 0) +
-           (Number(item['valor_icms_st']) || 0) +
-           rateio) /
+            (Number(item['desconto']) || 0) +
+            (Number(item['valor_ipi']) || 0) +
+            (Number(item['valor_icms_st']) || 0) +
+            rateio) /
           item['quantidade']
         : 0;
     this.itens.at(itemIndex).patchValue({ custo_unitario: custo }, { emitEvent: false });
   }
 
   calcularTotalProdutos(): number {
-    return this.itens.controls.reduce((s, c) => s + (Number((c as FormGroup).getRawValue()['valor_total']) || 0), 0);
+    return this.itens.controls.reduce(
+      (s, c) => s + (Number((c as FormGroup).getRawValue()['valor_total']) || 0),
+      0,
+    );
   }
 
   calcularTotalGeral(): number {
     const cab = this.form.value as Record<string, number>;
-    const ipiTotal = this.itens.controls.reduce((s, c) => s + (Number(c.value['valor_ipi']) || 0), 0);
+    const ipiTotal = this.itens.controls.reduce(
+      (s, c) => s + (Number(c.value['valor_ipi']) || 0),
+      0,
+    );
     return (
       this.calcularTotalProdutos() +
       (Number(cab['valor_frete']) || 0) +
@@ -338,12 +376,20 @@ export class CompraFormComponent implements OnInit {
     const arquivo = input.files?.[0];
     if (!arquivo) return;
 
-    arquivo.text().then(text => { this.xmlContent = text; });
+    arquivo.text().then((text) => {
+      this.xmlContent = text;
+    });
 
     this.compraService.importarXml(arquivo).subscribe({
       next: (res) => {
         if (!res.success) {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: String((res as unknown as Record<string, unknown>)['message'] ?? 'Erro ao importar XML') });
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: String(
+              (res as unknown as Record<string, unknown>)['message'] ?? 'Erro ao importar XML',
+            ),
+          });
           input.value = '';
           return;
         }
@@ -384,7 +430,8 @@ export class CompraFormComponent implements OnInit {
         input.value = '';
       },
       error: (err) => {
-        const msg = (err as { error?: { message?: string } })?.error?.message ?? 'Falha ao importar XML';
+        const msg =
+          (err as { error?: { message?: string } })?.error?.message ?? 'Falha ao importar XML';
         this.messageService.add({ severity: 'error', summary: 'Erro', detail: msg });
         input.value = '';
       },
@@ -477,7 +524,9 @@ export class CompraFormComponent implements OnInit {
   private processarProximoPendente() {
     if (this.filaProdutoIndex >= this.filaProdutosPendentes.length) {
       const total = this.itens.length;
-      const pulados = this.filaProdutosPendentes.length - (this.filaProdutosPendentes.length - this.filaProdutoIndex);
+      const pulados =
+        this.filaProdutosPendentes.length -
+        (this.filaProdutosPendentes.length - this.filaProdutoIndex);
       this.messageService.add({
         severity: 'success',
         summary: 'XML Processado',
@@ -511,7 +560,11 @@ export class CompraFormComponent implements OnInit {
     setTimeout(() => this.processarProximoPendente(), 100);
   }
 
-  private salvarVinculoFornecedorSeNecessario(codProduto: number, item: Record<string, unknown>, forcar = false) {
+  private salvarVinculoFornecedorSeNecessario(
+    codProduto: number,
+    item: Record<string, unknown>,
+    forcar = false,
+  ) {
     const gtin = String(item['gtin'] ?? '').trim();
     const cProd = String(item['cProd'] ?? '').trim();
     const codFornecedor = this.form.get('cod_fornecedor')?.value as number | null;
@@ -532,12 +585,20 @@ export class CompraFormComponent implements OnInit {
   onSave() {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Preencha todos os campos obrigatórios e vincule os produtos.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: 'Preencha todos os campos obrigatórios e vincule os produtos.',
+      });
       return;
     }
 
     if (this.itens.length === 0) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Adicione pelo menos um item antes de gravar a compra.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: 'Adicione pelo menos um item antes de gravar a compra.',
+      });
       return;
     }
 
@@ -586,7 +647,11 @@ export class CompraFormComponent implements OnInit {
         if (res.success) {
           this.compraId = res.data.id;
           this.compraIdSalva = res.data.id;
-          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: `Compra ${dados.id ? 'atualizada' : 'criada'} com sucesso` });
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: `Compra ${dados.id ? 'atualizada' : 'criada'} com sucesso`,
+          });
           // Pergunta se deseja atualizar custo dos produtos
           this.showConfirmaAtualizacaoCusto = true;
         }
@@ -606,14 +671,22 @@ export class CompraFormComponent implements OnInit {
     this.isAtualizandoCusto = true;
     this.compraService.atualizarCusto(this.compraIdSalva!).subscribe({
       next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Custo Atualizado', detail: 'Custo dos produtos atualizado com sucesso.' });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Custo Atualizado',
+          detail: 'Custo dos produtos atualizado com sucesso.',
+        });
         this.isAtualizandoCusto = false;
         this.showConfirmaAtualizacaoCusto = false;
         this.saved.emit();
         this.visible = false;
       },
       error: (err) => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Falha ao atualizar custo.' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: err?.error?.message ?? 'Falha ao atualizar custo.',
+        });
         this.isAtualizandoCusto = false;
       },
     });
@@ -629,12 +702,21 @@ export class CompraFormComponent implements OnInit {
     if (!this.compraId) return;
     this.compraService.alterarStatus(this.compraId, EStatusCompra.Confirmada).subscribe({
       next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Compra Confirmada', detail: 'Estoque e custos dos produtos foram atualizados.' });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Compra Confirmada',
+          detail: 'Estoque e custos dos produtos foram atualizados.',
+        });
         this.statusAtual = EStatusCompra.Confirmada;
         this.saved.emit();
         this.visible = false;
       },
-      error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Falha ao confirmar compra' }),
+      error: (err) =>
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: err?.error?.message ?? 'Falha ao confirmar compra',
+        }),
     });
   }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -34,6 +34,7 @@ interface IItemCorteExibicao {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './ordem-corte-publico.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./ordem-corte-publico.component.scss'],
 })
 export class OrdemCortePublicoComponent implements OnInit {
@@ -108,7 +109,9 @@ export class OrdemCortePublicoComponent implements OnInit {
       corteRef: item.corte?.corte != null ? `${item.corte.corte} cm` : '-',
       desenhoDescricao: item.desenho?.descricao ?? '-',
       total,
-      svg: temDesenho ? this.sanitizer.bypassSecurityTrustHtml(gerarSvgCorte(pontos, diagonais, medidas)) : null,
+      svg: temDesenho
+        ? this.sanitizer.bypassSecurityTrustHtml(gerarSvgCorte(pontos, diagonais, medidas))
+        : null,
     };
   }
 }

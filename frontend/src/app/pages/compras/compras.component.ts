@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
@@ -7,7 +7,10 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
-import { DataTableComponent, IRowAction } from '#shared-frontend/components/data-table/data-table.component';
+import {
+  DataTableComponent,
+  IRowAction,
+} from '#shared-frontend/components/data-table/data-table.component';
 import { CompraFormComponent } from './compra-form/compra-form.component';
 import { CompraService } from '#core/services/compra.service';
 import { DanfePrintService } from '#core/services/danfe-print.service';
@@ -29,6 +32,7 @@ import { EStatusCompra } from '#shared/enums';
   ],
   templateUrl: './compras.component.html',
   styleUrls: ['./compras.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })
 export class ComprasComponent implements OnInit {
@@ -83,7 +87,7 @@ export class ComprasComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private titleService: Title,
-    private danfePrintService: DanfePrintService
+    private danfePrintService: DanfePrintService,
   ) {}
 
   ngOnInit(): void {
@@ -103,7 +107,11 @@ export class ComprasComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar compras' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar compras',
+        });
         this.loading = false;
       },
     });
@@ -149,12 +157,20 @@ export class ComprasComponent implements OnInit {
         this.isSavingStatus = true;
         this.compraService.alterarStatus(compra.id, EStatusCompra.Confirmada).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Confirmada', detail: `Compra ${nfe} confirmada com sucesso.` });
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Confirmada',
+              detail: `Compra ${nfe} confirmada com sucesso.`,
+            });
             this.carregar();
             this.isSavingStatus = false;
           },
           error: (err) => {
-            this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Falha ao confirmar compra.' });
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Erro',
+              detail: err?.error?.message ?? 'Falha ao confirmar compra.',
+            });
             this.isSavingStatus = false;
           },
         });
@@ -170,32 +186,47 @@ export class ComprasComponent implements OnInit {
 
   onConfirmarCancelamento() {
     if (!this.motivoCancelamento.trim()) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Informe o motivo do cancelamento.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: 'Informe o motivo do cancelamento.',
+      });
       return;
     }
     const compra = this.compraCancelando!;
     const nfe = compra.numero_nfe ? `NF-e ${compra.numero_nfe}` : `#${compra.id}`;
     this.isSavingStatus = true;
-    this.compraService.alterarStatus(compra.id, EStatusCompra.Cancelada, this.motivoCancelamento.trim()).subscribe({
-      next: () => {
-        this.messageService.add({ severity: 'info', summary: 'Cancelada', detail: `Compra ${nfe} cancelada. Estoque revertido.` });
-        this.showCancelDialog = false;
-        this.compraCancelando = null;
-        this.carregar();
-        this.isSavingStatus = false;
-      },
-      error: (err) => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Falha ao cancelar compra.' });
-        this.isSavingStatus = false;
-      },
-    });
+    this.compraService
+      .alterarStatus(compra.id, EStatusCompra.Cancelada, this.motivoCancelamento.trim())
+      .subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Cancelada',
+            detail: `Compra ${nfe} cancelada. Estoque revertido.`,
+          });
+          this.showCancelDialog = false;
+          this.compraCancelando = null;
+          this.carregar();
+          this.isSavingStatus = false;
+        },
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: err?.error?.message ?? 'Falha ao cancelar compra.',
+          });
+          this.isSavingStatus = false;
+        },
+      });
   }
 
   onDelete(compra: ICompra) {
     const nfe = compra.numero_nfe ? `NF-e ${compra.numero_nfe}` : `#${compra.id}`;
-    const avisoEstoque = compra.status === EStatusCompra.Confirmada
-      ? '<br><br><strong>Atenção:</strong> o estoque dos produtos será revertido.'
-      : '';
+    const avisoEstoque =
+      compra.status === EStatusCompra.Confirmada
+        ? '<br><br><strong>Atenção:</strong> o estoque dos produtos será revertido.'
+        : '';
     this.confirmationService.confirm({
       message: `Deseja realmente excluir a compra ${nfe}?${avisoEstoque}`,
       header: 'Confirmar Exclusão',
@@ -205,10 +236,19 @@ export class ComprasComponent implements OnInit {
       accept: () => {
         this.compraService.excluir(compra.id).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Compra excluída' });
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Compra excluída',
+            });
             this.carregar();
           },
-          error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Falha ao excluir compra' }),
+          error: (err) =>
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Erro',
+              detail: err?.error?.message ?? 'Falha ao excluir compra',
+            }),
         });
       },
     });
@@ -227,8 +267,18 @@ export class ComprasComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-success',
       accept: () => {
         this.compraService.atualizarCusto(compra.id).subscribe({
-          next: () => this.messageService.add({ severity: 'success', summary: 'Custo Atualizado', detail: `Custo dos produtos da ${nfe} atualizado com sucesso.` }),
-          error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Falha ao atualizar custo.' }),
+          next: () =>
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Custo Atualizado',
+              detail: `Custo dos produtos da ${nfe} atualizado com sucesso.`,
+            }),
+          error: (err) =>
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Erro',
+              detail: err?.error?.message ?? 'Falha ao atualizar custo.',
+            }),
         });
       },
     });

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -10,7 +10,10 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
 import { PaginatorModule } from 'primeng/paginator';
 import { ButtonModule } from 'primeng/button';
-import { DataTableComponent, IRowAction } from '#shared-frontend/components/data-table/data-table.component';
+import {
+  DataTableComponent,
+  IRowAction,
+} from '#shared-frontend/components/data-table/data-table.component';
 import { PedidoFormComponent } from './pedido-form/pedido-form.component';
 import { OrdemCorteEnvioDialogComponent } from './dialogs/ordem-corte-envio-dialog/ordem-corte-envio-dialog.component';
 import { AutorizacaoDialogComponent } from './dialogs/autorizacao-dialog/autorizacao-dialog.component';
@@ -43,7 +46,8 @@ import { environment } from 'src/environments/environment';
   ],
   templateUrl: './pedidos.component.html',
   styleUrls: ['./pedidos.component.scss'],
-  providers: [ConfirmationService]
+  changeDetection: ChangeDetectionStrategy.Eager,
+  providers: [ConfirmationService],
 })
 export class PedidosComponent implements OnInit {
   @ViewChild('form') form!: PedidoFormComponent;
@@ -124,7 +128,7 @@ export class PedidosComponent implements OnInit {
     { field: 'valor_desconto', header: 'Desconto', type: 'currency' },
     { field: 'valor_liquido', header: 'Total Líquido', type: 'currency' },
     { field: 'status_label', header: 'Status' },
-    { field: 'aprovacao', header: 'Aprovação', type: 'tag' }
+    { field: 'aprovacao', header: 'Aprovação', type: 'tag' },
   ];
 
   constructor(
@@ -132,14 +136,17 @@ export class PedidosComponent implements OnInit {
     private clienteService: ClienteService,
     private impressaoService: PedidoImpressaoService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
   ) {}
 
   ngOnInit(): void {
     this.clienteService.listar().subscribe({
       next: (res) => {
-        this.clienteOptions = res.data.map((c: ICliente) => ({ label: c.razao_social, value: c.id }));
-      }
+        this.clienteOptions = res.data.map((c: ICliente) => ({
+          label: c.razao_social,
+          value: c.id,
+        }));
+      },
     });
     this.carregarPedidos();
   }
@@ -173,14 +180,23 @@ export class PedidosComponent implements OnInit {
           else if (p.status === EStatusPedido.EmProducao) statusLabel = 'Em Produção';
           else if (p.status === EStatusPedido.Concluido) statusLabel = 'Finalizado';
           else if (p.status === EStatusPedido.Cancelado) statusLabel = 'Cancelado';
-          return { ...p, cliente_nome: p.cliente?.razao_social, status_label: statusLabel, aprovacao: obterAprovacaoTag(p.aprovacao_status) };
+          return {
+            ...p,
+            cliente_nome: p.cliente?.razao_social,
+            status_label: statusLabel,
+            aprovacao: obterAprovacaoTag(p.aprovacao_status),
+          };
         });
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar pedidos' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar pedidos',
+        });
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -201,7 +217,12 @@ export class PedidosComponent implements OnInit {
   onPrint(pedido: IPedido) {
     this.pedidoService.buscarPorId(pedido.id).subscribe({
       next: (res) => this.impressaoService.imprimir(res.data),
-      error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar dados do pedido' })
+      error: () =>
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar dados do pedido',
+        }),
     });
   }
 
@@ -209,15 +230,24 @@ export class PedidosComponent implements OnInit {
     this.pedidoService.buscarPorId(pedido.id).subscribe({
       next: (res) => {
         const temItensEnviaveis = (res.data.itens ?? []).some(
-          i => i.tipo === ETipoItemPedido.Corte || i.tipo === ETipoItemPedido.Produto
+          (i) => i.tipo === ETipoItemPedido.Corte || i.tipo === ETipoItemPedido.Produto,
         );
         if (!temItensEnviaveis) {
-          this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Este pedido não possui produtos ou cortes para envio.' });
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Atenção',
+            detail: 'Este pedido não possui produtos ou cortes para envio.',
+          });
           return;
         }
         this.ordemCorteDialog.abrir(res.data);
       },
-      error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar dados do pedido' })
+      error: () =>
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar dados do pedido',
+        }),
     });
   }
 
@@ -232,9 +262,9 @@ export class PedidosComponent implements OnInit {
     }
 
     const mapa: Record<string, { status: EStatusPedido; label: string }> = {
-      iniciar:  { status: EStatusPedido.EmProducao, label: 'mover para Em Produção' },
-      concluir: { status: EStatusPedido.Concluido,  label: 'concluir' },
-      reabrir:  { status: EStatusPedido.Aberto,     label: 'reabrir (voltar para Aberto)' },
+      iniciar: { status: EStatusPedido.EmProducao, label: 'mover para Em Produção' },
+      concluir: { status: EStatusPedido.Concluido, label: 'concluir' },
+      reabrir: { status: EStatusPedido.Aberto, label: 'reabrir (voltar para Aberto)' },
     };
     const acao = mapa[event.key];
     if (!acao) return;
@@ -248,19 +278,28 @@ export class PedidosComponent implements OnInit {
       accept: () => {
         this.pedidoService.alterarStatus(event.row.id, acao.status).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Status do pedido atualizado.' });
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Status do pedido atualizado.',
+            });
             this.carregarPedidos();
           },
           error: (err) => {
             const erros: string[] = err.error?.erros ?? [];
             const summary = err.error?.message || 'Falha ao alterar status';
             this.messageService.add({ severity: 'error', summary, life: 6000 });
-            erros.forEach(e =>
-              this.messageService.add({ severity: 'warn', summary: 'Estoque insuficiente', detail: e, life: 8000 })
+            erros.forEach((e) =>
+              this.messageService.add({
+                severity: 'warn',
+                summary: 'Estoque insuficiente',
+                detail: e,
+                life: 8000,
+              }),
             );
-          }
+          },
         });
-      }
+      },
     });
   }
 
@@ -269,7 +308,10 @@ export class PedidosComponent implements OnInit {
       next: (res) => {
         const baseUrl = window.location.origin;
         const url = `${baseUrl}/orcamento/${res.data.token}`;
-        const mensagem = (res.data.mensagem_padrao || 'Segue o seu orçamento: {link}').replace('{link}', url);
+        const mensagem = (res.data.mensagem_padrao || 'Segue o seu orçamento: {link}').replace(
+          '{link}',
+          url,
+        );
         const telefone = (pedido as any).cliente?.telefone ?? '';
         const tel = telefone.replace(/\D/g, '');
         const waUrl = tel
@@ -278,14 +320,22 @@ export class PedidosComponent implements OnInit {
         window.open(waUrl, '_blank', 'noopener,noreferrer');
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao gerar link do WhatsApp.' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao gerar link do WhatsApp.',
+        });
       },
     });
   }
 
   onDelete(pedido: IPedido) {
     if (pedido.status !== EStatusPedido.Aberto) {
-      this.messageService.add({ severity: 'warn', summary: 'Não permitido', detail: 'Apenas pedidos em status ABERTO podem ser excluídos.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Não permitido',
+        detail: 'Apenas pedidos em status ABERTO podem ser excluídos.',
+      });
       return;
     }
     this.confirmationService.confirm({
@@ -297,11 +347,15 @@ export class PedidosComponent implements OnInit {
       accept: () => {
         this.pedidoService.remover(pedido.id).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Pedido excluído' });
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Pedido excluído',
+            });
             this.carregarPedidos();
-          }
+          },
         });
-      }
+      },
     });
   }
 }

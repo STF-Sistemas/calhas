@@ -1,4 +1,11 @@
-import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  signal,
+  computed,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -15,8 +22,16 @@ import { IPagamentoPix } from '#shared/interfaces';
 @Component({
   selector: 'app-pagamento',
   standalone: true,
-  imports: [CommonModule, ButtonModule, ProgressSpinnerModule, MessageModule, ToastModule, TooltipModule],
+  imports: [
+    CommonModule,
+    ButtonModule,
+    ProgressSpinnerModule,
+    MessageModule,
+    ToastModule,
+    TooltipModule,
+  ],
   templateUrl: './pagamento.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./pagamento.component.scss'],
 })
 export class PagamentoComponent implements OnInit, OnDestroy {
@@ -110,7 +125,10 @@ export class PagamentoComponent implements OnInit, OnDestroy {
 
   private verificarStatus() {
     const pag = this.pagamento();
-    if (!pag || pag.status === 'aprovado') { this.pararPolling(); return; }
+    if (!pag || pag.status === 'aprovado') {
+      this.pararPolling();
+      return;
+    }
 
     this.pagamentoService.verificarStatus(pag.id).subscribe({
       next: (res) => {
@@ -122,7 +140,9 @@ export class PagamentoComponent implements OnInit, OnDestroy {
           }
         }
       },
-      error: () => { /* ignora erros de polling */ },
+      error: () => {
+        /* ignora erros de polling */
+      },
     });
   }
 
@@ -139,7 +159,7 @@ export class PagamentoComponent implements OnInit, OnDestroy {
     });
     this.redirecionandoEm.set(5);
     this.redirectInterval = setInterval(() => {
-      this.redirecionandoEm.update(v => v - 1);
+      this.redirecionandoEm.update((v) => v - 1);
       if (this.redirecionandoEm() <= 0) {
         this.pararRedirecionamento();
         this.router.navigate(['/dashboard']);
@@ -159,7 +179,12 @@ export class PagamentoComponent implements OnInit, OnDestroy {
     if (!codigo) return;
     navigator.clipboard.writeText(codigo).then(() => {
       this.copiado.set(true);
-      this.messageService.add({ severity: 'success', summary: 'Copiado!', detail: 'Código Pix copiado para a área de transferência.', life: 3000 });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Copiado!',
+        detail: 'Código Pix copiado para a área de transferência.',
+        life: 3000,
+      });
       setTimeout(() => this.copiado.set(false), 3000);
     });
   }

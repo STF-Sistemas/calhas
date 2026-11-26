@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -12,32 +12,27 @@ import { EStatusGeral } from '#shared/enums';
 @Component({
   selector: 'app-chapas',
   standalone: true,
-  imports: [
-    CommonModule, 
-    DataTableComponent, 
-    ChapaFormComponent, 
-    ConfirmDialogModule,
-    ToastModule
-  ],
+  imports: [CommonModule, DataTableComponent, ChapaFormComponent, ConfirmDialogModule, ToastModule],
   templateUrl: './chapas.component.html',
   styleUrls: ['./chapas.component.scss'],
-  providers: [ConfirmationService]
+  changeDetection: ChangeDetectionStrategy.Eager,
+  providers: [ConfirmationService],
 })
 export class ChapasComponent implements OnInit {
   @ViewChild('form') form!: ChapaFormComponent;
-  
+
   chapas: IChapa[] = [];
   loading = false;
-  
+
   cols = [
     { field: 'descricao', header: 'Descrição' },
-    { field: 'status', header: 'Status', type: 'status' }
+    { field: 'status', header: 'Status', type: 'status' },
   ];
 
   constructor(
     private chapaService: ChapaService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
   ) {}
 
   ngOnInit(): void {
@@ -52,9 +47,13 @@ export class ChapasComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar chapas' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar chapas',
+        });
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -67,14 +66,19 @@ export class ChapasComponent implements OnInit {
   }
 
   onToggleStatus(chapa: IChapa) {
-    const novoStatus = chapa.status === EStatusGeral.Ativo ? EStatusGeral.Inativo : EStatusGeral.Ativo;
+    const novoStatus =
+      chapa.status === EStatusGeral.Ativo ? EStatusGeral.Inativo : EStatusGeral.Ativo;
     this.chapaService.alterarStatus(chapa.id, novoStatus).subscribe({
       next: () => {
         chapa.status = novoStatus;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao alterar status da chapa' });
-      }
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao alterar status da chapa',
+        });
+      },
     });
   }
 
@@ -88,11 +92,15 @@ export class ChapasComponent implements OnInit {
       accept: () => {
         this.chapaService.desativar(chapa.id).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Chapa excluída' });
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Chapa excluída',
+            });
             this.carregarChapas();
-          }
+          },
         });
-      }
+      },
     });
   }
 }

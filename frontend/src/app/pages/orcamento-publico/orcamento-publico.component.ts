@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -12,8 +12,16 @@ import { AssinaturaCanvasComponent } from '#shared-frontend/components/assinatur
 @Component({
   selector: 'app-orcamento-publico',
   standalone: true,
-  imports: [CommonModule, FormsModule, TagModule, ButtonModule, Textarea, AssinaturaCanvasComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TagModule,
+    ButtonModule,
+    Textarea,
+    AssinaturaCanvasComponent,
+  ],
   templateUrl: './orcamento-publico.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./orcamento-publico.component.scss'],
 })
 export class OrcamentoPublicoComponent implements OnInit {
@@ -110,7 +118,8 @@ export class OrcamentoPublicoComponent implements OnInit {
         if (err.error?.code === 'JA_DECIDIDO') {
           this.recarregarPedido();
         } else {
-          this.erroDecisao = err.error?.message || 'Não foi possível registrar a autorização. Tente novamente.';
+          this.erroDecisao =
+            err.error?.message || 'Não foi possível registrar a autorização. Tente novamente.';
         }
       },
     });
@@ -130,23 +139,26 @@ export class OrcamentoPublicoComponent implements OnInit {
   onConfirmarRecusa(): void {
     this.enviando = true;
     this.erroDecisao = null;
-    this.pedidoService.recusarPublico(this.token, this.motivoRecusa?.trim() || undefined).subscribe({
-      next: (res) => {
-        this.pedido.aprovacao_status = res.data.aprovacao_status;
-        this.pedido.aprovacao_data = res.data.aprovacao_data;
-        this.pedido.recusa_motivo = this.motivoRecusa?.trim() || null;
-        this.mostrandoMotivoRecusa = false;
-        this.enviando = false;
-      },
-      error: (err) => {
-        this.enviando = false;
-        if (err.error?.code === 'JA_DECIDIDO') {
-          this.recarregarPedido();
-        } else {
-          this.erroDecisao = err.error?.message || 'Não foi possível registrar a recusa. Tente novamente.';
-        }
-      },
-    });
+    this.pedidoService
+      .recusarPublico(this.token, this.motivoRecusa?.trim() || undefined)
+      .subscribe({
+        next: (res) => {
+          this.pedido.aprovacao_status = res.data.aprovacao_status;
+          this.pedido.aprovacao_data = res.data.aprovacao_data;
+          this.pedido.recusa_motivo = this.motivoRecusa?.trim() || null;
+          this.mostrandoMotivoRecusa = false;
+          this.enviando = false;
+        },
+        error: (err) => {
+          this.enviando = false;
+          if (err.error?.code === 'JA_DECIDIDO') {
+            this.recarregarPedido();
+          } else {
+            this.erroDecisao =
+              err.error?.message || 'Não foi possível registrar a recusa. Tente novamente.';
+          }
+        },
+      });
   }
 
   private recarregarPedido(): void {

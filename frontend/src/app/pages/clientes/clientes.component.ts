@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -42,7 +42,8 @@ import { EStatusPedido } from '#shared/enums';
   ],
   templateUrl: './clientes.component.html',
   styleUrls: ['./clientes.component.scss'],
-  providers: [ConfirmationService]
+  changeDetection: ChangeDetectionStrategy.Eager,
+  providers: [ConfirmationService],
 })
 export class ClientesComponent implements OnInit {
   @ViewChild('form') form!: ClienteFormComponent;
@@ -95,7 +96,7 @@ export class ClientesComponent implements OnInit {
     private clienteService: ClienteService,
     private pedidoService: PedidoService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
   ) {}
 
   ngOnInit(): void {
@@ -126,9 +127,13 @@ export class ClientesComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar clientes' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar clientes',
+        });
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -179,8 +184,10 @@ export class ClientesComponent implements OnInit {
       pagina: this.historicoPagina,
       limite: this.historicoLimite,
     };
-    if (this.historicoFiltros.dataInicio) params.dataInicio = this.formatDate(this.historicoFiltros.dataInicio);
-    if (this.historicoFiltros.dataFim) params.dataFim = this.formatDate(this.historicoFiltros.dataFim);
+    if (this.historicoFiltros.dataInicio)
+      params.dataInicio = this.formatDate(this.historicoFiltros.dataInicio);
+    if (this.historicoFiltros.dataFim)
+      params.dataFim = this.formatDate(this.historicoFiltros.dataFim);
 
     this.pedidoService.listar(params).subscribe({
       next: (res) => {
@@ -193,7 +200,11 @@ export class ClientesComponent implements OnInit {
         this.historicoLoading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar histórico de pedidos' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar histórico de pedidos',
+        });
         this.historicoLoading = false;
       },
     });
@@ -246,11 +257,15 @@ export class ClientesComponent implements OnInit {
       accept: () => {
         this.clienteService.desativar(cliente.id).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Cliente excluído' });
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Cliente excluído',
+            });
             this.carregarClientes();
-          }
+          },
         });
-      }
+      },
     });
   }
 }

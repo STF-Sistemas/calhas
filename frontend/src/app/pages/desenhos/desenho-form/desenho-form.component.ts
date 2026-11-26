@@ -1,4 +1,14 @@
-import { Component, EventEmitter, Output, ViewChild, ElementRef, AfterViewInit, HostListener, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Output,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  HostListener,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -14,9 +24,18 @@ import { IDiagonal, IPonto } from '#shared/interfaces';
 @Component({
   selector: 'app-desenho-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, InputTextModule, ButtonModule, TooltipModule, DialogModule, DialogWrapperComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    InputTextModule,
+    ButtonModule,
+    TooltipModule,
+    DialogModule,
+    DialogWrapperComponent,
+  ],
   templateUrl: './desenho-form.component.html',
-  styleUrls: ['./desenho-form.component.scss']
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrls: ['./desenho-form.component.scss'],
 })
 export class DesenhoFormComponent implements OnInit, AfterViewInit {
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -53,10 +72,10 @@ export class DesenhoFormComponent implements OnInit, AfterViewInit {
     private fb: FormBuilder,
     private desenhoService: DesenhoService,
     private messageService: MessageService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
   ) {
     this.form = this.fb.group({
-      descricao: ['', [Validators.required, Validators.maxLength(200)]]
+      descricao: ['', [Validators.required, Validators.maxLength(200)]],
     });
   }
 
@@ -73,12 +92,18 @@ export class DesenhoFormComponent implements OnInit, AfterViewInit {
   onOrientationChange() {
     if (this.canvasMobileAberto) {
       // Aguarda a animação de rotação do OS antes de redesenhar
-      setTimeout(() => { this.redraw(); }, 350);
+      setTimeout(() => {
+        this.redraw();
+      }, 350);
     }
   }
 
-  ngAfterViewInit() { this.initCanvas(); }
-  onDialogShow() { this.initCanvas(); }
+  ngAfterViewInit() {
+    this.initCanvas();
+  }
+  onDialogShow() {
+    this.initCanvas();
+  }
 
   private initCanvas() {
     const canvas = this.canvasRef?.nativeElement;
@@ -118,12 +143,18 @@ export class DesenhoFormComponent implements OnInit, AfterViewInit {
           this.pontos = (res.data.pontos as IPonto[]) || [];
           this.diagonais = (res.data.diagonais as IDiagonal[]) || [];
           this.isLoadingData = false;
-          setTimeout(() => { this.initCanvas(); }, 0);
+          setTimeout(() => {
+            this.initCanvas();
+          }, 0);
         },
         error: () => {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao buscar desenho' });
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Falha ao buscar desenho',
+          });
           this.visible = false;
-        }
+        },
       });
     }
   }
@@ -137,7 +168,9 @@ export class DesenhoFormComponent implements OnInit, AfterViewInit {
 
     try {
       await (screen as any).orientation?.lock?.('landscape');
-    } catch { /* não suportado; prossegue normalmente */ }
+    } catch {
+      /* não suportado; prossegue normalmente */
+    }
   }
 
   onMobileDialogShow() {
@@ -167,18 +200,22 @@ export class DesenhoFormComponent implements OnInit, AfterViewInit {
   }
 
   private tryUnlockOrientation() {
-    try { screen.orientation?.unlock(); } catch { }
+    try {
+      screen.orientation?.unlock();
+    } catch {}
   }
 
   // ── Helpers de canvas ativo ───────────────────────────────────────────────
 
   private get activeCanvas(): HTMLCanvasElement {
-    return (this.canvasMobileAberto && this.canvasMobileRef?.nativeElement)
+    return this.canvasMobileAberto && this.canvasMobileRef?.nativeElement
       ? this.canvasMobileRef.nativeElement
       : this.canvasRef.nativeElement;
   }
 
-  get cursorStyle(): string { return 'crosshair'; }
+  get cursorStyle(): string {
+    return 'crosshair';
+  }
 
   toggleModoInserir() {
     this.modoInserir = !this.modoInserir;
@@ -306,13 +343,13 @@ export class DesenhoFormComponent implements OnInit, AfterViewInit {
     if (rotated) {
       // Rect está em portrait: width = canvas_css_height, height = canvas_css_width
       return {
-        x: Math.round((rect.bottom - clientY) / rect.height * this.CANVAS_W),
-        y: Math.round((clientX - rect.left) / rect.width * this.CANVAS_H)
+        x: Math.round(((rect.bottom - clientY) / rect.height) * this.CANVAS_W),
+        y: Math.round(((clientX - rect.left) / rect.width) * this.CANVAS_H),
       };
     }
     return {
       x: Math.round((clientX - rect.left) * (this.CANVAS_W / rect.width)),
-      y: Math.round((clientY - rect.top) * (this.CANVAS_H / rect.height))
+      y: Math.round((clientY - rect.top) * (this.CANVAS_H / rect.height)),
     };
   }
 
@@ -321,7 +358,8 @@ export class DesenhoFormComponent implements OnInit, AfterViewInit {
   private redraw() {
     const ctx = this.canvasMobileAberto && this.mobileCtx ? this.mobileCtx : this.ctx;
     if (!ctx) return;
-    const W = this.CANVAS_W, H = this.CANVAS_H;
+    const W = this.CANVAS_W,
+      H = this.CANVAS_H;
     const dark = this.themeService.isDarkMode();
 
     ctx.fillStyle = dark ? '#141414' : '#f8f8f8';
@@ -330,8 +368,18 @@ export class DesenhoFormComponent implements OnInit, AfterViewInit {
     ctx.strokeStyle = dark ? '#252525' : '#e0e0e0';
     ctx.lineWidth = 1;
     const grid = 40;
-    for (let x = 0; x <= W; x += grid) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-    for (let y = 0; y <= H; y += grid) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    for (let x = 0; x <= W; x += grid) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= H; y += grid) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
 
     const lineColor = dark ? '#ef4444' : '#1a1a1a';
     const previewColor = dark ? 'rgba(239,68,68,0.45)' : 'rgba(26,26,26,0.35)';
@@ -410,11 +458,19 @@ export class DesenhoFormComponent implements OnInit, AfterViewInit {
   onSave() {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Informe a descrição do desenho.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: 'Informe a descrição do desenho.',
+      });
       return;
     }
     if (this.pontos.length < 2) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'O desenho precisa ter ao menos 2 pontos.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: 'O desenho precisa ter ao menos 2 pontos.',
+      });
       return;
     }
 
@@ -429,16 +485,24 @@ export class DesenhoFormComponent implements OnInit, AfterViewInit {
     this.desenhoService.salvar(dados).subscribe({
       next: (res) => {
         if (res.success) {
-          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: `Desenho ${this.desenhoId ? 'atualizado' : 'criado'} com sucesso` });
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: `Desenho ${this.desenhoId ? 'atualizado' : 'criado'} com sucesso`,
+          });
           this.saved.emit();
           this.visible = false;
         }
         this.isSaving = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao salvar desenho' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao salvar desenho',
+        });
         this.isSaving = false;
-      }
+      },
     });
   }
 }

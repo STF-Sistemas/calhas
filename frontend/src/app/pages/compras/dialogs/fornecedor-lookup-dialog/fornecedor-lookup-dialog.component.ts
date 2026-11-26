@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -23,6 +23,7 @@ import { IFornecedor } from '#shared/interfaces';
     FornecedorFormComponent,
   ],
   templateUrl: './fornecedor-lookup-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./fornecedor-lookup-dialog.component.scss'],
 })
 export class FornecedorLookupDialogComponent {
@@ -45,7 +46,7 @@ export class FornecedorLookupDialogComponent {
 
   constructor(
     private fornecedorService: FornecedorService,
-    private messageService: MessageService
+    private messageService: MessageService,
   ) {}
 
   abrir(cnpj: string, emitente?: Record<string, unknown>) {
@@ -71,7 +72,10 @@ export class FornecedorLookupDialogComponent {
     this.visible = false;
     this.showForm = true;
     // Aguarda o Angular renderizar o componente antes de chamar abrir()
-    setTimeout(() => this.fornecedorFormRef?.abrir(undefined, this.cnpjParaForm, this.emitenteParaForm), 0);
+    setTimeout(
+      () => this.fornecedorFormRef?.abrir(undefined, this.cnpjParaForm, this.emitenteParaForm),
+      0,
+    );
   }
 
   relacionar() {
@@ -81,14 +85,19 @@ export class FornecedorLookupDialogComponent {
         this.fornecedores = res.data;
         this.fornecedoresFiltrados = res.data;
       },
-      error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar fornecedores' }),
+      error: () =>
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar fornecedores',
+        }),
     });
   }
 
   filtrar() {
     const termo = this.filtro.toLowerCase();
     this.fornecedoresFiltrados = this.fornecedores.filter(
-      (f) => f.razao_social.toLowerCase().includes(termo) || f.cnpj.includes(termo)
+      (f) => f.razao_social.toLowerCase().includes(termo) || f.cnpj.includes(termo),
     );
   }
 

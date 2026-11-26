@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Input, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -11,6 +11,7 @@ import { IEmpresa } from '#shared/interfaces';
   templateUrl: './relatorio-wrapper.component.html',
   styleUrls: ['./relatorio-wrapper.component.scss'],
   // ViewEncapsulation.None permite que os estilos @media print afetem o DOM global
+  changeDetection: ChangeDetectionStrategy.Eager,
   encapsulation: ViewEncapsulation.None,
 })
 export class RelatorioWrapperComponent {

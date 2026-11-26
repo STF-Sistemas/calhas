@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TagModule } from 'primeng/tag';
 import { MessageService } from 'primeng/api';
@@ -12,6 +12,7 @@ import { EAprovacaoPedido } from '#shared/enums';
   standalone: true,
   imports: [CommonModule, TagModule, DialogWrapperComponent],
   templateUrl: './autorizacao-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./autorizacao-dialog.component.scss'],
 })
 export class AutorizacaoDialogComponent {
@@ -35,7 +36,11 @@ export class AutorizacaoDialogComponent {
         this.isLoadingData = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar dados da autorização.' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar dados da autorização.',
+        });
         this.isLoadingData = false;
       },
     });

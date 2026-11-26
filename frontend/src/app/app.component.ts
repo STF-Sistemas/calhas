@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { InstallPromptComponent } from './shared/components/install-prompt/install-prompt.component';
@@ -8,6 +8,7 @@ import { InstallPromptComponent } from './shared/components/install-prompt/insta
   standalone: true,
   imports: [CommonModule, RouterOutlet, InstallPromptComponent],
   template: `<router-outlet></router-outlet><app-install-prompt></app-install-prompt>`,
-  styles: []
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styles: [],
 })
 export class AppComponent {}

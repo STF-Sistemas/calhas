@@ -36,18 +36,18 @@
     <div class="row">
       <div class="field col-12 col-md-4">
         <label for="cpf_cnpj">CPF / CNPJ *</label>
-        <p-iconField iconPosition="right">
-          <p-inputIcon>
+        <p-iconfield iconPosition="right">
+          <p-inputicon>
             <i [class]="buscandoCpfCnpj ? 'pi pi-spin pi-spinner' : 'pi pi-search'"
                style="cursor:pointer"
                pTooltip="Consultar dados pelo CPF / CNPJ"
                (click)="onBuscarCpfCnpj()">
             </i>
-          </p-inputIcon>
+          </p-inputicon>
           <input appTecladoNumerico pInputText id="cpf_cnpj" formControlName="cpf_cnpj"
             placeholder="000.000.000-00 ou 00.000.000/0000-00"
             mask="000.000.000-00||00.000.000/0000-00" />
-        </p-iconField>
+        </p-iconfield>
         @if (form.get('cpf_cnpj')?.invalid && form.get('cpf_cnpj')?.touched) {
           <small class="p-error">CPF / CNPJ é obrigatório.</small>
         }

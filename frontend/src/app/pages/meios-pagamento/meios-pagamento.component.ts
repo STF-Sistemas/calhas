@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -17,11 +17,12 @@ import { EStatusGeral } from '#shared/enums';
     DataTableComponent,
     MeioPagamentoFormComponent,
     ConfirmDialogModule,
-    ToastModule
+    ToastModule,
   ],
   templateUrl: './meios-pagamento.component.html',
   styleUrls: ['./meios-pagamento.component.scss'],
-  providers: [ConfirmationService]
+  changeDetection: ChangeDetectionStrategy.Eager,
+  providers: [ConfirmationService],
 })
 export class MeiosPagamentoComponent implements OnInit {
   @ViewChild('form') form!: MeioPagamentoFormComponent;
@@ -31,13 +32,13 @@ export class MeiosPagamentoComponent implements OnInit {
 
   cols = [
     { field: 'descricao', header: 'Descrição' },
-    { field: 'ativo', header: 'Status', type: 'status' }
+    { field: 'ativo', header: 'Status', type: 'status' },
   ];
 
   constructor(
     private meioService: MeioPagamentoService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
   ) {}
 
   ngOnInit(): void {
@@ -52,9 +53,13 @@ export class MeiosPagamentoComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar meios de pagamento' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar meios de pagamento',
+        });
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -67,12 +72,19 @@ export class MeiosPagamentoComponent implements OnInit {
   }
 
   onToggleStatus(meio: IMeioPagamento) {
-    const novoStatus = meio.ativo === EStatusGeral.Ativo ? EStatusGeral.Inativo : EStatusGeral.Ativo;
+    const novoStatus =
+      meio.ativo === EStatusGeral.Ativo ? EStatusGeral.Inativo : EStatusGeral.Ativo;
     this.meioService.alterarStatus(meio.id, novoStatus).subscribe({
-      next: () => { meio.ativo = novoStatus; },
+      next: () => {
+        meio.ativo = novoStatus;
+      },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao alterar status' });
-      }
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao alterar status',
+        });
+      },
     });
   }
 
@@ -86,11 +98,15 @@ export class MeiosPagamentoComponent implements OnInit {
       accept: () => {
         this.meioService.desativar(meio.id).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Meio de pagamento excluído' });
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Meio de pagamento excluído',
+            });
             this.carregar();
-          }
+          },
         });
-      }
+      },
     });
   }
 }

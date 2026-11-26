@@ -1,4 +1,13 @@
-import { Component, ElementRef, EventEmitter, NgZone, OnDestroy, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  NgZone,
+  OnDestroy,
+  Output,
+  ViewChild,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -9,7 +18,10 @@ import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { IDiagonal, IPonto } from '#shared/interfaces';
 import { endireitarTraco, endireitarTransversal } from '#shared/functions/desenho-livre.functions';
-import { calcularTotalCorte, segmentosCobertosCorte } from '#shared/functions/desenho-corte.functions';
+import {
+  calcularTotalCorte,
+  segmentosCobertosCorte,
+} from '#shared/functions/desenho-corte.functions';
 import { reconhecerNumero } from '#shared/functions/reconhecer-numero.functions';
 import { SelectButtonModule } from 'primeng/selectbutton';
 
@@ -40,10 +52,18 @@ interface ISnapshot {
   selector: 'app-desenho-livre',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, ButtonModule, InputTextModule, TooltipModule, SelectButtonModule,
-    DialogWrapperComponent, CurrencyMaskDirective, EnterFocusNextDirective,
+    CommonModule,
+    FormsModule,
+    ButtonModule,
+    InputTextModule,
+    TooltipModule,
+    SelectButtonModule,
+    DialogWrapperComponent,
+    CurrencyMaskDirective,
+    EnterFocusNextDirective,
   ],
   templateUrl: './desenho-livre.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./desenho-livre.component.scss'],
 })
 export class DesenhoLivreComponent implements OnDestroy {
@@ -112,7 +132,7 @@ export class DesenhoLivreComponent implements OnDestroy {
 
   /** Ordem de preenchimento: linhas (exceto cobertas) e depois P1/P2 de cada transversal. */
   get sequenciaAlvos(): string[] {
-    const linhas = this.segmentos.filter(i => !this.cobertos.has(i)).map(i => `s${i}`);
+    const linhas = this.segmentos.filter((i) => !this.cobertos.has(i)).map((i) => `s${i}`);
     const transv = this.diagonais.flatMap((_, i) => [`d${i}-1`, `d${i}-2`]);
     return [...linhas, ...transv];
   }
@@ -140,14 +160,15 @@ export class DesenhoLivreComponent implements OnDestroy {
     this.LARGURA = this.retrato ? 600 : 800;
     this.ALTURA = this.retrato ? 800 : 600;
 
-    const pts = (pontos ?? []).map(p => ({ x: p.x, y: p.y }));
-    const diags = pts.length >= 2 ? (diagonais ?? []).map(d => ({ p1: { ...d.p1 }, p2: { ...d.p2 } })) : [];
-    const encaixar = this.criarEncaixe([...pts, ...diags.flatMap(d => [d.p1, d.p2])]);
+    const pts = (pontos ?? []).map((p) => ({ x: p.x, y: p.y }));
+    const diags =
+      pts.length >= 2 ? (diagonais ?? []).map((d) => ({ p1: { ...d.p1 }, p2: { ...d.p2 } })) : [];
+    const encaixar = this.criarEncaixe([...pts, ...diags.flatMap((d) => [d.p1, d.p2])]);
     this.pontos = pts.map(encaixar);
-    this.diagonais = diags.map(d => ({ p1: encaixar(d.p1), p2: encaixar(d.p2) }));
+    this.diagonais = diags.map((d) => ({ p1: encaixar(d.p1), p2: encaixar(d.p2) }));
 
     const base = this.segmentos.length;
-    this.medidasBase = this.segmentos.map(i => Number(medidas?.[i]) || 0);
+    this.medidasBase = this.segmentos.map((i) => Number(medidas?.[i]) || 0);
     this.medidasDiag = this.diagonais.map((_, i) => [
       Number(medidas?.[base + i * 2]) || 0,
       Number(medidas?.[base + i * 2 + 1]) || 0,
@@ -178,14 +199,19 @@ export class DesenhoLivreComponent implements OnDestroy {
   private criarEncaixe(todos: IPonto[]): (p: IPonto) => IPonto {
     const ident = (p: IPonto) => ({ x: p.x, y: p.y });
     if (todos.length < 2) return ident;
-    const xs = todos.map(p => p.x), ys = todos.map(p => p.y);
-    const minX = Math.min(...xs), maxX = Math.max(...xs);
-    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const xs = todos.map((p) => p.x),
+      ys = todos.map((p) => p.y);
+    const minX = Math.min(...xs),
+      maxX = Math.max(...xs);
+    const minY = Math.min(...ys),
+      maxY = Math.max(...ys);
     if (minX >= 0 && minY >= 0 && maxX <= this.LARGURA && maxY <= this.ALTURA) return ident;
     const margem = 60;
-    const w = maxX - minX || 1, h = maxY - minY || 1;
+    const w = maxX - minX || 1,
+      h = maxY - minY || 1;
     const esc = Math.min(1, (this.LARGURA - margem * 2) / w, (this.ALTURA - margem * 2) / h);
-    const ox = (this.LARGURA - w * esc) / 2, oy = (this.ALTURA - h * esc) / 2;
+    const ox = (this.LARGURA - w * esc) / 2,
+      oy = (this.ALTURA - h * esc) / 2;
     return (p: IPonto) => ({ x: ox + (p.x - minX) * esc, y: oy + (p.y - minY) * esc });
   }
 
@@ -242,7 +268,10 @@ export class DesenhoLivreComponent implements OnDestroy {
   onModoChange() {
     this.cancelarEscrita();
     this.naoEntendi = false;
-    if (this.modo === 'escrever' && (!this.alvoAtual || !this.sequenciaAlvos.includes(this.alvoAtual))) {
+    if (
+      this.modo === 'escrever' &&
+      (!this.alvoAtual || !this.sequenciaAlvos.includes(this.alvoAtual))
+    ) {
       this.alvoAtual = this.primeiroAlvoVazio() ?? this.sequenciaAlvos[0] ?? null;
     }
     this.redesenhar();
@@ -290,14 +319,20 @@ export class DesenhoLivreComponent implements OnDestroy {
 
   private agendarReconhecimento() {
     if (this.timerEscrita) clearTimeout(this.timerEscrita);
-    this.timerEscrita = setTimeout(() => this.zone.run(() => this.reconhecerTinta()), this.PAUSA_ESCRITA);
+    this.timerEscrita = setTimeout(
+      () => this.zone.run(() => this.reconhecerTinta()),
+      this.PAUSA_ESCRITA,
+    );
   }
 
   private reconhecerTinta() {
     this.timerEscrita = undefined;
     const tinta = this.tinta;
     this.tinta = [];
-    if (!tinta.length) { this.redesenhar(); return; }
+    if (!tinta.length) {
+      this.redesenhar();
+      return;
+    }
 
     const resultado = reconhecerNumero(tinta);
     const chave = this.alvoAtual ?? this.primeiroAlvoVazio();
@@ -328,12 +363,12 @@ export class DesenhoLivreComponent implements OnDestroy {
   private proximoAlvo(atual: string | null, soVazias: boolean): string | null {
     const seq = this.sequenciaAlvos;
     const idx = atual ? seq.indexOf(atual) : -1;
-    const depois = seq.slice(idx + 1).find(ch => !soVazias || this.valorDoAlvo(ch) <= 0);
+    const depois = seq.slice(idx + 1).find((ch) => !soVazias || this.valorDoAlvo(ch) <= 0);
     return depois ?? this.primeiroAlvoVazio();
   }
 
   private primeiroAlvoVazio(): string | null {
-    return this.sequenciaAlvos.find(ch => this.valorDoAlvo(ch) <= 0) ?? null;
+    return this.sequenciaAlvos.find((ch) => this.valorDoAlvo(ch) <= 0) ?? null;
   }
 
   private valorDoAlvo(chave: string): number {
@@ -350,8 +385,8 @@ export class DesenhoLivreComponent implements OnDestroy {
   confirmar() {
     this.confirmed.emit({
       index: this.itemIndex,
-      pontos: this.pontos.map(p => ({ x: p.x, y: p.y })),
-      diagonais: this.diagonais.map(d => ({ p1: { ...d.p1 }, p2: { ...d.p2 } })),
+      pontos: this.pontos.map((p) => ({ x: p.x, y: p.y })),
+      diagonais: this.diagonais.map((d) => ({ p1: { ...d.p1 }, p2: { ...d.p2 } })),
       medidas: this.medidasCompostas(),
     });
     this.visible = false;
@@ -359,15 +394,18 @@ export class DesenhoLivreComponent implements OnDestroy {
 
   /** Linhas base (cobertas = 0) seguidas de [P1, P2] de cada transversal. */
   private medidasCompostas(): number[] {
-    const base = this.segmentos.map(i => (this.cobertos.has(i) ? 0 : Number(this.medidasBase[i]) || 0));
+    const base = this.segmentos.map((i) =>
+      this.cobertos.has(i) ? 0 : Number(this.medidasBase[i]) || 0,
+    );
     const diag = this.medidasDiag.flatMap(([a, b]) => [Number(a) || 0, Number(b) || 0]);
     return [...base, ...diag];
   }
 
   private atualizarCobertos() {
-    this.cobertos = this.pontos.length >= 2 && this.diagonais.length
-      ? segmentosCobertosCorte(this.pontos, this.diagonais)
-      : new Set<number>();
+    this.cobertos =
+      this.pontos.length >= 2 && this.diagonais.length
+        ? segmentosCobertosCorte(this.pontos, this.diagonais)
+        : new Set<number>();
     if (this.visible) this.reapontarAlvo();
   }
 
@@ -441,20 +479,28 @@ export class DesenhoLivreComponent implements OnDestroy {
     const traco = this.traco;
     this.traco = [];
     // Volta para a zona do Angular: altera estado exibido no template.
-    this.zone.run(() => (this.modo === 'escrever' ? this.finalizarEscrita(traco) : this.finalizarTraco(traco)));
+    this.zone.run(() =>
+      this.modo === 'escrever' ? this.finalizarEscrita(traco) : this.finalizarTraco(traco),
+    );
   }
 
   /** Modo escrever: toque num número escolhe a medida; traços viram tinta para reconhecer. */
   private finalizarEscrita(traco: IPonto[]) {
-    const xs = traco.map(p => p.x), ys = traco.map(p => p.y);
+    const xs = traco.map((p) => p.x),
+      ys = traco.map((p) => p.y);
     const tamanho = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys));
     if (!this.tinta.length && tamanho < 12) {
       const p = traco[0];
-      const alvo = this.alvosClicaveis.find(a => Math.hypot(a.x - p.x, a.y - p.y) <= a.r + 8);
-      if (alvo) { this.selecionarAlvo(alvo.chave); return; }
+      const alvo = this.alvosClicaveis.find((a) => Math.hypot(a.x - p.x, a.y - p.y) <= a.r + 8);
+      if (alvo) {
+        this.selecionarAlvo(alvo.chave);
+        return;
+      }
     }
     // Um toque isolado (ponto/vírgula) vira um traço mínimo
-    this.tinta.push(traco.length === 1 ? [traco[0], { x: traco[0].x + 1, y: traco[0].y + 1 }] : traco);
+    this.tinta.push(
+      traco.length === 1 ? [traco[0], { x: traco[0].x + 1, y: traco[0].y + 1 }] : traco,
+    );
     this.naoEntendi = false;
     this.redesenhar();
     this.agendarReconhecimento();
@@ -462,17 +508,24 @@ export class DesenhoLivreComponent implements OnDestroy {
 
   /** Decide o que o traço é: início do desenho, continuação nas pontas ou transversal. */
   private finalizarTraco(traco: IPonto[]) {
-    if (traco.length < 2) { this.redesenhar(); return; }
+    if (traco.length < 2) {
+      this.redesenhar();
+      return;
+    }
 
     const inicio = traco[0];
-    const perto = (p?: IPonto) => !!p && Math.hypot(inicio.x - p.x, inicio.y - p.y) <= this.RAIO_CONTINUAR;
+    const perto = (p?: IPonto) =>
+      !!p && Math.hypot(inicio.x - p.x, inicio.y - p.y) <= this.RAIO_CONTINUAR;
     const ultimo = this.pontos[this.pontos.length - 1];
     const primeiro = this.pontos[0];
 
     // 1) Sem desenho ainda: o traço vira o desenho base.
     if (this.pontos.length < 2) {
       const reto = endireitarTraco(traco);
-      if (reto.length < 2) { this.redesenhar(); return; }
+      if (reto.length < 2) {
+        this.redesenhar();
+        return;
+      }
       this.salvarHistorico();
       this.pontos = reto.slice(0, this.MAX_PONTOS);
       this.medidasBase = this.segmentos.map(() => 0);
@@ -486,11 +539,15 @@ export class DesenhoLivreComponent implements OnDestroy {
     // 2) Começou na ponta final ou inicial: continua o desenho.
     if (perto(ultimo) || perto(primeiro)) {
       const reto = endireitarTraco(traco);
-      if (reto.length < 2) { this.redesenhar(); return; }
+      if (reto.length < 2) {
+        this.redesenhar();
+        return;
+      }
       const noFim = perto(ultimo);
       const alvo = noFim ? ultimo : primeiro;
-      const dx = alvo.x - reto[0].x, dy = alvo.y - reto[0].y;
-      const extra = reto.slice(1).map(p => ({ x: p.x + dx, y: p.y + dy }));
+      const dx = alvo.x - reto[0].x,
+        dy = alvo.y - reto[0].y;
+      const extra = reto.slice(1).map((p) => ({ x: p.x + dx, y: p.y + dy }));
       this.salvarHistorico();
       if (noFim) {
         // As linhas existentes mantêm a numeração.
@@ -500,16 +557,22 @@ export class DesenhoLivreComponent implements OnDestroy {
         this.pontos = [...extra.reverse(), ...this.pontos].slice(0, this.MAX_PONTOS);
         this.medidasBase = [...new Array<number>(extra.length).fill(0), ...this.medidasBase];
       }
-      this.medidasBase = this.segmentos.map(i => Number(this.medidasBase[i]) || 0);
+      this.medidasBase = this.segmentos.map((i) => Number(this.medidasBase[i]) || 0);
       this.atualizarCobertos();
       this.redesenhar();
       return;
     }
 
     // 3) Em qualquer outro lugar: linha transversal sobre o desenho.
-    if (this.diagonais.length >= this.MAX_DIAGONAIS) { this.redesenhar(); return; }
+    if (this.diagonais.length >= this.MAX_DIAGONAIS) {
+      this.redesenhar();
+      return;
+    }
     const transversal = endireitarTransversal(traco, this.pontos);
-    if (!transversal) { this.redesenhar(); return; }
+    if (!transversal) {
+      this.redesenhar();
+      return;
+    }
     this.salvarHistorico();
     this.diagonais = [...this.diagonais, transversal];
     this.medidasDiag = [...this.medidasDiag, [0, 0]];
@@ -519,8 +582,8 @@ export class DesenhoLivreComponent implements OnDestroy {
 
   private salvarHistorico() {
     this.historico.push({
-      pontos: this.pontos.map(p => ({ ...p })),
-      diagonais: this.diagonais.map(d => ({ p1: { ...d.p1 }, p2: { ...d.p2 } })),
+      pontos: this.pontos.map((p) => ({ ...p })),
+      diagonais: this.diagonais.map((d) => ({ p1: { ...d.p1 }, p2: { ...d.p2 } })),
       medidasBase: [...this.medidasBase],
       medidasDiag: this.medidasDiag.map(([a, b]) => [a, b] as [number, number]),
     });
@@ -558,8 +621,18 @@ export class DesenhoLivreComponent implements OnDestroy {
 
     ctx.strokeStyle = grade;
     ctx.lineWidth = 1;
-    for (let x = 0; x <= this.LARGURA; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, this.ALTURA); ctx.stroke(); }
-    for (let y = 0; y <= this.ALTURA; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(this.LARGURA, y); ctx.stroke(); }
+    for (let x = 0; x <= this.LARGURA; x += 40) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, this.ALTURA);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= this.ALTURA; y += 40) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(this.LARGURA, y);
+      ctx.stroke();
+    }
 
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -574,14 +647,18 @@ export class DesenhoLivreComponent implements OnDestroy {
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
     for (let i = 0; i < this.pontos.length - 1; i++) {
-      const a = this.pontos[i], b = this.pontos[i + 1];
+      const a = this.pontos[i],
+        b = this.pontos[i + 1];
       const coberta = this.cobertos.has(i);
       const focado = destaque === `s${i}`;
       const temMedida = !coberta && (Number(this.medidasBase[i]) || 0) > 0;
       ctx.strokeStyle = focado ? ambar : coberta ? neutro : temMedida ? verde : texto;
       ctx.lineWidth = focado ? 7 : 5;
       ctx.setLineDash(coberta ? [10, 8] : []);
-      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
     }
     ctx.setLineDash([]);
 
@@ -590,12 +667,19 @@ export class DesenhoLivreComponent implements OnDestroy {
       const focoDiag = destaque?.startsWith(`d${i}-`);
       ctx.strokeStyle = focoDiag ? ambar : this.maiorDiag(i) > 0 ? verde : transv;
       ctx.lineWidth = focoDiag ? 7 : 5;
-      ctx.beginPath(); ctx.moveTo(d.p1.x, d.p1.y); ctx.lineTo(d.p2.x, d.p2.y); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(d.p1.x, d.p1.y);
+      ctx.lineTo(d.p2.x, d.p2.y);
+      ctx.stroke();
     });
 
     // Vértices
     ctx.fillStyle = neutro;
-    for (const p of this.pontos) { ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI * 2); ctx.fill(); }
+    for (const p of this.pontos) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     // Ponta final (onde o próximo traço continua)
     const fim = this.pontos[this.pontos.length - 1];
@@ -603,14 +687,17 @@ export class DesenhoLivreComponent implements OnDestroy {
       ctx.strokeStyle = primaria;
       ctx.lineWidth = 2;
       ctx.setLineDash([6, 5]);
-      ctx.beginPath(); ctx.arc(fim.x, fim.y, this.RAIO_CONTINUAR, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(fim.x, fim.y, this.RAIO_CONTINUAR, 0, Math.PI * 2);
+      ctx.stroke();
       ctx.setLineDash([]);
     }
 
     // Número + medida das linhas base
     for (let i = 0; i < this.pontos.length - 1; i++) {
       if (this.cobertos.has(i)) continue;
-      const a = this.pontos[i], b = this.pontos[i + 1];
+      const a = this.pontos[i],
+        b = this.pontos[i + 1];
       const medida = Number(this.medidasBase[i]) || 0;
       const cor = destaque === `s${i}` ? ambar : medida > 0 ? verde : primaria;
       this.badgeComMedida(ctx, a, b, String(i + 1), cor, medida, fundo, texto);
@@ -623,8 +710,24 @@ export class DesenhoLivreComponent implements OnDestroy {
       this.badgeComMedida(ctx, d.p1, d.p2, `T${i + 1}`, cor, 0, fundo, texto);
       this.alvosClicaveis.push({ chave: `d${i}-1`, ...this.posRotuloPonta(d.p1, d.p2), r: 18 });
       this.alvosClicaveis.push({ chave: `d${i}-2`, ...this.posRotuloPonta(d.p2, d.p1), r: 18 });
-      this.rotuloPonta(ctx, d.p1, d.p2, 'P1', this.medidasDiag[i]?.[0] ?? 0, destaque === `d${i}-1` ? ambar : cor, fundo);
-      this.rotuloPonta(ctx, d.p2, d.p1, 'P2', this.medidasDiag[i]?.[1] ?? 0, destaque === `d${i}-2` ? ambar : cor, fundo);
+      this.rotuloPonta(
+        ctx,
+        d.p1,
+        d.p2,
+        'P1',
+        this.medidasDiag[i]?.[0] ?? 0,
+        destaque === `d${i}-1` ? ambar : cor,
+        fundo,
+      );
+      this.rotuloPonta(
+        ctx,
+        d.p2,
+        d.p1,
+        'P2',
+        this.medidasDiag[i]?.[1] ?? 0,
+        destaque === `d${i}-2` ? ambar : cor,
+        fundo,
+      );
     });
 
     // Tinta da escrita (números à mão) ainda não reconhecida
@@ -649,14 +752,24 @@ export class DesenhoLivreComponent implements OnDestroy {
   }
 
   private badgeComMedida(
-    ctx: CanvasRenderingContext2D, a: IPonto, b: IPonto, rotulo: string,
-    cor: string, medida: number, fundo: string, texto: string,
+    ctx: CanvasRenderingContext2D,
+    a: IPonto,
+    b: IPonto,
+    rotulo: string,
+    cor: string,
+    medida: number,
+    fundo: string,
+    texto: string,
   ) {
-    const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+    const mx = (a.x + b.x) / 2,
+      my = (a.y + b.y) / 2;
     const len = Math.hypot(b.x - a.x, b.y - a.y) || 1;
-    const nx = -(b.y - a.y) / len, ny = (b.x - a.x) / len;
+    const nx = -(b.y - a.y) / len,
+      ny = (b.x - a.x) / len;
     ctx.fillStyle = cor;
-    ctx.beginPath(); ctx.arc(mx, my, rotulo.length > 1 ? 17 : 15, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath();
+    ctx.arc(mx, my, rotulo.length > 1 ? 17 : 15, 0, Math.PI * 2);
+    ctx.fill();
     ctx.fillStyle = fundo;
     ctx.font = 'bold 14px sans-serif';
     ctx.fillText(rotulo, mx, my);
@@ -669,8 +782,13 @@ export class DesenhoLivreComponent implements OnDestroy {
 
   /** Etiqueta P1/P2 (com a medida, se houver) um pouco para fora da ponta. */
   private rotuloPonta(
-    ctx: CanvasRenderingContext2D, ponta: IPonto, outra: IPonto, rotulo: string,
-    medida: number, cor: string, fundo: string,
+    ctx: CanvasRenderingContext2D,
+    ponta: IPonto,
+    outra: IPonto,
+    rotulo: string,
+    medida: number,
+    cor: string,
+    fundo: string,
   ) {
     const { x, y } = this.posRotuloPonta(ponta, outra);
     const txt = medida > 0 ? `${rotulo}: ${Number(medida).toLocaleString('pt-BR')}` : rotulo;
@@ -686,6 +804,9 @@ export class DesenhoLivreComponent implements OnDestroy {
 
   private posRotuloPonta(ponta: IPonto, outra: IPonto): IPonto {
     const len = Math.hypot(ponta.x - outra.x, ponta.y - outra.y) || 1;
-    return { x: ponta.x + ((ponta.x - outra.x) / len) * 26, y: ponta.y + ((ponta.y - outra.y) / len) * 26 };
+    return {
+      x: ponta.x + ((ponta.x - outra.x) / len) * 26,
+      y: ponta.y + ((ponta.y - outra.y) / len) * 26,
+    };
   }
 }

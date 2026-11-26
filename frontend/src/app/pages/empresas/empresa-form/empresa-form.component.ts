@@ -1,5 +1,5 @@
 import { TecladoNumericoDirective } from '#shared-frontend/directives/teclado-numerico.directive';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -36,7 +36,11 @@ import { environment } from 'src/environments/environment';
     DatePickerModule,
     ButtonModule,
     TooltipModule,
-    Tabs, TabList, Tab, TabPanels, TabPanel,
+    Tabs,
+    TabList,
+    Tab,
+    TabPanels,
+    TabPanel,
     Textarea,
     TagModule,
     CheckboxModule,
@@ -48,7 +52,8 @@ import { environment } from 'src/environments/environment';
     LogoUploaderComponent,
   ],
   templateUrl: './empresa-form.component.html',
-  styleUrls: ['./empresa-form.component.scss']
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrls: ['./empresa-form.component.scss'],
 })
 export class EmpresaFormComponent {
   @Output() saved = new EventEmitter<void>();
@@ -83,7 +88,10 @@ export class EmpresaFormComponent {
       marca_dagua: ['', [Validators.maxLength(250)]],
       logo_url: [null as string | null],
       validar_estoque: [false],
-      quantidade_desenho_por_folha: [5, [Validators.required, Validators.min(1), Validators.max(20)]],
+      quantidade_desenho_por_folha: [
+        5,
+        [Validators.required, Validators.min(1), Validators.max(20)],
+      ],
       whatsapp_mensagem_padrao: [''],
       link_validade_dias: [7, [Validators.min(1), Validators.max(365)]],
       data_expiracao: [null as Date | null],
@@ -110,42 +118,56 @@ export class EmpresaFormComponent {
     this.isSavingValidade = true;
     const val = this.form.get('data_expiracao')?.value as Date | null;
     const valorMensalidade = Number(this.form.get('valor_mensalidade')?.value ?? 150);
-    this.http.put(`${environment.apiUrl}/empresas/${this.empresaId}/validade`, {
-      data_expiracao: val ? val.toISOString() : null,
-      valor_mensalidade: valorMensalidade,
-    }).subscribe({
-      next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Licença atualizada.' });
-        this.isSavingValidade = false;
-      },
-      error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar licença.' });
-        this.isSavingValidade = false;
-      },
-    });
+    this.http
+      .put(`${environment.apiUrl}/empresas/${this.empresaId}/validade`, {
+        data_expiracao: val ? val.toISOString() : null,
+        valor_mensalidade: valorMensalidade,
+      })
+      .subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: 'Licença atualizada.',
+          });
+          this.isSavingValidade = false;
+        },
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Falha ao atualizar licença.',
+          });
+          this.isSavingValidade = false;
+        },
+      });
   }
 
   abrir(id?: number) {
     this.empresaId = id;
     this.visible = true;
     this.form.reset();
-    
+
     if (id) {
       this.isLoadingData = true;
       this.empresaService.buscarPorId(id).subscribe({
         next: (res) => {
           this.form.patchValue({
-             ...res.data,
-             cidade_nome: res.data.cidade?.descricao,
-             data_expiracao: res.data.data_expiracao ? new Date(res.data.data_expiracao) : null,
-             valor_mensalidade: Number(res.data.valor_mensalidade ?? 150),
+            ...res.data,
+            cidade_nome: res.data.cidade?.descricao,
+            data_expiracao: res.data.data_expiracao ? new Date(res.data.data_expiracao) : null,
+            valor_mensalidade: Number(res.data.valor_mensalidade ?? 150),
           });
           this.isLoadingData = false;
         },
         error: () => {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao buscar dados da empresa' });
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Falha ao buscar dados da empresa',
+          });
           this.visible = false;
-        }
+        },
       });
     }
   }
@@ -155,16 +177,20 @@ export class EmpresaFormComponent {
     if (cep?.length === 8) {
       this.clienteService.buscarCep(cep).subscribe({
         next: (res) => {
-            if (res.success) {
-                this.form.patchValue({
-                    endereco: res.data.logradouro,
-                    bairro: res.data.bairro,
-                    cod_cidade: res.data.cidade.id,
-                    cidade_nome: res.data.cidade.descricao
-                });
-                this.messageService.add({ severity: 'info', summary: 'CEP Localizado', detail: 'Endereço e Cidade preenchidos automaticamente' });
-            }
-        }
+          if (res.success) {
+            this.form.patchValue({
+              endereco: res.data.logradouro,
+              bairro: res.data.bairro,
+              cod_cidade: res.data.cidade.id,
+              cidade_nome: res.data.cidade.descricao,
+            });
+            this.messageService.add({
+              severity: 'info',
+              summary: 'CEP Localizado',
+              detail: 'Endereço e Cidade preenchidos automaticamente',
+            });
+          }
+        },
       });
     }
   }
@@ -174,7 +200,10 @@ export class EmpresaFormComponent {
     const val = ctrl.value ?? '';
     const pos = el.selectionStart ?? val.length;
     ctrl.setValue(val.slice(0, pos) + '{link}' + val.slice(pos));
-    setTimeout(() => { el.selectionStart = el.selectionEnd = pos + 6; el.focus(); });
+    setTimeout(() => {
+      el.selectionStart = el.selectionEnd = pos + 6;
+      el.focus();
+    });
   }
 
   onSave() {
@@ -183,20 +212,28 @@ export class EmpresaFormComponent {
 
     this.isSaving = true;
     const dados = { ...this.form.getRawValue(), id: this.empresaId };
-    
+
     this.empresaService.salvar(dados).subscribe({
       next: (res) => {
         if (res.success) {
-          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: `Empresa ${this.empresaId ? 'atualizada' : 'criada'} com sucesso` });
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: `Empresa ${this.empresaId ? 'atualizada' : 'criada'} com sucesso`,
+          });
           this.saved.emit();
           this.visible = false;
         }
         this.isSaving = false;
       },
       error: (err) => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message || 'Falha ao salvar empresa' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: err.error?.message || 'Falha ao salvar empresa',
+        });
         this.isSaving = false;
-      }
+      },
     });
   }
 }

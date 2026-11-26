@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
@@ -8,15 +8,10 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 @Component({
   selector: 'app-dialog-wrapper',
   standalone: true,
-  imports: [
-    CommonModule,
-    DialogModule,
-    ButtonModule,
-    TooltipModule,
-    ProgressSpinnerModule
-  ],
+  imports: [CommonModule, DialogModule, ButtonModule, TooltipModule, ProgressSpinnerModule],
   templateUrl: './dialog-wrapper.component.html',
-  styleUrls: ['./dialog-wrapper.component.scss']
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrls: ['./dialog-wrapper.component.scss'],
 })
 export class DialogWrapperComponent {
   @Input() visible = false;
@@ -27,7 +22,16 @@ export class DialogWrapperComponent {
   @Input() width = '500px';
   @Input() height = '100dvh';
   @Input() maxHeight = '95vh';
-  @Input() position: 'center' | 'top' | 'bottom' | 'left' | 'right' | 'topleft' | 'topright' | 'bottomleft' | 'bottomright' = 'center';
+  @Input() position:
+    | 'center'
+    | 'top'
+    | 'bottom'
+    | 'left'
+    | 'right'
+    | 'topleft'
+    | 'topright'
+    | 'bottomleft'
+    | 'bottomright' = 'center';
   @Input() saveLabel = 'Salvar';
   @Input() cancelLabel = 'Cancelar';
   @Input() saveDisabled = false;

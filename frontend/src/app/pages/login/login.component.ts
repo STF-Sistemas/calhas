@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -29,9 +29,10 @@ import { CheckboxModule } from 'primeng/checkbox';
     ToastModule,
     CheckboxModule,
     TooltipModule,
-    MenuModule
+    MenuModule,
   ],
   templateUrl: './login.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
@@ -40,10 +41,26 @@ export class LoginComponent {
   currentYear = new Date().getFullYear();
 
   colorMenuItems: MenuItem[] = [
-    { label: 'Laranja (Sakai)', icon: 'pi pi-circle-fill text-orange-500', command: () => this.themeService.setColor('orange') },
-    { label: 'Azul', icon: 'pi pi-circle-fill text-blue-500', command: () => this.themeService.setColor('blue') },
-    { label: 'Esmeralda', icon: 'pi pi-circle-fill text-emerald-500', command: () => this.themeService.setColor('emerald') },
-    { label: 'Índigo', icon: 'pi pi-circle-fill text-indigo-500', command: () => this.themeService.setColor('indigo') }
+    {
+      label: 'Laranja (Sakai)',
+      icon: 'pi pi-circle-fill text-orange-500',
+      command: () => this.themeService.setColor('orange'),
+    },
+    {
+      label: 'Azul',
+      icon: 'pi pi-circle-fill text-blue-500',
+      command: () => this.themeService.setColor('blue'),
+    },
+    {
+      label: 'Esmeralda',
+      icon: 'pi pi-circle-fill text-emerald-500',
+      command: () => this.themeService.setColor('emerald'),
+    },
+    {
+      label: 'Índigo',
+      icon: 'pi pi-circle-fill text-indigo-500',
+      command: () => this.themeService.setColor('indigo'),
+    },
   ];
 
   constructor(
@@ -51,12 +68,12 @@ export class LoginComponent {
     private authService: AuthService,
     private router: Router,
     private messageService: MessageService,
-    public themeService: ThemeService
+    public themeService: ThemeService,
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       senha: ['', [Validators.required, Validators.minLength(6)]],
-      remember: [false]
+      remember: [false],
     });
   }
 
@@ -69,7 +86,11 @@ export class LoginComponent {
         if (res.success) {
           this.router.navigate(['/']);
         } else {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: res.message || 'Credenciais inválidas' });
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: res.message || 'Credenciais inválidas',
+          });
         }
         this.isLoading = false;
       },
@@ -77,7 +98,7 @@ export class LoginComponent {
         const detail = err?.error?.message || 'Erro ao conectar ao servidor';
         this.messageService.add({ severity: 'error', summary: 'Erro', detail });
         this.isLoading = false;
-      }
+      },
     });
   }
 }

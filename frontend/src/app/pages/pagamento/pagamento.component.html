@@ -61,7 +61,7 @@
         <!-- Loading -->
         @if (carregando()) {
           <div class="pag-loading">
-            <p-progressSpinner strokeWidth="4" animationDuration=".8s"></p-progressSpinner>
+            <p-progress-spinner strokeWidth="4" animationDuration=".8s"></p-progress-spinner>
             <span>Gerando cobrança Pix...</span>
           </div>
         }
@@ -69,7 +69,7 @@
         <!-- Erro -->
         @else if (erro()) {
           <div class="pag-erro">
-            <p-message severity="error" [text]="erro()!"></p-message>
+            <p-message severity="error">{{ erro() }}</p-message>
             <p-button label="Tentar novamente" icon="pi pi-refresh" severity="secondary"
               (onClick)="iniciarCobranca()" styleClass="w-full mt-3">
             </p-button>
@@ -125,7 +125,7 @@
 
             <!-- Aguardando -->
             <div class="pix-aguardando">
-              <p-progressSpinner strokeWidth="3" animationDuration="1s" styleClass="spinner-sm"></p-progressSpinner>
+              <p-progress-spinner strokeWidth="3" animationDuration="1s" styleClass="spinner-sm"></p-progress-spinner>
               <span>Aguardando confirmação do pagamento...</span>
             </div>
 

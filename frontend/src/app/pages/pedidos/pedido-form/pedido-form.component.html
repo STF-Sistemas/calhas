@@ -5,13 +5,11 @@
   [isSaving]="isSaving"
   width="100vw"
   position="top"
-  (save)="onSave()">
-
+  (save)="onSave()"
+>
   <form [formGroup]="form" class="grid p-fluid" appEnterNext>
-
     <!-- ===================== LADO ESQUERDO ======================== -->
     <div class="col-12 xl:col-9">
-
       <!-- Cabeçalho do Pedido -->
       <div class="mb-4">
         <h3 class="section-title">
@@ -31,7 +29,8 @@
               placeholder="Selecione o Cliente"
               [filter]="true"
               filterBy="razao_social"
-              appendTo="body">
+              appendTo="body"
+            >
             </p-select>
             @if (form.get('cod_cliente')?.invalid && form.get('cod_cliente')?.touched) {
               <small class="p-error">Cliente é obrigatório.</small>
@@ -40,7 +39,13 @@
 
           <div class="col-12 md:col-4 lg:col-4 field">
             <label for="data_pedido">Data do Pedido *</label>
-            <p-datepicker id="data_pedido" formControlName="data_pedido" [showIcon]="true" dateFormat="dd/mm/yy" appendTo="body"></p-datepicker>
+            <p-datepicker
+              id="data_pedido"
+              formControlName="data_pedido"
+              [showIcon]="true"
+              dateFormat="dd/mm/yy"
+              appendTo="body"
+            ></p-datepicker>
             @if (form.get('data_pedido')?.invalid && form.get('data_pedido')?.touched) {
               <small class="p-error">Data do pedido é obrigatória.</small>
             }
@@ -48,7 +53,12 @@
 
           <div class="col-12 md:col-3 lg:col-3 field">
             <label for="status">Status *</label>
-            <p-select id="status" formControlName="status" [options]="statusOpcoes" appendTo="body"></p-select>
+            <p-select
+              id="status"
+              formControlName="status"
+              [options]="statusOpcoes"
+              appendTo="body"
+            ></p-select>
             @if (form.get('status')?.invalid && form.get('status')?.touched) {
               <small class="p-error">Status é obrigatório.</small>
             }
@@ -63,17 +73,25 @@
               optionLabel="descricao"
               optionValue="id"
               placeholder="Selecione o meio de pagamento"
-              appendTo="body">
+              appendTo="body"
+            >
             </p-select>
-            @if (form.get('cod_meio_pagamento')?.invalid && form.get('cod_meio_pagamento')?.touched) {
+            @if (
+              form.get('cod_meio_pagamento')?.invalid && form.get('cod_meio_pagamento')?.touched
+            ) {
               <small class="p-error">Meio de pagamento é obrigatório.</small>
             }
           </div>
 
           <div class="col-12 field">
             <label for="observacoes">Observações Internas</label>
-            <textarea id="observacoes" pInputTextarea formControlName="observacoes" rows="2"
-              placeholder="Notas sobre a fabricação ou entrega..."></textarea>
+            <textarea
+              id="observacoes"
+              pInputTextarea
+              formControlName="observacoes"
+              rows="2"
+              placeholder="Notas sobre a fabricação ou entrega..."
+            ></textarea>
           </div>
         </div>
       </div>
@@ -89,7 +107,8 @@
           severity="primary"
           size="small"
           (onClick)="adicionarItem()"
-          [style]="{'margin-left': 'auto'}">
+          [style]="{ 'margin-left': 'auto' }"
+        >
         </p-button>
       </h3>
 
@@ -107,7 +126,12 @@
         <ng-template pTemplate="body" let-control let-i="rowIndex">
           <tr [formGroup]="$any(control)">
             <td>
-              <p-select formControlName="tipo" [options]="tiposItem" (onChange)="onTipoChange(i)" appendTo="body"></p-select>
+              <p-select
+                formControlName="tipo"
+                [options]="tiposItem"
+                (onChange)="onTipoChange(i)"
+                appendTo="body"
+              ></p-select>
             </td>
             <td>
               @if (control.get('tipo')?.value === ETipoItemPedido.Produto) {
@@ -119,11 +143,11 @@
                   [filter]="true"
                   (onChange)="onSelecaoProduto(i, $event)"
                   placeholder="Selecione Produto"
-                  appendTo="body">
+                  appendTo="body"
+                >
                 </p-select>
               } @else if (control.get('tipo')?.value === ETipoItemPedido.Corte) {
-                <div style="display:flex; flex-direction:column; gap:0.35rem;">
-
+                <div style="display: flex; flex-direction: column; gap: 0.35rem">
                   <!-- 1. Chapa -->
                   <p-select
                     formControlName="cod_chapa"
@@ -132,12 +156,13 @@
                     optionValue="id"
                     placeholder="1. Selecione a Chapa"
                     appendTo="body"
-                    (onChange)="onChapaChange(i)">
+                    (onChange)="onChapaChange(i)"
+                  >
                   </p-select>
 
                   <!-- 2. Origem do desenho: biblioteca ou desenho livre -->
                   @if (control.get('cod_chapa')?.value) {
-                    <p-selectButton
+                    <p-selectbutton
                       formControlName="desenho_livre"
                       [options]="modoDesenhoOpcoes"
                       optionLabel="label"
@@ -145,8 +170,9 @@
                       [allowEmpty]="false"
                       size="small"
                       (onChange)="onModoDesenhoChange(i)"
-                      aria-label="Origem do desenho: biblioteca ou desenhar à mão">
-                    </p-selectButton>
+                      aria-label="Origem do desenho: biblioteca ou desenhar à mão"
+                    >
+                    </p-selectbutton>
                   }
 
                   <!-- 2b. Desenho livre -->
@@ -154,12 +180,35 @@
                     <div class="desenho-livre-acao">
                       @if (control.get('desenho_pontos')?.value?.length >= 2) {
                         <svg width="56" height="26" class="desenho-livre-mini" aria-hidden="true">
-                          <polyline [attr.points]="getDesenhoPoints(control.get('desenho_pontos')?.value, 56, 26)"
-                            fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linejoin="round" stroke-linecap="round"/>
+                          <polyline
+                            [attr.points]="
+                              getDesenhoPoints(
+                                $safeNavigationMigration(control.get('desenho_pontos')?.value),
+                                56,
+                                26
+                              )
+                            "
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linejoin="round"
+                            stroke-linecap="round"
+                          />
                           @for (d of control.get('desenho_diagonais')?.value ?? []; track $index) {
-                            <polyline [attr.points]="getDesenhoDiagonalPoints(d, control.get('desenho_pontos')?.value, 56, 26)"
-                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <polyline
+                              [attr.points]="
+                                getDesenhoDiagonalPoints(
+                                  d,
+                                  $safeNavigationMigration(control.get('desenho_pontos')?.value),
+                                  56,
+                                  26
+                                )
+                              "
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                            />
                           }
                         </svg>
                       }
@@ -170,19 +219,25 @@
                         severity="secondary"
                         [outlined]="true"
                         (onClick)="abrirDesenhoLivre(i)"
-                        styleClass="w-full">
+                        styleClass="w-full"
+                      >
                       </p-button>
                     </div>
 
                     @if (control.get('desenho_pontos')?.value?.length >= 2) {
                       <p-select
                         formControlName="cod_corte"
-                        [options]="getCortesDeChapa(control.get('cod_chapa')?.value)"
+                        [options]="
+                          getCortesDeChapa(
+                            $safeNavigationMigration(control.get('cod_chapa')?.value)
+                          )
+                        "
                         optionLabel="descricao"
                         optionValue="id"
                         placeholder="Selecione o Corte"
                         appendTo="body"
-                        (onChange)="onCorteManualChange(i, $event)">
+                        (onChange)="onCorteManualChange(i, $event)"
+                      >
                       </p-select>
                     }
                   }
@@ -195,20 +250,41 @@
                       optionLabel="descricao"
                       optionValue="id"
                       placeholder="2. Selecione o Desenho"
-                      appendTo="body">
+                      appendTo="body"
+                    >
                       <ng-template pTemplate="selectedItem" let-opt>
                         @if (opt) {
-                          <div style="display:flex; align-items:center; gap:0.5rem;">
-                            <svg width="56" height="26" style="display:block; border-radius:3px; flex-shrink:0;">
-                              <rect width="56" height="26" rx="3"
-                                [attr.fill]="themeService.isDarkMode() ? '#141414' : '#f0f0f0'"/>
+                          <div style="display: flex; align-items: center; gap: 0.5rem">
+                            <svg
+                              width="56"
+                              height="26"
+                              style="display: block; border-radius: 3px; flex-shrink: 0"
+                            >
+                              <rect
+                                width="56"
+                                height="26"
+                                rx="3"
+                                [attr.fill]="themeService.isDarkMode() ? '#141414' : '#f0f0f0'"
+                              />
                               @if (opt.pontos?.length >= 2) {
-                                <polyline [attr.points]="getDesenhoPoints(opt.pontos, 56, 26)"
-                                  fill="none" [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'" stroke-width="2"
-                                  stroke-linejoin="round" stroke-linecap="round"/>
+                                <polyline
+                                  [attr.points]="getDesenhoPoints(opt.pontos, 56, 26)"
+                                  fill="none"
+                                  [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'"
+                                  stroke-width="2"
+                                  stroke-linejoin="round"
+                                  stroke-linecap="round"
+                                />
                                 @for (d of opt.diagonais ?? []; track $index) {
-                                  <polyline [attr.points]="getDesenhoDiagonalPoints(d, opt.pontos, 56, 26)"
-                                    fill="none" [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'" stroke-width="2" stroke-linecap="round"/>
+                                  <polyline
+                                    [attr.points]="getDesenhoDiagonalPoints(d, opt.pontos, 56, 26)"
+                                    fill="none"
+                                    [attr.stroke]="
+                                      themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'
+                                    "
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                  />
                                 }
                               }
                             </svg>
@@ -217,17 +293,35 @@
                         }
                       </ng-template>
                       <ng-template pTemplate="item" let-opt>
-                        <div style="display:flex; align-items:center; gap:0.5rem;">
-                          <svg width="56" height="26" style="display:block; border-radius:3px; flex-shrink:0;">
-                            <rect width="56" height="26" rx="3"
-                              [attr.fill]="themeService.isDarkMode() ? '#141414' : '#f0f0f0'"/>
+                        <div style="display: flex; align-items: center; gap: 0.5rem">
+                          <svg
+                            width="56"
+                            height="26"
+                            style="display: block; border-radius: 3px; flex-shrink: 0"
+                          >
+                            <rect
+                              width="56"
+                              height="26"
+                              rx="3"
+                              [attr.fill]="themeService.isDarkMode() ? '#141414' : '#f0f0f0'"
+                            />
                             @if (opt.pontos?.length >= 2) {
-                              <polyline [attr.points]="getDesenhoPoints(opt.pontos, 56, 26)"
-                                fill="none" [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'" stroke-width="2"
-                                stroke-linejoin="round" stroke-linecap="round"/>
+                              <polyline
+                                [attr.points]="getDesenhoPoints(opt.pontos, 56, 26)"
+                                fill="none"
+                                [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'"
+                                stroke-width="2"
+                                stroke-linejoin="round"
+                                stroke-linecap="round"
+                              />
                               @for (d of opt.diagonais ?? []; track $index) {
-                                <polyline [attr.points]="getDesenhoDiagonalPoints(d, opt.pontos, 56, 26)"
-                                  fill="none" [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'" stroke-width="2" stroke-linecap="round"/>
+                                <polyline
+                                  [attr.points]="getDesenhoDiagonalPoints(d, opt.pontos, 56, 26)"
+                                  fill="none"
+                                  [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                />
                               }
                             }
                           </svg>
@@ -246,20 +340,23 @@
                       severity="secondary"
                       [outlined]="true"
                       (onClick)="abrirMedidas(i)"
-                      styleClass="w-full">
+                      styleClass="w-full"
+                    >
                     </p-button>
 
                     <p-select
                       formControlName="cod_corte"
-                      [options]="getCortesDeChapa(control.get('cod_chapa')?.value)"
+                      [options]="
+                        getCortesDeChapa($safeNavigationMigration(control.get('cod_chapa')?.value))
+                      "
                       optionLabel="descricao"
                       optionValue="id"
                       placeholder="4. Selecione o Corte"
                       appendTo="body"
-                      (onChange)="onCorteManualChange(i, $event)">
+                      (onChange)="onCorteManualChange(i, $event)"
+                    >
                     </p-select>
                   }
-
                 </div>
               } @else {
                 <p-select
@@ -270,7 +367,8 @@
                   [filter]="true"
                   (onChange)="onSelecaoServico(i, $event)"
                   placeholder="Selecione Serviço"
-                  appendTo="body">
+                  appendTo="body"
+                >
                 </p-select>
               }
             </td>
@@ -281,10 +379,16 @@
               <input pInputText appCurrencyMask formControlName="valor_unitario" class="w-full" />
             </td>
             <td class="font-bold">
-              {{ control.get('subtotal').value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              {{ control.get('subtotal').value | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
             </td>
             <td class="text-center">
-              <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" (onClick)="removerItem(i)"></p-button>
+              <p-button
+                icon="pi pi-trash"
+                severity="danger"
+                [text]="true"
+                [rounded]="true"
+                (onClick)="removerItem(i)"
+              ></p-button>
             </td>
           </tr>
         </ng-template>
@@ -298,64 +402,118 @@
 
     <!-- ===================== RESUMO (sidebar) ======================== -->
     <div class="col-12 xl:col-3">
-      <div style="position: sticky; top: 0;">
-
+      <div style="position: sticky; top: 0">
         <h3 class="section-title">
           <i class="pi pi-calculator"></i>
           Resumo do Pedido
         </h3>
 
-        <div class="row" style="margin-bottom: 0.5rem;">
-          <div class="col-12" style="display:flex; justify-content:space-between; align-items:center; padding: 0.5rem 0.75rem;">
+        <div class="row" style="margin-bottom: 0.5rem">
+          <div
+            class="col-12"
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 0.5rem 0.75rem;
+            "
+          >
             <span class="text-600">Material / Cortes:</span>
-            <span class="font-bold">{{ form.get('valor_material')?.value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+            <span class="font-bold">{{
+              $safeNavigationMigration(form.get('valor_material')?.value)
+                | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+            }}</span>
           </div>
         </div>
 
-        <div class="row" style="margin-bottom: 0.5rem;">
-          <div class="col-12" style="display:flex; justify-content:space-between; align-items:center; padding: 0.5rem 0.75rem;">
+        <div class="row" style="margin-bottom: 0.5rem">
+          <div
+            class="col-12"
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 0.5rem 0.75rem;
+            "
+          >
             <span class="text-600">Serviço:</span>
-            <div style="display:flex; align-items:center; gap:0.4rem;">
-              <i class="pi pi-info-circle text-blue-500" pTooltip="Calculado automaticamente sobre o material"></i>
-              <span class="font-bold">{{ form.get('valor_servico')?.value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+            <div style="display: flex; align-items: center; gap: 0.4rem">
+              <i
+                class="pi pi-info-circle text-blue-500"
+                pTooltip="Calculado automaticamente sobre o material"
+              ></i>
+              <span class="font-bold">{{
+                $safeNavigationMigration(form.get('valor_servico')?.value)
+                  | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+              }}</span>
             </div>
           </div>
         </div>
 
-        <div class="row" style="border-top: 2px solid var(--border-color); padding-top: 0.75rem; margin-top: 0.5rem;">
-          <div class="col-12" style="display:flex; justify-content:space-between; align-items:center; padding: 0.5rem 0.75rem;">
-            <span class="font-bold" style="font-size: 1rem;">Total do Pedido:</span>
-            <span style="font-size: 1.5rem; font-weight: 700; color: var(--p-primary);">{{ form.get('valor_total')?.value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+        <div
+          class="row"
+          style="
+            border-top: 2px solid var(--border-color);
+            padding-top: 0.75rem;
+            margin-top: 0.5rem;
+          "
+        >
+          <div
+            class="col-12"
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 0.5rem 0.75rem;
+            "
+          >
+            <span class="font-bold" style="font-size: 1rem">Total do Pedido:</span>
+            <span style="font-size: 1.5rem; font-weight: 700; color: var(--p-primary)">{{
+              $safeNavigationMigration(form.get('valor_total')?.value)
+                | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+            }}</span>
           </div>
         </div>
 
         <!-- ===================== DESCONTO ======================== -->
-        <div class="row" style="padding-top: 0.5rem;">
-          <div class="col-12" style="padding: 0.5rem 0.75rem;">
-            <label for="desconto_valor" style="display:block; margin-bottom: 0.4rem;">Desconto</label>
-            <div style="display:flex; gap: 0.5rem; align-items:center;">
-              <p-selectButton
+        <div class="row" style="padding-top: 0.5rem">
+          <div class="col-12" style="padding: 0.5rem 0.75rem">
+            <label for="desconto_valor" style="display: block; margin-bottom: 0.4rem"
+              >Desconto</label
+            >
+            <div style="display: flex; gap: 0.5rem; align-items: center">
+              <p-selectbutton
                 formControlName="desconto_tipo"
                 [options]="descontoTipoOpcoes"
                 optionLabel="label"
                 optionValue="value"
                 [allowEmpty]="false"
                 (onChange)="onDescontoTipoChange()"
-                aria-label="Tipo de desconto: reais ou percentual">
-              </p-selectButton>
+                aria-label="Tipo de desconto: reais ou percentual"
+              >
+              </p-selectbutton>
 
               @if (form.get('desconto_tipo')?.value === EDescontoTipo.Percentual) {
-                <p-inputNumber
+                <p-inputnumber
                   inputId="desconto_valor"
                   formControlName="desconto_valor"
                   suffix="%"
-                  [min]="0" [max]="100" [maxFractionDigits]="2"
+                  [min]="0"
+                  [max]="100"
+                  [maxFractionDigits]="2"
                   styleClass="w-full"
-                  aria-label="Valor do desconto em percentual">
-                </p-inputNumber>
+                  aria-label="Valor do desconto em percentual"
+                >
+                </p-inputnumber>
               } @else {
-                <input pInputText appCurrencyMask id="desconto_valor" formControlName="desconto_valor"
-                  class="w-full" aria-label="Valor do desconto em reais" />
+                <input
+                  pInputText
+                  appCurrencyMask
+                  id="desconto_valor"
+                  formControlName="desconto_valor"
+                  class="w-full"
+                  aria-label="Valor do desconto em reais"
+                />
               }
             </div>
             @if (form.get('desconto_valor')?.invalid && form.get('desconto_valor')?.touched) {
@@ -366,33 +524,77 @@
 
         @if (form.get('valor_desconto')?.value > 0) {
           <div class="row">
-            <div class="col-12" style="display:flex; justify-content:space-between; align-items:center; padding: 0.5rem 0.75rem;">
+            <div
+              class="col-12"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.5rem 0.75rem;
+              "
+            >
               <span class="text-600">Desconto aplicado:</span>
-              <span class="font-bold" style="color: var(--p-red-500, #ef4444);">
-                - {{ form.get('valor_desconto')?.value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              <span class="font-bold" style="color: var(--p-red-500, #ef4444)">
+                -
+                {{
+                  $safeNavigationMigration(form.get('valor_desconto')?.value)
+                    | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+                }}
               </span>
             </div>
           </div>
         }
 
-        <div class="row" style="border-top: 2px solid var(--p-primary); padding-top: 0.75rem; margin-top: 0.5rem;">
-          <div class="col-12" style="display:flex; justify-content:space-between; align-items:center; padding: 0.5rem 0.75rem;">
-            <span class="font-bold" style="font-size: 1rem;">Total Líquido:</span>
-            <span style="font-size: 1.6rem; font-weight: 800; color: var(--p-green-600, #16a34a);">{{ form.get('valor_liquido')?.value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+        <div
+          class="row"
+          style="border-top: 2px solid var(--p-primary); padding-top: 0.75rem; margin-top: 0.5rem"
+        >
+          <div
+            class="col-12"
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 0.5rem 0.75rem;
+            "
+          >
+            <span class="font-bold" style="font-size: 1rem">Total Líquido:</span>
+            <span style="font-size: 1.6rem; font-weight: 800; color: var(--p-green-600, #16a34a)">{{
+              $safeNavigationMigration(form.get('valor_liquido')?.value)
+                | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+            }}</span>
           </div>
         </div>
 
-        <div style="margin-top: 1rem; padding: 0.75rem; background: var(--surface-100); border-radius: 8px; border-left: 3px solid var(--p-primary);">
-          <p style="margin: 0; font-size: 0.75rem; color: var(--text-secondary); font-style: italic; line-height: 1.5;">
-            * O valor de serviço é calculado automaticamente sobre o valor dos itens de material (Produtos e Cortes).
+        <div
+          style="
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: var(--surface-100);
+            border-radius: 8px;
+            border-left: 3px solid var(--p-primary);
+          "
+        >
+          <p
+            style="
+              margin: 0;
+              font-size: 0.75rem;
+              color: var(--text-secondary);
+              font-style: italic;
+              line-height: 1.5;
+            "
+          >
+            * O valor de serviço é calculado automaticamente sobre o valor dos itens de material
+            (Produtos e Cortes).
           </p>
         </div>
-
       </div>
     </div>
-
   </form>
 </app-dialog-wrapper>
 
 <app-desenho-medida #medidasDialog (confirmed)="onMedidasConfirmadas($event)"></app-desenho-medida>
-<app-desenho-livre #desenhoLivreDialog (confirmed)="onDesenhoLivreConfirmado($event)"></app-desenho-livre>
+<app-desenho-livre
+  #desenhoLivreDialog
+  (confirmed)="onDesenhoLivreConfirmado($event)"
+></app-desenho-livre>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -18,11 +18,12 @@ import { IEmpresa } from '#shared/interfaces';
     EmpresaFormComponent,
     ConfirmDialogModule,
     ToastModule,
-    TagModule
+    TagModule,
   ],
   templateUrl: './empresas.component.html',
   styleUrls: ['./empresas.component.scss'],
-  providers: [ConfirmationService]
+  changeDetection: ChangeDetectionStrategy.Eager,
+  providers: [ConfirmationService],
 })
 export class EmpresasComponent implements OnInit {
   @ViewChild('form') form!: EmpresaFormComponent;
@@ -35,14 +36,14 @@ export class EmpresasComponent implements OnInit {
     { field: 'cnpj', header: 'CNPJ' },
     { field: 'email', header: 'E-mail' },
     { field: 'telefone', header: 'Telefone', type: 'phone' },
-    { field: 'ativo', header: 'Status', type: 'status' }
+    { field: 'ativo', header: 'Status', type: 'status' },
   ];
 
   constructor(
     private empresaService: EmpresaService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
-  ) { }
+    private confirmationService: ConfirmationService,
+  ) {}
 
   ngOnInit(): void {
     this.carregarEmpresas();
@@ -56,9 +57,13 @@ export class EmpresasComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar empresas' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar empresas',
+        });
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -80,11 +85,15 @@ export class EmpresasComponent implements OnInit {
       accept: () => {
         this.empresaService.desativar(empresa.id).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Empresa excluída' });
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Empresa excluída',
+            });
             this.carregarEmpresas();
-          }
+          },
         });
-      }
+      },
     });
   }
 }

@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Output, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Output,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -12,9 +20,18 @@ import { ThemeService } from '#core/services/theme.service';
 @Component({
   selector: 'app-desenho-medida',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, DialogModule, InputTextModule, CurrencyMaskDirective, EnterFocusNextDirective],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ButtonModule,
+    DialogModule,
+    InputTextModule,
+    CurrencyMaskDirective,
+    EnterFocusNextDirective,
+  ],
   templateUrl: './desenho-medida.component.html',
-  styleUrls: ['./desenho-medida.component.scss']
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrls: ['./desenho-medida.component.scss'],
 })
 export class DesenhoMedidaComponent implements AfterViewInit {
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -48,7 +65,12 @@ export class DesenhoMedidaComponent implements AfterViewInit {
   }
 
   /** Cada diagonal gera 2 entradas: p1 e p2. */
-  get segmentosDiagonaisInfo(): { diagIdx: number; p1Idx: number; p2Idx: number; coberto: number }[] {
+  get segmentosDiagonaisInfo(): {
+    diagIdx: number;
+    p1Idx: number;
+    p2Idx: number;
+    coberto: number;
+  }[] {
     const base = this.segmentosBase.length;
     return (this.desenho?.diagonais ?? []).map((_, i) => ({
       diagIdx: i,
@@ -64,16 +86,21 @@ export class DesenhoMedidaComponent implements AfterViewInit {
     const d = this.desenho?.diagonais?.[diagIdx];
     if (!d || pontos.length < 2) return -1;
     const mid: IPonto = { x: (d.p1.x + d.p2.x) / 2, y: (d.p1.y + d.p2.y) / 2 };
-    let minDist = Infinity, idx = -1;
+    let minDist = Infinity,
+      idx = -1;
     for (let i = 0; i < pontos.length - 1; i++) {
       const dist = this.distToSegment(mid, pontos[i], pontos[i + 1]);
-      if (dist < minDist) { minDist = dist; idx = i; }
+      if (dist < minDist) {
+        minDist = dist;
+        idx = i;
+      }
     }
     return idx;
   }
 
   private distToSegment(p: IPonto, a: IPonto, b: IPonto): number {
-    const dx = b.x - a.x, dy = b.y - a.y;
+    const dx = b.x - a.x,
+      dy = b.y - a.y;
     const lenSq = dx * dx + dy * dy;
     if (lenSq === 0) return Math.hypot(p.x - a.x, p.y - a.y);
     const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / lenSq));
@@ -82,7 +109,9 @@ export class DesenhoMedidaComponent implements AfterViewInit {
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
 
-  ngAfterViewInit() { this.initCanvas(); }
+  ngAfterViewInit() {
+    this.initCanvas();
+  }
 
   abrir(index: number, desenho: IDesenho, medidasAtuais: number[]) {
     this.itemIndex = index;
@@ -124,7 +153,8 @@ export class DesenhoMedidaComponent implements AfterViewInit {
     const pontos = this.desenho.pontos as IPonto[];
     const diagonais: IDiagonal[] = (this.desenho.diagonais as IDiagonal[]) ?? [];
     const cobertos = this.segmentosCobertos;
-    const W = this.CANVAS_W, H = this.CANVAS_H;
+    const W = this.CANVAS_W,
+      H = this.CANVAS_H;
 
     const dark = this.themeService.isDarkMode();
     const baseColor = dark ? '#ef4444' : '#1a1a1a';
@@ -134,8 +164,18 @@ export class DesenhoMedidaComponent implements AfterViewInit {
 
     ctx.strokeStyle = dark ? '#252525' : '#e0e0e0';
     ctx.lineWidth = 1;
-    for (let x = 0; x <= W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-    for (let y = 0; y <= H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    for (let x = 0; x <= W; x += 40) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= H; y += 40) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
 
     if (pontos.length < 2) return;
 
@@ -143,7 +183,8 @@ export class DesenhoMedidaComponent implements AfterViewInit {
 
     // Segmentos base
     for (let i = 0; i < base; i++) {
-      const p1 = pontos[i], p2 = pontos[i + 1];
+      const p1 = pontos[i],
+        p2 = pontos[i + 1];
       const coberto = cobertos.has(i);
       const temMedida = !coberto && this.medidas[i] > 0;
       const cor = temMedida ? '#22c55e' : baseColor;
@@ -151,11 +192,16 @@ export class DesenhoMedidaComponent implements AfterViewInit {
       ctx.strokeStyle = cor;
       ctx.lineWidth = 3.5;
       ctx.setLineDash([]);
-      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
 
       if (!coberto) {
-        const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
+        const mx = (p1.x + p2.x) / 2,
+          my = (p1.y + p2.y) / 2;
         this.desenharBadge(ctx, mx, my, i + 1, cor);
         if (temMedida) this.desenharMedidaLabel(ctx, mx, my, this.medidas[i], cor);
       }
@@ -175,10 +221,14 @@ export class DesenhoMedidaComponent implements AfterViewInit {
       ctx.lineWidth = 3.5;
       ctx.setLineDash([]);
       ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(d.p1.x, d.p1.y); ctx.lineTo(d.p2.x, d.p2.y); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(d.p1.x, d.p1.y);
+      ctx.lineTo(d.p2.x, d.p2.y);
+      ctx.stroke();
 
       // Badge no meio com número sequencial
-      const mx = (d.p1.x + d.p2.x) / 2, my = (d.p1.y + d.p2.y) / 2;
+      const mx = (d.p1.x + d.p2.x) / 2,
+        my = (d.p1.y + d.p2.y) / 2;
       this.desenharBadge(ctx, mx, my, base + i + 1, cor);
 
       // Labels nas pontas
@@ -188,22 +238,42 @@ export class DesenhoMedidaComponent implements AfterViewInit {
 
     // Pontos
     ctx.fillStyle = dark ? '#888' : '#555';
-    pontos.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI * 2); ctx.fill(); });
+    pontos.forEach((p) => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    });
   }
 
-  private desenharBadge(ctx: CanvasRenderingContext2D, x: number, y: number, num: number, cor: string) {
+  private desenharBadge(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    num: number,
+    cor: string,
+  ) {
     ctx.fillStyle = cor;
-    ctx.beginPath(); ctx.arc(x, y, 13, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y, 13, 0, Math.PI * 2);
+    ctx.fill();
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 11px sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
     ctx.fillText(String(num), x, y);
   }
 
-  private desenharMedidaLabel(ctx: CanvasRenderingContext2D, x: number, y: number, medida: number, cor: string) {
+  private desenharMedidaLabel(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    medida: number,
+    cor: string,
+  ) {
     ctx.fillStyle = cor;
     ctx.font = '11px sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
     ctx.fillText(`${medida} cm`, x, y + 20);
   }
 }

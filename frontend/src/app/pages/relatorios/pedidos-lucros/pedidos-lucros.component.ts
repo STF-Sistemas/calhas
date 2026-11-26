@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -32,6 +32,7 @@ import { IRelatorioPedidosLucros, IEmpresa } from '#shared/interfaces';
     RelatorioWrapperComponent,
   ],
   templateUrl: './pedidos-lucros.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./pedidos-lucros.component.scss'],
 })
 export class PedidosLucrosComponent implements OnInit {
@@ -64,19 +65,21 @@ export class PedidosLucrosComponent implements OnInit {
     const codEmpresa = this.authService.currentUser()?.cod_empresa;
     if (codEmpresa) {
       this.empresaService.buscarPorId(codEmpresa).subscribe({
-        next: res => { if (res.success) this.empresa = res.data; },
+        next: (res) => {
+          if (res.success) this.empresa = res.data;
+        },
       });
     }
 
     this.clienteService.listar({ limite: 1000 }).subscribe({
-      next: res => {
-        this.clienteOptions = res.data.map(c => ({ label: c.razao_social, value: c.id }));
+      next: (res) => {
+        this.clienteOptions = res.data.map((c) => ({ label: c.razao_social, value: c.id }));
       },
     });
 
     this.produtoService.listar().subscribe({
-      next: res => {
-        this.produtoOptions = (res.data as any[]).map(p => ({ label: p.descricao, value: p.id }));
+      next: (res) => {
+        this.produtoOptions = (res.data as any[]).map((p) => ({ label: p.descricao, value: p.id }));
       },
     });
   }
@@ -93,22 +96,24 @@ export class PedidosLucrosComponent implements OnInit {
 
     const { data_inicio, data_fim, cod_cliente, cod_produto } = this.form.value;
 
-    this.relatorioService.pedidosLucros({
-      data_inicio: data_inicio ? this.toISODate(data_inicio) : undefined,
-      data_fim:    data_fim    ? this.toISODate(data_fim)    : undefined,
-      cod_cliente: cod_cliente ?? undefined,
-      cod_produto: cod_produto ?? undefined,
-    }).subscribe({
-      next: res => {
-        this.isLoading = false;
-        if (res.success) this.relatorio = res.data;
-        else this.erro = 'Não foi possível gerar o relatório.';
-      },
-      error: () => {
-        this.isLoading = false;
-        this.erro = 'Erro ao conectar ao servidor.';
-      },
-    });
+    this.relatorioService
+      .pedidosLucros({
+        data_inicio: data_inicio ? this.toISODate(data_inicio) : undefined,
+        data_fim: data_fim ? this.toISODate(data_fim) : undefined,
+        cod_cliente: cod_cliente ?? undefined,
+        cod_produto: cod_produto ?? undefined,
+      })
+      .subscribe({
+        next: (res) => {
+          this.isLoading = false;
+          if (res.success) this.relatorio = res.data;
+          else this.erro = 'Não foi possível gerar o relatório.';
+        },
+        error: () => {
+          this.isLoading = false;
+          this.erro = 'Erro ao conectar ao servidor.';
+        },
+      });
   }
 
   limpar() {

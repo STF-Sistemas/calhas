@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Output, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Output,
+  OnInit,
+  ViewChild,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -13,7 +20,10 @@ import { MessageService } from 'primeng/api';
 import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { DesenhoMedidaComponent } from '../desenho-medida/desenho-medida.component';
-import { DesenhoLivreComponent, IDesenhoLivreResultado } from '../desenho-livre/desenho-livre.component';
+import {
+  DesenhoLivreComponent,
+  IDesenhoLivreResultado,
+} from '../desenho-livre/desenho-livre.component';
 import { PedidoService } from '#core/services/pedido.service';
 import { ClienteService } from '#core/services/cliente.service';
 import { ProdutoService } from '#core/services/produto.service';
@@ -21,7 +31,16 @@ import { ChapaService } from '#core/services/chapa.service';
 import { ServicoService } from '#core/services/servico.service';
 import { DesenhoService } from '#core/services/desenho.service';
 import { MeioPagamentoService } from '#core/services/meio-pagamento.service';
-import { ICliente, IProduto, IChapa, IServico, IPedidoItem, IDesenho, IMeioPagamento, IDiagonal } from '#shared/interfaces';
+import {
+  ICliente,
+  IProduto,
+  IChapa,
+  IServico,
+  IPedidoItem,
+  IDesenho,
+  IMeioPagamento,
+  IDiagonal,
+} from '#shared/interfaces';
 import { EStatusGeral, EStatusPedido, ETipoItemPedido, EDescontoTipo } from '#shared/enums';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { ThemeService } from '#core/services/theme.service';
@@ -46,10 +65,11 @@ import { calcularValorDesconto, calcularValorLiquido } from '#shared/functions/d
     EnterFocusNextDirective,
     DialogWrapperComponent,
     DesenhoMedidaComponent,
-    DesenhoLivreComponent
+    DesenhoLivreComponent,
   ],
   templateUrl: './pedido-form.component.html',
-  styleUrls: ['./pedido-form.component.scss']
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrls: ['./pedido-form.component.scss'],
 })
 export class PedidoFormComponent implements OnInit {
   @ViewChild('medidasDialog') medidasDialog!: DesenhoMedidaComponent;
@@ -73,15 +93,15 @@ export class PedidoFormComponent implements OnInit {
   meiosPagamento: IMeioPagamento[] = [];
 
   statusOpcoes = [
-    { label: 'Aberto',      value: EStatusPedido.Aberto },
+    { label: 'Aberto', value: EStatusPedido.Aberto },
     { label: 'Em Produção', value: EStatusPedido.EmProducao },
-    { label: 'Finalizado',  value: EStatusPedido.Concluido },
-    { label: 'Cancelado',   value: EStatusPedido.Cancelado },
+    { label: 'Finalizado', value: EStatusPedido.Concluido },
+    { label: 'Cancelado', value: EStatusPedido.Cancelado },
   ];
   tiposItem = [
     { label: 'Produto', value: ETipoItemPedido.Produto },
     { label: 'Corte', value: ETipoItemPedido.Corte },
-    { label: 'Serviço Direto', value: ETipoItemPedido.Servico }
+    { label: 'Serviço Direto', value: ETipoItemPedido.Servico },
   ];
   modoDesenhoOpcoes = [
     { label: 'Biblioteca', value: false, icon: 'pi pi-images' },
@@ -102,7 +122,7 @@ export class PedidoFormComponent implements OnInit {
     private desenhoService: DesenhoService,
     private meioPagamentoService: MeioPagamentoService,
     private messageService: MessageService,
-    public themeService: ThemeService
+    public themeService: ThemeService,
   ) {
     this.form = this.fb.group({
       cod_cliente: [null, [Validators.required]],
@@ -117,13 +137,15 @@ export class PedidoFormComponent implements OnInit {
       desconto_valor: [0, [Validators.min(0)]],
       valor_desconto: [{ value: 0, disabled: true }],
       valor_liquido: [{ value: 0, disabled: true }],
-      itens: this.fb.array([])
+      itens: this.fb.array([]),
     });
 
     this.form.get('desconto_tipo')?.valueChanges.subscribe((tipo) => {
       const ctrl = this.form.get('desconto_valor');
       ctrl?.setValidators(
-        tipo === EDescontoTipo.Percentual ? [Validators.min(0), Validators.max(100)] : [Validators.min(0)]
+        tipo === EDescontoTipo.Percentual
+          ? [Validators.min(0), Validators.max(100)]
+          : [Validators.min(0)],
       );
       ctrl?.updateValueAndValidity({ emitEvent: false });
       this.recalcularTotais();
@@ -140,20 +162,32 @@ export class PedidoFormComponent implements OnInit {
   }
 
   carregarAuxiliares() {
-    this.clienteService.listar().subscribe(res => this.clientes = res.data);
-    this.produtoService.listar().subscribe(res =>
-      this.produtos = res.data.filter(p => p.status === EStatusGeral.Ativo)
-    );
-    this.chapaService.listar().subscribe(res =>
-      this.chapas = res.data
-        .filter(ch => ch.status === EStatusGeral.Ativo)
-        .map(ch => ({ ...ch, cortes: (ch.cortes ?? []).filter(c => c.status === EStatusGeral.Ativo) }))
-    );
-    this.servicoService.listar().subscribe(res =>
-      this.servicos = res.data.filter(s => s.status === EStatusGeral.Ativo)
-    );
-    this.desenhoService.listar().subscribe(res => this.desenhos = res.data);
-    this.meioPagamentoService.listar().subscribe(res => this.meiosPagamento = res.data.filter(m => m.ativo === 1));
+    this.clienteService.listar().subscribe((res) => (this.clientes = res.data));
+    this.produtoService
+      .listar()
+      .subscribe(
+        (res) => (this.produtos = res.data.filter((p) => p.status === EStatusGeral.Ativo)),
+      );
+    this.chapaService
+      .listar()
+      .subscribe(
+        (res) =>
+          (this.chapas = res.data
+            .filter((ch) => ch.status === EStatusGeral.Ativo)
+            .map((ch) => ({
+              ...ch,
+              cortes: (ch.cortes ?? []).filter((c) => c.status === EStatusGeral.Ativo),
+            }))),
+      );
+    this.servicoService
+      .listar()
+      .subscribe(
+        (res) => (this.servicos = res.data.filter((s) => s.status === EStatusGeral.Ativo)),
+      );
+    this.desenhoService.listar().subscribe((res) => (this.desenhos = res.data));
+    this.meioPagamentoService
+      .listar()
+      .subscribe((res) => (this.meiosPagamento = res.data.filter((m) => m.ativo === 1)));
   }
 
   abrir(id?: number) {
@@ -174,12 +208,12 @@ export class PedidoFormComponent implements OnInit {
         next: (res) => {
           this.form.patchValue({
             ...res.data,
-            data_pedido: new Date(res.data.data_pedido)
+            data_pedido: new Date(res.data.data_pedido),
           });
           res.data.itens?.forEach((item: IPedidoItem) => this.adicionarItem(item));
           this.recalcularTotais();
           this.isLoadingData = false;
-        }
+        },
       });
     } else {
       this.adicionarItem();
@@ -188,13 +222,13 @@ export class PedidoFormComponent implements OnInit {
 
   private getChapaIdDoCorteid(corteId: number | null | undefined): number | null {
     if (!corteId) return null;
-    return this.chapas.find(ch => ch.cortes?.some(c => c.id === corteId))?.id ?? null;
+    return this.chapas.find((ch) => ch.cortes?.some((c) => c.id === corteId))?.id ?? null;
   }
 
   adicionarItem(data?: Partial<IPedidoItem>) {
     const codChapa = this.getChapaIdDoCorteid(data?.cod_corte);
 
-    const qtd   = Number(data?.quantidade)    || 1;
+    const qtd = Number(data?.quantidade) || 1;
     const vUnit = Number(data?.valor_unitario) || 0;
     const custo = Number(data?.custo_unitario) || 0;
 
@@ -215,7 +249,7 @@ export class PedidoFormComponent implements OnInit {
       quantidade: [qtd, [Validators.required, Validators.min(0.01)]],
       valor_unitario: [vUnit, [Validators.required, Validators.min(0)]],
       custo_unitario: [custo],
-      subtotal: [{ value: qtd * vUnit, disabled: true }]
+      subtotal: [{ value: qtd * vUnit, disabled: true }],
     });
 
     itemForm.valueChanges.subscribe(() => {
@@ -237,9 +271,16 @@ export class PedidoFormComponent implements OnInit {
 
   onTipoChange(index: number) {
     this.itens.at(index).patchValue({
-      cod_produto: null, cod_chapa: null, cod_corte: null,
-      cod_servico: null, cod_desenho: null, medidas: [], valor_unitario: 0,
-      desenho_livre: false, desenho_pontos: null, desenho_diagonais: null
+      cod_produto: null,
+      cod_chapa: null,
+      cod_corte: null,
+      cod_servico: null,
+      cod_desenho: null,
+      medidas: [],
+      valor_unitario: 0,
+      desenho_livre: false,
+      desenho_pontos: null,
+      desenho_diagonais: null,
     });
   }
 
@@ -248,32 +289,49 @@ export class PedidoFormComponent implements OnInit {
     if (control.get('desenho_livre')?.value) {
       // Desenho livre independe da chapa: mantém o desenho e recalcula o corte.
       control.patchValue({ cod_corte: null, valor_unitario: 0 }, { emitEvent: false });
-      if ((control.get('desenho_pontos')?.value?.length ?? 0) >= 2) this.calcularCorteAutomatico(index);
+      if ((control.get('desenho_pontos')?.value?.length ?? 0) >= 2)
+        this.calcularCorteAutomatico(index);
       return;
     }
     control.patchValue(
       { cod_corte: null, cod_desenho: null, medidas: [], valor_unitario: 0 },
-      { emitEvent: false }
+      { emitEvent: false },
     );
   }
 
   onSelecaoProduto(index: number, event: { value: number }) {
-    const produto = this.produtos.find(p => p.id === event.value);
-    this.itens.at(index).patchValue({ valor_unitario: Number(produto?.valor_unitario) || 0, custo_unitario: Number(produto?.custo) || 0 });
+    const produto = this.produtos.find((p) => p.id === event.value);
+    this.itens
+      .at(index)
+      .patchValue({
+        valor_unitario: Number(produto?.valor_unitario) || 0,
+        custo_unitario: Number(produto?.custo) || 0,
+      });
     this.recalcularTotais();
   }
 
   onSelecaoServico(index: number, event: { value: number }) {
-    const servico = this.servicos.find(s => s.id === event.value);
-    this.itens.at(index).patchValue({ valor_unitario: Number(servico?.valor) || 0, custo_unitario: 0 });
+    const servico = this.servicos.find((s) => s.id === event.value);
+    this.itens
+      .at(index)
+      .patchValue({ valor_unitario: Number(servico?.valor) || 0, custo_unitario: 0 });
     this.recalcularTotais();
   }
 
   onModoDesenhoChange(index: number) {
-    this.itens.at(index).patchValue(
-      { cod_desenho: null, desenho_pontos: null, desenho_diagonais: null, medidas: [], cod_corte: null, valor_unitario: 0 },
-      { emitEvent: false }
-    );
+    this.itens
+      .at(index)
+      .patchValue(
+        {
+          cod_desenho: null,
+          desenho_pontos: null,
+          desenho_diagonais: null,
+          medidas: [],
+          cod_corte: null,
+          valor_unitario: 0,
+        },
+        { emitEvent: false },
+      );
     this.recalcularTotais();
   }
 
@@ -283,15 +341,22 @@ export class PedidoFormComponent implements OnInit {
       index,
       control.get('desenho_pontos')?.value,
       control.get('desenho_diagonais')?.value,
-      control.get('medidas')?.value
+      control.get('medidas')?.value,
     );
   }
 
   onDesenhoLivreConfirmado(event: IDesenhoLivreResultado) {
-    this.itens.at(event.index).patchValue(
-      { desenho_pontos: event.pontos, desenho_diagonais: event.diagonais, medidas: event.medidas, cod_desenho: null },
-      { emitEvent: false }
-    );
+    this.itens
+      .at(event.index)
+      .patchValue(
+        {
+          desenho_pontos: event.pontos,
+          desenho_diagonais: event.diagonais,
+          medidas: event.medidas,
+          cod_desenho: null,
+        },
+        { emitEvent: false },
+      );
     this.calcularCorteAutomatico(event.index);
   }
 
@@ -301,17 +366,25 @@ export class PedidoFormComponent implements OnInit {
       const pontos: IPonto[] = control.get('desenho_pontos')?.value ?? [];
       if (pontos.length < 2) return undefined;
       const diagonais: IDiagonal[] = control.get('desenho_diagonais')?.value ?? [];
-      return { id: 0, cod_empresa: 0, descricao: 'Desenho livre', pontos, diagonais, status: 1, excluido: false };
+      return {
+        id: 0,
+        cod_empresa: 0,
+        descricao: 'Desenho livre',
+        pontos,
+        diagonais,
+        status: 1,
+        excluido: false,
+      };
     }
     const codDesenho = control.get('cod_desenho')?.value;
-    return this.desenhos.find(d => d.id === codDesenho);
+    return this.desenhos.find((d) => d.id === codDesenho);
   }
 
   abrirMedidas(index: number) {
     const control = this.itens.at(index);
     const codDesenho = control.get('cod_desenho')?.value;
     const medidas: number[] = control.get('medidas')?.value || [];
-    const desenho = this.desenhos.find(d => d.id === codDesenho);
+    const desenho = this.desenhos.find((d) => d.id === codDesenho);
     if (desenho) {
       this.medidasDialog.abrir(index, desenho, medidas);
     }
@@ -334,7 +407,7 @@ export class PedidoFormComponent implements OnInit {
 
     // Detecta quais segmentos base estão cobertos por alguma diagonal
     const cobertos = new Set<number>();
-    diagonais.forEach(d => {
+    diagonais.forEach((d) => {
       const idx = this.segmentoCobertoPorDiagonal(desenho, d);
       if (idx >= 0) cobertos.add(idx);
     });
@@ -354,13 +427,24 @@ export class PedidoFormComponent implements OnInit {
   private segmentoCobertoPorDiagonal(desenho: IDesenho, d: IDiagonal): number {
     const pontos = desenho.pontos as IPonto[];
     const mid: IPonto = { x: (d.p1.x + d.p2.x) / 2, y: (d.p1.y + d.p2.y) / 2 };
-    let minDist = Infinity, idx = -1;
+    let minDist = Infinity,
+      idx = -1;
     for (let i = 0; i < pontos.length - 1; i++) {
-      const dx = pontos[i + 1].x - pontos[i].x, dy = pontos[i + 1].y - pontos[i].y;
+      const dx = pontos[i + 1].x - pontos[i].x,
+        dy = pontos[i + 1].y - pontos[i].y;
       const lenSq = dx * dx + dy * dy;
-      const t = lenSq === 0 ? 0 : Math.max(0, Math.min(1, ((mid.x - pontos[i].x) * dx + (mid.y - pontos[i].y) * dy) / lenSq));
+      const t =
+        lenSq === 0
+          ? 0
+          : Math.max(
+              0,
+              Math.min(1, ((mid.x - pontos[i].x) * dx + (mid.y - pontos[i].y) * dy) / lenSq),
+            );
       const dist = Math.hypot(mid.x - (pontos[i].x + t * dx), mid.y - (pontos[i].y + t * dy));
-      if (dist < minDist) { minDist = dist; idx = i; }
+      if (dist < minDist) {
+        minDist = dist;
+        idx = i;
+      }
     }
     return idx;
   }
@@ -379,12 +463,12 @@ export class PedidoFormComponent implements OnInit {
       return;
     }
 
-    const chapa = this.chapas.find(ch => ch.id === codChapa);
+    const chapa = this.chapas.find((ch) => ch.id === codChapa);
     if (!chapa?.cortes?.length) return;
 
     // Próximo corte maior ou igual à soma das medidas
     const candidatos = chapa.cortes
-      .filter(c => Number(c.corte) >= totalMedida)
+      .filter((c) => Number(c.corte) >= totalMedida)
       .sort((a, b) => Number(a.corte) - Number(b.corte));
 
     if (candidatos.length > 0) {
@@ -392,14 +476,14 @@ export class PedidoFormComponent implements OnInit {
       const valor = Number(corte.valor_venda ?? corte.valor ?? 0);
       control.patchValue(
         { cod_corte: corte.id, valor_unitario: valor, custo_unitario: 0 },
-        { emitEvent: false }
+        { emitEvent: false },
       );
       this.atualizarSubtotal(control as FormGroup);
       this.recalcularTotais();
       this.messageService.add({
         severity: 'success',
         summary: 'Corte selecionado',
-        detail: `"${corte.descricao}" (${corte.corte}cm) para ${totalMedida}cm de perfil`
+        detail: `"${corte.descricao}" (${corte.corte}cm) para ${totalMedida}cm de perfil`,
       });
     } else {
       control.patchValue({ cod_corte: null, valor_unitario: 0 }, { emitEvent: false });
@@ -407,7 +491,7 @@ export class PedidoFormComponent implements OnInit {
       this.messageService.add({
         severity: 'warn',
         summary: 'Corte não encontrado',
-        detail: `Nenhum corte ≥ ${totalMedida}cm disponível nesta chapa. Selecione manualmente.`
+        detail: `Nenhum corte ≥ ${totalMedida}cm disponível nesta chapa. Selecione manualmente.`,
       });
     }
   }
@@ -424,17 +508,19 @@ export class PedidoFormComponent implements OnInit {
   }
 
   getCortesDeChapa(codChapa: number) {
-    return this.chapas.find(ch => ch.id === codChapa)?.cortes || [];
+    return this.chapas.find((ch) => ch.id === codChapa)?.cortes || [];
   }
 
   onCorteManualChange(index: number, event: { value: number }) {
     const control = this.itens.at(index);
     const codChapa = control.get('cod_chapa')?.value;
-    const corte = this.chapas.find(ch => ch.id === codChapa)?.cortes?.find(c => c.id === event.value);
+    const corte = this.chapas
+      .find((ch) => ch.id === codChapa)
+      ?.cortes?.find((c) => c.id === event.value);
     if (corte) {
       control.patchValue(
         { valor_unitario: Number(corte.valor_venda ?? corte.valor ?? 0), custo_unitario: 0 },
-        { emitEvent: false }
+        { emitEvent: false },
       );
       this.atualizarSubtotal(control as FormGroup);
       this.recalcularTotais();
@@ -445,7 +531,7 @@ export class PedidoFormComponent implements OnInit {
     const codCorte = control.get('cod_corte')?.value;
     if (!codCorte) return '';
     for (const ch of this.chapas) {
-      const c = ch.cortes?.find(ct => ct.id === codCorte);
+      const c = ch.cortes?.find((ct) => ct.id === codCorte);
       if (c) return `${c.descricao} — ${c.corte}cm`;
     }
     return '';
@@ -453,20 +539,29 @@ export class PedidoFormComponent implements OnInit {
 
   getDesenhoPoints(pontos: IPonto[], w = 64, h = 30): string {
     if (!pontos || pontos.length < 2) return '';
-    const xs = pontos.map(p => p.x), ys = pontos.map(p => p.y);
-    const minX = Math.min(...xs), rangeX = (Math.max(...xs) - minX) || 1;
-    const minY = Math.min(...ys), rangeY = (Math.max(...ys) - minY) || 1;
+    const xs = pontos.map((p) => p.x),
+      ys = pontos.map((p) => p.y);
+    const minX = Math.min(...xs),
+      rangeX = Math.max(...xs) - minX || 1;
+    const minY = Math.min(...ys),
+      rangeY = Math.max(...ys) - minY || 1;
     const pad = 3;
-    return pontos.map(p =>
-      `${pad + ((p.x - minX) / rangeX) * (w - pad * 2)},${pad + ((p.y - minY) / rangeY) * (h - pad * 2)}`
-    ).join(' ');
+    return pontos
+      .map(
+        (p) =>
+          `${pad + ((p.x - minX) / rangeX) * (w - pad * 2)},${pad + ((p.y - minY) / rangeY) * (h - pad * 2)}`,
+      )
+      .join(' ');
   }
 
   getDesenhoDiagonalPoints(diagonal: IDiagonal, pontos: IPonto[], w = 64, h = 30): string {
     if (!pontos || pontos.length < 2) return '';
-    const xs = pontos.map(p => p.x), ys = pontos.map(p => p.y);
-    const minX = Math.min(...xs), rangeX = (Math.max(...xs) - minX) || 1;
-    const minY = Math.min(...ys), rangeY = (Math.max(...ys) - minY) || 1;
+    const xs = pontos.map((p) => p.x),
+      ys = pontos.map((p) => p.y);
+    const minX = Math.min(...xs),
+      rangeX = Math.max(...xs) - minX || 1;
+    const minY = Math.min(...ys),
+      rangeY = Math.max(...ys) - minY || 1;
     const pad = 3;
     const nx = (x: number) => pad + ((x - minX) / rangeX) * (w - pad * 2);
     const ny = (y: number) => pad + ((y - minY) / rangeY) * (h - pad * 2);
@@ -507,13 +602,16 @@ export class PedidoFormComponent implements OnInit {
     const valorDesconto = calcularValorDesconto(total, descontoTipo, descontoValor);
     const valorLiquido = calcularValorLiquido(total, valorDesconto);
 
-    this.form.patchValue({
-      valor_material: material,
-      valor_servico: servicoCalculado,
-      valor_total: total,
-      valor_desconto: valorDesconto,
-      valor_liquido: valorLiquido,
-    }, { emitEvent: false });
+    this.form.patchValue(
+      {
+        valor_material: material,
+        valor_servico: servicoCalculado,
+        valor_total: total,
+        valor_desconto: valorDesconto,
+        valor_liquido: valorLiquido,
+      },
+      { emitEvent: false },
+    );
   }
 
   onSave() {
@@ -521,21 +619,29 @@ export class PedidoFormComponent implements OnInit {
     if (this.form.invalid) return;
 
     // Valida itens antes de enviar
-    const itemInvalido = this.itens.controls.findIndex(c => {
+    const itemInvalido = this.itens.controls.findIndex((c) => {
       const tipo = c.get('tipo')?.value;
       if (tipo === ETipoItemPedido.Produto) return !c.get('cod_produto')?.value;
-      if (tipo === ETipoItemPedido.Corte)   return !c.get('cod_corte')?.value;
+      if (tipo === ETipoItemPedido.Corte) return !c.get('cod_corte')?.value;
       if (tipo === ETipoItemPedido.Servico) return !c.get('cod_servico')?.value;
       return true;
     });
 
     if (this.itens.length === 0) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Adicione pelo menos um item ao pedido.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: 'Adicione pelo menos um item ao pedido.',
+      });
       return;
     }
 
     if (itemInvalido !== -1) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: `Item ${itemInvalido + 1}: selecione o produto, corte ou serviço.` });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: `Item ${itemInvalido + 1}: selecione o produto, corte ou serviço.`,
+      });
       return;
     }
 
@@ -549,13 +655,17 @@ export class PedidoFormComponent implements OnInit {
         return desenho_livre
           ? { ...resto, cod_desenho: null }
           : { ...resto, desenho_pontos: null, desenho_diagonais: null };
-      })
+      }),
     };
 
     this.pedidoService.salvar(dados).subscribe({
       next: (res) => {
         if (res.success) {
-          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: `Pedido ${this.pedidoId ? 'atualizado' : 'criado'} com sucesso` });
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: `Pedido ${this.pedidoId ? 'atualizado' : 'criado'} com sucesso`,
+          });
           this.saved.emit();
           this.visible = false;
         }
@@ -565,11 +675,16 @@ export class PedidoFormComponent implements OnInit {
         const erros: string[] = err.error?.erros ?? [];
         const summary = err.error?.message || 'Falha ao salvar pedido';
         this.messageService.add({ severity: 'error', summary, life: 6000 });
-        erros.forEach(e =>
-          this.messageService.add({ severity: 'warn', summary: 'Estoque insuficiente', detail: e, life: 8000 })
+        erros.forEach((e) =>
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Estoque insuficiente',
+            detail: e,
+            life: 8000,
+          }),
         );
         this.isSaving = false;
-      }
+      },
     });
   }
 }

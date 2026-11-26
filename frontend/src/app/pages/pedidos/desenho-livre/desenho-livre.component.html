@@ -14,7 +14,7 @@
     <!-- Área de desenho -->
     <section class="area-desenho" aria-label="Área de desenho">
       <div class="barra">
-        <p-selectButton
+        <p-selectbutton
           [options]="modoOpcoes"
           [(ngModel)]="modo"
           optionLabel="label"
@@ -28,7 +28,7 @@
             <i [class]="opt.icon" aria-hidden="true"></i>
             <span class="modo-label">{{ opt.label }}</span>
           </ng-template>
-        </p-selectButton>
+        </p-selectbutton>
         <div class="acoes">
           <p-button icon="pi pi-undo" [text]="true" [rounded]="true" severity="secondary"
             [disabled]="!podeDesfazer" (onClick)="desfazer()"

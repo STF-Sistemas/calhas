@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -22,8 +22,16 @@ interface IItemSelecionavel {
 @Component({
   selector: 'app-ordem-corte-envio-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, SelectModule, CheckboxModule, DialogWrapperComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ButtonModule,
+    SelectModule,
+    CheckboxModule,
+    DialogWrapperComponent,
+  ],
   templateUrl: './ordem-corte-envio-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./ordem-corte-envio-dialog.component.scss'],
 })
 export class OrdemCorteEnvioDialogComponent {
@@ -73,7 +81,11 @@ export class OrdemCorteEnvioDialogComponent {
         this.carregandoFornecedores = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar fornecedores.' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar fornecedores.',
+        });
         this.carregandoFornecedores = false;
       },
     });
@@ -101,12 +113,19 @@ export class OrdemCorteEnvioDialogComponent {
     if (!this.pedido || !this.fornecedorSelecionado) return;
 
     this.itensSelecionaveis = (this.pedido.itens ?? [])
-      .filter((item) => item.tipo === ETipoItemPedido.Corte || item.tipo === ETipoItemPedido.Produto)
+      .filter(
+        (item) => item.tipo === ETipoItemPedido.Corte || item.tipo === ETipoItemPedido.Produto,
+      )
       // Produtos primeiro, depois cortes (Produto=10 < Corte=11)
       .sort((a, b) => a.tipo - b.tipo)
       .map((item) => ({
         item,
-        descricao: item.produto?.descricao || item.corte?.descricao || item.desenho?.descricao || (item.desenho_pontos?.length ? 'Desenho livre' : '') || `Item Nº ${item.id}`,
+        descricao:
+          item.produto?.descricao ||
+          item.corte?.descricao ||
+          item.desenho?.descricao ||
+          (item.desenho_pontos?.length ? 'Desenho livre' : '') ||
+          `Item Nº ${item.id}`,
         selecionado: true,
       }));
 
@@ -114,7 +133,9 @@ export class OrdemCorteEnvioDialogComponent {
   }
 
   todosSelecionados(): boolean {
-    return this.itensSelecionaveis.length > 0 && this.itensSelecionaveis.every((i) => i.selecionado);
+    return (
+      this.itensSelecionaveis.length > 0 && this.itensSelecionaveis.every((i) => i.selecionado)
+    );
   }
 
   toggleTodos(marcado: boolean): void {
@@ -130,13 +151,21 @@ export class OrdemCorteEnvioDialogComponent {
 
     const fone = this.fornecedorSelecionado.fone_vendedor?.replace(/\D/g, '');
     if (!fone) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Este fornecedor não possui telefone do vendedor cadastrado.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: 'Este fornecedor não possui telefone do vendedor cadastrado.',
+      });
       return;
     }
 
     const itensIds = this.itensSelecionaveis.filter((i) => i.selecionado).map((i) => i.item.id);
     if (itensIds.length === 0) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Selecione ao menos um item para enviar.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: 'Selecione ao menos um item para enviar.',
+      });
       return;
     }
 
@@ -146,12 +175,20 @@ export class OrdemCorteEnvioDialogComponent {
         const url = `${window.location.origin}/ordem-corte/${res.data.token}`;
         const destinatario = this.nomeExibicaoFornecedor(this.fornecedorSelecionado!);
         const mensagem = `Olá, ${destinatario}! Segue a ordem de corte referente ao Pedido Nº ${this.pedido!.id}:\n${url}`;
-        window.open(`https://wa.me/55${fone}?text=${encodeURIComponent(mensagem)}`, '_blank', 'noopener,noreferrer');
+        window.open(
+          `https://wa.me/55${fone}?text=${encodeURIComponent(mensagem)}`,
+          '_blank',
+          'noopener,noreferrer',
+        );
         this.enviando = false;
         this.fechar();
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao gerar link da ordem de corte.' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao gerar link da ordem de corte.',
+        });
         this.enviando = false;
       },
     });

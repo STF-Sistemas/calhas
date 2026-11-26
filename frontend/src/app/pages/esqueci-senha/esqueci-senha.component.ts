@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -23,6 +23,7 @@ import { TApiResponse } from '#shared/types';
     ToastModule,
   ],
   templateUrl: './esqueci-senha.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./esqueci-senha.component.scss'],
 })
 export class EsqueciSenhaComponent {
@@ -42,19 +43,24 @@ export class EsqueciSenhaComponent {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     this.isLoading = true;
-    this.http.post<TApiResponse<null>>(`${environment.apiUrl}/auth/esqueci-senha`, this.form.value).subscribe({
-      next: () => {
-        this.enviado = true;
-        this.isLoading = false;
-      },
-      error: () => {
-        // Mesmo em erro mostra mensagem genérica (não revelamos se email existe)
-        this.enviado = true;
-        this.isLoading = false;
-      },
-    });
+    this.http
+      .post<TApiResponse<null>>(`${environment.apiUrl}/auth/esqueci-senha`, this.form.value)
+      .subscribe({
+        next: () => {
+          this.enviado = true;
+          this.isLoading = false;
+        },
+        error: () => {
+          // Mesmo em erro mostra mensagem genérica (não revelamos se email existe)
+          this.enviado = true;
+          this.isLoading = false;
+        },
+      });
   }
 }

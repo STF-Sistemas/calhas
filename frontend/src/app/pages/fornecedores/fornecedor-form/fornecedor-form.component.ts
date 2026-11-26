@@ -1,5 +1,12 @@
 import { TecladoNumericoDirective } from '#shared-frontend/directives/teclado-numerico.directive';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -38,6 +45,7 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
   ],
   providers: [provideNgxMask()],
   templateUrl: './fornecedor-form.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./fornecedor-form.component.scss'],
 })
 export class FornecedorFormComponent implements OnInit {
@@ -59,15 +67,40 @@ export class FornecedorFormComponent implements OnInit {
   ];
 
   ufOpcoes = [
-    'AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG',
-    'PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO',
+    'AC',
+    'AL',
+    'AP',
+    'AM',
+    'BA',
+    'CE',
+    'DF',
+    'ES',
+    'GO',
+    'MA',
+    'MT',
+    'MS',
+    'MG',
+    'PA',
+    'PB',
+    'PR',
+    'PE',
+    'PI',
+    'RJ',
+    'RN',
+    'RS',
+    'RO',
+    'RR',
+    'SC',
+    'SP',
+    'SE',
+    'TO',
   ].map((uf) => ({ label: uf, value: uf }));
 
   constructor(
     private fb: FormBuilder,
     private fornecedorService: FornecedorService,
     private clienteService: ClienteService,
-    private messageService: MessageService
+    private messageService: MessageService,
   ) {}
 
   ngOnInit() {
@@ -104,12 +137,18 @@ export class FornecedorFormComponent implements OnInit {
         next: (res) => {
           this.form.patchValue({
             ...res.data,
-            cidade_nome: res.data.cidade ? `${res.data.cidade.descricao}/${res.data.cidade.uf}` : '',
+            cidade_nome: res.data.cidade
+              ? `${res.data.cidade.descricao}/${res.data.cidade.uf}`
+              : '',
           });
           this.isLoadingData = false;
         },
         error: () => {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao buscar dados do fornecedor' });
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Falha ao buscar dados do fornecedor',
+          });
           this.visible = false;
         },
       });
@@ -148,7 +187,11 @@ export class FornecedorFormComponent implements OnInit {
   onBuscarCnpj() {
     const cnpj = this.form.get('cnpj')?.value?.replace(/\D/g, '');
     if (!cnpj || cnpj.length !== 14) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Informe um CNPJ completo (14 dígitos).' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: 'Informe um CNPJ completo (14 dígitos).',
+      });
       return;
     }
     this.buscandoCnpj = true;
@@ -168,7 +211,11 @@ export class FornecedorFormComponent implements OnInit {
           cod_cidade: d.cod_cidade,
           cidade_nome: d.cidade_nome && d.uf ? `${d.cidade_nome}/${d.uf}` : d.cidade_nome,
         });
-        this.messageService.add({ severity: 'success', summary: 'Receita Federal', detail: 'Dados preenchidos automaticamente.' });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Receita Federal',
+          detail: 'Dados preenchidos automaticamente.',
+        });
         this.buscandoCnpj = false;
       },
       error: (err) => {
@@ -192,11 +239,19 @@ export class FornecedorFormComponent implements OnInit {
               cod_cidade: res.data.cidade.id,
               cidade_nome: `${res.data.cidade.descricao}/${res.data.uf}`,
             });
-            this.messageService.add({ severity: 'info', summary: 'CEP Localizado', detail: 'Endereço preenchido automaticamente' });
+            this.messageService.add({
+              severity: 'info',
+              summary: 'CEP Localizado',
+              detail: 'Endereço preenchido automaticamente',
+            });
           }
         },
         error: () => {
-          this.messageService.add({ severity: 'warn', summary: 'CEP', detail: 'Falha ao localizar CEP. Preencha manualmente.' });
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'CEP',
+            detail: 'Falha ao localizar CEP. Preencha manualmente.',
+          });
         },
       });
     }
@@ -205,7 +260,11 @@ export class FornecedorFormComponent implements OnInit {
   onSave() {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Preencha todos os campos obrigatórios.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: 'Preencha todos os campos obrigatórios.',
+      });
       return;
     }
 
@@ -224,7 +283,8 @@ export class FornecedorFormComponent implements OnInit {
       next: (res) => {
         if (res.success) {
           this.messageService.add({
-            severity: 'success', summary: 'Sucesso',
+            severity: 'success',
+            summary: 'Sucesso',
             detail: `Fornecedor ${this.fornecedorId ? 'atualizado' : 'criado'} com sucesso`,
           });
           this.saved.emit(res.data);

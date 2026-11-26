@@ -191,13 +191,13 @@
             <div class="field col-12 col-sm-4 col-md-3">
               <label for="quantidade_desenho_por_folha">Desenhos por Folha</label>
               <span class="label-hint">Quantidade de desenhos impressos por página A4 (1 a 20).</span>
-              <p-inputNumber
+              <p-inputnumber
                 id="quantidade_desenho_por_folha"
                 formControlName="quantidade_desenho_por_folha"
                 [min]="1" [max]="20" [showButtons]="true"
                 placeholder="5"
                 aria-label="Quantidade de desenhos por folha">
-              </p-inputNumber>
+              </p-inputnumber>
               @if (form.get('quantidade_desenho_por_folha')?.invalid && form.get('quantidade_desenho_por_folha')?.touched) {
                 <small class="p-error">Informe um valor entre 1 e 20.</small>
               }
@@ -212,14 +212,14 @@
           <div class="row">
             <div class="field col-12 col-md-3">
               <label for="link_validade_dias">Validade do link (dias)</label>
-              <p-inputNumber
+              <p-inputnumber
                 inputId="link_validade_dias"
                 formControlName="link_validade_dias"
                 [min]="1" [max]="365"
                 [showButtons]="true"
                 placeholder="Ex: 7"
                 aria-label="Validade do link de orçamento em dias">
-              </p-inputNumber>
+              </p-inputnumber>
               <small class="field-hint">Após este prazo o link expira e o cliente não consegue mais acessar.</small>
               @if (form.get('link_validade_dias')?.invalid && form.get('link_validade_dias')?.touched) {
                 <small class="p-error">Informe um valor entre 1 e 365.</small>

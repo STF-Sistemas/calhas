@@ -1,4 +1,13 @@
-import { Component, signal, computed, DestroyRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import {
+  Component,
+  signal,
+  computed,
+  DestroyRef,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { DrawerModule } from 'primeng/drawer';
@@ -39,7 +48,8 @@ import { NovidadesDialogComponent } from '#shared-frontend/components/novidades-
     NovidadesDialogComponent,
   ],
   templateUrl: './shell.component.html',
-  styleUrls: ['./shell.component.scss']
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrls: ['./shell.component.scss'],
 })
 export class ShellComponent implements OnInit, OnDestroy {
   @ViewChild('empresaForm') empresaFormRef?: EmpresaFormComponent;
@@ -63,15 +73,18 @@ export class ShellComponent implements OnInit, OnDestroy {
     if (dias === null || dias > 10 || this.authService.isSuperAdmin()) return null;
     if (dias === 0) return { texto: 'Sua licença vence hoje!', urgente: true };
     if (dias < 0) return { texto: 'Sua licença está vencida.', urgente: true };
-    return { texto: `Sua licença vence em ${dias} dia${dias === 1 ? '' : 's'}.`, urgente: dias <= 3 };
+    return {
+      texto: `Sua licença vence em ${dias} dia${dias === 1 ? '' : 's'}.`,
+      urgente: dias <= 3,
+    };
   });
 
   // ── Notificações reais (backend) ──────────────────────────────────────────────
   notificacoes = signal<INotificacao[]>([]);
   carregandoNotificacoes = signal(false);
 
-  readonly temNotificacaoPendente = computed(() =>
-    !!this.notificacaoLicenca() || this.notificacaoService.naoLidasCount() > 0
+  readonly temNotificacaoPendente = computed(
+    () => !!this.notificacaoLicenca() || this.notificacaoService.naoLidasCount() > 0,
   );
 
   // Menu de perfil: "Minha Empresa" só aparece para admin/super_admin
@@ -82,72 +95,169 @@ export class ShellComponent implements OnInit, OnDestroy {
       items.push({
         label: 'Minha Empresa',
         icon: 'pi pi-building',
-        command: () => this.abrirMinhaEmpresa()
+        command: () => this.abrirMinhaEmpresa(),
       });
     }
 
     items.push(
       { label: 'Meu Perfil', icon: 'pi pi-user', command: () => this.router.navigate(['/perfil']) },
-      { label: 'Alterar Senha', icon: 'pi pi-lock', command: () => this.router.navigate(['/alterar-senha']) },
+      {
+        label: 'Alterar Senha',
+        icon: 'pi pi-lock',
+        command: () => this.router.navigate(['/alterar-senha']),
+      },
       { separator: true },
-      { label: 'Sair do Sistema', icon: 'pi pi-sign-out', command: () => this.logout() }
+      { label: 'Sair do Sistema', icon: 'pi pi-sign-out', command: () => this.logout() },
     );
 
     return items;
   }
 
   colorMenuItems: MenuItem[] = [
-    { label: 'Laranja', icon: 'pi pi-circle-fill', style: { color: '#f97316' }, command: () => this.themeService.setColor('orange') },
-    { label: 'Azul', icon: 'pi pi-circle-fill', style: { color: '#3b82f6' }, command: () => this.themeService.setColor('blue') },
-    { label: 'Esmeralda', icon: 'pi pi-circle-fill', style: { color: '#10b981' }, command: () => this.themeService.setColor('emerald') },
-    { label: 'Índigo', icon: 'pi pi-circle-fill', style: { color: '#6366f1' }, command: () => this.themeService.setColor('indigo') },
+    {
+      label: 'Laranja',
+      icon: 'pi pi-circle-fill',
+      style: { color: '#f97316' },
+      command: () => this.themeService.setColor('orange'),
+    },
+    {
+      label: 'Azul',
+      icon: 'pi pi-circle-fill',
+      style: { color: '#3b82f6' },
+      command: () => this.themeService.setColor('blue'),
+    },
+    {
+      label: 'Esmeralda',
+      icon: 'pi pi-circle-fill',
+      style: { color: '#10b981' },
+      command: () => this.themeService.setColor('emerald'),
+    },
+    {
+      label: 'Índigo',
+      icon: 'pi pi-circle-fill',
+      style: { color: '#6366f1' },
+      command: () => this.themeService.setColor('indigo'),
+    },
   ];
 
   menuGroups = [
     {
       label: 'Início',
       items: [
-        { label: 'Dashboard', icon: 'pi pi-home', routerLink: '/dashboard', roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] }
-      ]
+        {
+          label: 'Dashboard',
+          icon: 'pi pi-home',
+          routerLink: '/dashboard',
+          roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
+        },
+      ],
     },
     {
       label: 'Operacional',
       items: [
-        { label: 'Pedidos', icon: 'pi pi-shopping-cart', routerLink: '/pedidos', roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] },
-        { label: 'Clientes', icon: 'pi pi-users', routerLink: '/clientes', roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] }
-      ]
+        {
+          label: 'Pedidos',
+          icon: 'pi pi-shopping-cart',
+          routerLink: '/pedidos',
+          roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
+        },
+        {
+          label: 'Clientes',
+          icon: 'pi pi-users',
+          routerLink: '/clientes',
+          roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
+        },
+      ],
     },
     {
       label: 'Compras',
       items: [
-        { label: 'Fornecedores', icon: 'pi pi-building', routerLink: '/fornecedores', roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] },
-        { label: 'Entrada de Estoque', icon: 'pi pi-truck', routerLink: '/compras', roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] }
-      ]
+        {
+          label: 'Fornecedores',
+          icon: 'pi pi-building',
+          routerLink: '/fornecedores',
+          roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
+        },
+        {
+          label: 'Entrada de Estoque',
+          icon: 'pi pi-truck',
+          routerLink: '/compras',
+          roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
+        },
+      ],
     },
     {
       label: 'Catálogo',
       items: [
-        { label: 'Meios de Pagamento', icon: 'pi pi-credit-card', routerLink: '/meios-pagamento', roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] },
-        { label: 'Produtos', icon: 'pi pi-box', routerLink: '/produtos', roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] },
-        { label: 'Chapas', icon: 'pi pi-clone', routerLink: '/chapas', roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] },
-        { label: 'Desenhos', icon: 'pi pi-pen-to-square', routerLink: '/desenhos', roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] },
-        { label: 'Serviços', icon: 'pi pi-cog', routerLink: '/servicos', roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] }
-      ]
+        {
+          label: 'Meios de Pagamento',
+          icon: 'pi pi-credit-card',
+          routerLink: '/meios-pagamento',
+          roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
+        },
+        {
+          label: 'Produtos',
+          icon: 'pi pi-box',
+          routerLink: '/produtos',
+          roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
+        },
+        {
+          label: 'Chapas',
+          icon: 'pi pi-clone',
+          routerLink: '/chapas',
+          roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
+        },
+        {
+          label: 'Desenhos',
+          icon: 'pi pi-pen-to-square',
+          routerLink: '/desenhos',
+          roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
+        },
+        {
+          label: 'Serviços',
+          icon: 'pi pi-cog',
+          routerLink: '/servicos',
+          roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
+        },
+      ],
     },
     {
       label: 'Relatórios',
       items: [
-        { label: 'Pedidos / Lucros', icon: 'pi pi-chart-bar', routerLink: '/relatorios/pedidos-lucros', roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] }
-      ]
+        {
+          label: 'Pedidos / Lucros',
+          icon: 'pi pi-chart-bar',
+          routerLink: '/relatorios/pedidos-lucros',
+          roles: ['USUARIO', 'ADMIN', 'SUPER_ADMIN'],
+        },
+      ],
     },
     {
       label: 'Administração',
       items: [
-        { label: 'Minha Empresa', icon: 'pi pi-building', routerLink: null, action: () => this.abrirMinhaEmpresa(), roles: ['ADMIN'] },
-        { label: 'Empresas', icon: 'pi pi-building-columns', routerLink: '/empresas', action: null, roles: ['SUPER_ADMIN'] },
-        { label: 'Usuários', icon: 'pi pi-user-edit', routerLink: '/usuarios', action: null, roles: ['ADMIN', 'SUPER_ADMIN'] }
-      ]
-    }
+        {
+          label: 'Minha Empresa',
+          icon: 'pi pi-building',
+          routerLink: null,
+          action: () => this.abrirMinhaEmpresa(),
+          roles: ['ADMIN'],
+        },
+        {
+          label: 'Empresas',
+          icon: 'pi pi-building-columns',
+          routerLink: '/empresas',
+          action: null,
+          roles: ['SUPER_ADMIN'],
+        },
+        {
+          label: 'Usuários',
+          icon: 'pi pi-user-edit',
+          routerLink: '/usuarios',
+          action: null,
+          roles: ['ADMIN', 'SUPER_ADMIN'],
+        },
+      ],
+    },
   ];
 
   constructor(
@@ -224,15 +334,21 @@ export class ShellComponent implements OnInit, OnDestroy {
   }
 
   getFilteredGroups() {
-    return this.menuGroups.map(group => ({
-      ...group,
-      items: group.items.filter(item => {
-        if (item.roles.includes('SUPER_ADMIN') && this.authService.isSuperAdmin()) return true;
-        if (item.roles.includes('ADMIN') && (this.authService.isAdmin() || this.authService.isSuperAdmin())) return true;
-        if (item.roles.includes('USUARIO')) return true;
-        return false;
-      })
-    })).filter(group => group.items.length > 0);
+    return this.menuGroups
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((item) => {
+          if (item.roles.includes('SUPER_ADMIN') && this.authService.isSuperAdmin()) return true;
+          if (
+            item.roles.includes('ADMIN') &&
+            (this.authService.isAdmin() || this.authService.isSuperAdmin())
+          )
+            return true;
+          if (item.roles.includes('USUARIO')) return true;
+          return false;
+        }),
+      }))
+      .filter((group) => group.items.length > 0);
   }
 
   logout() {

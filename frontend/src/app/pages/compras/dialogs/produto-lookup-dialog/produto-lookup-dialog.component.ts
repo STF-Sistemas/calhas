@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -12,15 +12,9 @@ import { IProduto } from '#shared/interfaces';
 @Component({
   selector: 'app-produto-lookup-dialog',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ButtonModule,
-    TableModule,
-    DialogModule,
-    InputTextModule,
-  ],
+  imports: [CommonModule, FormsModule, ButtonModule, TableModule, DialogModule, InputTextModule],
   templateUrl: './produto-lookup-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./produto-lookup-dialog.component.scss'],
 })
 export class ProdutoLookupDialogComponent {
@@ -38,7 +32,7 @@ export class ProdutoLookupDialogComponent {
 
   constructor(
     private produtoService: ProdutoService,
-    private messageService: MessageService
+    private messageService: MessageService,
   ) {}
 
   abrir(itemIndex: number, codigoDigitado: string) {
@@ -64,14 +58,19 @@ export class ProdutoLookupDialogComponent {
         this.produtos = res.data.filter((p: any) => p.status === 1);
         this.produtosFiltrados = this.produtos;
       },
-      error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar produtos' }),
+      error: () =>
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar produtos',
+        }),
     });
   }
 
   filtrar() {
     const termo = this.filtro.toLowerCase();
     this.produtosFiltrados = this.produtos.filter(
-      (p) => p.descricao.toLowerCase().includes(termo) || String(p.id).includes(termo)
+      (p) => p.descricao.toLowerCase().includes(termo) || String(p.id).includes(termo),
     );
   }
 

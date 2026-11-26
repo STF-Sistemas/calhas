@@ -1,5 +1,5 @@
 import { TecladoNumericoDirective } from '#shared-frontend/directives/teclado-numerico.directive';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
@@ -35,7 +35,11 @@ import { LogoUploaderComponent } from '#shared-frontend/components/logo-uploader
     ButtonModule,
     TooltipModule,
     CheckboxModule,
-    Tabs, TabList, Tab, TabPanels, TabPanel,
+    Tabs,
+    TabList,
+    Tab,
+    TabPanels,
+    TabPanel,
     Textarea,
     CardModule,
     ToastModule,
@@ -43,6 +47,7 @@ import { LogoUploaderComponent } from '#shared-frontend/components/logo-uploader
     LogoUploaderComponent,
   ],
   providers: [provideNgxMask()],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './minha-empresa.component.html',
 })
 export class MinhaEmpresaComponent implements OnInit {
@@ -55,27 +60,27 @@ export class MinhaEmpresaComponent implements OnInit {
     private http: HttpClient,
     private clienteService: ClienteService,
     private messageService: MessageService,
-    private title: Title
+    private title: Title,
   ) {}
 
   ngOnInit(): void {
     this.title.setTitle('Minha Empresa — Calhas Pro');
 
     this.form = this.fb.group({
-      razao_social:    ['', [Validators.required, Validators.maxLength(200)]],
-      nome_fantasia:   ['', [Validators.maxLength(200)]],
-      cnpj:            ['', [Validators.required]],
-      email:           ['', [Validators.email, Validators.maxLength(200)]],
-      telefone:        ['', [Validators.maxLength(20)]],
-      cep:             [''],
-      endereco:        ['', [Validators.maxLength(200)]],
-      numero:          ['', [Validators.maxLength(10)]],
-      bairro:          ['', [Validators.maxLength(100)]],
-      complemento:     ['', [Validators.maxLength(100)]],
-      cod_cidade:      [null as number | null],
-      cidade_nome:     [{ value: '', disabled: true }],
-      marca_dagua:     ['', [Validators.maxLength(250)]],
-      logo_url:        [null as string | null],
+      razao_social: ['', [Validators.required, Validators.maxLength(200)]],
+      nome_fantasia: ['', [Validators.maxLength(200)]],
+      cnpj: ['', [Validators.required]],
+      email: ['', [Validators.email, Validators.maxLength(200)]],
+      telefone: ['', [Validators.maxLength(20)]],
+      cep: [''],
+      endereco: ['', [Validators.maxLength(200)]],
+      numero: ['', [Validators.maxLength(10)]],
+      bairro: ['', [Validators.maxLength(100)]],
+      complemento: ['', [Validators.maxLength(100)]],
+      cod_cidade: [null as number | null],
+      cidade_nome: [{ value: '', disabled: true }],
+      marca_dagua: ['', [Validators.maxLength(250)]],
+      logo_url: [null as string | null],
       validar_estoque: [false],
       whatsapp_mensagem_padrao: [''],
       link_validade_dias: [7, [Validators.min(1), Validators.max(365)]],
@@ -95,7 +100,11 @@ export class MinhaEmpresaComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar dados da empresa.' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar dados da empresa.',
+        });
         this.isLoading = false;
       },
     });
@@ -108,12 +117,16 @@ export class MinhaEmpresaComponent implements OnInit {
         next: (res) => {
           if (res.success) {
             this.form.patchValue({
-              endereco:   res.data.logradouro,
-              bairro:     res.data.bairro,
+              endereco: res.data.logradouro,
+              bairro: res.data.bairro,
               cod_cidade: res.data.cidade.id,
               cidade_nome: res.data.cidade.descricao,
             });
-            this.messageService.add({ severity: 'info', summary: 'CEP Localizado', detail: 'Endereço preenchido automaticamente.' });
+            this.messageService.add({
+              severity: 'info',
+              summary: 'CEP Localizado',
+              detail: 'Endereço preenchido automaticamente.',
+            });
           }
         },
       });
@@ -125,13 +138,20 @@ export class MinhaEmpresaComponent implements OnInit {
     const val = ctrl.value ?? '';
     const pos = el.selectionStart ?? val.length;
     ctrl.setValue(val.slice(0, pos) + '{link}' + val.slice(pos));
-    setTimeout(() => { el.selectionStart = el.selectionEnd = pos + 6; el.focus(); });
+    setTimeout(() => {
+      el.selectionStart = el.selectionEnd = pos + 6;
+      el.focus();
+    });
   }
 
   onSave(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Preencha todos os campos obrigatórios.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: 'Preencha todos os campos obrigatórios.',
+      });
       return;
     }
 
@@ -145,11 +165,19 @@ export class MinhaEmpresaComponent implements OnInit {
           ...res.data,
           cidade_nome: res.data.cidade?.descricao ?? '',
         });
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Dados da empresa atualizados com sucesso.' });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Dados da empresa atualizados com sucesso.',
+        });
         this.isSaving = false;
       },
       error: (err) => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Falha ao salvar.' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: err?.error?.message ?? 'Falha ao salvar.',
+        });
         this.isSaving = false;
       },
     });

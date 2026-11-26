@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -25,10 +25,11 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
     SelectModule,
     CheckboxModule,
     EnterFocusNextDirective,
-    DialogWrapperComponent
+    DialogWrapperComponent,
   ],
   templateUrl: './usuario-form.component.html',
-  styleUrls: ['./usuario-form.component.scss']
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrls: ['./usuario-form.component.scss'],
 })
 export class UsuarioFormComponent implements OnInit {
   @Output() saved = new EventEmitter<void>();
@@ -43,7 +44,7 @@ export class UsuarioFormComponent implements OnInit {
   EStatusGeral = EStatusGeral;
   statusOpcoes = [
     { label: 'Ativo', value: EStatusGeral.Ativo },
-    { label: 'Inativo', value: EStatusGeral.Inativo }
+    { label: 'Inativo', value: EStatusGeral.Inativo },
   ];
 
   constructor(
@@ -51,7 +52,7 @@ export class UsuarioFormComponent implements OnInit {
     private usuarioService: UsuarioService,
     private empresaService: EmpresaService,
     public authService: AuthService,
-    private messageService: MessageService
+    private messageService: MessageService,
   ) {
     this.form = this.fb.group({
       cod_empresa: [null, [Validators.required]],
@@ -59,15 +60,20 @@ export class UsuarioFormComponent implements OnInit {
       email: ['', [Validators.required, Validators.email, Validators.maxLength(200)]],
       senha: ['', [Validators.minLength(6)]],
       admin: [false],
-      status: [EStatusGeral.Ativo, [Validators.required]]
+      status: [EStatusGeral.Ativo, [Validators.required]],
     });
   }
 
   ngOnInit(): void {
     if (this.authService.isSuperAdmin()) {
       this.empresaService.listar().subscribe({
-        next: (res) => this.empresas = res.data,
-        error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar empresas' })
+        next: (res) => (this.empresas = res.data),
+        error: () =>
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Falha ao carregar empresas',
+          }),
       });
     }
   }
@@ -100,9 +106,13 @@ export class UsuarioFormComponent implements OnInit {
           this.isLoadingData = false;
         },
         error: () => {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao buscar dados do usuário' });
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Falha ao buscar dados do usuário',
+          });
           this.visible = false;
-        }
+        },
       });
     }
   }
@@ -121,16 +131,24 @@ export class UsuarioFormComponent implements OnInit {
     this.usuarioService.salvar(dados).subscribe({
       next: (res) => {
         if (res.success) {
-          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: `Usuário ${this.usuarioId ? 'atualizado' : 'criado'} com sucesso` });
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: `Usuário ${this.usuarioId ? 'atualizado' : 'criado'} com sucesso`,
+          });
           this.saved.emit();
           this.visible = false;
         }
         this.isSaving = false;
       },
       error: (err) => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message || 'Falha ao salvar usuário' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: err.error?.message || 'Falha ao salvar usuário',
+        });
         this.isSaving = false;
-      }
+      },
     });
   }
 }

@@ -1,6 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+} from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
 import { ButtonModule } from 'primeng/button';
@@ -28,6 +34,7 @@ function senhasIguaisValidator(g: AbstractControl) {
     PasswordModule,
     ToastModule,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './alterar-senha.component.html',
 })
 export class AlterarSenhaComponent implements OnInit {
@@ -38,17 +45,20 @@ export class AlterarSenhaComponent implements OnInit {
     private fb: FormBuilder,
     private http: HttpClient,
     private messageService: MessageService,
-    private title: Title
+    private title: Title,
   ) {}
 
   ngOnInit(): void {
     this.title.setTitle('Alterar Senha — Calhas Pro');
 
-    this.form = this.fb.group({
-      senha_atual:    ['', [Validators.required]],
-      nova_senha:     ['', [Validators.required, Validators.minLength(8)]],
-      confirmar_senha: ['', [Validators.required]],
-    }, { validators: senhasIguaisValidator });
+    this.form = this.fb.group(
+      {
+        senha_atual: ['', [Validators.required]],
+        nova_senha: ['', [Validators.required, Validators.minLength(8)]],
+        confirmar_senha: ['', [Validators.required]],
+      },
+      { validators: senhasIguaisValidator },
+    );
   }
 
   onSave(): void {
@@ -60,16 +70,26 @@ export class AlterarSenhaComponent implements OnInit {
     this.isSaving = true;
     const { senha_atual, nova_senha } = this.form.value;
 
-    this.http.put<TApiResponse<null>>(`${environment.apiUrl}/perfil/senha`, { senha_atual, nova_senha }).subscribe({
-      next: (res) => {
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: res.message ?? 'Senha alterada com sucesso.' });
-        this.form.reset();
-        this.isSaving = false;
-      },
-      error: (err) => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Falha ao alterar senha.' });
-        this.isSaving = false;
-      },
-    });
+    this.http
+      .put<TApiResponse<null>>(`${environment.apiUrl}/perfil/senha`, { senha_atual, nova_senha })
+      .subscribe({
+        next: (res) => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: res.message ?? 'Senha alterada com sucesso.',
+          });
+          this.form.reset();
+          this.isSaving = false;
+        },
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: err?.error?.message ?? 'Falha ao alterar senha.',
+          });
+          this.isSaving = false;
+        },
+      });
   }
 }

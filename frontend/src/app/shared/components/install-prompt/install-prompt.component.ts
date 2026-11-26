@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 
@@ -7,7 +7,8 @@ import { ButtonModule } from 'primeng/button';
   standalone: true,
   imports: [CommonModule, ButtonModule],
   templateUrl: './install-prompt.component.html',
-  styleUrls: ['./install-prompt.component.scss']
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrls: ['./install-prompt.component.scss'],
 })
 export class InstallPromptComponent implements OnInit, OnDestroy {
   visible = false;
@@ -57,13 +58,17 @@ export class InstallPromptComponent implements OnInit, OnDestroy {
   }
 
   private isMobile(): boolean {
-    return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent)
-      || window.innerWidth < 768;
+    return (
+      /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent) ||
+      window.innerWidth < 768
+    );
   }
 
   private isInstalled(): boolean {
-    return window.matchMedia('(display-mode: standalone)').matches
-      || (navigator as any).standalone === true;
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (navigator as any).standalone === true
+    );
   }
 
   private wasDismissedRecently(): boolean {

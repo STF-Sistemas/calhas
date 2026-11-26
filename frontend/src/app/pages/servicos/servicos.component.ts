@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -13,32 +13,33 @@ import { EStatusGeral } from '#shared/enums';
   selector: 'app-servicos',
   standalone: true,
   imports: [
-    CommonModule, 
-    DataTableComponent, 
-    ServicoFormComponent, 
+    CommonModule,
+    DataTableComponent,
+    ServicoFormComponent,
     ConfirmDialogModule,
-    ToastModule
+    ToastModule,
   ],
   templateUrl: './servicos.component.html',
   styleUrls: ['./servicos.component.scss'],
-  providers: [ConfirmationService]
+  changeDetection: ChangeDetectionStrategy.Eager,
+  providers: [ConfirmationService],
 })
 export class ServicosComponent implements OnInit {
   @ViewChild('form') form!: ServicoFormComponent;
-  
+
   servicos: IServico[] = [];
   loading = false;
-  
+
   cols = [
     { field: 'descricao', header: 'Descrição' },
     { field: 'valor', header: 'Preço Sugerido', type: 'currency' },
-    { field: 'status', header: 'Status', type: 'status' }
+    { field: 'status', header: 'Status', type: 'status' },
   ];
 
   constructor(
     private servicoService: ServicoService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
   ) {}
 
   ngOnInit(): void {
@@ -53,9 +54,13 @@ export class ServicosComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar serviços' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar serviços',
+        });
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -68,14 +73,19 @@ export class ServicosComponent implements OnInit {
   }
 
   onToggleStatus(servico: IServico) {
-    const novoStatus = servico.status === EStatusGeral.Ativo ? EStatusGeral.Inativo : EStatusGeral.Ativo;
+    const novoStatus =
+      servico.status === EStatusGeral.Ativo ? EStatusGeral.Inativo : EStatusGeral.Ativo;
     this.servicoService.alterarStatus(servico.id, novoStatus).subscribe({
       next: () => {
         servico.status = novoStatus;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao alterar status do serviço' });
-      }
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao alterar status do serviço',
+        });
+      },
     });
   }
 
@@ -89,11 +99,15 @@ export class ServicosComponent implements OnInit {
       accept: () => {
         this.servicoService.desativar(servico.id).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Serviço excluído' });
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Serviço excluído',
+            });
             this.carregarServicos();
-          }
+          },
         });
-      }
+      },
     });
   }
 }

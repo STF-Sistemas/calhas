@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogWrapperComponent } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { NOVIDADES, VERSAO_ATUAL } from '#shared/constants';
@@ -16,6 +16,7 @@ const CHAVE_VERSAO_VISTA = 'calhas.novidades.versaoVista';
   standalone: true,
   imports: [ButtonModule, DialogWrapperComponent],
   templateUrl: './novidades-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./novidades-dialog.component.scss'],
 })
 export class NovidadesDialogComponent implements OnInit {

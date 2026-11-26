@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -15,10 +15,11 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
     ReactiveFormsModule,
     InputTextModule,
     EnterFocusNextDirective,
-    DialogWrapperComponent
+    DialogWrapperComponent,
   ],
   templateUrl: './meio-pagamento-form.component.html',
-  styleUrls: ['./meio-pagamento-form.component.scss']
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrls: ['./meio-pagamento-form.component.scss'],
 })
 export class MeioPagamentoFormComponent {
   @Output() saved = new EventEmitter<void>();
@@ -32,10 +33,10 @@ export class MeioPagamentoFormComponent {
   constructor(
     private fb: FormBuilder,
     private meioService: MeioPagamentoService,
-    private messageService: MessageService
+    private messageService: MessageService,
   ) {
     this.form = this.fb.group({
-      descricao: ['', [Validators.required, Validators.maxLength(200)]]
+      descricao: ['', [Validators.required, Validators.maxLength(200)]],
     });
   }
 
@@ -52,9 +53,13 @@ export class MeioPagamentoFormComponent {
           this.isLoadingData = false;
         },
         error: () => {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao buscar dados' });
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Falha ao buscar dados',
+          });
           this.visible = false;
-        }
+        },
       });
     }
   }
@@ -62,7 +67,11 @@ export class MeioPagamentoFormComponent {
   onSave() {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Preencha todos os campos obrigatórios.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: 'Preencha todos os campos obrigatórios.',
+      });
       return;
     }
 
@@ -72,16 +81,24 @@ export class MeioPagamentoFormComponent {
     this.meioService.salvar(dados).subscribe({
       next: (res) => {
         if (res.success) {
-          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: `Meio de pagamento ${this.meioId ? 'atualizado' : 'criado'} com sucesso` });
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: `Meio de pagamento ${this.meioId ? 'atualizado' : 'criado'} com sucesso`,
+          });
           this.saved.emit();
           this.visible = false;
         }
         this.isSaving = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao salvar meio de pagamento' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao salvar meio de pagamento',
+        });
         this.isSaving = false;
-      }
+      },
     });
   }
 }

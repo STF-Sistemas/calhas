@@ -33,19 +33,19 @@
     <div class="row">
       <div class="field col-12 col-md-4">
         <label for="cnpj">CNPJ *</label>
-        <p-iconField iconPosition="right">
-          <p-inputIcon>
+        <p-iconfield iconPosition="right">
+          <p-inputicon>
             <i [class]="buscandoCnpj ? 'pi pi-spin pi-spinner' : 'pi pi-search'"
                style="cursor:pointer"
                pTooltip="Consultar dados na Receita Federal"
                (click)="onBuscarCnpj()">
             </i>
-          </p-inputIcon>
+          </p-inputicon>
           <input appTecladoNumerico pInputText id="cnpj" formControlName="cnpj"
             placeholder="00.000.000/0000-00"
             mask="00.000.000/0000-00"
             [dropSpecialCharacters]="true" />
-        </p-iconField>
+        </p-iconfield>
         @if (form.get('cnpj')?.invalid && form.get('cnpj')?.touched) {
           <small class="p-error">CNPJ inválido (14 dígitos).</small>
         }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
@@ -43,6 +43,7 @@ import { EStatusCompra } from '#shared/enums';
   ],
   templateUrl: './fornecedores.component.html',
   styleUrls: ['./fornecedores.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [ConfirmationService],
 })
 export class FornecedoresComponent implements OnInit {
@@ -98,7 +99,7 @@ export class FornecedoresComponent implements OnInit {
     private compraService: CompraService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private titleService: Title
+    private titleService: Title,
   ) {}
 
   ngOnInit(): void {
@@ -130,7 +131,11 @@ export class FornecedoresComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar fornecedores' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar fornecedores',
+        });
         this.loading = false;
       },
     });
@@ -171,8 +176,10 @@ export class FornecedoresComponent implements OnInit {
       pagina: this.historicoPagina,
       limite: this.historicoLimite,
     };
-    if (this.historicoFiltros.dataInicio) params.dataInicio = this.formatDate(this.historicoFiltros.dataInicio);
-    if (this.historicoFiltros.dataFim) params.dataFim = this.formatDate(this.historicoFiltros.dataFim);
+    if (this.historicoFiltros.dataInicio)
+      params.dataInicio = this.formatDate(this.historicoFiltros.dataInicio);
+    if (this.historicoFiltros.dataFim)
+      params.dataFim = this.formatDate(this.historicoFiltros.dataFim);
 
     this.compraService.listar(params).subscribe({
       next: (res) => {
@@ -185,7 +192,11 @@ export class FornecedoresComponent implements OnInit {
         this.historicoLoading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar histórico de compras' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar histórico de compras',
+        });
         this.historicoLoading = false;
       },
     });
@@ -230,10 +241,19 @@ export class FornecedoresComponent implements OnInit {
     const novoStatus = fornecedor.status === 1 ? 2 : 1;
     this.fornecedorService.alterarStatus(fornecedor.id, novoStatus).subscribe({
       next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Status alterado' });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Status alterado',
+        });
         this.carregar();
       },
-      error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao alterar status' }),
+      error: () =>
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao alterar status',
+        }),
     });
   }
 
@@ -247,10 +267,19 @@ export class FornecedoresComponent implements OnInit {
       accept: () => {
         this.fornecedorService.excluir(fornecedor.id).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Fornecedor excluído' });
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Fornecedor excluído',
+            });
             this.carregar();
           },
-          error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao excluir fornecedor' }),
+          error: () =>
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Erro',
+              detail: 'Falha ao excluir fornecedor',
+            }),
         });
       },
     });

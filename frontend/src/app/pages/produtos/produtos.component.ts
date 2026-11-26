@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -27,7 +27,8 @@ import { EStatusGeral } from '#shared/enums';
   ],
   templateUrl: './produtos.component.html',
   styleUrls: ['./produtos.component.scss'],
-  providers: [ConfirmationService]
+  changeDetection: ChangeDetectionStrategy.Eager,
+  providers: [ConfirmationService],
 })
 export class ProdutosComponent implements OnInit {
   @ViewChild('form') form!: ProdutoFormComponent;
@@ -40,19 +41,19 @@ export class ProdutosComponent implements OnInit {
   historicoLoading = false;
   historico: IHistoricoCompraProduto[] = [];
   produtoHistoricoNome = '';
-  
+
   cols = [
     { field: 'descricao', header: 'Descrição' },
     { field: 'unidade_medida', header: 'UN' },
     { field: 'estoque_atual', header: 'Estoque', type: 'decimal' },
     { field: 'valor_unitario', header: 'Valor Unit.', type: 'currency' },
-    { field: 'status', header: 'Status', type: 'status' }
+    { field: 'status', header: 'Status', type: 'status' },
   ];
 
   constructor(
     private produtoService: ProdutoService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
   ) {}
 
   ngOnInit(): void {
@@ -67,9 +68,13 @@ export class ProdutosComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar produtos' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar produtos',
+        });
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -82,14 +87,19 @@ export class ProdutosComponent implements OnInit {
   }
 
   onToggleStatus(produto: IProduto) {
-    const novoStatus = produto.status === EStatusGeral.Ativo ? EStatusGeral.Inativo : EStatusGeral.Ativo;
+    const novoStatus =
+      produto.status === EStatusGeral.Ativo ? EStatusGeral.Inativo : EStatusGeral.Ativo;
     this.produtoService.alterarStatus(produto.id, novoStatus).subscribe({
       next: () => {
         produto.status = novoStatus;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao alterar status do produto' });
-      }
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao alterar status do produto',
+        });
+      },
     });
   }
 
@@ -104,7 +114,11 @@ export class ProdutosComponent implements OnInit {
         this.historicoLoading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao buscar histórico de compras' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao buscar histórico de compras',
+        });
         this.historicoLoading = false;
         this.showHistorico = false;
       },
@@ -121,11 +135,15 @@ export class ProdutosComponent implements OnInit {
       accept: () => {
         this.produtoService.desativar(produto.id).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Produto excluído' });
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Produto excluído',
+            });
             this.carregarProdutos();
-          }
+          },
         });
-      }
+      },
     });
   }
 }

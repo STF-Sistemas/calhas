@@ -1,6 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+} from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ButtonModule } from 'primeng/button';
@@ -29,6 +35,7 @@ function senhasIguaisValidator(g: AbstractControl) {
     ToastModule,
   ],
   templateUrl: './redefinir-senha.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./redefinir-senha.component.scss'],
 })
 export class RedefinirSenhaComponent implements OnInit {
@@ -52,32 +59,40 @@ export class RedefinirSenhaComponent implements OnInit {
       this.tokenInvalido = true;
     }
 
-    this.form = this.fb.group({
-      nova_senha:      ['', [Validators.required, Validators.minLength(8)]],
-      confirmar_senha: ['', [Validators.required]],
-    }, { validators: senhasIguaisValidator });
+    this.form = this.fb.group(
+      {
+        nova_senha: ['', [Validators.required, Validators.minLength(8)]],
+        confirmar_senha: ['', [Validators.required]],
+      },
+      { validators: senhasIguaisValidator },
+    );
   }
 
   onSubmit(): void {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     this.isLoading = true;
     const payload = { token: this.token, nova_senha: this.form.get('nova_senha')!.value };
 
-    this.http.post<TApiResponse<null>>(`${environment.apiUrl}/auth/redefinir-senha`, payload).subscribe({
-      next: () => {
-        this.concluido = true;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        const msg = err?.error?.message ?? 'Token inválido ou expirado.';
-        if (msg.toLowerCase().includes('inválido') || msg.toLowerCase().includes('expirado')) {
-          this.tokenInvalido = true;
-        } else {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: msg });
-        }
-        this.isLoading = false;
-      },
-    });
+    this.http
+      .post<TApiResponse<null>>(`${environment.apiUrl}/auth/redefinir-senha`, payload)
+      .subscribe({
+        next: () => {
+          this.concluido = true;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          const msg = err?.error?.message ?? 'Token inválido ou expirado.';
+          if (msg.toLowerCase().includes('inválido') || msg.toLowerCase().includes('expirado')) {
+            this.tokenInvalido = true;
+          } else {
+            this.messageService.add({ severity: 'error', summary: 'Erro', detail: msg });
+          }
+          this.isLoading = false;
+        },
+      });
   }
 }

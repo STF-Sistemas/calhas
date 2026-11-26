@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -11,10 +11,17 @@ import { IDesenho } from '#shared/interfaces';
 @Component({
   selector: 'app-desenhos',
   standalone: true,
-  imports: [CommonModule, DataTableComponent, DesenhoFormComponent, ConfirmDialogModule, ToastModule],
+  imports: [
+    CommonModule,
+    DataTableComponent,
+    DesenhoFormComponent,
+    ConfirmDialogModule,
+    ToastModule,
+  ],
   templateUrl: './desenhos.component.html',
   styleUrls: ['./desenhos.component.scss'],
-  providers: [ConfirmationService]
+  changeDetection: ChangeDetectionStrategy.Eager,
+  providers: [ConfirmationService],
 })
 export class DesenhosComponent implements OnInit {
   @ViewChild('form') form!: DesenhoFormComponent;
@@ -25,13 +32,13 @@ export class DesenhosComponent implements OnInit {
   cols = [
     { field: 'descricao', header: 'Descrição' },
     { field: 'pontos', header: 'Prévia', type: 'drawing' },
-    { field: 'status', header: 'Status', type: 'status' }
+    { field: 'status', header: 'Status', type: 'status' },
   ];
 
   constructor(
     private desenhoService: DesenhoService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
   ) {}
 
   ngOnInit() {
@@ -46,9 +53,13 @@ export class DesenhosComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar desenhos' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar desenhos',
+        });
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -70,11 +81,15 @@ export class DesenhosComponent implements OnInit {
       accept: () => {
         this.desenhoService.desativar(desenho.id).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Desenho excluído' });
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Desenho excluído',
+            });
             this.carregarDesenhos();
-          }
+          },
         });
-      }
+      },
     });
   }
 }

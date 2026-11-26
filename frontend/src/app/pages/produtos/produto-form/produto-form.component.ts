@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -22,6 +22,7 @@ import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus
     DialogWrapperComponent,
   ],
   templateUrl: './produto-form.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./produto-form.component.scss'],
 })
 export class ProdutoFormComponent implements OnDestroy {
@@ -41,7 +42,7 @@ export class ProdutoFormComponent implements OnDestroy {
   constructor(
     private fb: FormBuilder,
     private produtoService: ProdutoService,
-    private messageService: MessageService
+    private messageService: MessageService,
   ) {
     this.form = this.fb.group({
       descricao: ['', [Validators.required, Validators.maxLength(200)]],
@@ -62,14 +63,14 @@ export class ProdutoFormComponent implements OnDestroy {
   private registrarCalculos() {
     // Custo ou markup mudou → recalcula valor_unitario
     this.subs.add(
-      this.form.get('custo')!.valueChanges.subscribe(() => this.recalcularValorUnitario())
+      this.form.get('custo')!.valueChanges.subscribe(() => this.recalcularValorUnitario()),
     );
     this.subs.add(
-      this.form.get('markup')!.valueChanges.subscribe(() => this.recalcularValorUnitario())
+      this.form.get('markup')!.valueChanges.subscribe(() => this.recalcularValorUnitario()),
     );
     // valor_unitario editado manualmente → back-calcula markup
     this.subs.add(
-      this.form.get('valor_unitario')!.valueChanges.subscribe(() => this.recalcularMarkup())
+      this.form.get('valor_unitario')!.valueChanges.subscribe(() => this.recalcularMarkup()),
     );
   }
 
@@ -79,10 +80,9 @@ export class ProdutoFormComponent implements OnDestroy {
     const markup = Number(this.form.get('markup')?.value ?? 0);
     if (custo <= 0) return;
     this.recalculando = true;
-    this.form.get('valor_unitario')!.setValue(
-      +(custo * (1 + markup / 100)).toFixed(4),
-      { emitEvent: false }
-    );
+    this.form
+      .get('valor_unitario')!
+      .setValue(+(custo * (1 + markup / 100)).toFixed(4), { emitEvent: false });
     this.recalculando = false;
   }
 
@@ -92,10 +92,9 @@ export class ProdutoFormComponent implements OnDestroy {
     const valorUnitario = Number(this.form.get('valor_unitario')?.value ?? 0);
     if (custo <= 0) return;
     this.recalculando = true;
-    this.form.get('markup')!.setValue(
-      +((valorUnitario / custo - 1) * 100).toFixed(4),
-      { emitEvent: false }
-    );
+    this.form
+      .get('markup')!
+      .setValue(+((valorUnitario / custo - 1) * 100).toFixed(4), { emitEvent: false });
     this.recalculando = false;
   }
 
@@ -120,7 +119,11 @@ export class ProdutoFormComponent implements OnDestroy {
           this.isLoadingData = false;
         },
         error: () => {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao buscar dados do produto' });
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Falha ao buscar dados do produto',
+          });
           this.visible = false;
         },
       });
@@ -146,7 +149,11 @@ export class ProdutoFormComponent implements OnDestroy {
   onSave() {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Preencha todos os campos obrigatórios.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: 'Preencha todos os campos obrigatórios.',
+      });
       return;
     }
 
@@ -157,7 +164,8 @@ export class ProdutoFormComponent implements OnDestroy {
       next: (res) => {
         if (res.success) {
           this.messageService.add({
-            severity: 'success', summary: 'Sucesso',
+            severity: 'success',
+            summary: 'Sucesso',
             detail: `Produto ${this.produtoId ? 'atualizado' : 'criado'} com sucesso`,
           });
           this.saved.emit(res.data as IProduto);
@@ -166,7 +174,11 @@ export class ProdutoFormComponent implements OnDestroy {
         this.isSaving = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao salvar produto' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao salvar produto',
+        });
         this.isSaving = false;
       },
     });

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
@@ -30,6 +30,7 @@ import { PushNotificacaoService } from '#core/services/push-notificacao.service'
     AvatarModule,
     ToggleSwitch,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './perfil.component.html',
 })
 export class PerfilComponent implements OnInit {
@@ -51,7 +52,7 @@ export class PerfilComponent implements OnInit {
     this.title.setTitle('Meu Perfil — Calhas Pro');
 
     this.form = this.fb.group({
-      nome:  ['', [Validators.required, Validators.maxLength(150)]],
+      nome: ['', [Validators.required, Validators.maxLength(150)]],
       email: ['', [Validators.required, Validators.email, Validators.maxLength(200)]],
     });
 
@@ -64,13 +65,26 @@ export class PerfilComponent implements OnInit {
     try {
       if (ativar) {
         await this.pushService.ativar();
-        this.messageService.add({ severity: 'success', summary: 'Notificações ativadas', detail: 'Você receberá notificações push neste dispositivo.' });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Notificações ativadas',
+          detail: 'Você receberá notificações push neste dispositivo.',
+        });
       } else {
         await this.pushService.desativar();
-        this.messageService.add({ severity: 'info', summary: 'Notificações desativadas', detail: 'Você não receberá mais notificações push neste dispositivo.' });
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Notificações desativadas',
+          detail: 'Você não receberá mais notificações push neste dispositivo.',
+        });
       }
     } catch {
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível alterar as notificações push. Verifique a permissão do navegador.' });
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail:
+          'Não foi possível alterar as notificações push. Verifique a permissão do navegador.',
+      });
     } finally {
       this.alterandoPush = false;
     }
@@ -85,7 +99,11 @@ export class PerfilComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar perfil.' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar perfil.',
+        });
         this.isLoading = false;
       },
     });
@@ -98,22 +116,37 @@ export class PerfilComponent implements OnInit {
     }
 
     this.isSaving = true;
-    this.http.put<TApiResponse<IUsuario>>(`${environment.apiUrl}/perfil`, this.form.value).subscribe({
-      next: (res) => {
-        this.usuario = res.data;
-        this.form.patchValue({ nome: res.data.nome, email: res.data.email });
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Perfil atualizado com sucesso.' });
-        this.isSaving = false;
-      },
-      error: (err) => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Falha ao salvar.' });
-        this.isSaving = false;
-      },
-    });
+    this.http
+      .put<TApiResponse<IUsuario>>(`${environment.apiUrl}/perfil`, this.form.value)
+      .subscribe({
+        next: (res) => {
+          this.usuario = res.data;
+          this.form.patchValue({ nome: res.data.nome, email: res.data.email });
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: 'Perfil atualizado com sucesso.',
+          });
+          this.isSaving = false;
+        },
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: err?.error?.message ?? 'Falha ao salvar.',
+          });
+          this.isSaving = false;
+        },
+      });
   }
 
   get iniciais(): string {
     const nome = this.usuario?.nome || '';
-    return nome.split(' ').slice(0, 2).map(p => p[0]).join('').toUpperCase();
+    return nome
+      .split(' ')
+      .slice(0, 2)
+      .map((p) => p[0])
+      .join('')
+      .toUpperCase();
   }
 }
