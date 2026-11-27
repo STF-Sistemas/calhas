@@ -3,6 +3,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VERSAO_ATUAL = exports.NOVIDADES = void 0;
 exports.NOVIDADES = [
     {
+        versao: '2.5.0',
+        data: '27/11/2026',
+        itens: [
+            'Desenho › Escrever medida: a leitura dos números escritos à mão foi refeita com inteligência artificial treinada com milhares de letras de pessoas comuns. Ela entende números tortos, inclinados e o "4" aberto, e ignora pontinhos soltos.',
+            'Chapas › Cortes: os cortes viraram cartões. Toque em um cartão para editar ou em "Adicionar corte" para abrir o editor, que tem a opção "Concluir e adicionar outro".',
+            'Compras › Itens da nota no celular: os itens viraram cartões, igual ao pedido, com um editor em tela cheia para escolher o produto e informar quantidade, valores e impostos.',
+            'Compras: ao remover um item, o custo unitário dos outros itens volta a ser calculado corretamente.',
+        ],
+    },
+    {
         versao: '2.4.1',
         data: '27/11/2026',
         itens: [
