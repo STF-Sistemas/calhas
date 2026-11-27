@@ -176,6 +176,9 @@ export class PedidosService {
         },
       });
 
+      const idsMantidos = dto.itens.map((i) => i.id).filter((v): v is number => !!v);
+      await tx.pedidoItem.deleteMany({ where: { cod_pedido: id, id: { notIn: idsMantidos } } });
+
       for (const item of dto.itens) {
         if (item.id) {
           const pertence = await tx.pedidoItem.findFirst({ where: { id: item.id, cod_pedido: id }, select: { id: true } });

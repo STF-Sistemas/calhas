@@ -99,7 +99,12 @@ async function bootstrap(): Promise<void> {
       crossOriginEmbedderPolicy: false,
     }),
   );
-  app.use(compression());
+  app.use(
+    compression({
+      filter: (req, res) =>
+        String(req.headers.accept ?? '').includes('text/event-stream') ? false : compression.filter(req, res),
+    }),
+  );
   app.use(express.json({ limit: '2mb' }));
   app.use(express.urlencoded({ extended: false, limit: '100kb' }));
   app.enableCors({ origin: origensPermitidas(), credentials: true });

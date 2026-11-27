@@ -24,6 +24,7 @@ import { PedidosModule } from './pedidos/pedidos.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProdutosModule } from './produtos/produtos.module';
 import { PushModule } from './push/push.module';
+import { EventosModule } from './eventos/eventos.module';
 import { RelatoriosModule } from './relatorios/relatorios.module';
 import { ServicosModule } from './servicos/servicos.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
@@ -34,6 +35,7 @@ import { UsuariosModule } from './usuarios/usuarios.module';
     PrismaModule,
     MailModule,
     PushModule,
+    EventosModule,
     AuthModule,
     PagamentosModule,
     PedidosPublicoModule,

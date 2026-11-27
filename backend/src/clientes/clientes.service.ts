@@ -12,6 +12,7 @@ interface IBrasilApiCnpj {
   ddd_telefone_1?: string;
   cep?: string;
   logradouro?: string;
+  descricao_tipo_de_logradouro?: string;
   numero?: string;
   bairro?: string;
   complemento?: string;
@@ -21,6 +22,36 @@ interface IBrasilApiCnpj {
 }
 
 const texto = (valor: unknown, max: number) => (typeof valor === 'string' ? valor.slice(0, max) : '');
+
+const FONTES_CNPJ = ['https://brasilapi.com.br/api/cnpj/v1/', 'https://minhareceita.org/'];
+
+async function consultarCnpjExterno(doc: string): Promise<IBrasilApiCnpj> {
+  let naoEncontrado = false;
+  for (const base of FONTES_CNPJ) {
+    try {
+      const resposta = await fetch(`${base}${doc}`, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; consulta-cnpj/1.0)', Accept: 'application/json' },
+        signal: AbortSignal.timeout(10000),
+      });
+      if (resposta.ok) return (await resposta.json()) as IBrasilApiCnpj;
+      if (resposta.status === 404) naoEncontrado = true;
+    } catch {
+      continue;
+    }
+  }
+  if (naoEncontrado) throw falha(HttpStatus.NOT_FOUND, 'CNPJ não encontrado na Receita Federal.');
+  throw falha(
+    HttpStatus.BAD_GATEWAY,
+    'O serviço de consulta da Receita está indisponível no momento. Tente novamente em instantes ou preencha manualmente.',
+  );
+}
+
+function montarEndereco(d: IBrasilApiCnpj): string {
+  const logradouro = texto(d.logradouro, 200).trim();
+  const tipo = texto(d.descricao_tipo_de_logradouro, 30).trim();
+  if (!tipo || logradouro.toUpperCase().startsWith(tipo.toUpperCase())) return logradouro;
+  return `${tipo} ${logradouro}`.slice(0, 200);
+}
 
 @Injectable()
 export class ClientesService {
@@ -86,15 +117,7 @@ export class ClientesService {
     }
     if (doc.length !== 14) throw falha(HttpStatus.BAD_REQUEST, 'Informe um CNPJ completo (14 dígitos).');
 
-    let d: IBrasilApiCnpj;
-    try {
-      const resposta = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${doc}`, { signal: AbortSignal.timeout(10000) });
-      if (!resposta.ok) throw falha(HttpStatus.NOT_FOUND, 'CNPJ não encontrado na Receita Federal.');
-      d = (await resposta.json()) as IBrasilApiCnpj;
-    } catch (erro) {
-      if (erro instanceof Error && 'getStatus' in erro) throw erro;
-      throw falha(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao consultar Receita Federal.');
-    }
+    const d = await consultarCnpjExterno(doc);
 
     let cidade = null;
     const ibge = String(d.codigo_municipio_ibge ?? '');
@@ -115,7 +138,7 @@ export class ClientesService {
         email: texto(d.email, 200),
         telefone: texto(d.ddd_telefone_1, 30).replace(/\D/g, ''),
         cep: texto(d.cep, 20).replace(/\D/g, ''),
-        endereco: texto(d.logradouro, 200),
+        endereco: montarEndereco(d),
         numero: texto(d.numero, 10),
         bairro: texto(d.bairro, 100),
         complemento: texto(d.complemento, 100),

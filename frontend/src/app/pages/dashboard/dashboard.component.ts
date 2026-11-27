@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import {
@@ -11,6 +12,7 @@ import { AutorizacaoDialog } from '../pedidos/dialogs/autorizacao-dialog/autoriz
 import { AuthService } from '#core/services/auth.service';
 import { DashboardService, IDashboardStats } from '#core/services/dashboard.service';
 import { PedidoService } from '#core/services/pedido.service';
+import { EventosService } from '#core/services/eventos.service';
 import { PedidoImpressaoService } from '#core/services/pedido-impressao.service';
 import { formatCurrency } from '#shared/functions/format.functions';
 import { obterAprovacaoTag } from '#shared/functions/aprovacao.functions';
@@ -108,7 +110,17 @@ export class Dashboard implements OnInit {
     private readonly confirmDialog: ConfirmDialogService,
   ) {}
 
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly eventosService = inject(EventosService);
+
   ngOnInit(): void {
+    this.carregar();
+    this.eventosService.pedidoAprovacao$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.carregar());
+  }
+
+  carregar(): void {
     this.dashboardService.carregar().subscribe({
       next: (res) => {
         this.stats = res.data;
@@ -154,7 +166,7 @@ export class Dashboard implements OnInit {
         this.pedidoService.alterarStatus(event.row.id, acao.status).subscribe({
           next: () => {
             this.toast.success('Status do pedido atualizado.');
-            this.ngOnInit();
+            this.carregar();
           },
           error: (err) => {
             const erros: string[] = err.error?.erros ?? [];
@@ -210,7 +222,7 @@ export class Dashboard implements OnInit {
         this.pedidoService.remover(pedido.id).subscribe({
           next: () => {
             this.toast.success('Pedido excluído');
-            this.ngOnInit();
+            this.carregar();
           },
         });
     });

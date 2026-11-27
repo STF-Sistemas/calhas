@@ -43,6 +43,10 @@ export class NotificacaoService {
     return this.http.patch<TApiResponse<void>>(`${this.apiUrl}/marcar-todas-lidas`, {});
   }
 
+  incrementarContagem(delta = 1): void {
+    this._naoLidasCount.update((v) => v + delta);
+  }
+
   decrementarContagem(delta = 1): void {
     this._naoLidasCount.update((v) => Math.max(0, v - delta));
   }

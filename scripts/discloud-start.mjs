@@ -53,6 +53,8 @@ function carregarEnv() {
   if (!process.env.DATABASE_URL) {
     encerrar('DATABASE_URL ausente: cadastre a variável no painel e reinicie o app.');
   }
+  process.env.PORT ||= '8080';
+  log(`Porta ${process.env.PORT}`);
 }
 
 const hashDoLock = (comNode) => {

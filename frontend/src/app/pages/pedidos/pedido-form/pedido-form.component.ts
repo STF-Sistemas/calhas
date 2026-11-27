@@ -7,7 +7,14 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  FormArray,
+  Validators,
+  AbstractControl,
+} from '@angular/forms';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { DesenhoMedida } from '../desenho-medida/desenho-medida.component';
@@ -76,6 +83,7 @@ export class PedidoForm implements OnInit {
   isLoadingData = false;
   isSaving = false;
   pedidoId?: number;
+  linhasItens: AbstractControl[] = [];
 
   clientes: ICliente[] = [];
   produtos: IProduto[] = [];
@@ -143,6 +151,14 @@ export class PedidoForm implements OnInit {
       this.recalcularTotais();
     });
     this.form.get('desconto_valor')?.valueChanges.subscribe(() => this.recalcularTotais());
+    this.itens.valueChanges.subscribe(() => this.sincronizarLinhas());
+  }
+
+  private sincronizarLinhas() {
+    const atuais = this.itens.controls;
+    const iguais =
+      atuais.length === this.linhasItens.length && atuais.every((c, i) => c === this.linhasItens[i]);
+    if (!iguais) this.linhasItens = [...atuais];
   }
 
   ngOnInit() {
@@ -251,10 +267,6 @@ export class PedidoForm implements OnInit {
   }
 
   removerItem(index: number) {
-    const item = this.itens.at(index).value;
-    if (item.id && this.pedidoId) {
-      this.pedidoService.removerItem(this.pedidoId, item.id).subscribe();
-    }
     this.itens.removeAt(index);
     this.recalcularTotais();
   }

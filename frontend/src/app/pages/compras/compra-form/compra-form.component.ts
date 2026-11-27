@@ -8,7 +8,14 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  FormArray,
+  Validators,
+  AbstractControl,
+} from '@angular/forms';
 import { CurrencyMaskDirective } from '#shared-frontend/directives/currency-mask.directive';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { DialogWrapper } from '#shared-frontend/components/dialog-wrapper/dialog-wrapper.component';
@@ -57,6 +64,7 @@ export class CompraForm implements OnInit {
   @Output() saved = new EventEmitter<void>();
 
   form!: FormGroup;
+  linhasItens: AbstractControl[] = [];
   visible = false;
   isLoadingData = false;
   isSaving = false;
@@ -115,6 +123,14 @@ export class CompraForm implements OnInit {
         }
       });
     });
+    this.itens.valueChanges.subscribe(() => this.sincronizarLinhas());
+  }
+
+  private sincronizarLinhas() {
+    const atuais = this.itens.controls;
+    const iguais =
+      atuais.length === this.linhasItens.length && atuais.every((c, i) => c === this.linhasItens[i]);
+    if (!iguais) this.linhasItens = [...atuais];
   }
 
   get itens() {

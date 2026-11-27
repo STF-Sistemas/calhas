@@ -10,6 +10,7 @@ import {
 import { PedidoForm } from './pedido-form/pedido-form.component';
 import { OrdemCorteEnvioDialog } from './dialogs/ordem-corte-envio-dialog/ordem-corte-envio-dialog.component';
 import { AutorizacaoDialog } from './dialogs/autorizacao-dialog/autorizacao-dialog.component';
+import { EventosService } from '#core/services/eventos.service';
 import { PedidoService } from '#core/services/pedido.service';
 import { ClienteService } from '#core/services/cliente.service';
 import { PedidoImpressaoService } from '#core/services/pedido-impressao.service';
@@ -45,6 +46,7 @@ export class Pedidos implements OnInit, AfterViewInit {
   private readonly rota = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly eventosService = inject(EventosService);
 
   @ViewChild('form') form!: PedidoForm;
   @ViewChild('ordemCorteDialog') ordemCorteDialog!: OrdemCorteEnvioDialog;
@@ -145,6 +147,9 @@ export class Pedidos implements OnInit, AfterViewInit {
       },
     });
     this.carregarPedidos();
+    this.eventosService.pedidoAprovacao$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.carregarPedidos());
   }
 
   private formatDate(d: Date): string {

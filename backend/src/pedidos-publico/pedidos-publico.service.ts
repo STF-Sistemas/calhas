@@ -3,6 +3,7 @@ import { EAprovacaoPedido, EStatusGeral, EStatusPedido } from '#shared/enums';
 import { falha } from '../common/falha';
 import { PrismaService } from '../prisma/prisma.service';
 import { PushService } from '../push/push.service';
+import { EventosService } from '../eventos/eventos.service';
 
 const TOKEN_VALIDO = /^[A-Za-z0-9-]{16,100}$/;
 
@@ -13,6 +14,7 @@ export class PedidosPublicoService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly push: PushService,
+    private readonly eventos: EventosService,
   ) {}
 
   private async pedidoValido(token: string) {
@@ -38,7 +40,20 @@ export class PedidosPublicoService {
     if (r.count === 0) throw falha(HttpStatus.CONFLICT, 'Este orçamento já foi respondido.', { code: 'JA_DECIDIDO' });
   }
 
-  private async notificar(pedido: { id: number; cod_empresa: number }, tipo: string, titulo: string, mensagem: string) {
+  private async notificar(
+    pedido: { id: number; cod_empresa: number },
+    aprovacaoStatus: number,
+    tipo: string,
+    titulo: string,
+    mensagem: string,
+  ) {
+    this.eventos.emitir(pedido.cod_empresa, {
+      tipo: 'pedido_aprovacao',
+      cod_pedido: pedido.id,
+      aprovacao_status: aprovacaoStatus,
+      titulo,
+      mensagem,
+    });
     try {
       await this.prisma.notificacao.create({
         data: { cod_empresa: pedido.cod_empresa, cod_pedido: pedido.id, tipo, titulo, mensagem },
@@ -139,7 +154,7 @@ export class PedidosPublicoService {
       aprovacao_assinatura: assinatura,
       aprovacao_ip: ip?.slice(0, 45) ?? null,
     });
-    await this.notificar(pedido, 'pedido_autorizado', 'Orçamento autorizado', `O pedido Nº ${pedido.id} foi autorizado pelo cliente.`);
+    await this.notificar(pedido, EAprovacaoPedido.Autorizado, 'pedido_autorizado', 'Orçamento autorizado', `O pedido Nº ${pedido.id} foi autorizado pelo cliente.`);
     return { success: true, data: { aprovacao_status: EAprovacaoPedido.Autorizado, aprovacao_data: agora } };
   }
 
@@ -155,6 +170,7 @@ export class PedidosPublicoService {
     });
     await this.notificar(
       pedido,
+      EAprovacaoPedido.Recusado,
       'pedido_recusado',
       'Orçamento recusado',
       motivo

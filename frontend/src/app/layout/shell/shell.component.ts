@@ -15,6 +15,9 @@ import { filter } from 'rxjs';
 import { AuthService } from '#core/services/auth.service';
 import { ThemeService } from '#core/services/theme.service';
 import { NotificacaoService } from '#core/services/notificacao.service';
+import { EventosService } from '#core/services/eventos.service';
+import { ToastService } from '#shared-frontend/services/toast.service';
+import { EAprovacaoPedido } from '#shared/enums';
 import { INotificacao } from '#shared/interfaces';
 import { SITE_CONFIG } from '#core/config/site-config';
 import { EmpresaForm } from '../../pages/empresas/empresa-form/empresa-form.component';
@@ -282,6 +285,8 @@ export class Shell implements OnInit, OnDestroy {
     public notificacaoService: NotificacaoService,
     private router: Router,
     private destroyRef: DestroyRef,
+    private eventosService: EventosService,
+    private toast: ToastService,
   ) {}
 
   onSidebarItemClick(item: { action?: (() => void) | null; [key: string]: unknown }) {
@@ -304,6 +309,14 @@ export class Shell implements OnInit, OnDestroy {
     this.checkBreakpoint();
     window.addEventListener('resize', this.resizeListener);
     this.notificacaoService.iniciarPolling(this.destroyRef);
+    this.eventosService.conectar(this.destroyRef);
+    this.eventosService.pedidoAprovacao$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((evento) => {
+        this.notificacaoService.incrementarContagem();
+        if (evento.aprovacao_status === EAprovacaoPedido.Autorizado) this.toast.success(evento.mensagem, evento.titulo);
+        else this.toast.warn(evento.mensagem, evento.titulo);
+      });
     this.router.events
       .pipe(filter((e) => e instanceof NavigationEnd), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.fecharMenuNoCelular());

@@ -43,10 +43,6 @@ export class PedidoService {
     return this.http.delete<TApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
 
-  removerItem(pedidoId: number, itemId: number) {
-    return this.http.delete<TApiResponse<void>>(`${this.apiUrl}/${pedidoId}/itens/${itemId}`);
-  }
-
   gerarLink(id: number) {
     return this.http.post<TApiResponse<{ token: string; expiracao: string; mensagem_padrao: string }>>(`${this.apiUrl}/${id}/gerar-link`, {});
   }

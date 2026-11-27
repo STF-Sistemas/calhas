@@ -103,48 +103,66 @@
   color: var(--text-color-secondary);
 }
 
+.relatorio-iframe-impressao {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border: 0;
+  visibility: hidden;
+}
+
+body.relatorio-impressao {
+  margin: 0;
+  padding: 0;
+  height: auto;
+  overflow: visible;
+  background: #fff;
+  color: #000;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body.relatorio-impressao .relatorio-card {
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  background: #fff;
+  color: #000;
+}
+
+body.relatorio-impressao .no-print {
+  display: none !important;
+}
+
 @media print {
+  @page {
+    margin: 1cm;
+  }
+
   .no-print {
     display: none !important;
   }
-  .layout-topbar,
-  .layout-sidebar {
-    display: none !important;
-  }
-  html, body {
-    height: auto !important;
+
+  body.relatorio-impressao *,
+  body.relatorio-impressao *::before,
+  body.relatorio-impressao *::after {
     overflow: visible !important;
+    max-height: none !important;
   }
-  .layout-main-container {
-    margin-left: 0 !important;
-    padding: 0 !important;
-    overflow: visible !important;
-    height: auto !important;
+
+  body.relatorio-impressao table {
+    width: 100%;
+    border-collapse: collapse;
   }
-  .layout-main {
-    padding: 0 !important;
-    overflow: visible !important;
-    height: auto !important;
+
+  body.relatorio-impressao thead {
+    display: table-header-group;
   }
-  .relatorio-page {
-    padding: 0;
-    gap: 0;
-    overflow: visible !important;
-    height: auto !important;
-  }
-  .relatorio-card-wrapper {
-    gap: 0;
-    overflow: visible !important;
-    height: auto !important;
-  }
-  .relatorio-card {
-    border: none;
-    border-radius: 0;
-    padding: 0.5rem 1rem;
-    box-shadow: none;
-    background: #fff !important;
-    color: #000 !important;
-    overflow: visible !important;
-    height: auto !important;
+
+  body.relatorio-impressao tr {
+    break-inside: avoid;
   }
 }

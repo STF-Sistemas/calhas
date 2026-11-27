@@ -12,24 +12,30 @@ export function reconhecerNumero(tracos: ITraco[]): IResultadoNumero | null {
   const validos = tracos.filter(t => t.length > 0);
   if (!validos.length) return null;
 
-  const grupos = agruparCaracteres(validos);
-  const alturas = grupos.map(g => g.maxY - g.minY);
-  const alturaLinha = Math.max(...alturas, 1);
-  const baseLinha = Math.max(...grupos.map(g => g.maxY));
-  const topoLinha = Math.min(...grupos.map(g => g.minY));
+  const caixas = validos.map(t => ({ t, ...caixa(t) }));
+  const alturaLinha = Math.max(...caixas.map(c => c.maxY - c.minY), 1);
+  const topoLinha = Math.min(...caixas.map(c => c.minY));
+  const ehVirgula = (c: { minY: number; maxY: number; minX: number; maxX: number }) => {
+    const h = c.maxY - c.minY, w = c.maxX - c.minX;
+    if (c.minY <= topoLinha + alturaLinha * 0.6) return false;
+    if (h < alturaLinha * 0.2 && w < alturaLinha * 0.2) return true;
+    return h < alturaLinha * 0.65 && w < alturaLinha * 0.55 && h >= w * 0.6;
+  };
+
+  const virgulas = caixas.length > 1 ? caixas.filter(ehVirgula) : [];
+  const digitos = caixas.filter(c => !virgulas.includes(c));
+  if (!digitos.length) return null;
 
   const caracteres: IResultadoNumero['caracteres'] = [];
-  for (const g of grupos) {
+  for (const g of agruparCaracteres(digitos.map(c => c.t))) {
     const h = g.maxY - g.minY, w = g.maxX - g.minX;
-    const centroY = (g.minY + g.maxY) / 2;
-    const pequeno = h < alturaLinha * 0.45 && w < alturaLinha * 0.45;
-    const embaixo = centroY > topoLinha + (baseLinha - topoLinha) * 0.55;
-    let char: string;
-    if (grupos.length > 1 && pequeno && embaixo) char = ',';
-    else if (w < h * 0.28) char = '1';
-    else char = classificarDigito(g.tracos);
+    const char = w < h * 0.28 ? '1' : classificarDigito(g.tracos);
     caracteres.push({ char, minX: g.minX, maxX: g.maxX, minY: g.minY, maxY: g.maxY });
   }
+  for (const v of virgulas) {
+    caracteres.push({ char: ',', minX: v.minX, maxX: v.maxX, minY: v.minY, maxY: v.maxY });
+  }
+  caracteres.sort((a, b) => (a.char === ',' ? a.maxX : (a.minX + a.maxX) / 2) - (b.char === ',' ? b.maxX : (b.minX + b.maxX) / 2));
 
   let texto = '';
   for (const c of caracteres) {
@@ -244,6 +250,16 @@ function obterModelos() {
     ['9', [[...arco(0.3, 0.27, 0.27, 0.27, 0, 360), ...linha([0.57, 0.27], [0.5, 1])]]],
     ['9', [[...arco(0.3, 0.27, 0.27, 0.27, 0, 360), ...linha([0.57, 0.27], [0.55, 0.7], [0.35, 1])]]],
   ];
-  modelosCache = def.map(([digito, tracos]) => ({ digito, nuvem: normalizar(tracos) }));
+  const extras: [string, ITraco[]][] = [
+    ['2', [[...arco(0.25, 0.22, 0.2, 0.22, 190, 380), ...linha([0.42, 0.3], [0.05, 1], [0.75, 1])]]],
+    ['2', [[...arco(0.3, 0.25, 0.25, 0.25, 180, 390), ...linha([0.5, 0.4], [0.1, 0.85]), ...arco(0.12, 0.9, 0.1, 0.1, 270, 90), ...linha([0.12, 0.9], [0.6, 1])]]],
+    ['5', [[...linha([0.05, 0], [0.05, 0.45]), ...arco(0.4, 0.68, 0.4, 0.3, 225, 495)], linha([0.05, 0], [0.7, 0])]],
+    ['5', [[...linha([0.6, 0], [0.05, 0], [0.05, 0.4]), ...arco(0.4, 0.68, 0.4, 0.3, 225, 495)]]],
+  ];
+  const estirar = (tracos: ITraco[], fx: number): ITraco[] => tracos.map(t => t.map(p => ({ x: p.x * fx, y: p.y })));
+  const base = [...def, ...extras];
+  modelosCache = base.flatMap(([digito, tracos]) =>
+    (digito === '1' ? [1] : [0.75, 1, 1.4]).map(fx => ({ digito, nuvem: normalizar(estirar(tracos, fx)) })),
+  );
   return modelosCache;
 }

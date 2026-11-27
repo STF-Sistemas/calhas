@@ -29,12 +29,12 @@
 
       <div style="display:flex; flex-direction:column; gap:0.25rem;">
         <label style="font-size:0.85rem; font-weight:600;">CNPJ</label>
-        <input [(ngModel)]="filtros.cnpj" placeholder="00.000.000/0000-00" (keydown.enter)="filtrar()" />
+        <input appTecladoNumerico [(ngModel)]="filtros.cnpj" placeholder="00.000.000/0000-00" (keydown.enter)="filtrar()" />
       </div>
 
       <div style="display:flex; flex-direction:column; gap:0.25rem;">
         <label style="font-size:0.85rem; font-weight:600;">Telefone</label>
-        <input [(ngModel)]="filtros.telefone" placeholder="(00) 00000-0000" (keydown.enter)="filtrar()" />
+        <input appTecladoNumerico [(ngModel)]="filtros.telefone" placeholder="(00) 00000-0000" (keydown.enter)="filtrar()" />
       </div>
 
       <div style="display:flex; flex-direction:column; gap:0.25rem;">

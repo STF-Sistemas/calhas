@@ -8,6 +8,7 @@ import { FornecedorService } from '#core/services/fornecedor.service';
 import { CompraService } from '#core/services/compra.service';
 import { IFornecedor, ICompra } from '#shared/interfaces';
 import { EStatusCompra } from '#shared/enums';
+import { TecladoNumericoDirective } from '#shared-frontend/directives/teclado-numerico.directive';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
 import { Botao, Select, Dialogo, CampoData, Tag, Painel, Paginador, Tabela } from '#ui';
@@ -16,6 +17,7 @@ import { Botao, Select, Dialogo, CampoData, Tag, Painel, Paginador, Tabela } fro
   selector: 'app-fornecedores',
   standalone: true,
   imports: [
+    TecladoNumericoDirective,
     CommonModule,
     FormsModule,
     DataTable,

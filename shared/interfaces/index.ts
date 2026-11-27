@@ -24,3 +24,4 @@ export * from './IPagamentoPix';
 export * from './IDanfeData';
 export * from './INotificacao';
 export * from './INovidade';
+export * from './IEventoTempoReal';

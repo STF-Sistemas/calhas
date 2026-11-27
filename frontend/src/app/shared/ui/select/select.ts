@@ -41,7 +41,7 @@ export class Select implements ControlValueAccessor, OnDestroy {
   readonly optionValue = input<string | undefined>();
   readonly placeholder = input<string | undefined>();
   readonly showClear = input(false, { transform: booleanAttribute });
-  readonly filter = input(false, { transform: booleanAttribute });
+  readonly filter = input(true, { transform: booleanAttribute });
   readonly filterBy = input<string | undefined>();
   readonly inputId = input<string | undefined>();
   readonly styleClass = input<string | undefined>('');
@@ -69,7 +69,7 @@ export class Select implements ControlValueAccessor, OnDestroy {
     if (!this.filter() || !termo) return lista;
     const campos = (this.filterBy() || this.optionLabel() || '').split(',').map((c) => c.trim()).filter(Boolean);
     return lista.filter((op) => {
-      const textos = campos.length ? campos.map((c) => this.ler(op, c)) : [op];
+      const textos = campos.length ? campos.map((c) => this.ler(op, c)) : [this.rotulo(op)];
       return textos.some((t) => normalizarBusca(String(t ?? '')).includes(termo));
     });
   });
@@ -108,12 +108,14 @@ export class Select implements ControlValueAccessor, OnDestroy {
   protected rotulo(op: any): string {
     if (op === null || op === undefined) return '';
     const campo = this.optionLabel();
-    return String(campo ? (this.ler(op, campo) ?? '') : op);
+    if (campo) return String(this.ler(op, campo) ?? '');
+    return String(typeof op === 'object' && op.label !== undefined ? op.label : op);
   }
 
   protected valorDe(op: any): any {
     const campo = this.optionValue();
-    return campo ? this.ler(op, campo) : op;
+    if (campo) return this.ler(op, campo);
+    return op !== null && typeof op === 'object' && op.value !== undefined ? op.value : op;
   }
 
   protected alternar(): void {

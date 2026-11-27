@@ -2,6 +2,21 @@ import { INovidade } from '../interfaces/INovidade';
 
 export const NOVIDADES: INovidade[] = [
   {
+    versao: '2.2.0',
+    data: '27/11/2026',
+    itens: [
+      'Pedidos e Início: quando o cliente autoriza ou recusa o orçamento pelo link, a tela se atualiza sozinha na hora e aparece um aviso. Não precisa mais recarregar a página para ver a resposta.',
+      'Pedido › Itens: o botão "Adicionar Item" voltou a funcionar. Antes o item novo não aparecia na lista. O mesmo foi corrigido na tela de Compras.',
+      'Pedido › Itens: ao remover um item de um pedido já salvo, ele só sai de vez quando você salva o pedido. Se fechar sem salvar, o item continua lá.',
+      'Pedido: o Status e o Tipo do item não aparecem mais como "[object Object]".',
+      'Pedido › Desenho livre: a leitura das medidas escritas à mão ficou mais precisa. Vírgulas grandes, como "2,25", e números com estilos diferentes de escrita agora são reconhecidos corretamente.',
+      'Todas as listas de seleção agora têm campo de pesquisa, igual à escolha de cliente. É só digitar parte do nome para encontrar.',
+      'Celular: os filtros de CPF/CNPJ e telefone em Clientes e Fornecedores, e os campos Número, Série e Chave de acesso da nota em Compras, abrem o teclado numérico.',
+      'Clientes e Fornecedores › consulta de CNPJ: voltou a funcionar. Antes, CNPJs que existem apareciam como "não encontrado". O endereço também vem completo, com o tipo da rua (ex.: "RUA 12").',
+      'Relatórios › Imprimir Relatório: a impressão sai limpa, só com o relatório, em fundo branco e com todas as páginas, sem o menu do sistema e sem cortar no meio.',
+    ],
+  },
+  {
     versao: '2.1.1',
     data: '26/11/2026',
     itens: [
