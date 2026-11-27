@@ -3,6 +3,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VERSAO_ATUAL = exports.NOVIDADES = void 0;
 exports.NOVIDADES = [
     {
+        versao: '2.3.1',
+        data: '27/11/2026',
+        itens: [
+            'Empresas › Nova empresa: o cadastro voltou a salvar. Antes o botão Salvar não fazia nada. Agora o formulário já vem com valores padrão e, se faltar algum campo, aparece um aviso dizendo qual é e a tela vai direto para a aba certa.',
+            'Empresas e Minha Empresa › abas: cada aba mostra só o seu conteúdo. Antes a aba Configurações aparecia junto com os Dados da Empresa.',
+            'Empresas: ao informar um CNPJ que já está cadastrado, aparece um aviso claro em vez de "Erro interno do servidor".',
+        ],
+    },
+    {
         versao: '2.3.0',
         data: '27/11/2026',
         itens: [

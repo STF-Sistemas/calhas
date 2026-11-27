@@ -36,6 +36,17 @@ let EmpresasService = class EmpresasService {
             throw (0, falha_1.falha)(common_1.HttpStatus.NOT_FOUND, 'Empresa não encontrada.');
         return empresa;
     }
+    async exigirCnpjLivre(cnpj, ignorarId) {
+        const dup = await this.prisma.empresa.findFirst({
+            where: { cnpj, ...(ignorarId ? { NOT: { id: ignorarId } } : {}) },
+            select: { excluido: true },
+        });
+        if (!dup)
+            return;
+        throw (0, falha_1.falha)(common_1.HttpStatus.CONFLICT, dup.excluido
+            ? 'Este CNPJ pertence a uma empresa excluída. Fale com o suporte para reativá-la.'
+            : 'Já existe uma empresa cadastrada com este CNPJ.');
+    }
     exigirPropria(id, usuario) {
         if (!usuario.super_admin && usuario.cod_empresa !== id)
             throw (0, falha_1.falha)(common_1.HttpStatus.FORBIDDEN, 'Acesso negado.');
@@ -54,11 +65,13 @@ let EmpresasService = class EmpresasService {
         return { success: true, data: await this.obter(id) };
     }
     async criar(dto) {
+        await this.exigirCnpjLivre(dto.cnpj);
         return { success: true, data: await this.prisma.empresa.create({ data: dadosEmpresa(dto, true) }) };
     }
     async atualizar(id, dto, usuario) {
         this.exigirPropria(id, usuario);
         await this.obter(id);
+        await this.exigirCnpjLivre(dto.cnpj, id);
         const data = await this.prisma.empresa.update({ where: { id }, data: dadosEmpresa(dto, usuario.super_admin) });
         return { success: true, data };
     }
@@ -88,6 +101,7 @@ let EmpresasService = class EmpresasService {
     }
     async atualizarMinha(dto, codEmpresa) {
         const empresa = await this.obterMinha(codEmpresa);
+        await this.exigirCnpjLivre(dto.cnpj, empresa.id);
         const data = await this.prisma.empresa.update({
             where: { id: empresa.id },
             data: { ...dto, email: dto.email || null },

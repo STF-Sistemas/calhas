@@ -9,6 +9,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HttpExceptionFilter = void 0;
 const common_1 = require("@nestjs/common");
 const throttler_1 = require("@nestjs/throttler");
+function ehViolacaoDeUnicidade(erro) {
+    return (erro instanceof Error &&
+        erro.name === 'PrismaClientKnownRequestError' &&
+        erro.code === 'P2002');
+}
 let HttpExceptionFilter = class HttpExceptionFilter {
     logger = new common_1.Logger('Erro');
     catch(erro, host) {
@@ -30,6 +35,13 @@ let HttpExceptionFilter = class HttpExceptionFilter {
             const bruta = typeof corpo === 'string' ? corpo : corpo.message;
             const mensagem = Array.isArray(bruta) ? String(bruta[0]) : String(bruta ?? erro.message);
             res.status(status).json({ success: false, message: status === 404 ? 'Recurso não encontrado.' : mensagem });
+            return;
+        }
+        if (ehViolacaoDeUnicidade(erro)) {
+            res.status(common_1.HttpStatus.CONFLICT).json({
+                success: false,
+                message: 'Já existe um cadastro com estes dados. Confira CNPJ, e-mail ou código informados.',
+            });
             return;
         }
         this.logger.error(erro instanceof Error ? (erro.stack ?? erro.message) : String(erro));
