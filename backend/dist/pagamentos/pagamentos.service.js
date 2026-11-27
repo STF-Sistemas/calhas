@@ -12,6 +12,7 @@ var PagamentosService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PagamentosService = void 0;
 const common_1 = require("@nestjs/common");
+const frontend_url_util_1 = require("../common/frontend-url.util");
 const falha_1 = require("../common/falha");
 const prisma_service_1 = require("../prisma/prisma.service");
 const MP_API = 'https://api.mercadopago.com/v1/payments';
@@ -20,7 +21,7 @@ let PagamentosService = PagamentosService_1 = class PagamentosService {
     logger = new common_1.Logger(PagamentosService_1.name);
     mpToken = process.env['MP_ACCESS_TOKEN'] || '';
     pixChaveManual = process.env['PIX_CHAVE_MANUAL'] || '';
-    backendUrl = process.env['BACKEND_URL'] || process.env['SITE_URL'] || '';
+    backendUrl = process.env['BACKEND_URL']?.trim().replace(/\/+$/, '') || (0, frontend_url_util_1.frontendUrl)();
     constructor(prisma) {
         this.prisma = prisma;
     }

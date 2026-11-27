@@ -14,7 +14,7 @@ const node_crypto_1 = require("node:crypto");
 const node_fs_1 = require("node:fs");
 const node_path_1 = require("node:path");
 const app_module_1 = require("./app.module");
-const site_url_util_1 = require("./common/site-url.util");
+const frontend_url_util_1 = require("./common/frontend-url.util");
 const validacao_pipe_1 = require("./common/validacao.pipe");
 const logger = new common_1.Logger('Inicio');
 function validarAmbiente() {
@@ -23,7 +23,7 @@ function validarAmbiente() {
     const segredo = process.env['JWT_SECRET'] ?? '';
     if (segredo.length < 32)
         throw new Error('JWT_SECRET ausente ou com menos de 32 caracteres.');
-    (0, site_url_util_1.siteUrl)();
+    (0, frontend_url_util_1.frontendUrl)();
 }
 const SHELLS = ['index.csr.html', 'index.html'];
 function pastaDoFrontend() {
@@ -36,7 +36,7 @@ function pastaDoFrontend() {
     return pasta;
 }
 function carregarFrontend(pasta) {
-    const ler = (arquivo) => (0, node_fs_1.readFileSync)(arquivo, 'utf8').replaceAll('%SITE_URL%', (0, site_url_util_1.siteUrl)());
+    const ler = (arquivo) => (0, node_fs_1.readFileSync)(arquivo, 'utf8').replaceAll('%FRONTEND_URL%', (0, frontend_url_util_1.frontendUrl)());
     const shell = ler((0, node_path_1.join)(pasta, SHELLS.find((s) => (0, node_fs_1.existsSync)((0, node_path_1.join)(pasta, s)))));
     const paginas = new Map();
     for (const item of (0, node_fs_1.readdirSync)(pasta, { withFileTypes: true })) {
@@ -56,9 +56,7 @@ function carregarFrontend(pasta) {
 }
 function origensPermitidas() {
     const lista = (process.env['ALLOWED_ORIGINS'] || '').split(',').map((o) => o.trim()).filter(Boolean);
-    const frontend = process.env['FRONTEND_URL']?.trim().replace(/\/+$/, '');
-    if (frontend)
-        lista.push(frontend);
+    lista.push((0, frontend_url_util_1.frontendUrl)());
     if (process.env['NODE_ENV'] !== 'production')
         lista.push('http://localhost:4204');
     return [...new Set(lista)];

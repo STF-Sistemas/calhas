@@ -19,7 +19,7 @@ const node_crypto_1 = require("node:crypto");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const enums_1 = require("../shared/enums");
 const falha_1 = require("../common/falha");
-const site_url_util_1 = require("../common/site-url.util");
+const frontend_url_util_1 = require("../common/frontend-url.util");
 const mail_service_1 = require("../mail/mail.service");
 const prisma_service_1 = require("../prisma/prisma.service");
 exports.BCRYPT_ROUNDS = parseInt(process.env['BCRYPT_ROUNDS'] || '12', 10);
@@ -108,8 +108,7 @@ let AuthService = class AuthService {
                 where: { id: usuario.id },
                 data: { reset_token: hashDoToken(token), reset_token_expiracao: new Date(Date.now() + 60 * 60 * 1000) },
             });
-            const base = process.env['FRONTEND_URL']?.trim().replace(/\/+$/, '') || (0, site_url_util_1.siteUrl)();
-            const link = `${base}/redefinir-senha?token=${token}`;
+            const link = `${(0, frontend_url_util_1.frontendUrl)()}/redefinir-senha?token=${token}`;
             await this.mail.enviar(email, 'Recuperação de Senha: Calhas Pro', this.htmlRecuperacao(usuario.nome, link));
         }
         return { success: true, message: 'Se o e-mail estiver cadastrado, você receberá as instruções em breve.' };

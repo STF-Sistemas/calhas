@@ -3,6 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VERSAO_ATUAL = exports.NOVIDADES = void 0;
 exports.NOVIDADES = [
     {
+        versao: '2.5.1',
+        data: '27/11/2026',
+        itens: [
+            'Links enviados pelo WhatsApp (orçamento e ordem de corte) e o link de recuperação de senha agora usam sempre o endereço oficial do sistema, mesmo quando o acesso é feito por outro endereço.',
+            'A prévia do link do sistema ao ser compartilhado (no WhatsApp, por exemplo) aponta para o endereço oficial.',
+        ],
+    },
+    {
         versao: '2.5.0',
         data: '27/11/2026',
         itens: [
