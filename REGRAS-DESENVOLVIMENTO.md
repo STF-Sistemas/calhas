@@ -250,23 +250,23 @@ Sem isso, o preview do link no WhatsApp/redes sociais fica quebrado ou genérico
 `og:title`/`og:description` reaproveitam o `<title>` e a meta `description` já
 existentes; `og:image` deve apontar para uma imagem real do site (nunca placeholder).
 
-**URL pública sempre do `SITE_URL`:** toda URL absoluta das meta tags (`canonical`, `og:url`,
+**URL pública sempre do `FRONTEND_URL`:** toda URL absoluta das meta tags (`canonical`, `og:url`,
 `og:image`, `twitter:image`, JSON-LD), do `sitemap.xml` e do `robots.txt` é montada a partir da
-variável de ambiente `SITE_URL` (endereço público final, com `https://`, sem barra no fim).
+variável de ambiente `FRONTEND_URL` (endereço público final, com `https://`, sem barra no fim).
 Nunca escrever o domínio fixo no código, no `index.html` nem no `site-config.ts`: o mesmo build
 roda no subdomínio da hospedagem, no domínio próprio e em testes, e um domínio fixo faz o preview
 do WhatsApp e o canonical apontarem para o endereço errado depois de uma troca de domínio.
 
-- Backend: uma única função lê `SITE_URL` (ex.: `common/site-url.util.ts`, removendo a barra
+- Backend: uma única função lê `FRONTEND_URL` (ex.: `common/frontend-url.util.ts`, removendo a barra
   final). Em produção, sem a variável, o app **falha ao subir** com mensagem clara, em vez de
   cair num domínio padrão; em desenvolvimento usa `http://localhost:<PORT>`.
-- `index.html`: usar o marcador `%SITE_URL%` no lugar do domínio (ex.:
-  `content="%SITE_URL%/og-cinejales.jpg"`) e incluir `<meta name="site-url" content="%SITE_URL%">`.
-  O backend troca todos os `%SITE_URL%` ao carregar o template, antes de servir o HTML.
+- `index.html`: usar o marcador `%FRONTEND_URL%` no lugar do domínio (ex.:
+  `content="%FRONTEND_URL%/og-cinejales.jpg"`) e incluir `<meta name="frontend-url" content="%FRONTEND_URL%">`.
+  O backend troca todos os `%FRONTEND_URL%` ao carregar o template, antes de servir o HTML.
 - Frontend: as URLs absolutas (meta tags atualizadas na navegação, link de compartilhamento)
-  vêm de uma função `siteUrl()` no `site-config.ts`, que lê `<meta name="site-url">`; se o
+  vêm de uma função `frontendUrl()` no `site-config.ts`, que lê `<meta name="frontend-url">`; se o
   marcador não foi substituído (rodando só com `ng serve`), usa `location.origin`.
-- `SITE_URL` fica no `.env.example` e nas variáveis do painel da hospedagem; ao trocar de
+- `FRONTEND_URL` fica no `.env.example` e nas variáveis do painel da hospedagem; ao trocar de
   domínio, basta atualizar a variável e reiniciar o app.
 
 ## Imagens em WebP
@@ -886,7 +886,7 @@ frontend (ver seção anterior). Não criar dois apps.
    "Build no GitHub Actions" abaixo). Cada push na `main` gera o build e um novo commit na
    `deploy`, que a Discloud publica sozinha; então só dar push quando a mudança estiver pronta.
 3. Cadastrar as variáveis de ambiente: `NODE_ENV=production`, `PORT=8080`, `DATABASE_URL`,
-   `SITE_URL` e `FRONTEND_URL` (os dois com o endereço público final, com `https://`),
+   `FRONTEND_URL` (endereço público final, com `https://`),
    `JWT_SECRET` e as demais do `.env.example`. Depois de salvar, **reiniciar o app**: a
    Discloud só grava o `.env` na raiz quando o app sobe. Os nomes têm que ser exatos
    (maiúsculas, sem espaço no início ou no fim).
@@ -962,7 +962,7 @@ do build no GitHub, na aba **Actions** do repositório.
   criar exatamente os registros mostrados ali (hoje, dois registros `A` para o subdomínio;
   pode haver um `TXT` de verificação). Na Cloudflare, deixar como **DNS only** (nuvem cinza),
   senão o certificado HTTPS não é emitido.
-- Depois da propagação, clicar em **Rebuild** no app e atualizar `SITE_URL` e `FRONTEND_URL`
+- Depois da propagação, clicar em **Rebuild** no app e atualizar `FRONTEND_URL`
   para o novo endereço.
 
 **Domínio principal com e sem `www` (Cloudflare):**
@@ -973,7 +973,7 @@ fica só no `www` e a Cloudflare (plano Free) atende o domínio sem `www`, redir
 `www`. Configuração atual do `cinejales.com.br`:
 
 - **Discloud:** só `www.cinejales.com.br` cadastrado em **Domains**. Variáveis:
-  `SITE_URL=https://www.cinejales.com.br` e `FRONTEND_URL=https://www.cinejales.com.br` (o
+  `FRONTEND_URL=https://www.cinejales.com.br` (o
   domínio sem `www` nunca chega ao app).
 - **Registro.br:** em **DNS → Alterar servidores DNS**, os dois nameservers da Cloudflare
   (hoje `sydney.ns.cloudflare.com` e `yisroel.ns.cloudflare.com`). Não confundir com

@@ -16,6 +16,7 @@ interface IItemSelecionavel {
   descricao: string;
   selecionado: boolean;
 }
+import { frontendUrl } from '#core/config/site-config';
 
 @Component({
   selector: 'app-ordem-corte-envio-dialog',
@@ -156,7 +157,7 @@ export class OrdemCorteEnvioDialog {
     this.enviando = true;
     this.pedidoService.gerarLinkOrdemCorte(this.pedido.id, itensIds).subscribe({
       next: (res) => {
-        const url = `${window.location.origin}/ordem-corte/${res.data.token}`;
+        const url = `${frontendUrl()}/ordem-corte/${res.data.token}`;
         const destinatario = this.nomeExibicaoFornecedor(this.fornecedorSelecionado!);
         const mensagem = `Olá, ${destinatario}! Segue a ordem de corte referente ao Pedido Nº ${this.pedido!.id}:\n${url}`;
         window.open(

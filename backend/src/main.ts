@@ -10,7 +10,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { AppModule } from './app.module';
-import { siteUrl } from './common/site-url.util';
+import { frontendUrl } from './common/frontend-url.util';
 import { validacaoPipe } from './common/validacao.pipe';
 
 const logger = new Logger('Inicio');
@@ -19,7 +19,7 @@ function validarAmbiente(): void {
   if (!process.env['DATABASE_URL']) throw new Error('DATABASE_URL ausente.');
   const segredo = process.env['JWT_SECRET'] ?? '';
   if (segredo.length < 32) throw new Error('JWT_SECRET ausente ou com menos de 32 caracteres.');
-  siteUrl();
+  frontendUrl();
 }
 
 const SHELLS = ['index.csr.html', 'index.html'];
@@ -41,7 +41,7 @@ interface IFrontend {
 }
 
 function carregarFrontend(pasta: string): IFrontend {
-  const ler = (arquivo: string) => readFileSync(arquivo, 'utf8').replaceAll('%SITE_URL%', siteUrl());
+  const ler = (arquivo: string) => readFileSync(arquivo, 'utf8').replaceAll('%FRONTEND_URL%', frontendUrl());
   const shell = ler(join(pasta, SHELLS.find((s) => existsSync(join(pasta, s)))!));
   const paginas = new Map<string, string>();
   for (const item of readdirSync(pasta, { withFileTypes: true })) {
@@ -60,8 +60,7 @@ function carregarFrontend(pasta: string): IFrontend {
 
 function origensPermitidas(): string[] {
   const lista = (process.env['ALLOWED_ORIGINS'] || '').split(',').map((o) => o.trim()).filter(Boolean);
-  const frontend = process.env['FRONTEND_URL']?.trim().replace(/\/+$/, '');
-  if (frontend) lista.push(frontend);
+  lista.push(frontendUrl());
   if (process.env['NODE_ENV'] !== 'production') lista.push('http://localhost:4204');
   return [...new Set(lista)];
 }

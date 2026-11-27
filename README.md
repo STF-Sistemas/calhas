@@ -71,5 +71,5 @@ npm run start
 - `scripts/montar-deploy.mjs` define o conteúdo da `deploy`; `scripts/discloud-start.mjs`
   aplica as migrations, roda o seed e sobe o servidor no mesmo processo (heap limitado).
 - Variáveis no painel: `NODE_ENV=production`, `PORT=8080`, `DATABASE_URL` (conexão privada,
-  com `VLAN=true`), `SITE_URL`, `FRONTEND_URL`, `JWT_SECRET` e as demais do `.env.example`.
+  com `VLAN=true`), `FRONTEND_URL` (endereço público, com `https://`), `JWT_SECRET` e as demais do `.env.example`.
   Depois de salvar, reinicie o app.

@@ -21,6 +21,7 @@ import { environment } from '#environments/environment';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
 import { Botao, Select, CampoData, Painel, Paginador } from '#ui';
+import { frontendUrl } from '#core/config/site-config';
 
 @Component({
   selector: 'app-pedidos',
@@ -291,7 +292,7 @@ export class Pedidos implements OnInit, AfterViewInit {
   onEnviarWhatsApp(pedido: IPedido) {
     this.pedidoService.gerarLink(pedido.id).subscribe({
       next: (res) => {
-        const baseUrl = window.location.origin;
+        const baseUrl = frontendUrl();
         const url = `${baseUrl}/orcamento/${res.data.token}`;
         const mensagem = (res.data.mensagem_padrao || 'Segue o seu orçamento: {link}').replace(
           '{link}',

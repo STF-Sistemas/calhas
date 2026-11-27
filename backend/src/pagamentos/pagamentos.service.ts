@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { frontendUrl } from '../common/frontend-url.util';
 import { falha } from '../common/falha';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -9,7 +10,7 @@ export class PagamentosService {
   private readonly logger = new Logger(PagamentosService.name);
   private readonly mpToken = process.env['MP_ACCESS_TOKEN'] || '';
   private readonly pixChaveManual = process.env['PIX_CHAVE_MANUAL'] || '';
-  private readonly backendUrl = process.env['BACKEND_URL'] || process.env['SITE_URL'] || '';
+  private readonly backendUrl = process.env['BACKEND_URL']?.trim().replace(/\/+$/, '') || frontendUrl();
 
   constructor(private readonly prisma: PrismaService) {}
 

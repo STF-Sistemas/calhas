@@ -4,7 +4,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import { EStatusGeral } from '#shared/enums';
 import { falha } from '../common/falha';
-import { siteUrl } from '../common/site-url.util';
+import { frontendUrl } from '../common/frontend-url.util';
 import { MailService } from '../mail/mail.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { EsqueciSenhaDto } from './dto/esqueci-senha.dto';
@@ -133,8 +133,7 @@ export class AuthService {
         data: { reset_token: hashDoToken(token), reset_token_expiracao: new Date(Date.now() + 60 * 60 * 1000) },
       });
 
-      const base = process.env['FRONTEND_URL']?.trim().replace(/\/+$/, '') || siteUrl();
-      const link = `${base}/redefinir-senha?token=${token}`;
+      const link = `${frontendUrl()}/redefinir-senha?token=${token}`;
       await this.mail.enviar(email, 'Recuperação de Senha: Calhas Pro', this.htmlRecuperacao(usuario.nome, link));
     }
 

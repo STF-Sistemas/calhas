@@ -21,6 +21,7 @@ import { IPedido } from '#shared/interfaces';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { ConfirmDialogService } from '#shared-frontend/services/confirm-dialog.service';
 import { Botao } from '#ui';
+import { frontendUrl } from '#core/config/site-config';
 
 @Component({
   selector: 'app-dashboard',
@@ -183,7 +184,7 @@ export class Dashboard implements OnInit {
   onEnviarWhatsApp(pedido: IPedido) {
     this.pedidoService.gerarLink(pedido.id).subscribe({
       next: (res) => {
-        const baseUrl = window.location.origin;
+        const baseUrl = frontendUrl();
         const url = `${baseUrl}/orcamento/${res.data.token}`;
         const mensagem = (res.data.mensagem_padrao || 'Segue o seu orçamento: {link}').replace(
           '{link}',
