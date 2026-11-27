@@ -1,0 +1,138 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RelatoriosService = void 0;
+const common_1 = require("@nestjs/common");
+const falha_1 = require("../common/falha");
+const prisma_service_1 = require("../prisma/prisma.service");
+const DATA = /^\d{4}-\d{2}-\d{2}$/;
+const idOpcional = (valor) => {
+    const n = Number(valor);
+    return Number.isInteger(n) && n > 0 ? n : null;
+};
+let RelatoriosService = class RelatoriosService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async pedidosLucros(codEmpresa, q) {
+        if (!codEmpresa)
+            throw (0, falha_1.falha)(common_1.HttpStatus.BAD_REQUEST, 'Usuário não está vinculado a uma empresa.');
+        const dataInicio = DATA.test(q['data_inicio'] ?? '') ? q['data_inicio'] : null;
+        const dataFim = DATA.test(q['data_fim'] ?? '') ? q['data_fim'] : null;
+        const codCliente = idOpcional(q['cod_cliente']);
+        const codProduto = idOpcional(q['cod_produto']);
+        const empresa = await this.prisma.empresa.findUnique({ where: { id: codEmpresa }, include: { cidade: true } });
+        if (!empresa)
+            throw (0, falha_1.falha)(common_1.HttpStatus.NOT_FOUND, 'Empresa não encontrada.');
+        const where = { cod_empresa: codEmpresa, excluido: false };
+        if (dataInicio || dataFim) {
+            where.data_pedido = {
+                ...(dataInicio && { gte: new Date(`${dataInicio}T00:00:00.000Z`) }),
+                ...(dataFim && { lte: new Date(`${dataFim}T23:59:59.999Z`) }),
+            };
+        }
+        if (codCliente)
+            where.cod_cliente = codCliente;
+        if (codProduto)
+            where.itens = { some: { cod_produto: codProduto } };
+        const pedidos = await this.prisma.pedido.findMany({
+            where,
+            omit: { aprovacao_assinatura: true },
+            include: {
+                cliente: true,
+                itens: {
+                    where: codProduto ? { cod_produto: codProduto } : undefined,
+                    include: { produto: true, servico: true, corte: { include: { chapa: true } } },
+                },
+            },
+            orderBy: { data_pedido: 'asc' },
+            take: 5000,
+        });
+        let totalValor = 0;
+        let totalCusto = 0;
+        const formatados = pedidos.map((pedido) => {
+            let custoPedido = 0;
+            let valorPedido = 0;
+            const itens = pedido.itens.map((item) => {
+                const descricao = item.produto
+                    ? item.produto.descricao
+                    : item.servico
+                        ? item.servico.descricao
+                        : item.corte
+                            ? `${item.corte.chapa?.descricao ?? ''}: ${item.corte.descricao}`
+                            : '';
+                const quantidade = Number(item.quantidade);
+                const valorTotal = Number(item.valor_total);
+                const custoUnitario = Number(item.custo_unitario);
+                const custoTotal = quantidade * custoUnitario;
+                custoPedido += custoTotal;
+                valorPedido += valorTotal;
+                return {
+                    id: item.id,
+                    tipo: item.tipo,
+                    descricao,
+                    quantidade,
+                    valor_unitario: Number(item.valor_unitario),
+                    valor_total: valorTotal,
+                    custo_unitario: custoUnitario,
+                    custo_total: custoTotal,
+                    lucro: valorTotal - custoTotal,
+                };
+            });
+            totalValor += valorPedido;
+            totalCusto += custoPedido;
+            return {
+                id: pedido.id,
+                data_pedido: pedido.data_pedido.toISOString(),
+                status: pedido.status,
+                cliente: pedido.cliente,
+                itens,
+                valor_total: valorPedido,
+                custo_total: custoPedido,
+                lucro: valorPedido - custoPedido,
+            };
+        });
+        const [cliente, produto] = await Promise.all([
+            codCliente
+                ? this.prisma.cliente.findFirst({ where: { id: codCliente, cod_empresa: codEmpresa }, select: { razao_social: true } })
+                : null,
+            codProduto
+                ? this.prisma.produto.findFirst({ where: { id: codProduto, cod_empresa: codEmpresa }, select: { descricao: true } })
+                : null,
+        ]);
+        return {
+            success: true,
+            data: {
+                empresa,
+                filtros: {
+                    data_inicio: dataInicio,
+                    data_fim: dataFim,
+                    cliente: cliente?.razao_social ?? null,
+                    produto: produto?.descricao ?? null,
+                },
+                pedidos: formatados,
+                totais: {
+                    valor_total: totalValor,
+                    custo_total: totalCusto,
+                    lucro: totalValor - totalCusto,
+                    quantidade_pedidos: formatados.length,
+                },
+            },
+        };
+    }
+};
+exports.RelatoriosService = RelatoriosService;
+exports.RelatoriosService = RelatoriosService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+], RelatoriosService);
+//# sourceMappingURL=relatorios.service.js.map

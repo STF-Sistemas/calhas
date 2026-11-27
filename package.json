@@ -1,0 +1,7 @@
+{
+  "name": "calhas",
+  "private": true,
+  "scripts": {
+    "start": "node --max-old-space-size=256 --max-semi-space-size=8 scripts/discloud-start.mjs"
+  }
+}

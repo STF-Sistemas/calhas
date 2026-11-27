@@ -1,0 +1,1 @@
+var c={"&":`&amp;`,"<":`&lt;`,">":`&gt;`,'"':`&quot;`,"'":`&#39;`,"`":`&#96;`};var i=t=>t.replace(/[&<>"'`]/g,n=>c[n]);function e(t){if(typeof t==`string`)return i(t);if(Array.isArray(t))return t.map(n=>e(n));if(t&&typeof t==`object`&&!(t instanceof Date)){let n={};for(let[r,s]of Object.entries(t))n[r]=e(s);return n}return t}export{e as t};
