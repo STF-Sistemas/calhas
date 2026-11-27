@@ -18,6 +18,7 @@ export interface IPedido {
   valor_desconto: number;
   valor_liquido: number;
   observacoes: string | null;
+  observacoes_cliente?: string | null;
   excluido: boolean;
   estoque_baixado: boolean;
   token_acesso?: string | null;

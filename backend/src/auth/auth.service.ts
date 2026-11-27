@@ -15,6 +15,15 @@ export const BCRYPT_ROUNDS = parseInt(process.env['BCRYPT_ROUNDS'] || '12', 10);
 const HASH_FALSO = bcrypt.hashSync('senha-inexistente', 10);
 const hashDoToken = (token: string) => createHash('sha256').update(token).digest('hex');
 
+const MAX_FALHAS_LOGIN = 10;
+const JANELA_FALHAS_MS = 15 * 60 * 1000;
+const MAX_CONTAS_VIGIADAS = 10_000;
+
+interface IFalhasLogin {
+  total: number;
+  inicio: number;
+}
+
 interface IUsuarioToken {
   id: number;
   cod_empresa: number | null;
@@ -25,6 +34,8 @@ interface IUsuarioToken {
 
 @Injectable()
 export class AuthService {
+  private readonly falhasLogin = new Map<string, IFalhasLogin>();
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly mail: MailService,
@@ -44,13 +55,50 @@ export class AuthService {
     );
   }
 
+  private contaBloqueada(email: string): boolean {
+    const registro = this.falhasLogin.get(email);
+    if (!registro) return false;
+    if (Date.now() - registro.inicio > JANELA_FALHAS_MS) {
+      this.falhasLogin.delete(email);
+      return false;
+    }
+    return registro.total >= MAX_FALHAS_LOGIN;
+  }
+
+  private registrarFalha(email: string): void {
+    const agora = Date.now();
+    const registro = this.falhasLogin.get(email);
+    if (registro && agora - registro.inicio <= JANELA_FALHAS_MS) {
+      registro.total++;
+      return;
+    }
+    if (this.falhasLogin.size >= MAX_CONTAS_VIGIADAS) {
+      for (const [chave, valor] of this.falhasLogin) {
+        if (agora - valor.inicio > JANELA_FALHAS_MS) this.falhasLogin.delete(chave);
+      }
+      if (this.falhasLogin.size >= MAX_CONTAS_VIGIADAS) {
+        const maisAntiga = this.falhasLogin.keys().next().value;
+        if (maisAntiga !== undefined) this.falhasLogin.delete(maisAntiga);
+      }
+    }
+    this.falhasLogin.set(email, { total: 1, inicio: agora });
+  }
+
   async login(dto: LoginDto) {
     const email = dto.email.toLowerCase().trim();
+    if (this.contaBloqueada(email)) {
+      throw falha(
+        HttpStatus.TOO_MANY_REQUESTS,
+        'Muitas tentativas de acesso com este e-mail. Aguarde 15 minutos ou use "Esqueci minha senha".',
+      );
+    }
     const usuario = await this.prisma.usuario.findFirst({ where: { email, excluido: false } });
     const senhaConfere = await bcrypt.compare(dto.senha, usuario?.senha ?? HASH_FALSO);
     if (!usuario || usuario.status !== EStatusGeral.Ativo || !senhaConfere) {
+      this.registrarFalha(email);
       throw falha(HttpStatus.UNAUTHORIZED, 'Credenciais inválidas.');
     }
+    this.falhasLogin.delete(email);
 
     const token = this.gerarToken(usuario);
 
@@ -108,6 +156,7 @@ export class AuthService {
         token_versao: { increment: 1 },
       },
     });
+    this.falhasLogin.delete(usuario.email);
     return { success: true, message: 'Senha redefinida com sucesso. Você já pode fazer login.' };
   }
 

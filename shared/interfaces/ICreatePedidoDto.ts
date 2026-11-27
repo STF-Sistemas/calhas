@@ -5,5 +5,6 @@ export interface ICreatePedidoDto {
   data_pedido: string;
   status: string;
   observacoes?: string;
+  observacoes_cliente?: string;
   itens: ICreatePedidoItemDto[];
 }

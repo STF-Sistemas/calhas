@@ -37,6 +37,13 @@
               <small class="texto-erro">E-mail válido é obrigatório.</small>
             }
           </div>
+          @if (trocandoEmail) {
+            <div class="field col-12 col-md-6">
+              <label for="senha_atual">Senha atual *</label>
+              <ui-password inputId="senha_atual" formControlName="senha_atual" [toggleMask]="true" placeholder="Confirme a sua senha para trocar o e-mail"></ui-password>
+              <small class="text-600 text-sm">Por segurança, trocar o e-mail encerra as sessões abertas em outros aparelhos.</small>
+            </div>
+          }
         </div>
 
         <div class="form-actions">

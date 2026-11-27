@@ -2,6 +2,18 @@ import { INovidade } from '../interfaces/INovidade';
 
 export const NOVIDADES: INovidade[] = [
   {
+    versao: '2.3.0',
+    data: '27/11/2026',
+    itens: [
+      'Pedido: novo campo "Observações para o Cliente". Só ele aparece no link do orçamento enviado ao cliente. As "Observações Internas" agora ficam visíveis apenas para a sua equipe.',
+      'Atenção: pedidos antigos que usavam as Observações Internas para recados ao cliente precisam ter o texto copiado para o novo campo, se quiser que o cliente continue vendo.',
+      'Meu Perfil: para trocar o e-mail, agora é preciso confirmar a senha atual. Ao trocar, as sessões abertas em outros aparelhos são encerradas.',
+      'Acesso: depois de 10 senhas erradas seguidas no mesmo e-mail, o login fica bloqueado por 15 minutos. Use "Esqueci minha senha" se precisar entrar antes.',
+      'Escritórios com várias pessoas na mesma internet não recebem mais erros por "excesso de acessos": o limite agora é contado por usuário, e não pela conexão.',
+      'Atualização automática dos pedidos: a conexão se encerra sozinha quando o usuário é desativado ou a senha é trocada.',
+    ],
+  },
+  {
     versao: '2.2.0',
     data: '27/11/2026',
     itens: [

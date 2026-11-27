@@ -87,6 +87,9 @@ export class PedidoDto {
   @TextoOpcional(2000)
   observacoes?: string | null;
 
+  @TextoOpcional(2000)
+  observacoes_cliente?: string | null;
+
   @Inteiro({ opcional: true, min: 1, max: 2, mensagem: 'Tipo de desconto inválido.' })
   desconto_tipo?: number;
 

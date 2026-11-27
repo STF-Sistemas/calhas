@@ -23,10 +23,28 @@ export class PerfilService {
 
   async atualizar(dto: PerfilDto, idUsuario: number) {
     const email = dto.email.toLowerCase().trim();
-    const emUso = await this.prisma.usuario.findFirst({ where: { email, NOT: { id: idUsuario } }, select: { id: true } });
-    if (emUso) throw falha(HttpStatus.CONFLICT, 'Este e-mail já está em uso.');
-    const data = await this.prisma.usuario.update({ where: { id: idUsuario }, data: { nome: dto.nome, email }, select: campos });
-    return { success: true, data };
+    const atual = await this.prisma.usuario.findFirst({
+      where: { id: idUsuario, excluido: false },
+      select: { email: true, senha: true },
+    });
+    if (!atual) throw falha(HttpStatus.NOT_FOUND, 'Usuário não encontrado.');
+
+    const trocouEmail = email !== atual.email;
+    if (trocouEmail) {
+      if (!dto.senha_atual || !(await bcrypt.compare(dto.senha_atual, atual.senha))) {
+        throw falha(HttpStatus.BAD_REQUEST, 'Para trocar o e-mail, informe a sua senha atual corretamente.');
+      }
+      const emUso = await this.prisma.usuario.findFirst({ where: { email, NOT: { id: idUsuario } }, select: { id: true } });
+      if (emUso) throw falha(HttpStatus.CONFLICT, 'Este e-mail já está em uso.');
+    }
+
+    const usuario = await this.prisma.usuario.update({
+      where: { id: idUsuario },
+      data: { nome: dto.nome, email, ...(trocouEmail && { token_versao: { increment: 1 } }) },
+      select: { ...campos, cod_empresa: true, admin: true, super_admin: true, token_versao: true },
+    });
+    const { token_versao: _versao, ...data } = usuario;
+    return { success: true, data, ...(trocouEmail && { token: this.auth.gerarToken(usuario) }) };
   }
 
   async alterarSenha(dto: AlterarSenhaDto, idUsuario: number) {

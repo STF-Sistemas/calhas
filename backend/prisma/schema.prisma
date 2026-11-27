@@ -269,6 +269,7 @@ model Pedido {
   valor_desconto     Decimal  @default(0) @db.Decimal(10, 4)
   valor_liquido      Decimal  @default(0) @db.Decimal(10, 4)
   observacoes        String?  @db.Text
+  observacoes_cliente String? @db.Text
   excluido           Boolean  @default(false)
   estoque_baixado    Boolean  @default(false)
   token_acesso       String?  @unique @db.VarChar(100)

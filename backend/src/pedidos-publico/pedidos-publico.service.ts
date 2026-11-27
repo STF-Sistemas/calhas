@@ -113,7 +113,7 @@ export class PedidosPublicoService {
         data_pedido: pedido.data_pedido,
         status: pedido.status,
         status_label,
-        observacoes: pedido.observacoes,
+        observacoes: pedido.observacoes_cliente,
         valor_material: Number(pedido.valor_material),
         valor_servico: Number(pedido.valor_servico),
         valor_total: Number(pedido.valor_total),

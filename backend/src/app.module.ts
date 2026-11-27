@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { LimiteGuard } from './common/guards/limite.guard';
 import { AuthModule } from './auth/auth.module';
 import { ChapasModule } from './chapas/chapas.module';
 import { CidadesModule } from './cidades/cidades.module';
@@ -31,7 +32,7 @@ import { UsuariosModule } from './usuarios/usuarios.module';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot([{ name: 'default', ttl: 15 * 60 * 1000, limit: 300 }]),
+    ThrottlerModule.forRoot([{ name: 'default', ttl: 15 * 60 * 1000, limit: 600 }]),
     PrismaModule,
     MailModule,
     PushModule,
@@ -57,7 +58,7 @@ import { UsuariosModule } from './usuarios/usuarios.module';
     NotificacoesModule,
   ],
   providers: [
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: LimiteGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: LicencaGuard },
     { provide: APP_GUARD, useClass: PerfilGuard },

@@ -15,6 +15,7 @@ export class PerfilController {
     return this.perfil.buscar(usuario.id);
   }
 
+  @Throttle({ default: { limit: 10, ttl: 15 * 60 * 1000 } })
   @Put()
   atualizar(@Body() dto: PerfilDto, @UsuarioAtual() usuario: JwtPayload) {
     return this.perfil.atualizar(dto, usuario.id);

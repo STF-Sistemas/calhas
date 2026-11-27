@@ -130,6 +130,7 @@ export class PedidoForm implements OnInit {
       data_pedido: [new Date(), [Validators.required]],
       status: [EStatusPedido.Aberto, [Validators.required]],
       observacoes: [''],
+      observacoes_cliente: [''],
       valor_material: [{ value: 0, disabled: true }],
       valor_servico: [{ value: 0, disabled: true }],
       valor_total: [{ value: 0, disabled: true }],

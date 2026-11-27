@@ -8,8 +8,9 @@ import { environment } from '#environments/environment';
 import { TApiResponse } from '#shared/types';
 import { IUsuario } from '#shared/interfaces';
 import { PushNotificacaoService } from '#core/services/push-notificacao.service';
+import { AuthService } from '#core/services/auth.service';
 import { ToastService } from '#shared-frontend/services/toast.service';
-import { Botao, Avatar, Cartao } from '#ui';
+import { Botao, Avatar, Cartao, CampoSenha } from '#ui';
 
 @Component({
   selector: 'app-perfil',
@@ -21,6 +22,7 @@ import { Botao, Avatar, Cartao } from '#ui';
     Botao,
     Avatar,
     Cartao,
+    CampoSenha,
   ],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './perfil.component.html',
@@ -38,6 +40,7 @@ export class Perfil implements OnInit {
     private readonly toast: ToastService,
     private title: Title,
     public pushService: PushNotificacaoService,
+    private readonly authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -46,6 +49,7 @@ export class Perfil implements OnInit {
     this.form = this.fb.group({
       nome: ['', [Validators.required, Validators.maxLength(150)]],
       email: ['', [Validators.required, Validators.email, Validators.maxLength(200)]],
+      senha_atual: [''],
     });
 
     this.carregar();
@@ -84,20 +88,36 @@ export class Perfil implements OnInit {
     });
   }
 
+  get trocandoEmail(): boolean {
+    const email = String(this.form.get('email')?.value ?? '').trim().toLowerCase();
+    return !!this.usuario && email !== '' && email !== this.usuario.email;
+  }
+
   onSave(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+    if (this.trocandoEmail && !this.form.get('senha_atual')?.value) {
+      this.toast.warn('Para trocar o e-mail, informe a sua senha atual.');
+      return;
+    }
 
     this.isSaving = true;
+    const { nome, email, senha_atual } = this.form.value;
+    const corpo = this.trocandoEmail ? { nome, email, senha_atual } : { nome, email };
     this.http
-      .put<TApiResponse<IUsuario>>(`${environment.apiUrl}/perfil`, this.form.value)
+      .put<TApiResponse<IUsuario> & { token?: string }>(`${environment.apiUrl}/perfil`, corpo)
       .subscribe({
         next: (res) => {
+          if (res.token) this.authService.atualizarToken(res.token);
           this.usuario = res.data;
-          this.form.patchValue({ nome: res.data.nome, email: res.data.email });
-          this.toast.success('Perfil atualizado com sucesso.');
+          this.form.patchValue({ nome: res.data.nome, email: res.data.email, senha_atual: '' });
+          this.toast.success(
+            res.token
+              ? 'E-mail alterado. As sessões abertas em outros aparelhos foram encerradas.'
+              : 'Perfil atualizado com sucesso.',
+          );
           this.isSaving = false;
         },
         error: (err) => {

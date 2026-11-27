@@ -52,9 +52,14 @@
             }
           </div>
 
-          <div class="col-12 field">
+          <div class="col-12 md:col-6 field">
             <label for="observacoes">Observações Internas</label>
-            <textarea id="observacoes" formControlName="observacoes" rows="2" placeholder="Notas sobre a fabricação ou entrega..."></textarea>
+            <textarea id="observacoes" formControlName="observacoes" rows="2" placeholder="Só a sua equipe vê. Notas sobre a fabricação ou entrega..."></textarea>
+          </div>
+
+          <div class="col-12 md:col-6 field">
+            <label for="observacoes_cliente">Observações para o Cliente</label>
+            <textarea id="observacoes_cliente" formControlName="observacoes_cliente" rows="2" placeholder="Aparece no link do orçamento enviado ao cliente..."></textarea>
           </div>
         </div>
       </div>
