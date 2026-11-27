@@ -68,6 +68,9 @@ export class DesenhoLivre implements OnDestroy {
 
   readonly tela = inject(TelaService);
   medidasAbertas = false;
+  medidasLaterais = false;
+  private aoRedimensionar = () => this.ajustarTamanhoCelular();
+  private observadorArea?: ResizeObserver;
   private travouOrientacao = false;
   private entrouEmTelaCheia = false;
   visible = false;
@@ -141,20 +144,56 @@ export class DesenhoLivre implements OnDestroy {
     return Number(this.medidasDiag[d]?.[ponta - 1]) || 0;
   }
 
-  abrirMedidas() {
+  alternarMedidas() {
+    if (this.medidasAbertas) {
+      this.fecharMedidas();
+      return;
+    }
     this.cancelarEscrita();
     this.medidasAbertas = true;
+    this.ajustarDepois();
   }
 
   fecharMedidas() {
     this.medidasAbertas = false;
     this.foco = null;
     this.redesenhar();
+    this.ajustarDepois();
   }
 
   escreverAMao(chave: string) {
     this.selecionarAlvo(chave, true);
-    if (this.tela.celular()) this.fecharMedidas();
+    if (this.tela.celular() && !this.medidasLaterais) this.fecharMedidas();
+  }
+
+  private ajustarDepois() {
+    requestAnimationFrame(() => this.ajustarTamanhoCelular());
+  }
+
+  private ajustarTamanhoCelular() {
+    const canvas = this.canvasRef?.nativeElement;
+    const area = canvas?.closest<HTMLElement>('.desenho-livre');
+    const wrap = canvas?.parentElement;
+    if (!canvas || !area || !wrap) return;
+    const painel = area.querySelector<HTMLElement>('.painel-medidas');
+    this.medidasLaterais = this.tela.celular() && window.matchMedia('(orientation: landscape)').matches;
+    if (!this.tela.celular()) {
+      canvas.style.width = '';
+      if (painel) painel.style.maxHeight = '';
+      return;
+    }
+    const conteudo = canvas.closest<HTMLElement>('.ui-dialog__conteudo');
+    const limite = conteudo
+      ? conteudo.getBoundingClientRect().bottom - (parseFloat(getComputedStyle(conteudo).paddingBottom) || 0)
+      : window.innerHeight;
+    const altura = Math.max(120, limite - wrap.getBoundingClientRect().top - 2);
+    const largura = Math.min(wrap.clientWidth, (altura * this.LARGURA) / this.ALTURA);
+    canvas.style.width = `${Math.floor(largura)}px`;
+    if (painel) {
+      painel.style.maxHeight = this.medidasLaterais
+        ? `${Math.max(120, Math.floor(limite - area.getBoundingClientRect().top - 2))}px`
+        : '';
+    }
   }
 
   maiorDiag(i: number): number {
@@ -201,6 +240,15 @@ export class DesenhoLivre implements OnDestroy {
 
   onShow() {
     this.prepararCanvas();
+    const wrap = this.canvasRef?.nativeElement.parentElement;
+    this.observadorArea?.disconnect();
+    if (wrap) {
+      this.observadorArea = new ResizeObserver(() => this.ajustarTamanhoCelular());
+      this.observadorArea.observe(wrap);
+    }
+    window.removeEventListener('resize', this.aoRedimensionar);
+    window.addEventListener('resize', this.aoRedimensionar);
+    this.ajustarDepois();
   }
 
   private travarHorizontal() {
@@ -230,6 +278,8 @@ export class DesenhoLivre implements OnDestroy {
 
   ngOnDestroy() {
     this.liberarOrientacao();
+    this.observadorArea?.disconnect();
+    window.removeEventListener('resize', this.aoRedimensionar);
     this.resizeObs?.disconnect();
     if (this.timerEscrita) clearTimeout(this.timerEscrita);
   }

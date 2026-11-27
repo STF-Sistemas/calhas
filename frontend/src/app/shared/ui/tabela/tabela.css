@@ -89,3 +89,116 @@
 .ui-table__paginador {
   border-top: 1px solid var(--border-color);
 }
+
+@media screen and (max-width: 767px), screen and (max-height: 500px) and (pointer: coarse) {
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__rolagem {
+    overflow: visible;
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__rolagem--fixa {
+    max-height: none !important;
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela {
+    display: block;
+    min-width: 0 !important;
+    width: 100%;
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > thead {
+    display: none;
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tbody,
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tfoot {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tfoot {
+    margin-top: 0.6rem;
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tbody > tr,
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tfoot > tr {
+    display: block;
+    padding: 0.3rem 0.85rem;
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-left: 4px solid var(--primary-color);
+    border-radius: var(--radius-md);
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tfoot > tr {
+    border-left-color: var(--surface-400);
+    font-weight: 700;
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tbody > tr:has(> td[colspan]:only-child) {
+    border: 1px dashed var(--surface-border);
+    background: transparent;
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tbody > tr > td,
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tfoot > tr > td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 2.25rem;
+    padding: 0.4rem 0 !important;
+    border: none !important;
+    text-align: right !important;
+    white-space: normal !important;
+    word-break: break-word;
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tbody > tr > td + td,
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tfoot > tr > td + td {
+    border-top: 1px dashed var(--surface-border) !important;
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tbody > tr > td:first-child {
+    font-weight: 600;
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tbody > tr > td[data-label]::before,
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tfoot > tr > td[data-label]::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    max-width: 45%;
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-color-secondary);
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tbody > tr > td:has(input, textarea, select, ui-select, ui-selectbutton, ui-input-number) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+    text-align: left !important;
+    font-weight: 400;
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tbody > tr > td:has(input, textarea, select, ui-select, ui-selectbutton, ui-input-number)::before {
+    max-width: none;
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tbody > tr > td:not([data-label]):not([colspan]) {
+    justify-content: flex-end;
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tbody > tr > td[colspan] {
+    display: block;
+    text-align: center !important;
+    font-weight: 400;
+  }
+
+  .ui-table:not(.ui-table--sem-cartao) .ui-table__tabela > tbody > tr > td:empty {
+    display: none;
+  }
+}

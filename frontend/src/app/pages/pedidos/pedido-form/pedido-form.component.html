@@ -8,7 +8,7 @@
   (save)="onSave()"
 >
   <form [formGroup]="form" class="grid" appEnterNext>
-    <div class="col-12 xl:col-9">
+    <div class="col-12 col-xl-9">
       <div class="mb-4">
         <h3 class="section-title">
           <i class="ic ic-file-edit"></i>
@@ -16,7 +16,7 @@
         </h3>
 
         <div class="grid">
-          <div class="col-12 md:col-5 lg:col-5 field">
+          <div class="col-12 col-md-5 col-lg-5 field">
             <label for="cod_cliente">Cliente *</label>
             <ui-select inputId="cod_cliente" formControlName="cod_cliente" [options]="clientes" optionLabel="razao_social" optionValue="id" placeholder="Selecione o Cliente" [filter]="true" filterBy="razao_social">
             </ui-select>
@@ -25,7 +25,7 @@
             }
           </div>
 
-          <div class="col-12 md:col-4 lg:col-4 field">
+          <div class="col-12 col-md-4 col-lg-4 field">
             <label for="data_pedido">Data do Pedido *</label>
             <ui-datepicker inputId="data_pedido" formControlName="data_pedido"></ui-datepicker>
             @if (form.get('data_pedido')?.invalid && form.get('data_pedido')?.touched) {
@@ -33,7 +33,7 @@
             }
           </div>
 
-          <div class="col-12 md:col-3 lg:col-3 field">
+          <div class="col-12 col-md-3 col-lg-3 field">
             <label for="status">Status *</label>
             <ui-select inputId="status" formControlName="status" [options]="statusOpcoes"></ui-select>
             @if (form.get('status')?.invalid && form.get('status')?.touched) {
@@ -41,7 +41,7 @@
             }
           </div>
 
-          <div class="col-12 md:col-4 lg:col-4 field">
+          <div class="col-12 col-md-4 col-lg-4 field">
             <label for="cod_meio_pagamento">Meio de Pagamento *</label>
             <ui-select inputId="cod_meio_pagamento" formControlName="cod_meio_pagamento" [options]="meiosPagamento" optionLabel="descricao" optionValue="id" placeholder="Selecione o meio de pagamento">
             </ui-select>
@@ -52,12 +52,12 @@
             }
           </div>
 
-          <div class="col-12 md:col-6 field">
+          <div class="col-12 col-md-6 field">
             <label for="observacoes">Observações Internas</label>
             <textarea id="observacoes" formControlName="observacoes" rows="2" placeholder="Só a sua equipe vê. Notas sobre a fabricação ou entrega..."></textarea>
           </div>
 
-          <div class="col-12 md:col-6 field">
+          <div class="col-12 col-md-6 field">
             <label for="observacoes_cliente">Observações para o Cliente</label>
             <textarea id="observacoes_cliente" formControlName="observacoes_cliente" rows="2" placeholder="Aparece no link do orçamento enviado ao cliente..."></textarea>
           </div>
@@ -150,7 +150,7 @@
       }
     </div>
 
-    <div class="col-12 xl:col-3">
+    <div class="col-12 col-xl-3">
       <div style="position: sticky; top: 0">
         <h3 class="section-title">
           <i class="ic ic-calculator"></i>

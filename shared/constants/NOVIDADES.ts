@@ -2,6 +2,16 @@ import { INovidade } from '../interfaces/INovidade';
 
 export const NOVIDADES: INovidade[] = [
   {
+    versao: '2.4.1',
+    data: '27/11/2026',
+    itens: [
+      'Celular: todas as tabelas do sistema viraram cartões. Isso vale para os históricos de cliente, fornecedor e produto, as buscas da compra, os cortes da chapa, os itens da compra e o relatório de lucros.',
+      'Desenho à mão com o celular deitado: o desenho ocupa todo o espaço livre, sem barra de rolagem. O botão "Medidas" abre as medidas numa coluna à direita, ao lado do desenho, e os botões ficaram mais compactos.',
+      'Janelas com o celular deitado: agora ocupam a tela inteira, com o cabeçalho mais baixo.',
+      'Formulários de Pedido, Produto e Usuário: os campos se organizam conforme o tamanho da tela. No computador ficam lado a lado e no celular, um embaixo do outro.',
+    ],
+  },
+  {
     versao: '2.4.0',
     data: '27/11/2026',
     itens: [

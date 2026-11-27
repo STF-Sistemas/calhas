@@ -5,14 +5,19 @@ import {
   Component,
   computed,
   contentChild,
+  DestroyRef,
   Directive,
   effect,
+  ElementRef,
   inject,
   input,
+  PLATFORM_ID,
   signal,
   TemplateRef,
   ViewEncapsulation,
+  afterNextRender,
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { normalizarBusca } from '#shared-frontend/busca/normalizar-busca';
 import { Paginador } from '../paginador/paginador';
 import { Spinner } from '../spinner/spinner';
@@ -20,6 +25,21 @@ import { IPaginaEvento } from '../tipos';
 
 function ler(obj: any, caminho: string): any {
   return caminho.split('.').reduce((atual, chave) => (atual == null ? atual : atual[chave]), obj);
+}
+
+function rotularCelulas(tabela: HTMLTableElement): void {
+  const titulos = Array.from(tabela.querySelectorAll<HTMLTableCellElement>(':scope > thead > tr:last-child > th')).map((th) =>
+    (th.textContent ?? '').replace(/\*/g, '').replace(/\s+/g, ' ').trim(),
+  );
+  if (!titulos.length) return;
+  for (const linha of Array.from(tabela.querySelectorAll<HTMLTableRowElement>(':scope > tbody > tr, :scope > tfoot > tr'))) {
+    let coluna = 0;
+    for (const celula of Array.from(linha.cells)) {
+      const titulo = titulos[coluna];
+      if (titulo && celula.colSpan === 1 && celula.getAttribute('data-label') !== titulo) celula.setAttribute('data-label', titulo);
+      coluna += celula.colSpan || 1;
+    }
+  }
 }
 
 function comparar(a: any, b: any): number {
@@ -42,6 +62,9 @@ function comparar(a: any, b: any): number {
 })
 export class Tabela {
   readonly value = input<readonly any[] | null | undefined>([]);
+  private readonly elemento = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly noNavegador = isPlatformBrowser(inject(PLATFORM_ID));
   readonly columns = input<any[] | null | undefined>();
   readonly loading = input(false, { transform: booleanAttribute });
   readonly paginator = input(false, { transform: booleanAttribute });
@@ -88,10 +111,23 @@ export class Tabela {
   });
 
   constructor() {
+    this.observarRotulos();
     effect(() => this.linhasPorPagina.set(this.rows()));
     effect(() => {
       const total = this.filtradas().length;
       if (this.primeiro() >= total && this.primeiro() > 0) this.primeiro.set(0);
+    });
+  }
+
+  private observarRotulos(): void {
+    if (!this.noNavegador) return;
+    afterNextRender(() => {
+      const tabela = this.elemento.nativeElement.querySelector<HTMLTableElement>('.ui-table__tabela');
+      if (!tabela) return;
+      rotularCelulas(tabela);
+      const observador = new MutationObserver(() => rotularCelulas(tabela));
+      observador.observe(tabela, { childList: true, subtree: true });
+      this.destroyRef.onDestroy(() => observador.disconnect());
     });
   }
 

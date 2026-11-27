@@ -23,7 +23,7 @@
     </div>
 
     <div class="row">
-      <div class="field col-4">
+      <div class="field col-12 col-md-4">
         <label for="unidade_medida">Unidade *</label>
         <input id="unidade_medida" formControlName="unidade_medida" maxlength="10" placeholder="UN" />
         @if (form.get('unidade_medida')?.invalid && form.get('unidade_medida')?.touched) {
@@ -31,12 +31,12 @@
         }
       </div>
 
-      <div class="field col-4">
+      <div class="field col-12 col-md-4">
         <label for="estoque_atual">Estoque Atual</label>
         <input appCurrencyMask id="estoque_atual" formControlName="estoque_atual" class="w-full" readonly tabindex="-1" />
       </div>
 
-      <div class="field col-8">
+      <div class="field col-12 col-md-8">
         <label for="custo">Custo (R$)</label>
         <input appCurrencyMask id="custo" formControlName="custo" class="w-full" placeholder="0,00" />
         @if (form.get('custo')?.invalid && form.get('custo')?.touched) {

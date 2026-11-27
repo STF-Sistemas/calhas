@@ -75,7 +75,7 @@
     </h3>
 
     <div class="row">
-      <div class="field col-12 md:col-6">
+      <div class="field col-12 col-md-6">
         <label for="status">Status *</label>
         <ui-select inputId="status" formControlName="status" [options]="statusOpcoes"></ui-select>
         @if (form.get('status')?.invalid && form.get('status')?.touched) {

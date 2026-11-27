@@ -23,7 +23,7 @@
         </ui-selectbutton>
         <div class="acoes">
           @if (tela.celular()) {
-            <ui-button icon="ic ic-ruler" [label]="'Medidas ' + medidasPreenchidas + '/' + totalMedidas" size="small" [outlined]="medidasPreenchidas < totalMedidas" [severity]="totalMedidas && medidasPreenchidas === totalMedidas ? 'success' : 'primary'" [disabled]="!totalMedidas" (onClick)="abrirMedidas()" aria-label="Inserir ou alterar as medidas"></ui-button>
+            <ui-button icon="ic ic-ruler" [label]="'Medidas ' + medidasPreenchidas + '/' + totalMedidas" size="small" [outlined]="medidasPreenchidas < totalMedidas" [severity]="totalMedidas && medidasPreenchidas === totalMedidas ? 'success' : 'primary'" [disabled]="!totalMedidas" (onClick)="alternarMedidas()" aria-label="Inserir ou alterar as medidas"></ui-button>
           }
           <ui-button icon="ic ic-undo" [text]="true" [rounded]="true" severity="secondary" [disabled]="!podeDesfazer" (onClick)="desfazer()" dica="Desfazer" aria-label="Desfazer"></ui-button>
           <ui-button icon="ic ic-trash" [text]="true" [rounded]="true" severity="danger" [disabled]="!pontos.length" (onClick)="limpar()" dica="Limpar desenho" aria-label="Limpar desenho"></ui-button>
@@ -77,12 +77,12 @@
       </div>
     </section>
 
-    <aside class="painel-medidas" [class.painel-medidas--celular]="tela.celular()" [hidden]="tela.celular() && !medidasAbertas" aria-label="Medidas das linhas">
+    <aside class="painel-medidas" [class.painel-medidas--celular]="tela.celular() && !medidasLaterais" [class.painel-medidas--lateral]="tela.celular() && medidasLaterais" [hidden]="tela.celular() && !medidasAbertas" aria-label="Medidas das linhas">
       <h2 class="titulo-medidas">
         <i class="ic ic-ruler" aria-hidden="true"></i>
         Medidas (cm)
         @if (tela.celular()) {
-          <ui-button label="Voltar ao desenho" icon="ic ic-check" size="small" styleClass="titulo-medidas__voltar" (onClick)="fecharMedidas()"></ui-button>
+          <ui-button [label]="medidasLaterais ? 'Fechar' : 'Voltar ao desenho'" [icon]="medidasLaterais ? 'ic ic-times' : 'ic ic-check'" size="small" [text]="medidasLaterais" [severity]="medidasLaterais ? 'secondary' : 'primary'" styleClass="titulo-medidas__voltar" (onClick)="fecharMedidas()"></ui-button>
         }
       </h2>
 

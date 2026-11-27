@@ -563,7 +563,7 @@ body {
     transform: rotate(-90deg) !important;
   }
 }
-@media screen and (max-width: 640px) {
+@media screen and (max-width: 767px), screen and (max-height: 500px) and (pointer: coarse) {
   .ui-dialog.dialog-fullscreen-mobile {
     width: 100vw !important;
     max-width: 100vw;
@@ -621,5 +621,26 @@ body {
   }
   .page-header__title {
     font-size: 1.5rem;
+  }
+}
+
+@media screen and (max-height: 500px) and (pointer: coarse) {
+  .ui-dialog__cabecalho {
+    padding: 0.35rem 0.75rem !important;
+  }
+  .ui-dialog__titulo {
+    font-size: 1rem;
+  }
+  .ui-dialog__maximizar {
+    display: none;
+  }
+  .ui-dialog__conteudo {
+    padding: 0.5rem 0.75rem !important;
+  }
+}
+
+@media screen and (max-width: 767px), screen and (max-height: 500px) and (pointer: coarse) {
+  .ui-dialog__conteudo:has(.desenho-livre) {
+    overflow: hidden;
   }
 }

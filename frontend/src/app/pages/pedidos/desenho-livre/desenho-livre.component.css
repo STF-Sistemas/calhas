@@ -338,12 +338,62 @@
   }
 }
 
-@media (max-height: 500px) and (pointer: coarse) {
+.painel-medidas--lateral {
+  flex: 0 0 13.5rem;
+  overflow-y: auto;
+  padding-left: 0.5rem;
+  border-left: 1px solid var(--surface-border);
+}
+
+.painel-medidas--lateral .titulo-medidas {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-0);
+  padding-bottom: 0.25rem;
+}
+
+.painel-medidas--lateral .lista {
+  max-height: none;
+  overflow: visible;
+}
+
+.painel-medidas--lateral .linha-medida input {
+  height: 2.4rem;
+  font-size: 1rem;
+}
+
+.painel-medidas--lateral .numero,
+.painel-medidas--lateral .ponta {
+  flex-basis: 2rem;
+  height: 2rem;
+}
+
+@media screen and (max-width: 767px), screen and (max-height: 500px) and (pointer: coarse) {
+  .desenho-livre {
+    gap: 0.5rem;
+  }
   .canvas {
-    width: min(100%, calc((100dvh - 7.5rem) * 4 / 3));
     margin: 0 auto;
   }
   .barra {
     flex-wrap: nowrap;
+  }
+  .modo-label {
+    display: none;
+  }
+  .acoes {
+    gap: 0.25rem;
+    align-items: center;
+  }
+  .barra ::ng-deep .ui-button {
+    min-height: 2.1rem;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.82rem;
+    gap: 0.35rem;
+  }
+  .barra ::ng-deep .ui-button:has(> .ic:only-child) {
+    width: 2.1rem;
+    padding: 0;
   }
 }
