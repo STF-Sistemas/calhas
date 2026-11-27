@@ -67,206 +67,87 @@
       <h3 class="section-title">
         <i class="ic ic-list"></i>
         Itens do Pedido
-        <ui-button label="Adicionar Item" icon="ic ic-plus" [text]="true" severity="primary" size="small" (onClick)="adicionarItem()" [style]="{ 'margin-left': 'auto' }">
-        </ui-button>
+        @if (!tela.celular()) {
+          <ui-button label="Adicionar Item" icon="ic ic-plus" [text]="true" severity="primary" size="small" (onClick)="adicionarItem()" [style]="{ 'margin-left': 'auto' }">
+          </ui-button>
+        }
       </h3>
 
-      <ui-table [value]="linhasItens" styleClass="ui-table--compacta">
-        <ng-template #header>
-          <tr>
-            <th style="width: 15%">Tipo</th>
-            <th style="width: 35%">Item</th>
-            <th style="width: 12%">Qtd.</th>
-            <th style="width: 15%">Vl. Unit.</th>
-            <th style="width: 15%">Subtotal</th>
-            <th style="width: 8%"></th>
-          </tr>
-        </ng-template>
-        <ng-template #body let-control let-i="rowIndex">
-          <tr [formGroup]="$any(control)">
-            <td>
-              <ui-select formControlName="tipo" [options]="tiposItem" (onChange)="onTipoChange(i)"></ui-select>
-            </td>
-            <td>
-              @if (control.get('tipo')?.value === ETipoItemPedido.Produto) {
-                <ui-select formControlName="cod_produto" [options]="produtos" optionLabel="descricao" optionValue="id" [filter]="true" (onChange)="onSelecaoProduto(i, $event)" placeholder="Selecione Produto">
-                </ui-select>
-              } @else if (control.get('tipo')?.value === ETipoItemPedido.Corte) {
-                <div style="display: flex; flex-direction: column; gap: 0.35rem">
-                  <ui-select formControlName="cod_chapa" [options]="chapas" optionLabel="descricao" optionValue="id" placeholder="1. Selecione a Chapa" (onChange)="onChapaChange(i)">
-                  </ui-select>
+      @if (tela.celular()) {
+        <div class="itens-cartoes">
+          @for (control of linhasItens; track control; let i = $index) {
+            <div class="item-cartao" [class.item-cartao--pendente]="!itemCompleto(control)">
+              <button type="button" class="item-cartao__corpo" (click)="editarItem(i)" [attr.aria-label]="'Editar item ' + (i + 1) + ': ' + descricaoItem(control)">
+                <span class="item-cartao__icone" aria-hidden="true">
+                  <i [class]="iconeTipo(control.get('tipo')?.value)"></i>
+                </span>
+                <span class="item-cartao__textos">
+                  <span class="item-cartao__titulo">{{ descricaoItem(control) }}</span>
+                  <span class="item-cartao__detalhe">
+                    {{ control.get('quantidade')?.value | number: '1.0-2' : 'pt-BR' }} ×
+                    {{ control.get('valor_unitario')?.value | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+                  </span>
+                </span>
+                <span class="item-cartao__subtotal">
+                  {{ control.get('subtotal')?.value | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+                </span>
+              </button>
+              <ui-button icon="ic ic-trash" severity="danger" [text]="true" [rounded]="true" (onClick)="removerItem(i)" [aria-label]="'Remover item ' + (i + 1)"></ui-button>
+            </div>
+          } @empty {
+            <p class="itens-vazio">Nenhum item ainda. Toque em "Adicionar item" para começar.</p>
+          }
 
-                  @if (control.get('cod_chapa')?.value) {
-                    <ui-selectbutton formControlName="desenho_livre" [options]="modoDesenhoOpcoes" optionLabel="label" optionValue="value" [allowEmpty]="false" size="small" (onChange)="onModoDesenhoChange(i)" aria-label="Origem do desenho: biblioteca ou desenhar à mão">
-                    </ui-selectbutton>
-                  }
+          <ui-button label="Adicionar item" icon="ic ic-plus" severity="primary" size="large" styleClass="w-full" (onClick)="novoItemCelular()"></ui-button>
 
-                  @if (control.get('cod_chapa')?.value && control.get('desenho_livre')?.value) {
-                    <div class="desenho-livre-acao">
-                      @if (control.get('desenho_pontos')?.value?.length >= 2) {
-                        <svg width="56" height="26" class="desenho-livre-mini" aria-hidden="true">
-                          <polyline
-                            [attr.points]="
-                              getDesenhoPoints(
-                                $safeNavigationMigration(control.get('desenho_pontos')?.value),
-                                56,
-                                26
-                              )
-                            "
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linejoin="round"
-                            stroke-linecap="round"
-                          />
-                          @for (d of control.get('desenho_diagonais')?.value ?? []; track $index) {
-                            <polyline
-                              [attr.points]="
-                                getDesenhoDiagonalPoints(
-                                  d,
-                                  $safeNavigationMigration(control.get('desenho_pontos')?.value),
-                                  56,
-                                  26
-                                )
-                              "
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                            />
-                          }
-                        </svg>
-                      }
-                      <ui-button [label]="getMedidasLabel(control)" icon="ic ic-pencil" size="small" severity="secondary" [outlined]="true" (onClick)="abrirDesenhoLivre(i)" styleClass="w-full">
-                      </ui-button>
-                    </div>
-
-                    @if (control.get('desenho_pontos')?.value?.length >= 2) {
-                      <ui-select formControlName="cod_corte" [options]="
-                          getCortesDeChapa(
-                            $safeNavigationMigration(control.get('cod_chapa')?.value)
-                          )
-                        " optionLabel="descricao" optionValue="id" placeholder="Selecione o Corte" (onChange)="onCorteManualChange(i, $event)">
-                      </ui-select>
-                    }
-                  }
-
-                  @if (control.get('cod_chapa')?.value && !control.get('desenho_livre')?.value) {
-                    <ui-select formControlName="cod_desenho" [options]="desenhos" optionLabel="descricao" optionValue="id" placeholder="2. Selecione o Desenho">
-                      <ng-template #selecionado let-opt>
-                        @if (opt) {
-                          <div style="display: flex; align-items: center; gap: 0.5rem">
-                            <svg
-                              width="56"
-                              height="26"
-                              style="display: block; border-radius: 3px; flex-shrink: 0"
-                            >
-                              <rect
-                                width="56"
-                                height="26"
-                                rx="3"
-                                [attr.fill]="themeService.isDarkMode() ? '#141414' : '#f0f0f0'"
-                              />
-                              @if (opt.pontos?.length >= 2) {
-                                <polyline
-                                  [attr.points]="getDesenhoPoints(opt.pontos, 56, 26)"
-                                  fill="none"
-                                  [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'"
-                                  stroke-width="2"
-                                  stroke-linejoin="round"
-                                  stroke-linecap="round"
-                                />
-                                @for (d of opt.diagonais ?? []; track $index) {
-                                  <polyline
-                                    [attr.points]="getDesenhoDiagonalPoints(d, opt.pontos, 56, 26)"
-                                    fill="none"
-                                    [attr.stroke]="
-                                      themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'
-                                    "
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                  />
-                                }
-                              }
-                            </svg>
-                            <span>{{ opt.descricao }}</span>
-                          </div>
-                        }
-                      </ng-template>
-                      <ng-template #item let-opt>
-                        <div style="display: flex; align-items: center; gap: 0.5rem">
-                          <svg
-                            width="56"
-                            height="26"
-                            style="display: block; border-radius: 3px; flex-shrink: 0"
-                          >
-                            <rect
-                              width="56"
-                              height="26"
-                              rx="3"
-                              [attr.fill]="themeService.isDarkMode() ? '#141414' : '#f0f0f0'"
-                            />
-                            @if (opt.pontos?.length >= 2) {
-                              <polyline
-                                [attr.points]="getDesenhoPoints(opt.pontos, 56, 26)"
-                                fill="none"
-                                [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'"
-                                stroke-width="2"
-                                stroke-linejoin="round"
-                                stroke-linecap="round"
-                              />
-                              @for (d of opt.diagonais ?? []; track $index) {
-                                <polyline
-                                  [attr.points]="getDesenhoDiagonalPoints(d, opt.pontos, 56, 26)"
-                                  fill="none"
-                                  [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                />
-                              }
-                            }
-                          </svg>
-                          <span>{{ opt.descricao }}</span>
-                        </div>
-                      </ng-template>
-                    </ui-select>
-                  }
-
-                  @if (control.get('cod_desenho')?.value && !control.get('desenho_livre')?.value) {
-                    <ui-button [label]="getMedidasLabel(control)" icon="ic ic-ruler" size="small" severity="secondary" [outlined]="true" (onClick)="abrirMedidas(i)" styleClass="w-full">
-                    </ui-button>
-
-                    <ui-select formControlName="cod_corte" [options]="
-                        getCortesDeChapa($safeNavigationMigration(control.get('cod_chapa')?.value))
-                      " optionLabel="descricao" optionValue="id" placeholder="4. Selecione o Corte" (onChange)="onCorteManualChange(i, $event)">
-                    </ui-select>
-                  }
-                </div>
-              } @else {
-                <ui-select formControlName="cod_servico" [options]="servicos" optionLabel="descricao" optionValue="id" [filter]="true" (onChange)="onSelecaoServico(i, $event)" placeholder="Selecione Serviço">
-                </ui-select>
-              }
-            </td>
-            <td>
-              <input appCurrencyMask formControlName="quantidade" class="w-full" />
-            </td>
-            <td>
-              <input appCurrencyMask formControlName="valor_unitario" class="w-full" />
-            </td>
-            <td class="font-bold">
-              {{ control.get('subtotal').value | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-            </td>
-            <td class="text-center">
-              <ui-button icon="ic ic-trash" severity="danger" [text]="true" [rounded]="true" (onClick)="removerItem(i)"></ui-button>
-            </td>
-          </tr>
-        </ng-template>
-        <ng-template #emptymessage>
-          <tr>
-            <td colspan="6" class="text-center p-4 text-600">Nenhum item adicionado.</td>
-          </tr>
-        </ng-template>
-      </ui-table>
+          @if (linhasItens.length) {
+            <div class="itens-total">
+              <span>{{ linhasItens.length }} {{ linhasItens.length === 1 ? 'item' : 'itens' }}</span>
+              <strong>{{ $safeNavigationMigration(form.get('valor_total')?.value) | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</strong>
+            </div>
+          }
+        </div>
+      } @else {
+        <ui-table [value]="linhasItens" styleClass="ui-table--compacta">
+          <ng-template #header>
+            <tr>
+              <th style="width: 15%">Tipo</th>
+              <th style="width: 35%">Item</th>
+              <th style="width: 12%">Qtd.</th>
+              <th style="width: 15%">Vl. Unit.</th>
+              <th style="width: 15%">Subtotal</th>
+              <th style="width: 8%"></th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-control let-i="rowIndex">
+            <tr [formGroup]="$any(control)">
+              <td>
+                <ui-select formControlName="tipo" [options]="tiposItem" (onChange)="onTipoChange(i)"></ui-select>
+              </td>
+              <td>
+                <ng-container *ngTemplateOutlet="camposItem; context: { $implicit: control, indice: i }"></ng-container>
+              </td>
+              <td>
+                <input appCurrencyMask formControlName="quantidade" class="w-full" />
+              </td>
+              <td>
+                <input appCurrencyMask formControlName="valor_unitario" class="w-full" />
+              </td>
+              <td class="font-bold">
+                {{ control.get('subtotal').value | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+              </td>
+              <td class="text-center">
+                <ui-button icon="ic ic-trash" severity="danger" [text]="true" [rounded]="true" (onClick)="removerItem(i)"></ui-button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template #emptymessage>
+            <tr>
+              <td colspan="6" class="text-center p-4 text-600">Nenhum item adicionado.</td>
+            </tr>
+          </ng-template>
+        </ui-table>
+      }
     </div>
 
     <div class="col-12 xl:col-3">
@@ -432,6 +313,227 @@
     </div>
   </form>
 </app-dialog-wrapper>
+
+<app-dialog-wrapper
+  [(visible)]="editorVisivel"
+  [title]="itemNovo ? 'Novo item' : 'Item ' + (indiceEditado + 1)"
+  width="100vw"
+  position="bottom"
+  saveLabel="Concluir"
+  (save)="concluirItem()"
+  (cancel)="cancelarItem()"
+>
+  @if (itemEditado; as control) {
+    <div class="editor-item" [formGroup]="control">
+      <div class="editor-item__tipos" role="radiogroup" aria-label="Tipo do item">
+        @for (tipo of tiposItem; track tipo.value) {
+          <button
+            type="button"
+            role="radio"
+            class="editor-item__tipo"
+            [class.editor-item__tipo--ativo]="control.get('tipo')?.value === tipo.value"
+            [attr.aria-checked]="control.get('tipo')?.value === tipo.value"
+            (click)="escolherTipo(tipo.value)"
+          >
+            <i [class]="iconeTipo(tipo.value)" aria-hidden="true"></i>
+            <span>{{ tipo.label }}</span>
+          </button>
+        }
+      </div>
+
+      <div class="editor-item__campo">
+        <span class="editor-item__rotulo">{{ rotuloEscolha(control.get('tipo')?.value) }}</span>
+        <ng-container *ngTemplateOutlet="camposItem; context: { $implicit: control, indice: indiceEditado }"></ng-container>
+      </div>
+
+      <div class="editor-item__linha">
+        <div class="editor-item__campo">
+          <label class="editor-item__rotulo" for="editor_quantidade">Quantidade</label>
+          <div class="stepper">
+            <button type="button" class="stepper__botao" (click)="alterarQuantidade(-1)" aria-label="Diminuir quantidade">−</button>
+            <input appCurrencyMask id="editor_quantidade" formControlName="quantidade" class="stepper__valor" />
+            <button type="button" class="stepper__botao" (click)="alterarQuantidade(1)" aria-label="Aumentar quantidade">+</button>
+          </div>
+        </div>
+
+        <div class="editor-item__campo">
+          <label class="editor-item__rotulo" for="editor_valor">Valor unitário</label>
+          <input appCurrencyMask id="editor_valor" formControlName="valor_unitario" class="w-full editor-item__valor" />
+        </div>
+      </div>
+
+      <div class="editor-item__subtotal">
+        <span>Subtotal</span>
+        <strong>{{ control.get('subtotal')?.value | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</strong>
+      </div>
+
+      <ui-button label="Concluir e adicionar outro" icon="ic ic-plus" severity="secondary" [outlined]="true" styleClass="w-full" (onClick)="concluirItem(true)"></ui-button>
+    </div>
+  }
+</app-dialog-wrapper>
+
+<ng-template #camposItem let-control let-i="indice">
+  <div class="item-campos" [formGroup]="control">
+    @if (control.get('tipo')?.value === ETipoItemPedido.Produto) {
+      <ui-select formControlName="cod_produto" [options]="produtos" optionLabel="descricao" optionValue="id" [filter]="true" (onChange)="onSelecaoProduto(i, $event)" placeholder="Selecione Produto">
+      </ui-select>
+    } @else if (control.get('tipo')?.value === ETipoItemPedido.Corte) {
+      <div style="display: flex; flex-direction: column; gap: 0.35rem">
+        <ui-select formControlName="cod_chapa" [options]="chapas" optionLabel="descricao" optionValue="id" placeholder="1. Selecione a Chapa" (onChange)="onChapaChange(i)">
+        </ui-select>
+
+        @if (control.get('cod_chapa')?.value) {
+          <ui-selectbutton formControlName="desenho_livre" [options]="modoDesenhoOpcoes" optionLabel="label" optionValue="value" [allowEmpty]="false" size="small" (onChange)="onModoDesenhoChange(i)" aria-label="Origem do desenho: biblioteca ou desenhar à mão">
+          </ui-selectbutton>
+        }
+
+        @if (control.get('cod_chapa')?.value && control.get('desenho_livre')?.value) {
+          <div class="desenho-livre-acao">
+            @if (control.get('desenho_pontos')?.value?.length >= 2) {
+              <svg width="56" height="26" class="desenho-livre-mini" aria-hidden="true">
+                <polyline
+                  [attr.points]="
+                    getDesenhoPoints(
+                      $safeNavigationMigration(control.get('desenho_pontos')?.value),
+                      56,
+                      26
+                    )
+                  "
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                />
+                @for (d of control.get('desenho_diagonais')?.value ?? []; track $index) {
+                  <polyline
+                    [attr.points]="
+                      getDesenhoDiagonalPoints(
+                        d,
+                        $safeNavigationMigration(control.get('desenho_pontos')?.value),
+                        56,
+                        26
+                      )
+                    "
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                }
+              </svg>
+            }
+            <ui-button [label]="getMedidasLabel(control)" icon="ic ic-pencil" size="small" severity="secondary" [outlined]="true" (onClick)="abrirDesenhoLivre(i)" styleClass="w-full">
+            </ui-button>
+          </div>
+
+          @if (control.get('desenho_pontos')?.value?.length >= 2) {
+            <ui-select formControlName="cod_corte" [options]="
+                getCortesDeChapa(
+                  $safeNavigationMigration(control.get('cod_chapa')?.value)
+                )
+              " optionLabel="descricao" optionValue="id" placeholder="Selecione o Corte" (onChange)="onCorteManualChange(i, $event)">
+            </ui-select>
+          }
+        }
+
+        @if (control.get('cod_chapa')?.value && !control.get('desenho_livre')?.value) {
+          <ui-select formControlName="cod_desenho" [options]="desenhos" optionLabel="descricao" optionValue="id" placeholder="2. Selecione o Desenho">
+            <ng-template #selecionado let-opt>
+              @if (opt) {
+                <div style="display: flex; align-items: center; gap: 0.5rem">
+                  <svg
+                    width="56"
+                    height="26"
+                    style="display: block; border-radius: 3px; flex-shrink: 0"
+                  >
+                    <rect
+                      width="56"
+                      height="26"
+                      rx="3"
+                      [attr.fill]="themeService.isDarkMode() ? '#141414' : '#f0f0f0'"
+                    />
+                    @if (opt.pontos?.length >= 2) {
+                      <polyline
+                        [attr.points]="getDesenhoPoints(opt.pontos, 56, 26)"
+                        fill="none"
+                        [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'"
+                        stroke-width="2"
+                        stroke-linejoin="round"
+                        stroke-linecap="round"
+                      />
+                      @for (d of opt.diagonais ?? []; track $index) {
+                        <polyline
+                          [attr.points]="getDesenhoDiagonalPoints(d, opt.pontos, 56, 26)"
+                          fill="none"
+                          [attr.stroke]="
+                            themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'
+                          "
+                          stroke-width="2"
+                          stroke-linecap="round"
+                        />
+                      }
+                    }
+                  </svg>
+                  <span>{{ opt.descricao }}</span>
+                </div>
+              }
+            </ng-template>
+            <ng-template #item let-opt>
+              <div style="display: flex; align-items: center; gap: 0.5rem">
+                <svg
+                  width="56"
+                  height="26"
+                  style="display: block; border-radius: 3px; flex-shrink: 0"
+                >
+                  <rect
+                    width="56"
+                    height="26"
+                    rx="3"
+                    [attr.fill]="themeService.isDarkMode() ? '#141414' : '#f0f0f0'"
+                  />
+                  @if (opt.pontos?.length >= 2) {
+                    <polyline
+                      [attr.points]="getDesenhoPoints(opt.pontos, 56, 26)"
+                      fill="none"
+                      [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'"
+                      stroke-width="2"
+                      stroke-linejoin="round"
+                      stroke-linecap="round"
+                    />
+                    @for (d of opt.diagonais ?? []; track $index) {
+                      <polyline
+                        [attr.points]="getDesenhoDiagonalPoints(d, opt.pontos, 56, 26)"
+                        fill="none"
+                        [attr.stroke]="themeService.isDarkMode() ? '#ef4444' : '#1a1a1a'"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      />
+                    }
+                  }
+                </svg>
+                <span>{{ opt.descricao }}</span>
+              </div>
+            </ng-template>
+          </ui-select>
+        }
+
+        @if (control.get('cod_desenho')?.value && !control.get('desenho_livre')?.value) {
+          <ui-button [label]="getMedidasLabel(control)" icon="ic ic-ruler" size="small" severity="secondary" [outlined]="true" (onClick)="abrirMedidas(i)" styleClass="w-full">
+          </ui-button>
+
+          <ui-select formControlName="cod_corte" [options]="
+              getCortesDeChapa($safeNavigationMigration(control.get('cod_chapa')?.value))
+            " optionLabel="descricao" optionValue="id" placeholder="4. Selecione o Corte" (onChange)="onCorteManualChange(i, $event)">
+          </ui-select>
+        }
+      </div>
+    } @else {
+      <ui-select formControlName="cod_servico" [options]="servicos" optionLabel="descricao" optionValue="id" [filter]="true" (onChange)="onSelecaoServico(i, $event)" placeholder="Selecione Serviço">
+      </ui-select>
+    }
+  </div>
+</ng-template>
 
 <app-desenho-medida #medidasDialog (confirmed)="onMedidasConfirmadas($event)"></app-desenho-medida>
 <app-desenho-livre

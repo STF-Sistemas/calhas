@@ -7,6 +7,7 @@ import {
   Output,
   ViewChild,
   ChangeDetectionStrategy,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -21,6 +22,7 @@ import {
 } from '#shared/functions/desenho-corte.functions';
 import { reconhecerNumero } from '#shared/functions/reconhecer-numero.functions';
 import { Botao, Dica, SelecaoBotoes } from '#ui';
+import { TelaService } from '#core/services/tela.service';
 
 export interface IDesenhoLivreResultado {
   index: number;
@@ -64,6 +66,10 @@ export class DesenhoLivre implements OnDestroy {
   private readonly MAX_PONTOS = 200;
   private readonly MAX_DIAGONAIS = 50;
 
+  readonly tela = inject(TelaService);
+  medidasAbertas = false;
+  private travouOrientacao = false;
+  private entrouEmTelaCheia = false;
   visible = false;
   itemIndex = 0;
   pontos: IPonto[] = [];
@@ -121,6 +127,36 @@ export class DesenhoLivre implements OnDestroy {
     return `T${Number(d) + 1} · P${ponta}`;
   }
 
+  get totalMedidas(): number {
+    return this.sequenciaAlvos.length;
+  }
+
+  get medidasPreenchidas(): number {
+    return this.sequenciaAlvos.filter((chave) => this.valorAlvo(chave) > 0).length;
+  }
+
+  private valorAlvo(chave: string): number {
+    if (chave.startsWith('s')) return Number(this.medidasBase[Number(chave.slice(1))]) || 0;
+    const [d, ponta] = chave.slice(1).split('-').map(Number);
+    return Number(this.medidasDiag[d]?.[ponta - 1]) || 0;
+  }
+
+  abrirMedidas() {
+    this.cancelarEscrita();
+    this.medidasAbertas = true;
+  }
+
+  fecharMedidas() {
+    this.medidasAbertas = false;
+    this.foco = null;
+    this.redesenhar();
+  }
+
+  escreverAMao(chave: string) {
+    this.selecionarAlvo(chave, true);
+    if (this.tela.celular()) this.fecharMedidas();
+  }
+
   maiorDiag(i: number): number {
     const [a, b] = this.medidasDiag[i] ?? [0, 0];
     return Math.max(Number(a) || 0, Number(b) || 0);
@@ -133,9 +169,11 @@ export class DesenhoLivre implements OnDestroy {
     medidas: number[] | null | undefined,
   ) {
     this.itemIndex = index;
-    this.retrato = window.matchMedia('(max-width: 640px)').matches;
-    this.LARGURA = this.retrato ? 600 : 800;
-    this.ALTURA = this.retrato ? 800 : 600;
+    this.medidasAbertas = false;
+    this.retrato = false;
+    this.LARGURA = 800;
+    this.ALTURA = 600;
+    this.travarHorizontal();
 
     const pts = (pontos ?? []).map((p) => ({ x: p.x, y: p.y }));
     const diags =
@@ -165,7 +203,33 @@ export class DesenhoLivre implements OnDestroy {
     this.prepararCanvas();
   }
 
+  private travarHorizontal() {
+    if (!this.tela.celular()) return;
+    const raiz = document.documentElement;
+    const orientacao = screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> };
+    const tela = document.fullscreenElement || !raiz.requestFullscreen ? Promise.resolve() : raiz.requestFullscreen({ navigationUI: 'hide' });
+    tela
+      .then(() => {
+        this.entrouEmTelaCheia = !!document.fullscreenElement;
+        return orientacao?.lock?.('landscape');
+      })
+      .then(() => (this.travouOrientacao = true))
+      .catch(() => undefined);
+  }
+
+  liberarOrientacao() {
+    if (this.travouOrientacao) {
+      try {
+        screen.orientation?.unlock?.();
+      } catch {}
+    }
+    if (this.entrouEmTelaCheia && document.fullscreenElement) document.exitFullscreen().catch(() => undefined);
+    this.travouOrientacao = false;
+    this.entrouEmTelaCheia = false;
+  }
+
   ngOnDestroy() {
+    this.liberarOrientacao();
     this.resizeObs?.disconnect();
     if (this.timerEscrita) clearTimeout(this.timerEscrita);
   }
@@ -355,6 +419,7 @@ export class DesenhoLivre implements OnDestroy {
       medidas: this.medidasCompostas(),
     });
     this.visible = false;
+    this.liberarOrientacao();
   }
 
   private medidasCompostas(): number[] {

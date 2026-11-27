@@ -14,7 +14,7 @@
     </div>
   </div>
 
-  <ui-panel header="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-3">
+  <ui-panel header="Filtros" [toggleable]="true" [collapsed]="true" styleClass="mb-3">
     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:1rem; align-items:flex-end;">
 
       <div style="display:flex; flex-direction:column; gap:0.25rem;">
@@ -47,6 +47,8 @@
   <app-data-table
     title="Histórico de Pedidos"
     [data]="pedidos"
+    campoTituloCelular="cliente_nome"
+    campoValorCelular="valor_liquido"
     [columns]="cols"
     [loading]="loading"
     [globalFilterFields]="['id', 'cliente_nome', 'status_label']"

@@ -5,6 +5,7 @@ import {
   OnInit,
   ViewChild,
   ChangeDetectionStrategy,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -42,6 +43,7 @@ import {
 import { EStatusGeral, EStatusPedido, ETipoItemPedido, EDescontoTipo } from '#shared/enums';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { ThemeService } from '#core/services/theme.service';
+import { TelaService } from '#core/services/tela.service';
 import { IPonto } from '#shared/interfaces';
 import { calcularValorDesconto, calcularValorLiquido } from '#shared/functions/desconto.functions';
 import { ToastService } from '#shared-frontend/services/toast.service';
@@ -84,6 +86,11 @@ export class PedidoForm implements OnInit {
   isSaving = false;
   pedidoId?: number;
   linhasItens: AbstractControl[] = [];
+  readonly tela = inject(TelaService);
+  editorVisivel = false;
+  indiceEditado = -1;
+  itemNovo = false;
+  private copiaItem: Record<string, unknown> | null = null;
 
   clientes: ICliente[] = [];
   produtos: IProduto[] = [];
@@ -224,9 +231,118 @@ export class PedidoForm implements OnInit {
           this.isLoadingData = false;
         },
       });
-    } else {
+    } else if (!this.tela.celular()) {
       this.adicionarItem();
     }
+  }
+
+  get itemEditado(): FormGroup | null {
+    if (this.indiceEditado < 0 || this.indiceEditado >= this.itens.length) return null;
+    return this.itens.at(this.indiceEditado) as FormGroup;
+  }
+
+  novoItemCelular() {
+    this.adicionarItem();
+    this.abrirEditor(this.itens.length - 1, true);
+  }
+
+  editarItem(index: number) {
+    this.abrirEditor(index, false);
+  }
+
+  private abrirEditor(index: number, novo: boolean) {
+    this.indiceEditado = index;
+    this.itemNovo = novo;
+    this.copiaItem = novo ? null : (this.itens.at(index) as FormGroup).getRawValue();
+    this.editorVisivel = true;
+  }
+
+  escolherTipo(tipo: ETipoItemPedido) {
+    const control = this.itemEditado;
+    if (!control || control.get('tipo')?.value === tipo) return;
+    control.patchValue({ tipo });
+    this.onTipoChange(this.indiceEditado);
+  }
+
+  alterarQuantidade(delta: number) {
+    const ctrl = this.itemEditado?.get('quantidade');
+    if (!ctrl) return;
+    const atual = Number(ctrl.value) || 0;
+    const novo = Math.round((atual + delta) * 100) / 100;
+    if (novo < 1) return;
+    ctrl.setValue(novo);
+  }
+
+  concluirItem(continuar = false) {
+    const control = this.itemEditado;
+    if (!control) return;
+    if (!this.itemCompleto(control)) {
+      this.toast.warn(this.rotuloEscolha(control.get('tipo')?.value) + ' antes de concluir.');
+      return;
+    }
+    if (control.get('quantidade')?.invalid) {
+      this.toast.warn('Informe uma quantidade maior que zero.');
+      return;
+    }
+    if (continuar) {
+      this.adicionarItem();
+      this.indiceEditado = this.itens.length - 1;
+      this.itemNovo = true;
+      this.copiaItem = null;
+      return;
+    }
+    this.fecharEditor();
+  }
+
+  cancelarItem() {
+    const index = this.indiceEditado;
+    if (index >= 0 && index < this.itens.length) {
+      if (this.itemNovo) this.itens.removeAt(index);
+      else if (this.copiaItem) this.itens.at(index).patchValue(this.copiaItem);
+    }
+    this.fecharEditor();
+    this.recalcularTotais();
+  }
+
+  private fecharEditor() {
+    this.editorVisivel = false;
+    this.indiceEditado = -1;
+    this.itemNovo = false;
+    this.copiaItem = null;
+  }
+
+  itemCompleto(control: AbstractControl): boolean {
+    const tipo = control.get('tipo')?.value;
+    if (tipo === ETipoItemPedido.Produto) return !!control.get('cod_produto')?.value;
+    if (tipo === ETipoItemPedido.Corte) return !!control.get('cod_corte')?.value;
+    if (tipo === ETipoItemPedido.Servico) return !!control.get('cod_servico')?.value;
+    return false;
+  }
+
+  iconeTipo(tipo: ETipoItemPedido): string {
+    if (tipo === ETipoItemPedido.Corte) return 'ic ic-ruler';
+    if (tipo === ETipoItemPedido.Servico) return 'ic ic-wrench';
+    return 'ic ic-box';
+  }
+
+  rotuloEscolha(tipo: ETipoItemPedido): string {
+    if (tipo === ETipoItemPedido.Corte) return 'Escolha a chapa, o desenho e o corte';
+    if (tipo === ETipoItemPedido.Servico) return 'Escolha o serviço';
+    return 'Escolha o produto';
+  }
+
+  descricaoItem(control: AbstractControl): string {
+    const tipo = control.get('tipo')?.value;
+    if (tipo === ETipoItemPedido.Produto) {
+      return this.produtos.find((p) => p.id === control.get('cod_produto')?.value)?.descricao ?? 'Escolha o produto';
+    }
+    if (tipo === ETipoItemPedido.Servico) {
+      return this.servicos.find((s) => s.id === control.get('cod_servico')?.value)?.descricao ?? 'Escolha o serviço';
+    }
+    const chapa = this.chapas.find((ch) => ch.id === control.get('cod_chapa')?.value);
+    if (!chapa) return 'Escolha a chapa do corte';
+    const corte = this.getNomeCorteDetectado(control);
+    return corte ? `${chapa.descricao} · ${corte}` : `${chapa.descricao} · escolha o corte`;
   }
 
   private getChapaIdDoCorteid(corteId: number | null | undefined): number | null {
@@ -602,13 +718,7 @@ export class PedidoForm implements OnInit {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    const itemInvalido = this.itens.controls.findIndex((c) => {
-      const tipo = c.get('tipo')?.value;
-      if (tipo === ETipoItemPedido.Produto) return !c.get('cod_produto')?.value;
-      if (tipo === ETipoItemPedido.Corte) return !c.get('cod_corte')?.value;
-      if (tipo === ETipoItemPedido.Servico) return !c.get('cod_servico')?.value;
-      return true;
-    });
+    const itemInvalido = this.itens.controls.findIndex((c) => !this.itemCompleto(c));
 
     if (this.itens.length === 0) {
       this.toast.warn('Adicione pelo menos um item ao pedido.');

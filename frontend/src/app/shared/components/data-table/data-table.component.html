@@ -1,3 +1,75 @@
+@if (tela.celular()) {
+  <section class="dtc" [attr.aria-label]="title || 'Lista de registros'">
+    <div class="dtc__cabecalho">
+      @if (title) {
+        <h2 class="dtc__titulo">{{ title }}</h2>
+      }
+      <span class="ui-iconfield dtc__busca">
+        <i class="ic ic-search" aria-hidden="true"></i>
+        <input type="search" [value]="termoCelular" (input)="pesquisarCelular($any($event.target).value)" placeholder="Pesquisar..." aria-label="Pesquisar na lista" enterkeyhint="search" class="w-full" />
+      </span>
+      @if (showAddButton) {
+        <ui-button [label]="addButtonLabel" icon="ic ic-plus" severity="primary" size="large" styleClass="w-full" (onClick)="add.emit()" aria-label="Adicionar novo registro"></ui-button>
+      }
+    </div>
+
+    @if (loading) {
+      <div class="dtc__carregando"><ui-spinner ariaLabel="Carregando registros" /></div>
+    } @else {
+      <div class="dtc__lista">
+        @for (row of visiveisCelular; track trackById($index, row)) {
+          <div class="dtc__cartao" [class.dtc__cartao--inativo]="colunaStatus() && !isAtivo(row[colunaStatus().field])">
+            <button type="button" class="dtc__corpo" (click)="tocarCartao($event, row)" [attr.aria-label]="(showEditButton ? 'Editar ' : 'Ações de ') + tituloCartao(row)">
+              @if (colunaDesenho(); as desenho) {
+                <svg width="64" height="36" viewBox="0 0 96 44" class="dtc__desenho" aria-hidden="true">
+                  <rect class="drawing-bg" width="96" height="44" rx="4"/>
+                  @if (row[desenho.field]?.length >= 2) {
+                    <polyline [attr.points]="getDrawingPoints(row[desenho.field])" fill="none" [attr.stroke]="drawingLineColor" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+                    @for (d of row['diagonais'] ?? []; track $index) {
+                      <polyline [attr.points]="getDrawingDiagonalPoints(d, row[desenho.field])" fill="none" [attr.stroke]="drawingLineColor" stroke-width="2.5" stroke-linecap="round"/>
+                    }
+                  }
+                </svg>
+              } @else {
+                <span class="dtc__avatar" aria-hidden="true">{{ iniciais(tituloCartao(row)) }}</span>
+              }
+              <span class="dtc__textos">
+                <span class="dtc__titulo-item">{{ tituloCartao(row) }}</span>
+                @if (detalheCartao(row); as detalhe) {
+                  <span class="dtc__detalhe">{{ detalhe }}</span>
+                }
+              </span>
+              <span class="dtc__lado">
+                @if (colunaValor(); as valor) {
+                  <span class="dtc__valor">{{ formatar(valor, row) }}</span>
+                }
+                @if (colunaEtiqueta(); as etiqueta) {
+                  @if (etiqueta.type === 'status') {
+                    <ui-tag [value]="isAtivo(row[etiqueta.field]) ? 'Ativo' : 'Inativo'" [severity]="isAtivo(row[etiqueta.field]) ? 'success' : 'danger'"></ui-tag>
+                  } @else if (row[etiqueta.field]) {
+                    <ui-tag [value]="row[etiqueta.field].label" [severity]="row[etiqueta.field].severity"></ui-tag>
+                  }
+                }
+              </span>
+            </button>
+            @if (temAcoes()) {
+              <ui-button icon="ic ic-ellipsis-v" [rounded]="true" [text]="true" severity="secondary" [aria-label]="'Abrir ações de ' + tituloCartao(row)" (onClick)="abrirAcoes($event, row)"></ui-button>
+            }
+          </div>
+        } @empty {
+          <p class="dtc__vazio">Nenhum registro encontrado.</p>
+        }
+      </div>
+
+      @if (filtradosCelular.length > limiteCelular) {
+        <ui-button [label]="'Carregar mais (' + (filtradosCelular.length - limiteCelular) + ')'" icon="ic ic-chevron-down" severity="secondary" [outlined]="true" styleClass="w-full" (onClick)="carregarMaisCelular()"></ui-button>
+      } @else if (filtradosCelular.length) {
+        <p class="dtc__rodape">{{ filtradosCelular.length }} {{ filtradosCelular.length === 1 ? 'registro' : 'registros' }}</p>
+      }
+    }
+    <ui-menu #menuAcoes [model]="acoesLinha" alinhar="fim" />
+  </section>
+} @else {
 <div class="card shadow-1 p-0 overflow-hidden">
   <div class="table-scroll-wrapper">
     <ui-table #dt [value]="data" [columns]="columns" [loading]="loading" [rows]="rows" [paginator]="paginator" [globalFilterFields]="globalFilterFields" [rowHover]="true" dataKey="id" currentPageReportTemplate="Exibindo {first} a {last} de {totalRecords} registros" [showCurrentPageReport]="true" styleClass="ui-table--compacta">
@@ -92,3 +164,4 @@
     <ui-menu #menuAcoes [model]="acoesLinha" alinhar="inicio" />
   </div>
 </div>
+}

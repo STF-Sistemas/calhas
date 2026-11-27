@@ -6,7 +6,9 @@
   [fullscreenMobile]="true"
   saveLabel="Confirmar desenho"
   [saveDisabled]="pontos.length < 2"
+  [hasFooter]="!tela.celular()"
   (show)="onShow()"
+  (cancel)="liberarOrientacao()"
   (save)="confirmar()">
 
   <div class="desenho-livre">
@@ -20,12 +22,18 @@
           </ng-template>
         </ui-selectbutton>
         <div class="acoes">
+          @if (tela.celular()) {
+            <ui-button icon="ic ic-ruler" [label]="'Medidas ' + medidasPreenchidas + '/' + totalMedidas" size="small" [outlined]="medidasPreenchidas < totalMedidas" [severity]="totalMedidas && medidasPreenchidas === totalMedidas ? 'success' : 'primary'" [disabled]="!totalMedidas" (onClick)="abrirMedidas()" aria-label="Inserir ou alterar as medidas"></ui-button>
+          }
           <ui-button icon="ic ic-undo" [text]="true" [rounded]="true" severity="secondary" [disabled]="!podeDesfazer" (onClick)="desfazer()" dica="Desfazer" aria-label="Desfazer"></ui-button>
           <ui-button icon="ic ic-trash" [text]="true" [rounded]="true" severity="danger" [disabled]="!pontos.length" (onClick)="limpar()" dica="Limpar desenho" aria-label="Limpar desenho"></ui-button>
+          @if (tela.celular()) {
+            <ui-button icon="ic ic-check" label="Confirmar" size="small" severity="primary" [disabled]="pontos.length < 2" (onClick)="confirmar()" aria-label="Confirmar desenho"></ui-button>
+          }
         </div>
       </div>
 
-      <p class="dica">
+      <p class="dica" [hidden]="tela.celular()">
         @if (modo === 'desenhar') {
           <i class="ic ic-pencil" aria-hidden="true"></i>
           Desenhe mesmo torto: ao soltar, fica reto. Na ponta (círculo tracejado) continua o desenho;
@@ -37,8 +45,11 @@
         }
       </p>
 
+      @if (tela.celular()) {
+        <p class="aviso-girar"><i class="ic ic-replay" aria-hidden="true"></i> Gire o celular para desenhar na horizontal</p>
+      }
       <div class="canvas-wrap">
-        <canvas #canvas class="canvas" [class.retrato]="retrato" [class.escrevendo]="modo === 'escrever'" role="img"
+        <canvas #canvas class="canvas" [style.aspect-ratio]="LARGURA + ' / ' + ALTURA" [class.escrevendo]="modo === 'escrever'" role="img"
           [attr.aria-label]="'Desenho com ' + segmentos.length + ' linhas e ' + diagonais.length + ' transversais'"></canvas>
 
         @if (modo === 'escrever') {
@@ -66,10 +77,13 @@
       </div>
     </section>
 
-    <aside class="painel-medidas" aria-label="Medidas das linhas">
+    <aside class="painel-medidas" [class.painel-medidas--celular]="tela.celular()" [hidden]="tela.celular() && !medidasAbertas" aria-label="Medidas das linhas">
       <h2 class="titulo-medidas">
         <i class="ic ic-ruler" aria-hidden="true"></i>
         Medidas (cm)
+        @if (tela.celular()) {
+          <ui-button label="Voltar ao desenho" icon="ic ic-check" size="small" styleClass="titulo-medidas__voltar" (onClick)="fecharMedidas()"></ui-button>
+        }
       </h2>
 
       @if (segmentos.length === 0) {
@@ -85,7 +99,7 @@
               <button type="button" class="numero"
                 [class.ok]="!coberta && medidasBase[seg] > 0"
                 [disabled]="coberta"
-                (click)="selecionarAlvo('s' + seg, true)"
+                (click)="escreverAMao('s' + seg)"
                 [attr.aria-label]="'Escrever à mão a medida da linha ' + (seg + 1)">{{ seg + 1 }}</button>
               @if (coberta) {
                 <span class="coberta-txt">coberta</span>
@@ -108,7 +122,7 @@
                 @let chave = 'd' + i + '-' + ponta;
                 <div class="linha-medida" [class.proxima]="modo === 'escrever' && alvoAtual === chave">
                   <button type="button" class="ponta"
-                    (click)="selecionarAlvo(chave, true)"
+                    (click)="escreverAMao(chave)"
                     [attr.aria-label]="'Escrever à mão a ponta ' + ponta + ' da transversal ' + (i + 1)">P{{ ponta }}</button>
                   <input appCurrencyMask type="text" [id]="'medida-transv-' + i + '-' + ponta" [attr.aria-label]="'Transversal ' + (i + 1) + ', ponta ' + ponta + ', em centímetros'" [ngModel]="medidasDiag[i][ponta - 1]" (ngModelChange)="onMedidaDiagChange(i, ponta === 1 ? 0 : 1, $event)" (focus)="focar(chave); selecionarAlvo(chave)" (blur)="focar(null)" placeholder="0,00" />
                 </div>

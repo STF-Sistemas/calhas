@@ -1,4 +1,5 @@
 .desenho-livre {
+  position: relative;
   display: flex;
   gap: 1rem;
   align-items: stretch;
@@ -54,9 +55,6 @@
   user-select: none;
   -webkit-user-select: none;
   cursor: crosshair;
-}
-.canvas.retrato {
-  aspect-ratio: 3/4;
 }
 .canvas.escrevendo {
   outline: 2px solid var(--cor-alerta, #f59e0b);
@@ -268,5 +266,84 @@
   .linha-medida input {
     font-size: 0.78rem;
     padding: 0.2rem 0.3rem;
+  }
+}
+
+.painel-medidas--celular {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 0.25rem;
+  background: var(--surface-card);
+  overflow-y: auto;
+}
+
+.painel-medidas--celular .titulo-medidas {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.25rem 0 0.5rem;
+  background: var(--surface-card);
+  font-size: 1rem;
+}
+
+.titulo-medidas__voltar {
+  margin-left: auto;
+}
+
+.painel-medidas--celular .lista {
+  max-height: none;
+  overflow: visible;
+  gap: 0.5rem;
+}
+
+.painel-medidas--celular .linha-medida input {
+  height: 2.75rem;
+  font-size: 1.05rem;
+}
+
+.painel-medidas--celular .numero,
+.painel-medidas--celular .ponta {
+  flex-basis: 2.25rem;
+  height: 2.25rem;
+  font-size: 0.85rem;
+}
+
+.painel-medidas--celular .numero--transv {
+  flex-basis: 2.75rem;
+}
+
+.painel-medidas--celular .transversal-info {
+  font-size: 0.8rem;
+}
+
+.painel-medidas--celular .total {
+  font-size: 1rem;
+  padding-top: 0.6rem;
+}
+
+.aviso-girar {
+  display: none;
+  margin: 0;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-md);
+  background: var(--surface-100);
+  color: var(--text-color-secondary);
+  font-size: 0.8rem;
+}
+
+@media (orientation: portrait) {
+  .aviso-girar {
+    display: block;
+  }
+}
+
+@media (max-height: 500px) and (pointer: coarse) {
+  .canvas {
+    width: min(100%, calc((100dvh - 7.5rem) * 4 / 3));
+    margin: 0 auto;
+  }
+  .barra {
+    flex-wrap: nowrap;
   }
 }
