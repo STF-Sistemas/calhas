@@ -30,43 +30,58 @@
   <h3 class="section-title mt-2">
     <i class="ic ic-list"></i>
     Cortes desta Chapa
-    <ui-button label="Adicionar Corte" icon="ic ic-plus" [text]="true" severity="primary" size="small" (onClick)="adicionarCorte()" [style]="{'margin-left': 'auto'}">
-    </ui-button>
+    @if (cortesVisiveis.length) {
+      <span class="cortes-contagem">{{ cortesVisiveis.length }}</span>
+    }
   </h3>
 
-  <ui-table [value]="cortesVisiveis" styleClass="ui-table--compacta">
-    <ng-template #header>
-      <tr>
-        <th>Descrição *</th>
-        <th style="width: 8rem">Corte (cm)</th>
-        <th style="width: 10rem">Valor (R$) *</th>
-        <th style="width: 4rem"></th>
-      </tr>
-    </ng-template>
-    <ng-template #body let-corte>
-      <tr>
-        <td>
-          <input [(ngModel)]="corte.descricao" class="ui-campo--pequeno w-full" placeholder="Descrição do corte" />
-        </td>
-        <td>
-          <input appCurrencyMask [(ngModel)]="corte.corte" class="w-full" />
-        </td>
-        <td>
-          <input appCurrencyMask [(ngModel)]="corte.valor" class="w-full" />
-        </td>
-        <td class="text-center">
-          <ui-button icon="ic ic-trash" severity="danger" [text]="true" [rounded]="true" (onClick)="removerCorte(corte)" aria-label="Remover corte">
-          </ui-button>
-        </td>
-      </tr>
-    </ng-template>
-    <ng-template #emptymessage>
-      <tr>
-        <td colspan="4" class="text-center p-3 text-600">
-          Nenhum corte cadastrado.
-        </td>
-      </tr>
-    </ng-template>
-  </ui-table>
+  <div class="cortes">
+    @for (corte of cortesVisiveis; track corte) {
+      <div class="corte-cartao" [class.corte-cartao--destaque]="corte === ultimoAlterado">
+        <button type="button" class="corte-cartao__corpo" (click)="editarCorte(corte)" [attr.aria-label]="'Editar corte ' + corte.descricao">
+          <span class="corte-cartao__icone" aria-hidden="true"><i class="ic ic-ruler"></i></span>
+          <span class="corte-cartao__textos">
+            <span class="corte-cartao__titulo">{{ corte.descricao || 'Sem descrição' }}</span>
+            <span class="corte-cartao__detalhe">Corte: {{ corte.corte | number: '1.0-2' : 'pt-BR' }} cm</span>
+          </span>
+          <span class="corte-cartao__valor">{{ corte.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</span>
+        </button>
+        <ui-button icon="ic ic-trash" severity="danger" [text]="true" [rounded]="true" (onClick)="removerCorte(corte)" [aria-label]="'Remover corte ' + corte.descricao"></ui-button>
+      </div>
+    } @empty {
+      <p class="cortes-vazio">Nenhum corte cadastrado. Toque em "Adicionar corte" para começar.</p>
+    }
 
+    <ui-button label="Adicionar corte" icon="ic ic-plus" severity="primary" [outlined]="true" styleClass="w-full" (onClick)="novoCorte()"></ui-button>
+  </div>
+
+</app-dialog-wrapper>
+
+<app-dialog-wrapper
+  [(visible)]="editorVisivel"
+  [title]="corteEditado ? 'Editar corte' : 'Novo corte'"
+  width="480px"
+  saveLabel="Concluir"
+  (show)="focarDescricao()"
+  (save)="concluirCorte()"
+  (cancel)="fecharEditor()">
+  <div class="editor-corte" appEnterNext>
+    <div class="field">
+      <label for="corte_descricao">Descrição *</label>
+      <input #descricaoCorte id="corte_descricao" [(ngModel)]="rascunho.descricao" maxlength="200" placeholder="Ex: Calha 30 cm" class="w-full" />
+    </div>
+    <div class="editor-corte__linha">
+      <div class="field">
+        <label for="corte_medida">Corte (cm)</label>
+        <input appCurrencyMask id="corte_medida" [(ngModel)]="rascunho.corte" class="w-full" />
+      </div>
+      <div class="field">
+        <label for="corte_valor">Valor (R$) *</label>
+        <input appCurrencyMask id="corte_valor" [(ngModel)]="rascunho.valor" class="w-full" (keydown.enter)="concluirCorte(); $event.preventDefault()" />
+      </div>
+    </div>
+    @if (!corteEditado) {
+      <ui-button label="Concluir e adicionar outro" icon="ic ic-plus" severity="secondary" [outlined]="true" styleClass="w-full" (onClick)="concluirCorte(true)"></ui-button>
+    }
+  </div>
 </app-dialog-wrapper>

@@ -102,12 +102,48 @@
     <h3 class="section-title mt-2">
       <i class="ic ic-list"></i>
       Itens da NF-e
-      @if (isRascunho()) {
+      @if (isRascunho() && !tela.celular()) {
         <ui-button icon="ic ic-plus" label="Adicionar Item" size="small" [outlined]="true" aria-label="Adicionar item à compra" class="ml-auto" (onClick)="adicionarItem()">
         </ui-button>
       }
     </h3>
 
+    @if (tela.celular()) {
+      <div class="itens-cartoes">
+        @for (ctrl of linhasItens; track ctrl; let i = $index) {
+          <div class="item-cartao" [class.item-cartao--pendente]="!ctrl.get('cod_produto')?.value">
+            <button type="button" class="item-cartao__corpo" (click)="editarItem(i)" [attr.aria-label]="'Abrir item ' + (i + 1) + ': ' + descricaoItem(ctrl)">
+              <span class="item-cartao__icone" aria-hidden="true"><i class="ic ic-box"></i></span>
+              <span class="item-cartao__textos">
+                <span class="item-cartao__titulo">{{ descricaoItem(ctrl) }}</span>
+                <span class="item-cartao__detalhe">
+                  {{ ctrl.get('quantidade')?.value | number: '1.0-4' : 'pt-BR' }} {{ ctrl.get('unidade')?.value }} ×
+                  {{ ctrl.get('valor_unitario')?.value | currency: 'BRL' : 'symbol' : '1.2-4' : 'pt-BR' }}
+                </span>
+                <span class="item-cartao__detalhe">Custo un.: {{ ctrl.get('custo_unitario')?.value | currency: 'BRL' : 'symbol' : '1.2-4' : 'pt-BR' }}</span>
+              </span>
+              <span class="item-cartao__subtotal">{{ ctrl.get('valor_total')?.value | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</span>
+            </button>
+            @if (isRascunho()) {
+              <ui-button icon="ic ic-trash" severity="danger" [text]="true" [rounded]="true" (onClick)="removerItem(i)" [aria-label]="'Remover item ' + (i + 1)"></ui-button>
+            }
+          </div>
+        } @empty {
+          <p class="itens-vazio">Nenhum item ainda.@if (isRascunho()) { Toque em "Adicionar item" para começar.}</p>
+        }
+
+        @if (isRascunho()) {
+          <ui-button label="Adicionar item" icon="ic ic-plus" severity="primary" size="large" styleClass="w-full" (onClick)="novoItemCelular()"></ui-button>
+        }
+
+        @if (linhasItens.length) {
+          <div class="itens-total">
+            <span>{{ linhasItens.length }} {{ linhasItens.length === 1 ? 'item' : 'itens' }} · Produtos {{ calcularTotalProdutos() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</span>
+            <strong>{{ calcularTotalGeral() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</strong>
+          </div>
+        }
+      </div>
+    } @else {
     <div class="itens-tabela" formArrayName="itens">
       <ui-table [value]="linhasItens" [scrollable]="true" scrollHeight="360px" styleClass="ui-table--compacta">
         <ng-template #header>
@@ -198,6 +234,7 @@
         </ng-template>
       </ui-table>
     </div>
+    }
 
     <div class="row mt-2">
       <div class="field col-12">
@@ -326,4 +363,88 @@
     </div>
   </ui-dialog>
 
+</app-dialog-wrapper>
+
+<app-dialog-wrapper
+  [(visible)]="editorVisivel"
+  [title]="itemNovo ? 'Novo item' : 'Item ' + (indiceEditado + 1)"
+  width="100vw"
+  position="bottom"
+  [saveLabel]="isRascunho() ? 'Concluir' : 'Fechar'"
+  (save)="concluirItem()"
+  (cancel)="cancelarItem()">
+  @if (itemEditado; as ctrl) {
+    <div class="editor-item" [formGroup]="ctrl">
+      <div class="editor-item__campo">
+        <span class="editor-item__rotulo">Produto *</span>
+        <button type="button" class="editor-item__produto" [class.editor-item__produto--vazio]="!ctrl.get('cod_produto')?.value" [disabled]="!isRascunho()" (click)="onBuscarProduto(indiceEditado)">
+          <i class="ic ic-search" aria-hidden="true"></i>
+          <span class="editor-item__produto-textos">
+            <span>{{ ctrl.get('descricao')?.value || 'Toque para escolher o produto' }}</span>
+            @if (ctrl.get('cod_produto')?.value) {
+              <small>Cód. {{ ctrl.get('cod_produto')?.value }}</small>
+            }
+          </span>
+        </button>
+        @if (ctrl.get('descricao_xml')?.value && ctrl.get('descricao_xml')?.value !== ctrl.get('descricao')?.value) {
+          <small class="editor-item__xml">Na nota: {{ ctrl.get('descricao_xml')?.value }}</small>
+        }
+      </div>
+
+      <div class="editor-item__linha">
+        <div class="editor-item__campo">
+          <label class="editor-item__rotulo" for="nf_quantidade">Quantidade *</label>
+          <div class="stepper">
+            <button type="button" class="stepper__botao" (click)="alterarQuantidade(-1)" aria-label="Diminuir quantidade">−</button>
+            <input appCurrencyMask [decimals]="4" id="nf_quantidade" formControlName="quantidade" class="stepper__valor" />
+            <button type="button" class="stepper__botao" (click)="alterarQuantidade(1)" aria-label="Aumentar quantidade">+</button>
+          </div>
+        </div>
+        <div class="editor-item__campo">
+          <label class="editor-item__rotulo" for="nf_unidade">Unidade</label>
+          <input id="nf_unidade" formControlName="unidade" class="w-full" maxlength="6" />
+        </div>
+      </div>
+
+      <div class="editor-item__linha">
+        <div class="editor-item__campo">
+          <label class="editor-item__rotulo" for="nf_valor">Valor unitário</label>
+          <input appCurrencyMask [decimals]="4" id="nf_valor" formControlName="valor_unitario" class="w-full" />
+        </div>
+        <div class="editor-item__campo">
+          <label class="editor-item__rotulo" for="nf_desconto">Desconto</label>
+          <input appCurrencyMask id="nf_desconto" formControlName="desconto" class="w-full" />
+        </div>
+      </div>
+
+      <div class="editor-item__linha">
+        <div class="editor-item__campo">
+          <label class="editor-item__rotulo" for="nf_ipi">IPI</label>
+          <input appCurrencyMask id="nf_ipi" formControlName="valor_ipi" class="w-full" />
+        </div>
+        <div class="editor-item__campo">
+          <label class="editor-item__rotulo" for="nf_st">ICMS ST</label>
+          <input appCurrencyMask id="nf_st" formControlName="valor_icms_st" class="w-full" />
+        </div>
+      </div>
+
+      <div class="editor-item__resumo">
+        <div>
+          <span>Valor total</span>
+          <strong>{{ ctrl.get('valor_total')?.value | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</strong>
+        </div>
+        <div>
+          <span>
+            Custo unitário
+            <ui-button icon="ic ic-question-circle" [rounded]="true" [text]="true" size="small" aria-label="Como o custo é calculado?" (onClick)="showHelp = true"></ui-button>
+          </span>
+          <strong>{{ ctrl.get('custo_unitario')?.value | currency: 'BRL' : 'symbol' : '1.2-4' : 'pt-BR' }}</strong>
+        </div>
+      </div>
+
+      @if (isRascunho()) {
+        <ui-button label="Concluir e adicionar outro" icon="ic ic-plus" severity="secondary" [outlined]="true" styleClass="w-full" (onClick)="concluirItem(true)"></ui-button>
+      }
+    </div>
+  }
 </app-dialog-wrapper>

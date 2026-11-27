@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Output, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -14,7 +14,7 @@ import { ICorte } from '#shared/interfaces';
 import { forkJoin, of, switchMap, Observable } from 'rxjs';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { ToastService } from '#shared-frontend/services/toast.service';
-import { Botao, Tabela } from '#ui';
+import { Botao } from '#ui';
 
 @Component({
   selector: 'app-chapa-form',
@@ -27,7 +27,6 @@ import { Botao, Tabela } from '#ui';
     EnterFocusNextDirective,
     DialogWrapper,
     Botao,
-    Tabela,
   ],
   templateUrl: './chapa-form.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -43,6 +42,11 @@ export class ChapaForm {
   chapaId?: number;
 
   cortes: ICorte[] = [];
+  editorVisivel = false;
+  corteEditado: ICorte | null = null;
+  ultimoAlterado: ICorte | null = null;
+  rascunho = { descricao: '', corte: 0, valor: 0 };
+  @ViewChild('descricaoCorte') descricaoCorte?: ElementRef<HTMLInputElement>;
 
   constructor(
     private fb: FormBuilder,
@@ -63,6 +67,8 @@ export class ChapaForm {
     this.visible = true;
     this.form.reset();
     this.cortes = [];
+    this.ultimoAlterado = null;
+    this.editorVisivel = false;
 
     if (id) {
       this.isLoadingData = true;
@@ -80,11 +86,55 @@ export class ChapaForm {
     }
   }
 
-  adicionarCorte() {
-    this.cortes = [
-      ...this.cortes,
-      { descricao: '', corte: 0, valor: 0, excluido: false } as ICorte,
-    ];
+  novoCorte() {
+    this.corteEditado = null;
+    this.rascunho = { descricao: '', corte: 0, valor: 0 };
+    this.editorVisivel = true;
+    this.focarDescricao();
+  }
+
+  editarCorte(corte: ICorte) {
+    this.corteEditado = corte;
+    this.rascunho = { descricao: corte.descricao ?? '', corte: Number(corte.corte) || 0, valor: Number(corte.valor) || 0 };
+    this.editorVisivel = true;
+  }
+
+  focarDescricao() {
+    setTimeout(() => this.descricaoCorte?.nativeElement.focus(), 50);
+  }
+
+  concluirCorte(continuar = false) {
+    const descricao = this.rascunho.descricao?.trim();
+    if (!descricao) {
+      this.toast.warn('Informe a descrição do corte.');
+      this.focarDescricao();
+      return;
+    }
+    if (!(Number(this.rascunho.valor) > 0)) {
+      this.toast.warn('Informe o valor do corte.');
+      return;
+    }
+    const dados = { descricao, corte: Number(this.rascunho.corte) || 0, valor: Number(this.rascunho.valor) };
+    if (this.corteEditado) {
+      Object.assign(this.corteEditado, dados);
+      this.ultimoAlterado = this.corteEditado;
+      this.cortes = [...this.cortes];
+    } else {
+      const novo = { ...dados, excluido: false } as ICorte;
+      this.cortes = [...this.cortes, novo];
+      this.ultimoAlterado = novo;
+    }
+    if (continuar) {
+      this.toast.success(`Corte "${descricao}" incluído.`);
+      this.novoCorte();
+      return;
+    }
+    this.fecharEditor();
+  }
+
+  fecharEditor() {
+    this.editorVisivel = false;
+    this.corteEditado = null;
   }
 
   removerCorte(corte: ICorte) {

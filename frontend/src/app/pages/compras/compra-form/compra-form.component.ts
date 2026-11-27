@@ -6,6 +6,7 @@ import {
   Output,
   ViewChild,
   ChangeDetectionStrategy,
+  inject,
 } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import {
@@ -30,6 +31,7 @@ import { EStatusCompra } from '#shared/enums';
 import { EnterFocusNextDirective } from '#shared-frontend/directives/enter-focus-next.directive';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { Botao, Dica, Dialogo, CampoData, Tabela } from '#ui';
+import { TelaService } from '#core/services/tela.service';
 
 @Component({
   selector: 'app-compra-form',
@@ -65,6 +67,11 @@ export class CompraForm implements OnInit {
 
   form!: FormGroup;
   linhasItens: AbstractControl[] = [];
+  readonly tela = inject(TelaService);
+  editorVisivel = false;
+  indiceEditado = -1;
+  itemNovo = false;
+  private copiaItem: Record<string, unknown> | null = null;
   visible = false;
   isLoadingData = false;
   isSaving = false;
@@ -175,9 +182,86 @@ export class CompraForm implements OnInit {
           this.visible = false;
         },
       });
-    } else {
+    } else if (!this.tela.celular()) {
       this.adicionarItem();
     }
+  }
+
+  get itemEditado(): FormGroup | null {
+    if (this.indiceEditado < 0 || this.indiceEditado >= this.itens.length) return null;
+    return this.itens.at(this.indiceEditado) as FormGroup;
+  }
+
+  descricaoItem(ctrl: AbstractControl): string {
+    return ctrl.get('descricao')?.value || ctrl.get('descricao_xml')?.value || 'Escolha o produto';
+  }
+
+  novoItemCelular() {
+    this.adicionarItem();
+    this.abrirEditor(this.itens.length - 1, true);
+  }
+
+  editarItem(index: number) {
+    this.abrirEditor(index, false);
+  }
+
+  private abrirEditor(index: number, novo: boolean) {
+    this.indiceEditado = index;
+    this.itemNovo = novo;
+    this.copiaItem = novo ? null : (this.itens.at(index) as FormGroup).getRawValue();
+    this.editorVisivel = true;
+  }
+
+  alterarQuantidade(delta: number) {
+    const ctrl = this.itemEditado?.get('quantidade');
+    if (!ctrl || !this.isRascunho()) return;
+    const novo = Math.round(((Number(ctrl.value) || 0) + delta) * 10000) / 10000;
+    if (novo < 1) return;
+    ctrl.setValue(novo);
+  }
+
+  concluirItem(continuar = false) {
+    const ctrl = this.itemEditado;
+    if (!ctrl) return;
+    if (!this.isRascunho()) {
+      this.fecharEditor();
+      return;
+    }
+    if (!ctrl.get('cod_produto')?.value) {
+      this.toast.warn('Escolha o produto antes de concluir.');
+      return;
+    }
+    if (!(Number(ctrl.get('quantidade')?.value) > 0)) {
+      this.toast.warn('Informe uma quantidade maior que zero.');
+      return;
+    }
+    if (continuar) {
+      this.adicionarItem();
+      this.indiceEditado = this.itens.length - 1;
+      this.itemNovo = true;
+      this.copiaItem = null;
+      return;
+    }
+    this.fecharEditor();
+  }
+
+  cancelarItem() {
+    const index = this.indiceEditado;
+    if (index >= 0 && index < this.itens.length) {
+      if (this.itemNovo) this.removerItem(index);
+      else if (this.copiaItem) {
+        this.itens.at(index).patchValue(this.copiaItem);
+        this.calcularCustoItem(index);
+      }
+    }
+    this.fecharEditor();
+  }
+
+  private fecharEditor() {
+    this.editorVisivel = false;
+    this.indiceEditado = -1;
+    this.itemNovo = false;
+    this.copiaItem = null;
   }
 
   onCnpjBlur() {
@@ -250,20 +334,22 @@ export class CompraForm implements OnInit {
       custo_unitario: [{ value: Number(data?.['custo_unitario'] ?? 0), disabled: true }],
     });
 
-    const idx = this.itens.length;
-
+    const recalcularCusto = () => {
+      const idx = this.itens.controls.indexOf(itemGroup);
+      if (idx >= 0) this.calcularCustoItem(idx);
+    };
     const recalcTotal = () => {
       const qty = Number(itemGroup.get('quantidade')?.value || 0);
       const vu = Number(itemGroup.get('valor_unitario')?.value || 0);
       itemGroup.get('valor_total')?.setValue(qty * vu, { emitEvent: true });
-      this.calcularCustoItem(idx);
+      recalcularCusto();
     };
     ['quantidade', 'valor_unitario'].forEach((c) => {
       itemGroup.get(c)?.valueChanges.subscribe(() => recalcTotal());
     });
 
     ['desconto', 'valor_ipi', 'valor_icms_st'].forEach((c) => {
-      itemGroup.get(c)?.valueChanges.subscribe(() => this.calcularCustoItem(idx));
+      itemGroup.get(c)?.valueChanges.subscribe(() => recalcularCusto());
     });
 
     this.itens.push(itemGroup);

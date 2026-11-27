@@ -8,11 +8,15 @@ export interface IResultadoNumero {
   caracteres: { char: string; minX: number; maxX: number; minY: number; maxY: number }[];
 }
 
-export function reconhecerNumero(tracos: ITraco[]): IResultadoNumero | null {
+export type TClassificador = (tracos: ITraco[]) => string;
+
+export function reconhecerNumero(tracos: ITraco[], classificar: TClassificador = classificarDigito): IResultadoNumero | null {
   const validos = tracos.filter(t => t.length > 0);
   if (!validos.length) return null;
 
-  const caixas = validos.map(t => ({ t, ...caixa(t) }));
+  const todasCaixas = validos.map(t => ({ t, ...caixa(t) }));
+  const maiorLado = Math.max(...todasCaixas.map(c => Math.max(c.maxY - c.minY, c.maxX - c.minX)), 1);
+  const caixas = todasCaixas;
   const alturaLinha = Math.max(...caixas.map(c => c.maxY - c.minY), 1);
   const topoLinha = Math.min(...caixas.map(c => c.minY));
   const ehVirgula = (c: { minY: number; maxY: number; minX: number; maxX: number }) => {
@@ -23,13 +27,15 @@ export function reconhecerNumero(tracos: ITraco[]): IResultadoNumero | null {
   };
 
   const virgulas = caixas.length > 1 ? caixas.filter(ehVirgula) : [];
-  const digitos = caixas.filter(c => !virgulas.includes(c));
+  const ehMiudo = (c: { minY: number; maxY: number; minX: number; maxX: number }) =>
+    Math.max(c.maxY - c.minY, c.maxX - c.minX) < Math.max(alturaLinha, maiorLado) * 0.12;
+  const digitos = caixas.filter(c => !virgulas.includes(c) && !(caixas.length > 1 && ehMiudo(c)));
   if (!digitos.length) return null;
 
   const caracteres: IResultadoNumero['caracteres'] = [];
-  for (const g of agruparCaracteres(digitos.map(c => c.t))) {
+  for (const g of agruparCaracteres(digitos.map(c => c.t), alturaLinha)) {
     const h = g.maxY - g.minY, w = g.maxX - g.minX;
-    const char = w < h * 0.28 ? '1' : classificarDigito(g.tracos);
+    const char = w < h * 0.2 ? '1' : classificar(g.tracos);
     caracteres.push({ char, minX: g.minX, maxX: g.maxX, minY: g.minY, maxY: g.maxY });
   }
   for (const v of virgulas) {
@@ -59,24 +65,64 @@ function caixa(t: ITraco) {
   return { minX: Math.min(...xs), maxX: Math.max(...xs), minY: Math.min(...ys), maxY: Math.max(...ys) };
 }
 
-function agruparCaracteres(tracos: ITraco[]): IGrupo[] {
-  const itens = tracos.map(t => ({ t, ...caixa(t) })).sort((a, b) => a.minX - b.minX);
+function juntar(a: IGrupo, b: IGrupo): void {
+  a.tracos.push(...b.tracos);
+  a.minX = Math.min(a.minX, b.minX); a.maxX = Math.max(a.maxX, b.maxX);
+  a.minY = Math.min(a.minY, b.minY); a.maxY = Math.max(a.maxY, b.maxY);
+}
+
+function sobreposicaoX(a: IGrupo, b: IGrupo): number {
+  return Math.min(a.maxX, b.maxX) - Math.max(a.minX, b.minX);
+}
+
+function contido(a: IGrupo, b: IGrupo, altura: number): boolean {
+  const folga = altura * 0.04;
+  const dentro = (x: IGrupo, y: IGrupo) => y.minX >= x.minX - folga && y.maxX <= x.maxX + folga && x.maxX - x.minX > y.maxX - y.minX;
+  return dentro(a, b) || dentro(b, a);
+}
+
+function ehRisco(g: IGrupo, altura: number): boolean {
+  const h = g.maxY - g.minY, w = g.maxX - g.minX;
+  return h > altura * 0.6 && w < h * 0.3;
+}
+
+function agruparCaracteres(tracos: ITraco[], altura: number): IGrupo[] {
   const grupos: IGrupo[] = [];
-  for (const it of itens) {
+  for (const t of tracos) {
+    const c = caixa(t);
+    const novo: IGrupo = { tracos: [t], ...c };
     const ult = grupos[grupos.length - 1];
     if (ult) {
-      const sobreposicao = Math.min(ult.maxX, it.maxX) - Math.max(ult.minX, it.minX);
-      const menor = Math.max(1, Math.min(ult.maxX - ult.minX, it.maxX - it.minX));
-      if (sobreposicao > menor * 0.4) {
-        ult.tracos.push(it.t);
-        ult.minX = Math.min(ult.minX, it.minX); ult.maxX = Math.max(ult.maxX, it.maxX);
-        ult.minY = Math.min(ult.minY, it.minY); ult.maxY = Math.max(ult.maxY, it.maxY);
+      const sob = sobreposicaoX(ult, novo);
+      const menor = Math.max(1, Math.min(ult.maxX - ult.minX, novo.maxX - novo.minX));
+      const largura = Math.max(ult.maxX, novo.maxX) - Math.min(ult.minX, novo.minX);
+      const doisRiscos = ehRisco(ult, altura) && ehRisco(novo, altura);
+      const hUlt = ult.maxY - ult.minY, hNovo = novo.maxY - novo.minY;
+      const parcial = Math.min(hUlt, hNovo) < Math.max(hUlt, hNovo) * 0.75;
+      const encosta = sob > -altura * 0.08 && largura < altura * 0.85 && !doisRiscos && parcial;
+      if (sob > menor * 0.4 || encosta || contido(ult, novo, altura)) {
+        juntar(ult, novo);
         continue;
       }
     }
-    grupos.push({ tracos: [it.t], minX: it.minX, maxX: it.maxX, minY: it.minY, maxY: it.maxY });
+    grupos.push(novo);
   }
-  return grupos;
+  let mudou = true;
+  while (mudou) {
+    mudou = false;
+    for (let i = 0; i < grupos.length && !mudou; i++) {
+      for (let j = i + 1; j < grupos.length; j++) {
+        const menor = Math.max(1, Math.min(grupos[i].maxX - grupos[i].minX, grupos[j].maxX - grupos[j].minX));
+        if (sobreposicaoX(grupos[i], grupos[j]) > menor * 0.5 || contido(grupos[i], grupos[j], altura)) {
+          juntar(grupos[i], grupos[j]);
+          grupos.splice(j, 1);
+          mudou = true;
+          break;
+        }
+      }
+    }
+  }
+  return grupos.sort((a, b) => a.minX - b.minX);
 }
 
 const N = 32;

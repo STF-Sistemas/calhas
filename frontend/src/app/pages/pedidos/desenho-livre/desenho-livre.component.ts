@@ -21,6 +21,7 @@ import {
   segmentosCobertosCorte,
 } from '#shared/functions/desenho-corte.functions';
 import { reconhecerNumero } from '#shared/functions/reconhecer-numero.functions';
+import { classificarDigitoRede } from '#shared-frontend/reconhecimento/classificador-digitos';
 import { Botao, Dica, SelecaoBotoes } from '#ui';
 import { TelaService } from '#core/services/tela.service';
 
@@ -415,7 +416,7 @@ export class DesenhoLivre implements OnDestroy {
       return;
     }
 
-    const resultado = reconhecerNumero(tinta);
+    const resultado = reconhecerNumero(tinta, classificarDigitoRede);
     const chave = this.alvoAtual ?? this.primeiroAlvoVazio();
     if (!resultado || resultado.valor <= 0 || !chave) {
       this.naoEntendi = !!chave;
