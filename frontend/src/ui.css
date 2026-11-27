@@ -1,3 +1,7 @@
+[hidden] {
+  display: none !important;
+}
+
 :root {
   --cor-sucesso: #16a34a;
   --cor-info: #0ea5e9;

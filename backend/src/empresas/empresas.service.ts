@@ -26,6 +26,20 @@ export class EmpresasService {
     return empresa;
   }
 
+  private async exigirCnpjLivre(cnpj: string, ignorarId?: number): Promise<void> {
+    const dup = await this.prisma.empresa.findFirst({
+      where: { cnpj, ...(ignorarId ? { NOT: { id: ignorarId } } : {}) },
+      select: { excluido: true },
+    });
+    if (!dup) return;
+    throw falha(
+      HttpStatus.CONFLICT,
+      dup.excluido
+        ? 'Este CNPJ pertence a uma empresa excluída. Fale com o suporte para reativá-la.'
+        : 'Já existe uma empresa cadastrada com este CNPJ.',
+    );
+  }
+
   private exigirPropria(id: number, usuario: JwtPayload): void {
     if (!usuario.super_admin && usuario.cod_empresa !== id) throw falha(HttpStatus.FORBIDDEN, 'Acesso negado.');
   }
@@ -46,12 +60,14 @@ export class EmpresasService {
   }
 
   async criar(dto: EmpresaDto) {
+    await this.exigirCnpjLivre(dto.cnpj);
     return { success: true, data: await this.prisma.empresa.create({ data: dadosEmpresa(dto, true) }) };
   }
 
   async atualizar(id: number, dto: EmpresaDto, usuario: JwtPayload) {
     this.exigirPropria(id, usuario);
     await this.obter(id);
+    await this.exigirCnpjLivre(dto.cnpj, id);
     const data = await this.prisma.empresa.update({ where: { id }, data: dadosEmpresa(dto, usuario.super_admin) });
     return { success: true, data };
   }
@@ -85,6 +101,7 @@ export class EmpresasService {
 
   async atualizarMinha(dto: MinhaEmpresaDto, codEmpresa: number | null) {
     const empresa = await this.obterMinha(codEmpresa);
+    await this.exigirCnpjLivre(dto.cnpj, empresa.id);
     const data = await this.prisma.empresa.update({
       where: { id: empresa.id },
       data: { ...dto, email: dto.email || null },

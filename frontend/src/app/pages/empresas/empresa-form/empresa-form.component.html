@@ -3,7 +3,7 @@
   position="top" (save)="onSave()">
 
   <form [formGroup]="form" appEnterNext>
-    <ui-tabs value="0">
+    <ui-tabs [(value)]="abaAtiva">
       <ui-tablist>
         <ui-tab value="0">
           <i class="ic ic-building mr-2"></i>

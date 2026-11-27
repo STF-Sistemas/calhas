@@ -2,6 +2,14 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logge
 import { ThrottlerException } from '@nestjs/throttler';
 import { Response } from 'express';
 
+function ehViolacaoDeUnicidade(erro: unknown): boolean {
+  return (
+    erro instanceof Error &&
+    erro.name === 'PrismaClientKnownRequestError' &&
+    (erro as Error & { code?: string }).code === 'P2002'
+  );
+}
+
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger('Erro');
@@ -27,6 +35,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
       const bruta = typeof corpo === 'string' ? corpo : (corpo as { message?: unknown }).message;
       const mensagem = Array.isArray(bruta) ? String(bruta[0]) : String(bruta ?? erro.message);
       res.status(status).json({ success: false, message: status === 404 ? 'Recurso não encontrado.' : mensagem });
+      return;
+    }
+
+    if (ehViolacaoDeUnicidade(erro)) {
+      res.status(HttpStatus.CONFLICT).json({
+        success: false,
+        message: 'Já existe um cadastro com estes dados. Confira CNPJ, e-mail ou código informados.',
+      });
       return;
     }
 

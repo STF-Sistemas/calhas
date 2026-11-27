@@ -15,6 +15,31 @@ import { environment } from '#environments/environment';
 import { ToastService } from '#shared-frontend/services/toast.service';
 import { Botao, Dica, CampoData, CampoNumero, Tag, Abas, ListaAbas, Aba, PaineisAbas, PainelAba } from '#ui';
 
+const VALORES_PADRAO = {
+  validar_estoque: false,
+  quantidade_desenho_por_folha: 5,
+  link_validade_dias: 7,
+  valor_mensalidade: 150,
+  data_expiracao: null,
+  logo_url: null,
+};
+
+const ROTULOS_CAMPOS: Record<string, { rotulo: string; aba: string }> = {
+  razao_social: { rotulo: 'Razão Social', aba: '0' },
+  cnpj: { rotulo: 'CNPJ', aba: '0' },
+  email: { rotulo: 'E-mail', aba: '0' },
+  telefone: { rotulo: 'Telefone', aba: '0' },
+  cep: { rotulo: 'CEP', aba: '0' },
+  endereco: { rotulo: 'Logradouro', aba: '0' },
+  numero: { rotulo: 'Número', aba: '0' },
+  bairro: { rotulo: 'Bairro', aba: '0' },
+  cod_cidade: { rotulo: 'Cidade (informe o CEP)', aba: '0' },
+  marca_dagua: { rotulo: "Marca d'água", aba: '1' },
+  quantidade_desenho_por_folha: { rotulo: 'Desenhos por Folha', aba: '1' },
+  link_validade_dias: { rotulo: 'Validade do link', aba: '1' },
+  valor_mensalidade: { rotulo: 'Valor da Mensalidade', aba: '2' },
+};
+
 @Component({
   selector: 'app-empresa-form',
   standalone: true,
@@ -44,6 +69,8 @@ import { Botao, Dica, CampoData, CampoNumero, Tag, Abas, ListaAbas, Aba, Paineis
 })
 export class EmpresaForm {
   @Output() saved = new EventEmitter<void>();
+
+  abaAtiva: string | number | undefined = '0';
 
   form: FormGroup;
   visible = false;
@@ -125,7 +152,8 @@ export class EmpresaForm {
   abrir(id?: number) {
     this.empresaId = id;
     this.visible = true;
-    this.form.reset();
+    this.abaAtiva = '0';
+    this.form.reset(VALORES_PADRAO);
 
     if (id) {
       this.isLoadingData = true;
@@ -179,7 +207,19 @@ export class EmpresaForm {
 
   onSave() {
     this.form.markAllAsTouched();
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      const invalidos = Object.keys(this.form.controls).filter((c) => this.form.get(c)?.invalid);
+      const campos = invalidos.map((c) => ROTULOS_CAMPOS[c]).filter(Boolean);
+      const primeiraAba = campos[0]?.aba;
+      if (primeiraAba && (primeiraAba !== '2' || (this.empresaId && this.authService.isSuperAdmin()))) {
+        this.abaAtiva = primeiraAba;
+      }
+      this.toast.warn(
+        campos.length ? `Confira: ${campos.map((c) => c.rotulo).join(', ')}.` : 'Confira os campos destacados.',
+        'Cadastro incompleto',
+      );
+      return;
+    }
 
     this.isSaving = true;
     const dados = { ...this.form.getRawValue(), id: this.empresaId };
