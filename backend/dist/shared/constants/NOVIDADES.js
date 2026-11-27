@@ -3,6 +3,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VERSAO_ATUAL = exports.NOVIDADES = void 0;
 exports.NOVIDADES = [
     {
+        versao: '2.4.0',
+        data: '27/11/2026',
+        itens: [
+            'Pedido no celular: os itens viraram cartões. Toque em "Adicionar item" ou em um cartão para abrir um editor em tela cheia, com botões grandes para o tipo, quantidade com − e + e a opção "Concluir e adicionar outro".',
+            'Desenho à mão: abre sempre na horizontal. No Android a tela gira sozinha e fica em tela cheia; no iPhone aparece um aviso para girar o celular. No celular, o desenho ocupa toda a tela e as medidas ficam no botão "Medidas", que mostra quantas já foram preenchidas.',
+            'Listagens no celular: todas as telas passaram a mostrar cartões com nome, detalhes, valor e status. Toque no cartão para editar ou no botão ⋮ para as outras ações. A pesquisa ignora acentos e o botão "Carregar mais" traz mais registros.',
+            'Atualização automática: quando sai uma versão nova, o sistema se atualiza sozinho, sem precisar de Ctrl+F5. Se você estiver usando a tela, a atualização acontece na próxima troca de tela, para não perder o que está preenchendo.',
+            'Filtros: os painéis de filtro agora começam fechados. Toque no título para abrir.',
+        ],
+    },
+    {
         versao: '2.3.1',
         data: '27/11/2026',
         itens: [
